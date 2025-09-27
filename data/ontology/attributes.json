@@ -1,0 +1,108 @@
+[
+  {
+    "id": "attr:fat_pct",
+    "name": "Fat % (dairy)",
+    "role": "identity_param",
+    "kind": "number",
+    "notes": "Dairy standardization"
+  },
+  {
+    "id": "attr:lean_pct",
+    "name": "Lean % (meat)",
+    "role": "identity_param",
+    "kind": "number"
+  },
+  {
+    "id": "attr:salt_level",
+    "name": "Salt level",
+    "role": "identity_param",
+    "kind": "enum",
+    "enum": [
+      "no_salt",
+      "low_salt",
+      "regular"
+    ]
+  },
+  {
+    "id": "attr:refinement",
+    "name": "Refinement",
+    "role": "identity_param",
+    "kind": "enum",
+    "enum": [
+      "whole",
+      "refined",
+      "00"
+    ]
+  },
+  {
+    "id": "attr:enrichment",
+    "name": "Enrichment",
+    "role": "identity_param",
+    "kind": "enum",
+    "enum": [
+      "none",
+      "std_enriched",
+      "custom"
+    ]
+  },
+  {
+    "id": "attr:process",
+    "name": "Process (raw/cooked)",
+    "role": "identity_param",
+    "kind": "enum",
+    "enum": [
+      "raw",
+      "boil",
+      "steam",
+      "bake",
+      "roast",
+      "fry",
+      "broil"
+    ]
+  },
+  {
+    "id": "attr:style",
+    "name": "Style",
+    "role": "identity_param",
+    "kind": "enum",
+    "enum": [
+      "greek",
+      "regular"
+    ]
+  },
+  {
+    "id": "attr:ripeness_bucket",
+    "name": "Ripeness bucket",
+    "role": "covariate",
+    "kind": "enum",
+    "enum": [
+      "unripe",
+      "ripe",
+      "overripe"
+    ]
+  },
+  {
+    "id": "attr:region",
+    "name": "Region",
+    "role": "covariate",
+    "kind": "string"
+  },
+  {
+    "id": "attr:lab_code",
+    "name": "Lab code",
+    "role": "covariate",
+    "kind": "string"
+  },
+  {
+    "id": "attr:color",
+    "name": "Color",
+    "role": "facet",
+    "kind": "string"
+  },
+  {
+    "id": "attr:brand",
+    "name": "Brand",
+    "role": "facet",
+    "kind": "string"
+  }
+]

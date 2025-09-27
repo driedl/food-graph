@@ -1,0 +1,32 @@
+{
+  "$id": "part.schema.json",
+  "title": "Part",
+  "type": "object",
+  "required": [
+    "id",
+    "name"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Stable part ID, e.g., part:fruit, part:milk"
+    },
+    "name": {
+      "type": "string"
+    },
+    "kind": {
+      "type": "string",
+      "description": "plant|animal|fungus|any"
+    },
+    "applies_to": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Optional list of taxon IDs this part explicitly applies to"
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}

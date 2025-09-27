@@ -1,0 +1,44 @@
+[
+  {
+    "id": "part:fruit",
+    "name": "Fruit",
+    "kind": "plant",
+    "applies_to": [],
+    "notes": "Fleshy fruit tissue"
+  },
+  {
+    "id": "part:seed",
+    "name": "Seed",
+    "kind": "plant",
+    "applies_to": []
+  },
+  {
+    "id": "part:leaf",
+    "name": "Leaf",
+    "kind": "plant",
+    "applies_to": []
+  },
+  {
+    "id": "part:grain",
+    "name": "Caryopsis (Grain)",
+    "kind": "plant",
+    "applies_to": [
+      "tx:plantae:poaceae"
+    ],
+    "notes": "Grass family grains"
+  },
+  {
+    "id": "part:milk",
+    "name": "Milk",
+    "kind": "animal",
+    "applies_to": [
+      "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus"
+    ]
+  },
+  {
+    "id": "part:muscle",
+    "name": "Muscle",
+    "kind": "animal",
+    "applies_to": []
+  }
+]

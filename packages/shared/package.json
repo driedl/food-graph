@@ -1,0 +1,14 @@
+{
+  "name": "@nutrition/shared",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "dev": "echo shared:dev",
+    "build": "echo shared:build",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint ."
+  }
+}

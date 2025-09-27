@@ -1,0 +1,44 @@
+{
+  "$id": "taxon.schema.json",
+  "title": "Taxon",
+  "type": "object",
+  "required": [
+    "id",
+    "parent",
+    "rank",
+    "display_name",
+    "latin_name"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Stable taxon ID, e.g., tx:plantae:rosaceae:malus:domestica"
+    },
+    "parent": {
+      "type": "string",
+      "description": "Parent taxon ID or null for root"
+    },
+    "rank": {
+      "type": "string",
+      "description": "Taxonomic rank or domain-level bucket (kingdom, family, genus, species, cultivar, etc.)"
+    },
+    "display_name": {
+      "type": "string"
+    },
+    "latin_name": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "aliases": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

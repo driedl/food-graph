@@ -1,0 +1,56 @@
+[
+  {
+    "id": "nutr:energy_kcal",
+    "name": "Energy",
+    "unit": "kcal/100g",
+    "short_name": "kcal"
+  },
+  {
+    "id": "nutr:protein_g",
+    "name": "Protein",
+    "unit": "g/100g",
+    "short_name": "Protein"
+  },
+  {
+    "id": "nutr:fat_g",
+    "name": "Fat",
+    "unit": "g/100g",
+    "short_name": "Fat"
+  },
+  {
+    "id": "nutr:carb_g",
+    "name": "Carbohydrate",
+    "unit": "g/100g",
+    "short_name": "Carb"
+  },
+  {
+    "id": "nutr:fiber_g",
+    "name": "Fiber",
+    "unit": "g/100g",
+    "short_name": "Fiber"
+  },
+  {
+    "id": "nutr:sugar_g",
+    "name": "Sugars",
+    "unit": "g/100g",
+    "short_name": "Sugar"
+  },
+  {
+    "id": "nutr:water_g",
+    "name": "Water",
+    "unit": "g/100g",
+    "short_name": "Water"
+  },
+  {
+    "id": "nutr:sodium_mg",
+    "name": "Sodium",
+    "unit": "mg/100g",
+    "short_name": "Na"
+  },
+  {
+    "id": "nutr:potassium_mg",
+    "name": "Potassium",
+    "unit": "mg/100g",
+    "short_name": "K"
+  }
+]

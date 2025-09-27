@@ -1,0 +1,109 @@
+[
+  {
+    "id": "tf:skim",
+    "name": "Standardize fat (skim/fortify)",
+    "identity": true,
+    "params": [
+      {
+        "key": "fat_pct",
+        "kind": "number",
+        "unit": "% m/m"
+      }
+    ],
+    "notes": "Standardization of dairy fat percentage"
+  },
+  {
+    "id": "tf:strain",
+    "name": "Strain (whey removal)",
+    "identity": true,
+    "params": [
+      {
+        "key": "yield_factor",
+        "kind": "number",
+        "unit": "ratio"
+      },
+      {
+        "key": "water_loss",
+        "kind": "number",
+        "unit": "% m/m"
+      }
+    ],
+    "notes": "Covers Greek-style yogurt via whey removal"
+  },
+  {
+    "id": "tf:cook",
+    "name": "Cook",
+    "identity": true,
+    "params": [
+      {
+        "key": "method",
+        "kind": "enum",
+        "enum": [
+          "raw",
+          "boil",
+          "steam",
+          "bake",
+          "roast",
+          "fry",
+          "broil"
+        ]
+      },
+      {
+        "key": "fat_added",
+        "kind": "boolean"
+      }
+    ],
+    "notes": "Thermal processing"
+  },
+  {
+    "id": "tf:brine",
+    "name": "Brine/Can (Salt)",
+    "identity": true,
+    "params": [
+      {
+        "key": "salt_level",
+        "kind": "enum",
+        "enum": [
+          "no_salt",
+          "low_salt",
+          "regular"
+        ]
+      }
+    ],
+    "notes": "Sodium-affecting canning/brine"
+  },
+  {
+    "id": "tf:mill",
+    "name": "Mill/Refine",
+    "identity": true,
+    "params": [
+      {
+        "key": "refinement",
+        "kind": "enum",
+        "enum": [
+          "whole",
+          "refined",
+          "00"
+        ]
+      }
+    ],
+    "notes": "Grain milling/refinement"
+  },
+  {
+    "id": "tf:enrich",
+    "name": "Enrich fortification",
+    "identity": true,
+    "params": [
+      {
+        "key": "enrichment",
+        "kind": "enum",
+        "enum": [
+          "none",
+          "std_enriched",
+          "custom"
+        ]
+      }
+    ],
+    "notes": "Post-mill enrichment of select micronutrients"
+  }
+]

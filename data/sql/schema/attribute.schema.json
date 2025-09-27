@@ -1,0 +1,47 @@
+{
+  "$id": "attribute.schema.json",
+  "title": "Attribute",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "role",
+    "kind"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "attr:fad_pct, attr:salt_level"
+    },
+    "name": {
+      "type": "string"
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "identity_param",
+        "taxon_refinement",
+        "covariate",
+        "facet"
+      ]
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "number",
+        "string",
+        "enum",
+        "boolean"
+      ]
+    },
+    "enum": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}

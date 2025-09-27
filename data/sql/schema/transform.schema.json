@@ -1,0 +1,60 @@
+{
+  "$id": "transform.schema.json",
+  "title": "Transform Family",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "params",
+    "identity"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "tf:skim, tf:cook, tf:strain, tf:mill, tf:enrich"
+    },
+    "name": {
+      "type": "string"
+    },
+    "identity": {
+      "type": "boolean",
+      "description": "True if transform is identity-bearing (affects FoodState identity)"
+    },
+    "params": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "key",
+          "kind"
+        ],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "number",
+              "string",
+              "enum",
+              "boolean"
+            ]
+          },
+          "unit": {
+            "type": "string"
+          },
+          "enum": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}

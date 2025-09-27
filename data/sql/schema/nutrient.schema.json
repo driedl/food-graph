@@ -1,0 +1,31 @@
+{
+  "$id": "nutrient.schema.json",
+  "title": "Nutrient",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "unit"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "nutr:energy_kcal, nutr:protein_g"
+    },
+    "name": {
+      "type": "string"
+    },
+    "unit": {
+      "type": "string"
+    },
+    "short_name": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

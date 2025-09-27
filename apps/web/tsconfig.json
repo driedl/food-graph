@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@nutrition/shared/*": ["../../packages/shared/src/*"],
+      "@ui/*": ["src/components/ui/*"]
+    }
+  },
+  "include": ["src", "vite.config.ts"]
+}
