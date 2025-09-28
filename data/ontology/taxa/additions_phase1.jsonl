@@ -1,0 +1,76 @@
+{"id":"tx:plantae:rosaceae:malus:domestica:fuji","parent":"tx:plantae:rosaceae:malus:domestica","rank":"cultivar","display_name":"Apple (Fuji)","latin_name":"Malus domestica 'Fuji'","aliases":["fuji apple","fuji"],"tags":[]}
+{"id":"tx:plantae:rosaceae:malus:domestica:gala","parent":"tx:plantae:rosaceae:malus:domestica","rank":"cultivar","display_name":"Apple (Gala)","latin_name":"Malus domestica 'Gala'","aliases":["gala apple","gala"],"tags":[]}
+{"id":"tx:plantae:rosaceae:malus:domestica:granny_smith","parent":"tx:plantae:rosaceae:malus:domestica","rank":"cultivar","display_name":"Apple (Granny Smith)","latin_name":"Malus domestica 'Granny Smith'","aliases":["granny smith"],"tags":[]}
+{"id":"tx:plantae:rosaceae:malus:domestica:honeycrisp","parent":"tx:plantae:rosaceae:malus:domestica","rank":"cultivar","display_name":"Apple (Honeycrisp)","latin_name":"Malus domestica 'Honeycrisp'","aliases":["honeycrisp"],"tags":[]}
+{"id":"tx:plantae:rosaceae:malus:domestica:red_delicious","parent":"tx:plantae:rosaceae:malus:domestica","rank":"cultivar","display_name":"Apple (Red Delicious)","latin_name":"Malus domestica 'Red Delicious'","aliases":["red delicious"],"tags":[]}
+
+{"id":"tx:plantae:rosaceae:fragaria","parent":"tx:plantae:rosaceae","rank":"genus","display_name":"Fragaria","latin_name":"Fragaria","aliases":[],"tags":[]}
+{"id":"tx:plantae:rosaceae:fragaria:x_ananassa","parent":"tx:plantae:rosaceae:fragaria","rank":"species","display_name":"Strawberry","latin_name":"Fragaria × ananassa","aliases":["strawberry","strawberries"],"tags":["foundation"]}
+
+{"id":"tx:plantae:rosaceae:prunus:domestica","parent":"tx:plantae:rosaceae:prunus","rank":"species","display_name":"Plum","latin_name":"Prunus domestica","aliases":["plum","black plum"],"tags":[]}
+
+{"id":"tx:plantae:oleaceae","parent":"tx:plantae","rank":"family","display_name":"Oleaceae","latin_name":"Oleaceae","aliases":[],"tags":[]}
+{"id":"tx:plantae:oleaceae:olea","parent":"tx:plantae:oleaceae","rank":"genus","display_name":"Olea","latin_name":"Olea","aliases":[],"tags":[]}
+{"id":"tx:plantae:oleaceae:olea:europaea","parent":"tx:plantae:oleaceae:olea","rank":"species","display_name":"Olive","latin_name":"Olea europaea","aliases":["olive","olives"],"tags":["foundation"]}
+
+{"id":"tx:plantae:arecaceae","parent":"tx:plantae","rank":"family","display_name":"Arecaceae","latin_name":"Arecaceae","aliases":[],"tags":[]}
+{"id":"tx:plantae:arecaceae:cocos","parent":"tx:plantae:arecaceae","rank":"genus","display_name":"Cocos","latin_name":"Cocos","aliases":[],"tags":[]}
+{"id":"tx:plantae:arecaceae:cocos:nucifera","parent":"tx:plantae:arecaceae:cocos","rank":"species","display_name":"Coconut","latin_name":"Cocos nucifera","aliases":["coconut"],"tags":["foundation"]}
+
+{"id":"tx:plantae:fagaceae","parent":"tx:plantae","rank":"family","display_name":"Fagaceae","latin_name":"Fagaceae","aliases":[],"tags":[]}
+{"id":"tx:plantae:fagaceae:castanea","parent":"tx:plantae:fagaceae","rank":"genus","display_name":"Castanea","latin_name":"Castanea","aliases":[],"tags":[]}
+{"id":"tx:plantae:fagaceae:castanea:sativa","parent":"tx:plantae:fagaceae:castanea","rank":"species","display_name":"Chestnut","latin_name":"Castanea sativa","aliases":["chestnut","chestnuts"],"tags":[]}
+
+{"id":"tx:plantae:euphorbiaceae","parent":"tx:plantae","rank":"family","display_name":"Euphorbiaceae","latin_name":"Euphorbiaceae","aliases":[],"tags":[]}
+{"id":"tx:plantae:euphorbiaceae:manihot","parent":"tx:plantae:euphorbiaceae","rank":"genus","display_name":"Manihot","latin_name":"Manihot","aliases":[],"tags":[]}
+{"id":"tx:plantae:euphorbiaceae:manihot:esculenta","parent":"tx:plantae:euphorbiaceae:manihot","rank":"species","display_name":"Cassava","latin_name":"Manihot esculenta","aliases":["cassava","yuca","manioc"],"tags":[]}
+
+{"id":"tx:plantae:poaceae:oryza:sativa:black","parent":"tx:plantae:poaceae:oryza:sativa","rank":"form","display_name":"Rice (black)","latin_name":"Oryza sativa (black varieties)","aliases":["black rice"],"tags":[]}
+{"id":"tx:plantae:poaceae:oryza:sativa:red","parent":"tx:plantae:poaceae:oryza:sativa","rank":"form","display_name":"Rice (red)","latin_name":"Oryza sativa (red varieties)","aliases":["red rice"],"tags":[]}
+{"id":"tx:plantae:poaceae:oryza:sativa:long_grain_white","parent":"tx:plantae:poaceae:oryza:sativa","rank":"form","display_name":"Rice (long grain, white)","latin_name":"Oryza sativa (long-grain, white)","aliases":["long grain white rice"],"tags":[]}
+{"id":"tx:plantae:poaceae:oryza:sativa:long_grain_brown","parent":"tx:plantae:poaceae:oryza:sativa","rank":"form","display_name":"Rice (long grain, brown)","latin_name":"Oryza sativa (long-grain, brown)","aliases":["long grain brown rice"],"tags":[]}
+{"id":"tx:plantae:poaceae:oryza:sativa:glutinous","parent":"tx:plantae:poaceae:oryza:sativa","rank":"variety","display_name":"Rice (glutinous)","latin_name":"Oryza sativa var. glutinosa","aliases":["sticky rice","sweet rice","glutinous rice"],"tags":[]}
+
+{"id":"tx:plantae:fabaceae:phaseolus:vulgaris:black","parent":"tx:plantae:fabaceae:phaseolus:vulgaris","rank":"form","display_name":"Bean (black, dry)","latin_name":"Phaseolus vulgaris (black)","aliases":["black bean (dry)"],"tags":[]}
+{"id":"tx:plantae:fabaceae:phaseolus:vulgaris:pinto","parent":"tx:plantae:fabaceae:phaseolus:vulgaris","rank":"form","display_name":"Bean (pinto, dry)","latin_name":"Phaseolus vulgaris (pinto)","aliases":["pinto bean (dry)"],"tags":[]}
+{"id":"tx:plantae:fabaceae:phaseolus:vulgaris:dark_red_kidney","parent":"tx:plantae:fabaceae:phaseolus:vulgaris","rank":"form","display_name":"Bean (kidney, dark red, dry)","latin_name":"Phaseolus vulgaris (dark red kidney)","aliases":["kidney bean dark red"],"tags":[]}
+{"id":"tx:plantae:fabaceae:phaseolus:vulgaris:light_red_kidney","parent":"tx:plantae:fabaceae:phaseolus:vulgaris","rank":"form","display_name":"Bean (kidney, light red, dry)","latin_name":"Phaseolus vulgaris (light red kidney)","aliases":["kidney bean light red"],"tags":[]}
+{"id":"tx:plantae:fabaceae:phaseolus:vulgaris:navy","parent":"tx:plantae:fabaceae:phaseolus:vulgaris","rank":"form","display_name":"Bean (navy, dry)","latin_name":"Phaseolus vulgaris (navy)","aliases":["navy bean (dry)"],"tags":[]}
+{"id":"tx:plantae:fabaceae:phaseolus:vulgaris:great_northern","parent":"tx:plantae:fabaceae:phaseolus:vulgaris","rank":"form","display_name":"Bean (great northern, dry)","latin_name":"Phaseolus vulgaris (great northern)","aliases":["great northern bean (dry)"],"tags":[]}
+{"id":"tx:plantae:fabaceae:phaseolus:vulgaris:small_red","parent":"tx:plantae:fabaceae:phaseolus:vulgaris","rank":"form","display_name":"Bean (small red, dry)","latin_name":"Phaseolus vulgaris (small red)","aliases":["small red bean"],"tags":[]}
+{"id":"tx:plantae:fabaceae:phaseolus:vulgaris:small_white","parent":"tx:plantae:fabaceae:phaseolus:vulgaris","rank":"form","display_name":"Bean (small white, dry)","latin_name":"Phaseolus vulgaris (small white)","aliases":["small white bean"],"tags":[]}
+{"id":"tx:plantae:fabaceae:phaseolus:vulgaris:cranberry","parent":"tx:plantae:fabaceae:phaseolus:vulgaris","rank":"form","display_name":"Bean (cranberry, dry)","latin_name":"Phaseolus vulgaris (cranberry)","aliases":["cranberry bean"],"tags":[]}
+{"id":"tx:plantae:fabaceae:phaseolus:vulgaris:carioca","parent":"tx:plantae:fabaceae:phaseolus:vulgaris","rank":"form","display_name":"Bean (carioca, dry)","latin_name":"Phaseolus vulgaris (carioca)","aliases":["carioca bean"],"tags":[]}
+{"id":"tx:plantae:fabaceae:phaseolus:vulgaris:flor_de_mayo","parent":"tx:plantae:fabaceae:phaseolus:vulgaris","rank":"form","display_name":"Bean (flor de mayo, dry)","latin_name":"Phaseolus vulgaris (flor de mayo)","aliases":["flor de mayo bean"],"tags":[]}
+{"id":"tx:plantae:fabaceae:phaseolus:vulgaris:pink","parent":"tx:plantae:fabaceae:phaseolus:vulgaris","rank":"form","display_name":"Bean (pink, dry)","latin_name":"Phaseolus vulgaris (pink)","aliases":["pink bean"],"tags":[]}
+{"id":"tx:plantae:fabaceae:phaseolus:vulgaris:medium_red","parent":"tx:plantae:fabaceae:phaseolus:vulgaris","rank":"form","display_name":"Bean (medium red, dry)","latin_name":"Phaseolus vulgaris (medium red)","aliases":["medium red bean"],"tags":[]}
+
+{"id":"tx:plantae:brassicaceae:brassica:oleracea:kale","parent":"tx:plantae:brassicaceae:brassica:oleracea","rank":"variety","display_name":"Kale","latin_name":"Brassica oleracea var. acephala","aliases":["kale"],"tags":[]}
+{"id":"tx:plantae:brassicaceae:brassica:oleracea:brussels_sprouts","parent":"tx:plantae:brassicaceae:brassica:oleracea","rank":"variety","display_name":"Brussels sprouts","latin_name":"Brassica oleracea var. gemmifera","aliases":["brussels sprouts"],"tags":[]}
+{"id":"tx:plantae:brassicaceae:brassica:oleracea:cabbage_green","parent":"tx:plantae:brassicaceae:brassica:oleracea","rank":"variety","display_name":"Cabbage (green)","latin_name":"Brassica oleracea var. capitata","aliases":["green cabbage"],"tags":[]}
+
+{"id":"tx:plantae:brassicaceae:brassica:rapa:bok_choy","parent":"tx:plantae:brassicaceae:brassica:rapa","rank":"variety","display_name":"Bok choy","latin_name":"Brassica rapa var. chinensis","aliases":["pak choi","bok choy"],"tags":[]}
+{"id":"tx:plantae:brassicaceae:brassica:rapa:napa","parent":"tx:plantae:brassicaceae:brassica:rapa","rank":"variety","display_name":"Napa cabbage","latin_name":"Brassica rapa var. pekinensis","aliases":["napa","Chinese cabbage"],"tags":[]}
+
+{"id":"tx:plantae:amaryllidaceae:allium:cepa:shallot","parent":"tx:plantae:amaryllidaceae:allium:cepa","rank":"form","display_name":"Shallot","latin_name":"Allium cepa (Aggregatum Group)","aliases":["shallot"],"tags":[]}
+
+{"id":"tx:plantae:brassicaceae:brassica:napus","parent":"tx:plantae:brassicaceae:brassica","rank":"species","display_name":"Rapeseed / Canola","latin_name":"Brassica napus","aliases":["rapeseed","canola"],"tags":[]}
+{"id":"tx:plantae:brassicaceae:brassica:napus:napobrassica","parent":"tx:plantae:brassicaceae:brassica:napus","rank":"variety","display_name":"Rutabaga","latin_name":"Brassica napus var. napobrassica","aliases":["rutabaga","swede"],"tags":[]}
+
+{"id":"tx:plantae:cucurbitaceae:cucurbita:pepo:acorn","parent":"tx:plantae:cucurbitaceae:cucurbita:pepo","rank":"variety","display_name":"Acorn squash","latin_name":"Cucurbita pepo (Acorn group)","aliases":["acorn squash"],"tags":[]}
+{"id":"tx:plantae:cucurbitaceae:cucurbita:pepo:spaghetti","parent":"tx:plantae:cucurbitaceae:cucurbita:pepo","rank":"variety","display_name":"Spaghetti squash","latin_name":"Cucurbita pepo (Spaghetti group)","aliases":["spaghetti squash"],"tags":[]}
+
+{"id":"tx:plantae:vitaceae:vitis:vinifera:thompson_seedless","parent":"tx:plantae:vitaceae:vitis:vinifera","rank":"cultivar","display_name":"Grape (Thompson Seedless)","latin_name":"Vitis vinifera 'Thompson Seedless'","aliases":["green seedless grape"],"tags":[]}
+{"id":"tx:plantae:vitaceae:vitis:vinifera:crimson_seedless","parent":"tx:plantae:vitaceae:vitis:vinifera","rank":"cultivar","display_name":"Grape (Crimson Seedless)","latin_name":"Vitis vinifera 'Crimson Seedless'","aliases":["red seedless grape"],"tags":[]}
+
+{"id":"tx:animalia:penaeidae","parent":"tx:animalia","rank":"family","display_name":"Penaeidae","latin_name":"Penaeidae","aliases":[],"tags":[]}
+{"id":"tx:animalia:penaeidae:litopenaeus","parent":"tx:animalia:penaeidae","rank":"genus","display_name":"Litopenaeus","latin_name":"Litopenaeus","aliases":[],"tags":[]}
+{"id":"tx:animalia:penaeidae:litopenaeus:vannamei","parent":"tx:animalia:penaeidae:litopenaeus","rank":"species","display_name":"Whiteleg shrimp","latin_name":"Litopenaeus vannamei","aliases":["pacific white shrimp","whiteleg shrimp","shrimp"],"tags":[]}
+
+{"id":"tx:animalia:portunidae","parent":"tx:animalia","rank":"family","display_name":"Portunidae","latin_name":"Portunidae","aliases":[],"tags":[]}
+{"id":"tx:animalia:portunidae:portunus","parent":"tx:animalia:portunidae","rank":"genus","display_name":"Portunus","latin_name":"Portunus","aliases":[],"tags":[]}
+{"id":"tx:animalia:portunidae:portunus:pelagicus","parent":"tx:animalia:portunidae:portunus","rank":"species","display_name":"Blue swimming crab","latin_name":"Portunus pelagicus","aliases":["blue swimming crab","portunus"],"tags":[]}
+
+{"id":"tx:animalia:scombridae","parent":"tx:animalia","rank":"family","display_name":"Scombridae","latin_name":"Scombridae","aliases":[],"tags":[]}
+{"id":"tx:animalia:scombridae:katsuwonus","parent":"tx:animalia:scombridae","rank":"genus","display_name":"Katsuwonus","latin_name":"Katsuwonus","aliases":[],"tags":[]}
+{"id":"tx:animalia:scombridae:katsuwonus:pelamis","parent":"tx:animalia:scombridae:katsuwonus","rank":"species","display_name":"Skipjack tuna","latin_name":"Katsuwonus pelamis","aliases":["skipjack","light tuna"],"tags":[]}

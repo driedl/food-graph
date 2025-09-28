@@ -17,4 +17,194 @@
 {"id": "tx:plantae:fagales:betulaceae", "parent": "tx:plantae", "rank": "family", "display_name": "Betulaceae", "latin_name": "Betulaceae", "aliases": [], "tags": []}
 {"id": "tx:plantae:fagales:betulaceae:corylus", "parent": "tx:plantae:fagales:betulaceae", "rank": "genus", "display_name": "Hazelnut (genus)", "latin_name": "Corylus", "aliases": [], "tags": []}
 {"id": "tx:plantae:fagales:betulaceae:corylus:avellana", "parent": "tx:plantae:fagales:betulaceae:corylus", "rank": "species", "display_name": "Hazelnut", "latin_name": "Corylus avellana", "aliases": ["hazelnut", "filbert"], "tags": ["foundation"]}
-{"id": "tx:plantae:fabaceae:cicer:arietinum", "parent": "tx:plantae", "rank": "species", "display_name": "Chickpea", "latin_name": "Cicer arietinum", "aliases": ["chickpea", "garbanzo"], "tags": ["foundation"]}
+{"id": "tx:plantae:fabaceae:cicer", "parent": "tx:plantae:fabaceae", "rank": "genus", "display_name": "Cicer", "latin_name": "Cicer", "aliases": [], "tags": []}
+{"id": "tx:plantae:fabaceae:cicer:arietinum", "parent": "tx:plantae:fabaceae:cicer", "rank": "species", "display_name": "Chickpea", "latin_name": "Cicer arietinum", "aliases": ["chickpea", "garbanzo"], "tags": ["foundation"]}
+{"id":"tx:plantae:vitaceae","parent":"tx:plantae","rank":"family","display_name":"Vitaceae","latin_name":"Vitaceae","aliases":[],"tags":[]}
+{"id":"tx:plantae:vitaceae:vitis","parent":"tx:plantae:vitaceae","rank":"genus","display_name":"Vitis","latin_name":"Vitis","aliases":[],"tags":[]}
+{"id":"tx:plantae:vitaceae:vitis:vinifera","parent":"tx:plantae:vitaceae:vitis","rank":"species","display_name":"Grape","latin_name":"Vitis vinifera","aliases":["grape","table grape"],"tags":["foundation"]}
+
+{"id":"tx:plantae:ericaceae","parent":"tx:plantae","rank":"family","display_name":"Ericaceae","latin_name":"Ericaceae","aliases":[],"tags":[]}
+{"id":"tx:plantae:ericaceae:vaccinium","parent":"tx:plantae:ericaceae","rank":"genus","display_name":"Vaccinium","latin_name":"Vaccinium","aliases":[],"tags":[]}
+{"id":"tx:plantae:ericaceae:vaccinium:corymbosum","parent":"tx:plantae:ericaceae:vaccinium","rank":"species","display_name":"Blueberry","latin_name":"Vaccinium corymbosum","aliases":["blueberry","blueberries"],"tags":["foundation"]}
+
+{"id":"tx:plantae:rosaceae:prunus","parent":"tx:plantae:rosaceae","rank":"genus","display_name":"Prunus","latin_name":"Prunus","aliases":[],"tags":[]}
+{"id":"tx:plantae:rosaceae:prunus:avium","parent":"tx:plantae:rosaceae:prunus","rank":"species","display_name":"Sweet cherry","latin_name":"Prunus avium","aliases":["cherry","sweet cherry"],"tags":["foundation"]}
+{"id":"tx:plantae:rosaceae:prunus:persica","parent":"tx:plantae:rosaceae:prunus","rank":"species","display_name":"Peach","latin_name":"Prunus persica","aliases":["peach","peaches"],"tags":["foundation"]}
+{"id":"tx:plantae:rosaceae:prunus:persica:nucipersica","parent":"tx:plantae:rosaceae:prunus:persica","rank":"variety","display_name":"Nectarine","latin_name":"Prunus persica var. nucipersica","aliases":["nectarine"],"tags":["foundation"]}
+{"id":"tx:plantae:rosaceae:prunus:dulcis","parent":"tx:plantae:rosaceae:prunus","rank":"species","display_name":"Almond","latin_name":"Prunus dulcis","aliases":["almond","almonds"],"tags":["foundation"]}
+
+{"id":"tx:plantae:rosaceae:rubus","parent":"tx:plantae:rosaceae","rank":"genus","display_name":"Rubus","latin_name":"Rubus","aliases":[],"tags":[]}
+{"id":"tx:plantae:rosaceae:rubus:idaeus","parent":"tx:plantae:rosaceae:rubus","rank":"species","display_name":"Raspberry","latin_name":"Rubus idaeus","aliases":["raspberry","raspberries"],"tags":["foundation"]}
+{"id":"tx:plantae:rosaceae:rubus:fruticosus","parent":"tx:plantae:rosaceae:rubus","rank":"species","display_name":"Blackberry","latin_name":"Rubus fruticosus","aliases":["blackberry","blackberries"],"tags":["foundation"]}
+
+{"id":"tx:plantae:rosaceae:pyrus","parent":"tx:plantae:rosaceae","rank":"genus","display_name":"Pyrus","latin_name":"Pyrus","aliases":[],"tags":[]}
+{"id":"tx:plantae:rosaceae:pyrus:communis","parent":"tx:plantae:rosaceae:pyrus","rank":"species","display_name":"Pear","latin_name":"Pyrus communis","aliases":["pear","pears"],"tags":["foundation"]}
+{"id":"tx:plantae:rosaceae:pyrus:communis:anjou","parent":"tx:plantae:rosaceae:pyrus:communis","rank":"cultivar","display_name":"Pear (Anjou)","latin_name":"Pyrus communis 'Anjou'","aliases":["anjou pear","anjou"],"tags":[]}
+{"id":"tx:plantae:rosaceae:pyrus:communis:bartlett","parent":"tx:plantae:rosaceae:pyrus:communis","rank":"cultivar","display_name":"Pear (Bartlett)","latin_name":"Pyrus communis 'Bartlett'","aliases":["bartlett pear","bartlett"],"tags":[]}
+
+{"id":"tx:plantae:anacardiaceae","parent":"tx:plantae","rank":"family","display_name":"Anacardiaceae","latin_name":"Anacardiaceae","aliases":[],"tags":[]}
+{"id":"tx:plantae:anacardiaceae:mangifera","parent":"tx:plantae:anacardiaceae","rank":"genus","display_name":"Mangifera","latin_name":"Mangifera","aliases":[],"tags":[]}
+{"id":"tx:plantae:anacardiaceae:mangifera:indica","parent":"tx:plantae:anacardiaceae:mangifera","rank":"species","display_name":"Mango","latin_name":"Mangifera indica","aliases":["mango"],"tags":["foundation"]}
+{"id":"tx:plantae:anacardiaceae:mangifera:indica:ataulfo","parent":"tx:plantae:anacardiaceae:mangifera:indica","rank":"cultivar","display_name":"Mango (Ataulfo)","latin_name":"Mangifera indica 'Ataulfo'","aliases":["ataulfo","honey mango"],"tags":[]}
+{"id":"tx:plantae:anacardiaceae:mangifera:indica:tommy_atkins","parent":"tx:plantae:anacardiaceae:mangifera:indica","rank":"cultivar","display_name":"Mango (Tommy Atkins)","latin_name":"Mangifera indica 'Tommy Atkins'","aliases":["tommy atkins"],"tags":[]}
+{"id":"tx:plantae:anacardiaceae:anacardium","parent":"tx:plantae:anacardiaceae","rank":"genus","display_name":"Anacardium","latin_name":"Anacardium","aliases":[],"tags":[]}
+{"id":"tx:plantae:anacardiaceae:anacardium:occidentale","parent":"tx:plantae:anacardiaceae:anacardium","rank":"species","display_name":"Cashew","latin_name":"Anacardium occidentale","aliases":["cashew","cashews"],"tags":["foundation"]}
+{"id":"tx:plantae:anacardiaceae:pistacia","parent":"tx:plantae:anacardiaceae","rank":"genus","display_name":"Pistachio (genus)","latin_name":"Pistacia","aliases":[],"tags":[]}
+{"id":"tx:plantae:anacardiaceae:pistacia:vera","parent":"tx:plantae:anacardiaceae:pistacia","rank":"species","display_name":"Pistachio","latin_name":"Pistacia vera","aliases":["pistachio","pistachios"],"tags":["foundation"]}
+
+{"id":"tx:plantae:juglandaceae","parent":"tx:plantae","rank":"family","display_name":"Juglandaceae","latin_name":"Juglandaceae","aliases":[],"tags":[]}
+{"id":"tx:plantae:juglandaceae:juglans","parent":"tx:plantae:juglandaceae","rank":"genus","display_name":"Juglans","latin_name":"Juglans","aliases":[],"tags":[]}
+{"id":"tx:plantae:juglandaceae:juglans:regia","parent":"tx:plantae:juglandaceae:juglans","rank":"species","display_name":"Walnut (English)","latin_name":"Juglans regia","aliases":["walnut","english walnut"],"tags":["foundation"]}
+{"id":"tx:plantae:juglandaceae:carya","parent":"tx:plantae:juglandaceae","rank":"genus","display_name":"Carya","latin_name":"Carya","aliases":[],"tags":[]}
+{"id":"tx:plantae:juglandaceae:carya:illinoinensis","parent":"tx:plantae:juglandaceae:carya","rank":"species","display_name":"Pecan","latin_name":"Carya illinoinensis","aliases":["pecan","pecans"],"tags":["foundation"]}
+
+{"id":"tx:plantae:proteaceae","parent":"tx:plantae","rank":"family","display_name":"Proteaceae","latin_name":"Proteaceae","aliases":[],"tags":[]}
+{"id":"tx:plantae:proteaceae:macadamia","parent":"tx:plantae:proteaceae","rank":"genus","display_name":"Macadamia","latin_name":"Macadamia","aliases":[],"tags":[]}
+{"id":"tx:plantae:proteaceae:macadamia:integrifolia","parent":"tx:plantae:proteaceae:macadamia","rank":"species","display_name":"Macadamia","latin_name":"Macadamia integrifolia","aliases":["macadamia","macadamia nuts"],"tags":["foundation"]}
+
+{"id":"tx:plantae:lecythidaceae","parent":"tx:plantae","rank":"family","display_name":"Lecythidaceae","latin_name":"Lecythidaceae","aliases":[],"tags":[]}
+{"id":"tx:plantae:lecythidaceae:bertholletia","parent":"tx:plantae:lecythidaceae","rank":"genus","display_name":"Bertholletia","latin_name":"Bertholletia","aliases":[],"tags":[]}
+{"id":"tx:plantae:lecythidaceae:bertholletia:excelsa","parent":"tx:plantae:lecythidaceae:bertholletia","rank":"species","display_name":"Brazil nut","latin_name":"Bertholletia excelsa","aliases":["brazil nut","brazil nuts"],"tags":["foundation"]}
+
+{"id":"tx:plantae:lauraceae","parent":"tx:plantae","rank":"family","display_name":"Lauraceae","latin_name":"Lauraceae","aliases":[],"tags":[]}
+{"id":"tx:plantae:lauraceae:persea","parent":"tx:plantae:lauraceae","rank":"genus","display_name":"Persea","latin_name":"Persea","aliases":[],"tags":[]}
+{"id":"tx:plantae:lauraceae:persea:americana","parent":"tx:plantae:lauraceae:persea","rank":"species","display_name":"Avocado","latin_name":"Persea americana","aliases":["avocado"],"tags":["foundation"]}
+{"id":"tx:plantae:lauraceae:persea:americana:hass","parent":"tx:plantae:lauraceae:persea:americana","rank":"cultivar","display_name":"Avocado (Hass)","latin_name":"Persea americana 'Hass'","aliases":["hass avocado","hass"],"tags":[]}
+
+{"id":"tx:plantae:annonaceae","parent":"tx:plantae","rank":"family","display_name":"Annonaceae","latin_name":"Annonaceae","aliases":[],"tags":[]}
+{"id":"tx:plantae:annonaceae:asimina","parent":"tx:plantae:annonaceae","rank":"genus","display_name":"Asimina","latin_name":"Asimina","aliases":[],"tags":[]}
+{"id":"tx:plantae:annonaceae:asimina:triloba","parent":"tx:plantae:annonaceae:asimina","rank":"species","display_name":"Pawpaw","latin_name":"Asimina triloba","aliases":["pawpaw"],"tags":[]}
+
+{"id":"tx:plantae:actinidiaceae","parent":"tx:plantae","rank":"family","display_name":"Actinidiaceae","latin_name":"Actinidiaceae","aliases":[],"tags":[]}
+{"id":"tx:plantae:actinidiaceae:actinidia","parent":"tx:plantae:actinidiaceae","rank":"genus","display_name":"Actinidia","latin_name":"Actinidia","aliases":[],"tags":[]}
+{"id":"tx:plantae:actinidiaceae:actinidia:deliciosa","parent":"tx:plantae:actinidiaceae:actinidia","rank":"species","display_name":"Kiwifruit (green)","latin_name":"Actinidia deliciosa","aliases":["kiwifruit","kiwi"],"tags":["foundation"]}
+
+{"id":"tx:plantae:rutaceae","parent":"tx:plantae","rank":"family","display_name":"Rutaceae","latin_name":"Rutaceae","aliases":[],"tags":[]}
+{"id":"tx:plantae:rutaceae:citrus","parent":"tx:plantae:rutaceae","rank":"genus","display_name":"Citrus","latin_name":"Citrus","aliases":[],"tags":[]}
+{"id":"tx:plantae:rutaceae:citrus:sinensis","parent":"tx:plantae:rutaceae:citrus","rank":"species","display_name":"Orange","latin_name":"Citrus sinensis","aliases":["orange","navel orange"],"tags":["foundation"]}
+{"id":"tx:plantae:rutaceae:citrus:paradisi","parent":"tx:plantae:rutaceae:citrus","rank":"species","display_name":"Grapefruit","latin_name":"Citrus paradisi","aliases":["grapefruit"],"tags":[]}
+{"id":"tx:plantae:rutaceae:citrus:reticulata","parent":"tx:plantae:rutaceae:citrus","rank":"species","display_name":"Mandarin","latin_name":"Citrus reticulata","aliases":["mandarin","tangerine"],"tags":[]}
+
+{"id":"tx:plantae:cucurbitaceae","parent":"tx:plantae","rank":"family","display_name":"Cucurbitaceae","latin_name":"Cucurbitaceae","aliases":[],"tags":[]}
+{"id":"tx:plantae:cucurbitaceae:cucumis","parent":"tx:plantae:cucurbitaceae","rank":"genus","display_name":"Cucumis","latin_name":"Cucumis","aliases":[],"tags":[]}
+{"id":"tx:plantae:cucurbitaceae:cucumis:melo","parent":"tx:plantae:cucurbitaceae:cucumis","rank":"species","display_name":"Melon","latin_name":"Cucumis melo","aliases":["melon"],"tags":["foundation"]}
+{"id":"tx:plantae:cucurbitaceae:cucumis:melo:cantalupensis","parent":"tx:plantae:cucurbitaceae:cucumis:melo","rank":"variety","display_name":"Cantaloupe","latin_name":"Cucumis melo var. cantalupensis","aliases":["cantaloupe"],"tags":[]}
+{"id":"tx:plantae:cucurbitaceae:cucumis:melo:inodorus","parent":"tx:plantae:cucurbitaceae:cucumis:melo","rank":"variety","display_name":"Honeydew","latin_name":"Cucumis melo var. inodorus","aliases":["honeydew"],"tags":[]}
+{"id":"tx:plantae:cucurbitaceae:cucumis:sativus","parent":"tx:plantae:cucurbitaceae:cucumis","rank":"species","display_name":"Cucumber","latin_name":"Cucumis sativus","aliases":["cucumber"],"tags":["foundation"]}
+{"id":"tx:plantae:cucurbitaceae:cucurbita","parent":"tx:plantae:cucurbitaceae","rank":"genus","display_name":"Cucurbita","latin_name":"Cucurbita","aliases":[],"tags":[]}
+{"id":"tx:plantae:cucurbitaceae:cucurbita:pepo","parent":"tx:plantae:cucurbitaceae:cucurbita","rank":"species","display_name":"Squash (C. pepo)","latin_name":"Cucurbita pepo","aliases":["zucchini","summer squash","acorn squash","spaghetti squash","pumpkin seed source"],"tags":["foundation"]}
+{"id":"tx:plantae:cucurbitaceae:cucurbita:moschata","parent":"tx:plantae:cucurbitaceae:cucurbita","rank":"species","display_name":"Squash (C. moschata)","latin_name":"Cucurbita moschata","aliases":["butternut squash"],"tags":["foundation"]}
+
+{"id":"tx:plantae:solanaceae","parent":"tx:plantae","rank":"family","display_name":"Solanaceae","latin_name":"Solanaceae","aliases":[],"tags":[]}
+{"id":"tx:plantae:solanaceae:solanum","parent":"tx:plantae:solanaceae","rank":"genus","display_name":"Solanum","latin_name":"Solanum","aliases":[],"tags":[]}
+{"id":"tx:plantae:solanaceae:solanum:lycopersicum","parent":"tx:plantae:solanaceae:solanum","rank":"species","display_name":"Tomato","latin_name":"Solanum lycopersicum","aliases":["tomato","tomatoes"],"tags":["foundation"]}
+{"id":"tx:plantae:solanaceae:solanum:lycopersicum:roma","parent":"tx:plantae:solanaceae:solanum:lycopersicum","rank":"cultivar","display_name":"Tomato (Roma)","latin_name":"Solanum lycopersicum 'Roma'","aliases":["roma tomato"],"tags":[]}
+{"id":"tx:plantae:solanaceae:solanum:lycopersicum:grape","parent":"tx:plantae:solanaceae:solanum:lycopersicum","rank":"cultivar","display_name":"Tomato (Grape)","latin_name":"Solanum lycopersicum 'Grape'","aliases":["grape tomato"],"tags":[]}
+{"id":"tx:plantae:solanaceae:solanum:melongena","parent":"tx:plantae:solanaceae:solanum","rank":"species","display_name":"Eggplant","latin_name":"Solanum melongena","aliases":["eggplant"],"tags":[]}
+{"id":"tx:plantae:solanaceae:capsicum","parent":"tx:plantae:solanaceae","rank":"genus","display_name":"Capsicum","latin_name":"Capsicum","aliases":[],"tags":[]}
+{"id":"tx:plantae:solanaceae:capsicum:annuum","parent":"tx:plantae:solanaceae:capsicum","rank":"species","display_name":"Bell pepper","latin_name":"Capsicum annuum","aliases":["bell pepper","capsicum"],"tags":["foundation"]}
+
+{"id":"tx:plantae:amaryllidaceae","parent":"tx:plantae","rank":"family","display_name":"Amaryllidaceae","latin_name":"Amaryllidaceae","aliases":[],"tags":[]}
+{"id":"tx:plantae:amaryllidaceae:allium","parent":"tx:plantae:amaryllidaceae","rank":"genus","display_name":"Allium","latin_name":"Allium","aliases":[],"tags":[]}
+{"id":"tx:plantae:amaryllidaceae:allium:cepa","parent":"tx:plantae:amaryllidaceae:allium","rank":"species","display_name":"Onion","latin_name":"Allium cepa","aliases":["onion","onions"],"tags":["foundation"]}
+{"id":"tx:plantae:amaryllidaceae:allium:sativum","parent":"tx:plantae:amaryllidaceae:allium","rank":"species","display_name":"Garlic","latin_name":"Allium sativum","aliases":["garlic"],"tags":["foundation"]}
+{"id":"tx:plantae:amaryllidaceae:allium:porrum","parent":"tx:plantae:amaryllidaceae:allium","rank":"species","display_name":"Leek","latin_name":"Allium porrum","aliases":["leek","leeks"],"tags":[]}
+{"id":"tx:plantae:amaryllidaceae:allium:fistulosum","parent":"tx:plantae:amaryllidaceae:allium","rank":"species","display_name":"Scallion (green onion)","latin_name":"Allium fistulosum","aliases":["scallion","green onion"],"tags":[]}
+
+{"id":"tx:plantae:asteraceae","parent":"tx:plantae","rank":"family","display_name":"Asteraceae","latin_name":"Asteraceae","aliases":["Compositae"],"tags":[]}
+{"id":"tx:plantae:asteraceae:lactuca","parent":"tx:plantae:asteraceae","rank":"genus","display_name":"Lactuca","latin_name":"Lactuca","aliases":[],"tags":[]}
+{"id":"tx:plantae:asteraceae:lactuca:sativa","parent":"tx:plantae:asteraceae:lactuca","rank":"species","display_name":"Lettuce","latin_name":"Lactuca sativa","aliases":["lettuce"],"tags":["foundation"]}
+{"id":"tx:plantae:asteraceae:lactuca:sativa:romaine","parent":"tx:plantae:asteraceae:lactuca:sativa","rank":"variety","display_name":"Lettuce (Romaine)","latin_name":"Lactuca sativa var. longifolia","aliases":["romaine lettuce","cos lettuce"],"tags":[]}
+{"id":"tx:plantae:asteraceae:lactuca:sativa:iceberg","parent":"tx:plantae:asteraceae:lactuca:sativa","rank":"variety","display_name":"Lettuce (Iceberg)","latin_name":"Lactuca sativa var. capitata","aliases":["iceberg lettuce"],"tags":[]}
+{"id":"tx:plantae:asteraceae:helianthus","parent":"tx:plantae:asteraceae","rank":"genus","display_name":"Helianthus","latin_name":"Helianthus","aliases":[],"tags":[]}
+{"id":"tx:plantae:asteraceae:helianthus:annuus","parent":"tx:plantae:asteraceae:helianthus","rank":"species","display_name":"Sunflower","latin_name":"Helianthus annuus","aliases":["sunflower"],"tags":["foundation"]}
+
+{"id":"tx:plantae:apiaceae","parent":"tx:plantae","rank":"family","display_name":"Apiaceae","latin_name":"Apiaceae","aliases":["Umbelliferae"],"tags":[]}
+{"id":"tx:plantae:apiaceae:daucus","parent":"tx:plantae:apiaceae","rank":"genus","display_name":"Daucus","latin_name":"Daucus","aliases":[],"tags":[]}
+{"id":"tx:plantae:apiaceae:daucus:carota","parent":"tx:plantae:apiaceae:daucus","rank":"species","display_name":"Carrot","latin_name":"Daucus carota","aliases":["carrot","carrots"],"tags":["foundation"]}
+{"id":"tx:plantae:apiaceae:apium","parent":"tx:plantae:apiaceae","rank":"genus","display_name":"Apium","latin_name":"Apium","aliases":[],"tags":[]}
+{"id":"tx:plantae:apiaceae:apium:graveolens","parent":"tx:plantae:apiaceae:apium","rank":"species","display_name":"Celery","latin_name":"Apium graveolens","aliases":["celery"],"tags":[]}
+
+{"id":"tx:plantae:brassicaceae","parent":"tx:plantae","rank":"family","display_name":"Brassicaceae","latin_name":"Brassicaceae","aliases":["Cruciferae"],"tags":[]}
+{"id":"tx:plantae:brassicaceae:brassica","parent":"tx:plantae:brassicaceae","rank":"genus","display_name":"Brassica","latin_name":"Brassica","aliases":[],"tags":[]}
+{"id":"tx:plantae:brassicaceae:brassica:oleracea","parent":"tx:plantae:brassicaceae:brassica","rank":"species","display_name":"Brassica oleracea (leafy/heading types)","latin_name":"Brassica oleracea","aliases":["broccoli","brussels sprouts","cabbage","kale"],"tags":["foundation"]}
+{"id":"tx:plantae:brassicaceae:brassica:rapa","parent":"tx:plantae:brassicaceae:brassica","rank":"species","display_name":"Brassica rapa","latin_name":"Brassica rapa","aliases":["bok choy","napa cabbage"],"tags":["foundation"]}
+{"id":"tx:plantae:brassicaceae:eruca","parent":"tx:plantae:brassicaceae","rank":"genus","display_name":"Eruca","latin_name":"Eruca","aliases":[],"tags":[]}
+{"id":"tx:plantae:brassicaceae:eruca:sativa","parent":"tx:plantae:brassicaceae:eruca","rank":"species","display_name":"Arugula","latin_name":"Eruca sativa","aliases":["rocket","rucola"],"tags":[]}
+
+{"id":"tx:plantae:asparagaceae","parent":"tx:plantae","rank":"family","display_name":"Asparagaceae","latin_name":"Asparagaceae","aliases":[],"tags":[]}
+{"id":"tx:plantae:asparagaceae:asparagus","parent":"tx:plantae:asparagaceae","rank":"genus","display_name":"Asparagus (genus)","latin_name":"Asparagus","aliases":[],"tags":[]}
+{"id":"tx:plantae:asparagaceae:asparagus:officinalis","parent":"tx:plantae:asparagaceae:asparagus","rank":"species","display_name":"Asparagus","latin_name":"Asparagus officinalis","aliases":["asparagus"],"tags":[]}
+
+{"id":"tx:plantae:amaranthaceae","parent":"tx:plantae","rank":"family","display_name":"Amaranthaceae","latin_name":"Amaranthaceae","aliases":[],"tags":[]}
+{"id":"tx:plantae:amaranthaceae:chenopodium","parent":"tx:plantae:amaranthaceae","rank":"genus","display_name":"Chenopodium","latin_name":"Chenopodium","aliases":[],"tags":[]}
+{"id":"tx:plantae:amaranthaceae:chenopodium:quinoa","parent":"tx:plantae:amaranthaceae:chenopodium","rank":"species","display_name":"Quinoa","latin_name":"Chenopodium quinoa","aliases":["quinoa"],"tags":["foundation"]}
+{"id":"tx:plantae:amaranthaceae:beta","parent":"tx:plantae:amaranthaceae","rank":"genus","display_name":"Beta","latin_name":"Beta","aliases":[],"tags":[]}
+{"id":"tx:plantae:amaranthaceae:beta:vulgaris","parent":"tx:plantae:amaranthaceae:beta","rank":"species","display_name":"Beet","latin_name":"Beta vulgaris","aliases":["beet","beets"],"tags":[]}
+{"id":"tx:plantae:amaranthaceae:spinacia","parent":"tx:plantae:amaranthaceae","rank":"genus","display_name":"Spinach (genus)","latin_name":"Spinacia","aliases":[],"tags":[]}
+{"id":"tx:plantae:amaranthaceae:spinacia:oleracea","parent":"tx:plantae:amaranthaceae:spinacia","rank":"species","display_name":"Spinach","latin_name":"Spinacia oleracea","aliases":["spinach"],"tags":["foundation"]}
+
+{"id":"tx:plantae:linaceae","parent":"tx:plantae","rank":"family","display_name":"Linaceae","latin_name":"Linaceae","aliases":[],"tags":[]}
+{"id":"tx:plantae:linaceae:linum","parent":"tx:plantae:linaceae","rank":"genus","display_name":"Linum","latin_name":"Linum","aliases":[],"tags":[]}
+{"id":"tx:plantae:linaceae:linum:usitatissimum","parent":"tx:plantae:linaceae:linum","rank":"species","display_name":"Flax","latin_name":"Linum usitatissimum","aliases":["flax","flaxseed"],"tags":[]}
+
+{"id":"tx:plantae:pedaliaceae","parent":"tx:plantae","rank":"family","display_name":"Pedaliaceae","latin_name":"Pedaliaceae","aliases":[],"tags":[]}
+{"id":"tx:plantae:pedaliaceae:sesamum","parent":"tx:plantae:pedaliaceae","rank":"genus","display_name":"Sesamum","latin_name":"Sesamum","aliases":[],"tags":[]}
+{"id":"tx:plantae:pedaliaceae:sesamum:indicum","parent":"tx:plantae:pedaliaceae:sesamum","rank":"species","display_name":"Sesame","latin_name":"Sesamum indicum","aliases":["sesame","sesame seeds"],"tags":[]}
+
+{"id":"tx:plantae:lamiaceae","parent":"tx:plantae","rank":"family","display_name":"Lamiaceae","latin_name":"Lamiaceae","aliases":[],"tags":[]}
+{"id":"tx:plantae:lamiaceae:salvia","parent":"tx:plantae:lamiaceae","rank":"genus","display_name":"Salvia","latin_name":"Salvia","aliases":[],"tags":[]}
+{"id":"tx:plantae:lamiaceae:salvia:hispanica","parent":"tx:plantae:lamiaceae:salvia","rank":"species","display_name":"Chia","latin_name":"Salvia hispanica","aliases":["chia","chia seed","chia seeds"],"tags":[]}
+
+{"id":"tx:plantae:pinaceae","parent":"tx:plantae","rank":"family","display_name":"Pinaceae","latin_name":"Pinaceae","aliases":[],"tags":[]}
+{"id":"tx:plantae:pinaceae:pinus","parent":"tx:plantae:pinaceae","rank":"genus","display_name":"Pine","latin_name":"Pinus","aliases":[],"tags":[]}
+{"id":"tx:plantae:pinaceae:pinus:pinea","parent":"tx:plantae:pinaceae:pinus","rank":"species","display_name":"Pine nut (stone pine)","latin_name":"Pinus pinea","aliases":["pine nut","pignoli"],"tags":[]}
+
+{"id":"tx:plantae:poaceae:secale","parent":"tx:plantae:poaceae","rank":"genus","display_name":"Rye (genus)","latin_name":"Secale","aliases":[],"tags":[]}
+{"id":"tx:plantae:poaceae:secale:cereale","parent":"tx:plantae:poaceae:secale","rank":"species","display_name":"Rye","latin_name":"Secale cereale","aliases":["rye"],"tags":["foundation"]}
+{"id":"tx:plantae:poaceae:hordeum","parent":"tx:plantae:poaceae","rank":"genus","display_name":"Barley (genus)","latin_name":"Hordeum","aliases":[],"tags":[]}
+{"id":"tx:plantae:poaceae:hordeum:vulgare","parent":"tx:plantae:poaceae:hordeum","rank":"species","display_name":"Barley","latin_name":"Hordeum vulgare","aliases":["barley"],"tags":["foundation"]}
+{"id":"tx:plantae:poaceae:zea","parent":"tx:plantae:poaceae","rank":"genus","display_name":"Maize (genus)","latin_name":"Zea","aliases":[],"tags":[]}
+{"id":"tx:plantae:poaceae:zea:mays","parent":"tx:plantae:poaceae:zea","rank":"species","display_name":"Corn (sweet)","latin_name":"Zea mays","aliases":["corn","sweet corn"],"tags":["foundation"]}
+{"id":"tx:plantae:poaceae:digitaria","parent":"tx:plantae:poaceae","rank":"genus","display_name":"Fonio (genus)","latin_name":"Digitaria","aliases":[],"tags":[]}
+{"id":"tx:plantae:poaceae:digitaria:exilis","parent":"tx:plantae:poaceae:digitaria","rank":"species","display_name":"Fonio","latin_name":"Digitaria exilis","aliases":["fonio"],"tags":[]}
+{"id":"tx:plantae:poaceae:pennisetum","parent":"tx:plantae:poaceae","rank":"genus","display_name":"Pennisetum","latin_name":"Pennisetum","aliases":[],"tags":[]}
+{"id":"tx:plantae:poaceae:pennisetum:glaucum","parent":"tx:plantae:poaceae:pennisetum","rank":"species","display_name":"Millet (pearl)","latin_name":"Pennisetum glaucum","aliases":["pearl millet","millet"],"tags":[]}
+{"id":"tx:plantae:poaceae:sorghum","parent":"tx:plantae:poaceae","rank":"genus","display_name":"Sorghum (genus)","latin_name":"Sorghum","aliases":[],"tags":[]}
+{"id":"tx:plantae:poaceae:sorghum:bicolor","parent":"tx:plantae:poaceae:sorghum","rank":"species","display_name":"Sorghum","latin_name":"Sorghum bicolor","aliases":["sorghum"],"tags":[]}
+{"id":"tx:plantae:poaceae:zizania","parent":"tx:plantae:poaceae","rank":"genus","display_name":"Wild rice (genus)","latin_name":"Zizania","aliases":[],"tags":[]}
+{"id":"tx:plantae:poaceae:zizania:palustris","parent":"tx:plantae:poaceae:zizania","rank":"species","display_name":"Wild rice","latin_name":"Zizania palustris","aliases":["wild rice"],"tags":[]}
+
+{"id":"tx:plantae:polygonaceae","parent":"tx:plantae","rank":"family","display_name":"Polygonaceae","latin_name":"Polygonaceae","aliases":[],"tags":[]}
+{"id":"tx:plantae:polygonaceae:fagopyrum","parent":"tx:plantae:polygonaceae","rank":"genus","display_name":"Fagopyrum","latin_name":"Fagopyrum","aliases":[],"tags":[]}
+{"id":"tx:plantae:polygonaceae:fagopyrum:esculentum","parent":"tx:plantae:polygonaceae:fagopyrum","rank":"species","display_name":"Buckwheat","latin_name":"Fagopyrum esculentum","aliases":["buckwheat"],"tags":[]}
+
+{"id":"tx:plantae:amaranthaceae:chenopodium:quinoa:note","parent":"tx:plantae:amaranthaceae:chenopodium:quinoa","rank":"form","display_name":"(placeholder form)","latin_name":"","aliases":[],"tags":["_ignore"]}
+{"id":"tx:plantae:rosaceae:prunus:persica:note","parent":"tx:plantae:rosaceae:prunus:persica","rank":"form","display_name":"(placeholder form)","latin_name":"","aliases":[],"tags":["_ignore"]}
+
+{"id":"tx:plantae:poales","parent":"tx:plantae","rank":"order","display_name":"Poales","latin_name":"Poales","aliases":[],"tags":[]}
+{"id":"tx:plantae:poales:bromeliaceae","parent":"tx:plantae:poales","rank":"family","display_name":"Bromeliaceae","latin_name":"Bromeliaceae","aliases":[],"tags":[]}
+{"id":"tx:plantae:poales:bromeliaceae:ananas","parent":"tx:plantae:poales:bromeliaceae","rank":"genus","display_name":"Ananas","latin_name":"Ananas","aliases":[],"tags":[]}
+{"id":"tx:plantae:poales:bromeliaceae:ananas:comosus","parent":"tx:plantae:poales:bromeliaceae:ananas","rank":"species","display_name":"Pineapple","latin_name":"Ananas comosus","aliases":["pineapple"],"tags":[]}
+
+{"id":"tx:plantae:fabaceae","parent":"tx:plantae","rank":"family","display_name":"Fabaceae","latin_name":"Fabaceae","aliases":["Leguminosae"],"tags":[]}
+{"id":"tx:plantae:fabaceae:phaseolus","parent":"tx:plantae:fabaceae","rank":"genus","display_name":"Phaseolus","latin_name":"Phaseolus","aliases":[],"tags":[]}
+{"id":"tx:plantae:fabaceae:phaseolus:vulgaris","parent":"tx:plantae:fabaceae:phaseolus","rank":"species","display_name":"Common bean","latin_name":"Phaseolus vulgaris","aliases":["dry bean","green bean","snap bean"],"tags":["foundation"]}
+{"id":"tx:plantae:fabaceae:lens","parent":"tx:plantae:fabaceae","rank":"genus","display_name":"Lens","latin_name":"Lens","aliases":[],"tags":[]}
+{"id":"tx:plantae:fabaceae:lens:culinaris","parent":"tx:plantae:fabaceae:lens","rank":"species","display_name":"Lentil","latin_name":"Lens culinaris","aliases":["lentil","lentils"],"tags":[]}
+{"id":"tx:plantae:fabaceae:vigna","parent":"tx:plantae:fabaceae","rank":"genus","display_name":"Vigna","latin_name":"Vigna","aliases":[],"tags":[]}
+{"id":"tx:plantae:fabaceae:vigna:unguiculata","parent":"tx:plantae:fabaceae:vigna","rank":"species","display_name":"Cowpea (black-eyed pea)","latin_name":"Vigna unguiculata","aliases":["black-eyed pea","cowpea"],"tags":[]}
+
+{"id":"tx:plantae:chenopodiaceae:spinacia:note","parent":"tx:plantae","rank":"form","display_name":"(deprecated family alias)","latin_name":"","aliases":[],"tags":["_ignore"]}
+
+{"id":"tx:plantae:solanaceae:solanum:tuberosum","parent":"tx:plantae:solanaceae:solanum","rank":"species","display_name":"Potato","latin_name":"Solanum tuberosum","aliases":["potato","potatoes"],"tags":["foundation"]}
+{"id":"tx:plantae:solanaceae:solanum:tuberosum:russet","parent":"tx:plantae:solanaceae:solanum:tuberosum","rank":"cultivar","display_name":"Potato (Russet)","latin_name":"Solanum tuberosum 'Russet'","aliases":["russet potato"],"tags":[]}
+{"id":"tx:plantae:solanaceae:solanum:tuberosum:yukon_gold","parent":"tx:plantae:solanaceae:solanum:tuberosum","rank":"cultivar","display_name":"Potato (Yukon Gold)","latin_name":"Solanum tuberosum 'Yukon Gold'","aliases":["yukon gold"],"tags":[]}
+{"id":"tx:plantae:solanaceae:solanum:tuberosum:red_skin","parent":"tx:plantae:solanaceae:solanum:tuberosum","rank":"cultivar","display_name":"Potato (Red skin)","latin_name":"Solanum tuberosum (red-skinned cvs.)","aliases":["red potato"],"tags":[]}
+
+{"id":"tx:plantae:convolvulaceae","parent":"tx:plantae","rank":"family","display_name":"Convolvulaceae","latin_name":"Convolvulaceae","aliases":[],"tags":[]}
+{"id":"tx:plantae:convolvulaceae:ipomoea","parent":"tx:plantae:convolvulaceae","rank":"genus","display_name":"Ipomoea","latin_name":"Ipomoea","aliases":[],"tags":[]}
+{"id":"tx:plantae:convolvulaceae:ipomoea:batatas","parent":"tx:plantae:convolvulaceae:ipomoea","rank":"species","display_name":"Sweet potato","latin_name":"Ipomoea batatas","aliases":["sweet potato","yams (market)"],"tags":[]}
+
+{"id":"tx:plantae:solanaceae:physalis","parent":"tx:plantae:solanaceae","rank":"genus","display_name":"Physalis","latin_name":"Physalis","aliases":[],"tags":[]}
+{"id":"tx:plantae:solanaceae:physalis:philadelphica","parent":"tx:plantae:solanaceae:physalis","rank":"species","display_name":"Tomatillo","latin_name":"Physalis philadelphica","aliases":["tomatillo"],"tags":[]}

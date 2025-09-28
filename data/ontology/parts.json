@@ -40,5 +40,29 @@
     "name": "Muscle",
     "kind": "animal",
     "applies_to": []
+  },
+  {
+    "id": "part:egg",
+    "name": "Egg (whole)",
+    "kind": "animal",
+    "applies_to": [
+      "tx:animalia:phasianidae:gallus:gallus_domesticus"
+    ]
+  },
+  {
+    "id": "part:egg_white",
+    "name": "Egg white (albumen)",
+    "kind": "animal",
+    "applies_to": [
+      "tx:animalia:phasianidae:gallus:gallus_domesticus"
+    ]
+  },
+  {
+    "id": "part:egg_yolk",
+    "name": "Egg yolk",
+    "kind": "animal",
+    "applies_to": [
+      "tx:animalia:phasianidae:gallus:gallus_domesticus"
+    ]
   }
 ]

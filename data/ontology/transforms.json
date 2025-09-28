@@ -74,7 +74,7 @@
   },
   {
     "id": "tf:mill",
-    "name": "Mill/Refine",
+    "name": "Mill / Refine / Flake",
     "identity": true,
     "params": [
       {
@@ -83,11 +83,20 @@
         "enum": [
           "whole",
           "refined",
+          "pearled",
           "00"
+        ]
+      },
+      {
+        "key": "oat_form",
+        "kind": "enum",
+        "enum": [
+          "rolled",
+          "steel_cut"
         ]
       }
     ],
-    "notes": "Grain milling/refinement"
+    "notes": "Grain milling/refinement and common oat forms"
   },
   {
     "id": "tf:enrich",

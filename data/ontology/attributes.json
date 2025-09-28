@@ -3,8 +3,7 @@
     "id": "attr:fat_pct",
     "name": "Fat % (dairy)",
     "role": "identity_param",
-    "kind": "number",
-    "notes": "Dairy standardization"
+    "kind": "number"
   },
   {
     "id": "attr:lean_pct",
@@ -31,6 +30,7 @@
     "enum": [
       "whole",
       "refined",
+      "pearled",
       "00"
     ]
   },
@@ -46,28 +46,13 @@
     ]
   },
   {
-    "id": "attr:process",
-    "name": "Process (raw/cooked)",
+    "id": "attr:oat_form",
+    "name": "Oat form",
     "role": "identity_param",
     "kind": "enum",
     "enum": [
-      "raw",
-      "boil",
-      "steam",
-      "bake",
-      "roast",
-      "fry",
-      "broil"
-    ]
-  },
-  {
-    "id": "attr:style",
-    "name": "Style",
-    "role": "identity_param",
-    "kind": "enum",
-    "enum": [
-      "greek",
-      "regular"
+      "rolled",
+      "steel_cut"
     ]
   },
   {
@@ -77,6 +62,20 @@
     "kind": "enum",
     "enum": [
       "unripe",
+      "ripe",
+      "overripe"
+    ]
+  },
+  {
+    "id": "attr:maturity_stage",
+    "name": "Maturity / Ripeness",
+    "role": "facet",
+    "kind": "enum",
+    "enum": [
+      "baby",
+      "mature",
+      "underripe",
+      "slightly_ripe",
       "ripe",
       "overripe"
     ]
@@ -104,5 +103,24 @@
     "name": "Brand",
     "role": "facet",
     "kind": "string"
+  },
+  {
+    "id": "attr:seedless",
+    "name": "Seedless",
+    "role": "facet",
+    "kind": "boolean"
+  },
+  {
+    "id": "attr:production_system",
+    "name": "Production system",
+    "role": "covariate",
+    "kind": "enum",
+    "enum": [
+      "wild_caught",
+      "wild_harvested",
+      "farm_raised",
+      "pasture_raised",
+      "unspecified"
+    ]
   }
 ]

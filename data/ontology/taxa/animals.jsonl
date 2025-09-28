@@ -3,3 +3,39 @@
 {"id": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos", "parent": "tx:animalia:chordata:mammalia:artiodactyla:bovidae", "rank": "genus", "display_name": "Cattle (genus)", "latin_name": "Bos", "aliases": [], "tags": []}
 {"id": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus", "parent": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos", "rank": "species", "display_name": "Cow", "latin_name": "Bos taurus", "aliases": ["cow"], "tags": ["foundation"]}
 {"id": "tx:animalia:salmonidae:salmo:salar", "parent": "tx:animalia", "rank": "species", "display_name": "Atlantic salmon", "latin_name": "Salmo salar", "aliases": ["salmon"], "tags": ["foundation"]}
+{"id":"tx:animalia:gadidae","parent":"tx:animalia","rank":"family","display_name":"Gadidae","latin_name":"Gadidae","aliases":[],"tags":[]}
+{"id":"tx:animalia:gadidae:gadus","parent":"tx:animalia:gadidae","rank":"genus","display_name":"Gadus","latin_name":"Gadus","aliases":[],"tags":[]}
+{"id":"tx:animalia:gadidae:gadus:morhua","parent":"tx:animalia:gadidae:gadus","rank":"species","display_name":"Atlantic cod","latin_name":"Gadus morhua","aliases":["cod"],"tags":["foundation"]}
+{"id":"tx:animalia:gadidae:gadus:chalcogrammus","parent":"tx:animalia:gadidae:gadus","rank":"species","display_name":"Alaska pollock","latin_name":"Gadus chalcogrammus","aliases":["pollock"],"tags":[]}
+{"id":"tx:animalia:gadidae:melanogrammus","parent":"tx:animalia:gadidae","rank":"genus","display_name":"Melanogrammus","latin_name":"Melanogrammus","aliases":[],"tags":[]}
+{"id":"tx:animalia:gadidae:melanogrammus:aeglefinus","parent":"tx:animalia:gadidae:melanogrammus","rank":"species","display_name":"Haddock","latin_name":"Melanogrammus aeglefinus","aliases":["haddock"],"tags":[]}
+
+{"id":"tx:animalia:salmonidae","parent":"tx:animalia","rank":"family","display_name":"Salmonidae","latin_name":"Salmonidae","aliases":[],"tags":[]}
+{"id":"tx:animalia:salmonidae:oncorhynchus","parent":"tx:animalia:salmonidae","rank":"genus","display_name":"Oncorhynchus","latin_name":"Oncorhynchus","aliases":[],"tags":[]}
+{"id":"tx:animalia:salmonidae:oncorhynchus:nerka","parent":"tx:animalia:salmonidae:oncorhynchus","rank":"species","display_name":"Sockeye salmon","latin_name":"Oncorhynchus nerka","aliases":["sockeye"],"tags":[]}
+
+{"id":"tx:animalia:cichlidae","parent":"tx:animalia","rank":"family","display_name":"Cichlidae","latin_name":"Cichlidae","aliases":[],"tags":[]}
+{"id":"tx:animalia:cichlidae:oreochromis","parent":"tx:animalia:cichlidae","rank":"genus","display_name":"Oreochromis","latin_name":"Oreochromis","aliases":[],"tags":[]}
+{"id":"tx:animalia:cichlidae:oreochromis:niloticus","parent":"tx:animalia:cichlidae:oreochromis","rank":"species","display_name":"Nile tilapia","latin_name":"Oreochromis niloticus","aliases":["tilapia"],"tags":[]}
+
+{"id":"tx:animalia:ictaluridae","parent":"tx:animalia","rank":"family","display_name":"Ictaluridae","latin_name":"Ictaluridae","aliases":[],"tags":[]}
+{"id":"tx:animalia:ictaluridae:ictalurus","parent":"tx:animalia:ictaluridae","rank":"genus","display_name":"Ictalurus","latin_name":"Ictalurus","aliases":[],"tags":[]}
+{"id":"tx:animalia:ictaluridae:ictalurus:punctatus","parent":"tx:animalia:ictaluridae:ictalurus","rank":"species","display_name":"Channel catfish","latin_name":"Ictalurus punctatus","aliases":["catfish"],"tags":[]}
+
+{"id":"tx:animalia:suidae","parent":"tx:animalia","rank":"family","display_name":"Suidae","latin_name":"Suidae","aliases":[],"tags":[]}
+{"id":"tx:animalia:suidae:sus","parent":"tx:animalia:suidae","rank":"genus","display_name":"Sus","latin_name":"Sus","aliases":[],"tags":[]}
+{"id":"tx:animalia:suidae:sus:scrofa_domesticus","parent":"tx:animalia:suidae:sus","rank":"species","display_name":"Pig","latin_name":"Sus scrofa domesticus","aliases":["pork","pig"],"tags":["foundation"]}
+
+{"id":"tx:animalia:phasianidae","parent":"tx:animalia","rank":"family","display_name":"Phasianidae","latin_name":"Phasianidae","aliases":[],"tags":[]}
+{"id":"tx:animalia:phasianidae:gallus","parent":"tx:animalia:phasianidae","rank":"genus","display_name":"Gallus","latin_name":"Gallus","aliases":[],"tags":[]}
+{"id":"tx:animalia:phasianidae:gallus:gallus_domesticus","parent":"tx:animalia:phasianidae:gallus","rank":"species","display_name":"Chicken","latin_name":"Gallus gallus domesticus","aliases":["chicken"],"tags":["foundation"]}
+
+{"id":"tx:animalia:meleagrididae","parent":"tx:animalia","rank":"family","display_name":"Meleagrididae","latin_name":"Meleagrididae","aliases":[],"tags":[]}
+{"id":"tx:animalia:meleagrididae:meleagris","parent":"tx:animalia:meleagrididae","rank":"genus","display_name":"Meleagris","latin_name":"Meleagris","aliases":[],"tags":[]}
+{"id":"tx:animalia:meleagrididae:meleagris:gallopavo","parent":"tx:animalia:meleagrididae:meleagris","rank":"species","display_name":"Turkey","latin_name":"Meleagris gallopavo","aliases":["turkey"],"tags":[]}
+
+{"id":"tx:animalia:chordata:mammalia:artiodactyla:bovidae:ovis","parent":"tx:animalia:chordata:mammalia:artiodactyla:bovidae","rank":"genus","display_name":"Ovis","latin_name":"Ovis","aliases":[],"tags":[]}
+{"id":"tx:animalia:chordata:mammalia:artiodactyla:bovidae:ovis:aries","parent":"tx:animalia:chordata:mammalia:artiodactyla:bovidae:ovis","rank":"species","display_name":"Sheep (lamb)","latin_name":"Ovis aries","aliases":["lamb","mutton"],"tags":[]}
+
+{"id":"tx:animalia:chordata:mammalia:artiodactyla:bovidae:bison","parent":"tx:animalia:chordata:mammalia:artiodactyla:bovidae","rank":"genus","display_name":"Bison","latin_name":"Bison","aliases":[],"tags":[]}
+{"id":"tx:animalia:chordata:mammalia:artiodactyla:bovidae:bison:bison","parent":"tx:animalia:chordata:mammalia:artiodactyla:bovidae:bison","rank":"species","display_name":"American bison","latin_name":"Bison bison","aliases":["bison"],"tags":[]}

@@ -146,11 +146,49 @@ for i, tf in enumerate(taxa_files):
 
 print_success(f"Loaded {len(rows)} taxa from {len(taxa_files)} files")
 
-# Insert nodes in parent-first order
+# Insert nodes in parent-first order using topological sort
 print_step("4/5", "Sorting taxa by hierarchy depth...")
 def depth(tx_id: str) -> int:
     return tx_id.count(":")
-rows.sort(key=lambda o: depth(o["id"]))
+
+# Create a mapping of node_id to object for quick lookup
+node_map = {obj["id"]: obj for obj in rows}
+
+# Topological sort to ensure parents are inserted before children
+def topological_sort(nodes):
+    # Create adjacency list
+    graph = {}
+    in_degree = {}
+    
+    for node in nodes:
+        node_id = node["id"]
+        graph[node_id] = []
+        in_degree[node_id] = 0
+    
+    # Build graph and calculate in-degrees
+    for node in nodes:
+        node_id = node["id"]
+        parent = node.get("parent")
+        if parent and parent in node_map:
+            graph[parent].append(node_id)
+            in_degree[node_id] += 1
+    
+    # Kahn's algorithm for topological sort
+    queue = [node_id for node_id, degree in in_degree.items() if degree == 0]
+    result = []
+    
+    while queue:
+        current = queue.pop(0)
+        result.append(node_map[current])
+        
+        for neighbor in graph[current]:
+            in_degree[neighbor] -= 1
+            if in_degree[neighbor] == 0:
+                queue.append(neighbor)
+    
+    return result
+
+rows = topological_sort(rows)
 
 # Group by depth for better progress reporting
 depth_groups = {}
