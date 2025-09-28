@@ -10,9 +10,11 @@
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "db:build": "python3 etl/py/compile.py --in ./data/ontology --out ./data/builds/graph.dev.sqlite",
-    "db:open": "sqlite3 data/builds/graph.dev.sqlite"
+    "db:open": "sqlite3 data/builds/graph.dev.sqlite",
+    "ag": "tsx scripts/aggregate.ts"
   },
   "devDependencies": {
-    "turbo": "^2.1.0"
+    "turbo": "^2.1.0",
+      "tsx": "^4.20.6"
   }
 }
