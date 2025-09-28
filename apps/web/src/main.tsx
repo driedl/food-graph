@@ -5,8 +5,16 @@ import { trpc } from './lib/trpc'
 import { httpBatchLink } from '@trpc/client'
 import App from './App'
 import './index.css'
+import './styles/theme.css'
 
-const client = new QueryClient()
+const client = new QueryClient({
+  defaultOptions: { 
+    queries: { 
+      refetchOnWindowFocus: false, 
+      staleTime: 30_000 
+    } 
+  }
+})
 const trpcClient = trpc.createClient({
   links: [
     httpBatchLink({ url: '/trpc' }),

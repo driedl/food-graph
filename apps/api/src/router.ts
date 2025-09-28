@@ -1,8 +1,12 @@
-import { initTRPC } from '@trpc/server'
+import { initTRPC, TRPCError } from '@trpc/server'
 import { z } from 'zod'
 import { db } from './db'
 
 const t = initTRPC.create()
+
+const nullToNotFound = t.middleware(({ next }) => {
+  return next()
+})
 
 export const appRouter = t.router({
   health: t.procedure.query(() => ({ ok: true })),
@@ -25,27 +29,30 @@ export const appRouter = t.router({
     }),
 
     pathToRoot: t.procedure.input(z.object({ id: z.string() })).query(({ input }) => {
-      const out: any[] = []
-      let current = db.prepare('SELECT id, name, slug, rank, parent_id as parentId FROM nodes WHERE id = ?').get(input.id)
-      while (current) {
-        out.push(current)
-        if (!current.parentId) break
-        current = db.prepare('SELECT id, name, slug, rank, parent_id as parentId FROM nodes WHERE id = ?').get(current.parentId)
-      }
-      return out.reverse()
+      const stmt = db.prepare(`
+        WITH RECURSIVE lineage(id,name,slug,rank,parent_id,depth) AS (
+          SELECT id,name,slug,rank,parent_id,0 FROM nodes WHERE id = ?
+          UNION ALL
+          SELECT n.id,n.name,n.slug,n.rank,n.parent_id,depth+1 FROM nodes n
+          JOIN lineage l ON n.id = l.parent_id
+        )
+        SELECT id,name,slug,rank,parent_id as parentId FROM lineage ORDER BY depth DESC;
+      `)
+      return stmt.all(input.id)
     }),
 
     search: t.procedure.input(z.object({ q: z.string().min(1) })).query(({ input }) => {
-      const q = `%${input.q.toLowerCase()}%`
+      // Use wildcards for partial matching - split query and add * to each term
+      const q = input.q.split(/\s+/).map(term => term + '*').join(' AND ')
       const stmt = db.prepare(`
-        SELECT DISTINCT n.id, n.name, n.slug, n.rank, n.parent_id as parentId 
+        SELECT n.id, n.name, n.slug, n.rank, n.parent_id as parentId 
         FROM nodes n 
-        LEFT JOIN synonyms s ON n.id = s.node_id 
-        WHERE LOWER(n.name) LIKE ? OR LOWER(n.slug) LIKE ? OR LOWER(s.synonym) LIKE ?
-        ORDER BY n.rank, n.name 
+        JOIN nodes_fts fts ON n.rowid = fts.rowid
+        WHERE nodes_fts MATCH ?
+        ORDER BY bm25(nodes_fts) ASC, n.name
         LIMIT 50
       `)
-      return stmt.all(q, q, q)
+      return stmt.all(q)
     }),
   }),
 })

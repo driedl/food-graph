@@ -9,17 +9,17 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: 'hsl(0 0% 100%)',
-        foreground: 'hsl(222.2 84% 4.9%)',
-        muted: 'hsl(210 40% 96.1%)',
-        border: 'hsl(214.3 31.8% 91.4%)',
-        card: 'hsl(0 0% 100%)',
-        popover: 'hsl(0 0% 100%)',
+        background: 'hsl(var(--background))',
+        foreground: 'hsl(var(--foreground))',
+        muted: 'hsl(var(--muted))',
+        border: 'hsl(var(--border))',
+        card: 'hsl(var(--card))',
+        popover: 'hsl(var(--popover))',
       },
       borderRadius: {
-        lg: '0.5rem',
-        md: '0.375rem',
-        sm: '0.25rem',
+        lg: 'var(--radius)',
+        md: 'calc(var(--radius) - 2px)',
+        sm: 'calc(var(--radius) - 4px)',
       },
     },
   },

@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "cd ../../ && tsx watch apps/api/src/index.ts",
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint ."
@@ -16,7 +16,8 @@
     "zod": "^3.23.8",
     "better-sqlite3": "^9.4.0",
     "dotenv": "^16.4.5",
-    "ulid": "^2.3.0"
+    "ulid": "^2.3.0",
+    "@nutrition/config": "workspace:*"
   },
   "devDependencies": {
     "tsx": "^4.16.2",

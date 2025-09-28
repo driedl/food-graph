@@ -4,8 +4,7 @@ import cors from '@fastify/cors'
 import { fastifyTRPCPlugin } from '@trpc/server/adapters/fastify'
 import { appRouter } from './router'
 import { migrate, seedMinimal, isEmpty } from './db'
-
-const PORT = Number(process.env.PORT || 3000)
+import { env } from '@nutrition/config'
 
 async function main() {
   const app = Fastify({ logger: false })
@@ -21,8 +20,8 @@ async function main() {
 
   app.get('/', async () => ({ status: 'ok', service: 'nutrition-graph-api' }))
 
-  await app.listen({ port: PORT, host: '0.0.0.0' })
-  console.log(`[api] listening on http://localhost:${PORT}`)
+  await app.listen({ port: env.PORT, host: '0.0.0.0' })
+  console.log(`[api] listening on http://localhost:${env.PORT}`)
 }
 
 main().catch((err) => {

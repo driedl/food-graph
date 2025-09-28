@@ -3,16 +3,11 @@ import path from 'node:path'
 import fs from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { ulid } from 'ulid'
+import { env } from '@nutrition/config'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const rootEnvPath = path.resolve(process.cwd(), '.env')
-if (fs.existsSync(rootEnvPath)) {
-  // best-effort: load root .env in case index.ts wasn't the one to do it
-  await import('dotenv/config')
-}
-const DB_PATH = process.env.DB_PATH ?? path.join(process.cwd(), '..', '..', 'data', 'builds', 'graph.dev.sqlite')
-const DATA_DIR = path.dirname(DB_PATH)
-const DB_FILE = DB_PATH
+const DATA_DIR = path.dirname(env.DB_PATH)
+const DB_FILE = env.DB_PATH
 
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true })
 
@@ -20,35 +15,21 @@ export const db = new Database(DB_FILE)
 db.pragma('journal_mode = WAL')
 
 export function migrate() {
-  db.exec(`
-  CREATE TABLE IF NOT EXISTS nodes (
-    id TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    slug TEXT NOT NULL,
-    rank TEXT NOT NULL,
-    parent_id TEXT REFERENCES nodes(id) ON DELETE CASCADE
-  );
-  CREATE INDEX IF NOT EXISTS idx_nodes_parent ON nodes(parent_id);
-  CREATE UNIQUE INDEX IF NOT EXISTS idx_nodes_slug_parent ON nodes(slug, parent_id);
-
-  CREATE TABLE IF NOT EXISTS synonyms (
-    node_id TEXT REFERENCES nodes(id) ON DELETE CASCADE,
-    synonym TEXT NOT NULL,
-    PRIMARY KEY (node_id, synonym)
-  );
-
-  CREATE TABLE IF NOT EXISTS node_attributes (
-    node_id TEXT REFERENCES nodes(id) ON DELETE CASCADE,
-    attr TEXT NOT NULL,
-    val TEXT NOT NULL,
-    PRIMARY KEY (node_id, attr, val)
-  );
-
-  CREATE TABLE IF NOT EXISTS attr_def (
-    attr TEXT PRIMARY KEY,
-    kind TEXT NOT NULL DEFAULT 'categorical'  -- numeric | boolean | categorical
-  );
-  `)
+  db.exec(`CREATE TABLE IF NOT EXISTS schema_version (version INTEGER PRIMARY KEY);`)
+  const get = db.prepare('SELECT max(version) as v FROM schema_version').get() as { v: number | null }
+  const current = get.v ?? 0
+  const files = fs.readdirSync(path.join(__dirname, '..', 'migrations')).sort()
+  let applied = 0
+  for (const f of files) {
+    const ver = Number(f.split('_')[0])
+    if (ver > current) {
+      const sql = fs.readFileSync(path.join(__dirname, '..', 'migrations', f), 'utf-8')
+      db.exec(sql)
+      db.prepare('INSERT INTO schema_version(version) VALUES (?)').run(ver)
+      applied++
+    }
+  }
+  if (applied) console.log(`[api] migrations applied: ${applied}`)
 }
 
 export function isEmpty() {

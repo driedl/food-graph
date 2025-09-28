@@ -7,16 +7,25 @@
     "dev:api": "turbo run dev --filter=@nutrition/api",
     "dev:web": "turbo run dev --filter=@nutrition/web",
     "build": "turbo run build",
-    "lint": "turbo run lint",
+    "lint": "turbo run lint && eslint .",
+    "lint:fix": "eslint . --fix && prettier --write .",
     "typecheck": "turbo run typecheck",
     "db:build": "python3 etl/py/compile.py --in ./data/ontology --out ./data/builds/graph.dev.sqlite",
     "db:open": "sqlite3 data/builds/graph.dev.sqlite",
-    "ag": "tsx scripts/aggregate.ts"
+    "sql": "tsx scripts/run-sql.ts",
+    "sql:repl": "tsx scripts/run-sql.ts --repl",
+    "api:routes": "tsx scripts/print-trpc-routes.ts",
+    "ag": "tsx scripts/aggregate.ts",
+    "check": "pnpm typecheck && pnpm lint && pnpm db:build"
   },
   "devDependencies": {
     "turbo": "^2.1.0",
     "tsx": "^4.20.6",
     "inquirer": "^9.2.12",
-    "glob": "^10.3.10"
+    "glob": "^10.3.10",
+    "eslint": "^8.57.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "prettier": "^3.2.5"
   }
 }
