@@ -98,15 +98,13 @@ const FILE_CATEGORIES: Record<string, FileCategory> = {
     pattern: [
       'data/ontology/**/*.json',
       'data/ontology/**/*.jsonl',
-      'data/ontology/compiled/**/*.json',
-      'data/ontology/compiled/**/*.jsonl',
       'data/sql/**/*.json',
       'data/builds/*.json', // Include metadata JSON files from builds
     ],
     ignore: [
-      'data/ontology/compiled/taxa/taxa.jsonl', // Exclude compiled taxa (redundant with source files)
+      'data/ontology/compiled/**', // Exclude all compiled files (redundant with source files)
     ],
-    description: 'Food ontology data, compiled assets, and schemas',
+    description: 'Food ontology data and schemas',
   },
   scripts: {
     name: 'Project Scripts',

@@ -59,6 +59,64 @@ export const appRouter = t.router({
       return stmt.all(q)
     }),
   }),
+
+  docs: t.router({
+    getByTaxon: t.procedure
+      .input(z.object({ 
+        taxonId: z.string(),
+        lang: z.string().default('en')
+      }))
+      .query(({ input }) => {
+        const stmt = db.prepare(`
+          SELECT taxon_id, lang, summary, description_md, updated_at, 
+                 rank, latin_name, display_name, tags
+          FROM taxon_doc 
+          WHERE taxon_id = ? AND lang = ?
+        `)
+        return stmt.get(input.taxonId, input.lang) ?? null
+      }),
+
+    search: t.procedure
+      .input(z.object({ 
+        q: z.string().min(1),
+        lang: z.string().default('en'),
+        limit: z.number().default(20)
+      }))
+      .query(({ input }) => {
+        const q = input.q.split(/\s+/).map(term => term + '*').join(' AND ')
+        const stmt = db.prepare(`
+          SELECT td.taxon_id, td.lang, td.summary, td.updated_at,
+                 n.name, n.slug, n.rank, n.parent_id as parentId
+          FROM taxon_doc td
+          JOIN nodes n ON td.taxon_id = n.id
+          WHERE td.lang = ? AND (
+            td.summary LIKE ? OR 
+            td.description_md LIKE ?
+          )
+          ORDER BY td.updated_at DESC
+          LIMIT ?
+        `)
+        const searchTerm = `%${input.q}%`
+        return stmt.all(input.lang, searchTerm, searchTerm, input.limit)
+      }),
+
+    getSummaries: t.procedure
+      .input(z.object({ 
+        taxonIds: z.array(z.string()),
+        lang: z.string().default('en')
+      }))
+      .query(({ input }) => {
+        if (input.taxonIds.length === 0) return []
+        
+        const placeholders = input.taxonIds.map(() => '?').join(',')
+        const stmt = db.prepare(`
+          SELECT taxon_id, summary, updated_at
+          FROM taxon_doc 
+          WHERE taxon_id IN (${placeholders}) AND lang = ?
+        `)
+        return stmt.all(...input.taxonIds, input.lang)
+      }),
+  }),
 })
 
 export type AppRouter = typeof appRouter

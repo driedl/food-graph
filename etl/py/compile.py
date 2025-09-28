@@ -77,9 +77,27 @@ CREATE TABLE IF NOT EXISTS attr_def (
   attr TEXT PRIMARY KEY,
   kind TEXT NOT NULL DEFAULT 'categorical' -- numeric|boolean|categorical
 );
+CREATE TABLE IF NOT EXISTS taxon_doc (
+  taxon_id TEXT NOT NULL,
+  lang TEXT NOT NULL DEFAULT 'en',
+  summary TEXT NOT NULL,
+  description_md TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  checksum TEXT NOT NULL,
+  rank TEXT,
+  latin_name TEXT,
+  display_name TEXT,
+  tags TEXT, -- JSON array as text
+  PRIMARY KEY (taxon_id, lang),
+  FOREIGN KEY (taxon_id) REFERENCES nodes(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_taxon_doc_taxon_id ON taxon_doc(taxon_id);
+CREATE INDEX IF NOT EXISTS idx_taxon_doc_lang ON taxon_doc(lang);
+CREATE INDEX IF NOT EXISTS idx_taxon_doc_updated ON taxon_doc(updated_at);
 """)
 
 print_info("Clearing existing data...")
+cur.execute("DELETE FROM taxon_doc")
 cur.execute("DELETE FROM synonyms")
 cur.execute("DELETE FROM node_attributes")
 cur.execute("DELETE FROM nodes")
@@ -145,6 +163,27 @@ for i, tf in enumerate(taxa_files):
     print(f"  ✓ Loaded {len(file_rows)} taxa from {filename}")
 
 print_success(f"Loaded {len(rows)} taxa from {len(taxa_files)} files")
+
+# Load documentation data
+print_step("3.5/5", "Loading documentation data...")
+docs_file = os.path.join(args.in_dir, "docs.jsonl")
+docs_rows = []
+if os.path.exists(docs_file):
+    print_info(f"Found documentation file: {os.path.basename(docs_file)}")
+    with open(docs_file, "r", encoding="utf-8") as f:
+        for line_num, line in enumerate(f, 1):
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                obj = json.loads(line)
+                docs_rows.append(obj)
+            except json.JSONDecodeError as e:
+                print_error(f"JSON decode error in docs line {line_num}: {e}")
+                continue
+    print_success(f"Loaded {len(docs_rows)} documentation records")
+else:
+    print_info("No documentation file found, skipping...")
 
 # Insert nodes in parent-first order using topological sort
 print_step("4/5", "Sorting taxa by hierarchy depth...")
@@ -231,6 +270,33 @@ for i, o in enumerate(rows):
 
 print_success(f"Inserted {nodes_inserted} nodes and {synonyms_inserted} synonyms")
 
+# Insert documentation
+if docs_rows:
+    print_step("5.5/5", "Inserting documentation...")
+    docs_inserted = 0
+    
+    for doc in docs_rows:
+        cur.execute("""
+            INSERT OR REPLACE INTO taxon_doc(
+                taxon_id, lang, summary, description_md,
+                updated_at, checksum, rank, latin_name, display_name, tags
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            doc["taxon_id"],
+            doc["lang"],
+            doc["summary"],
+            doc["description_md"],
+            doc["updated_at"],
+            doc["checksum"],
+            doc.get("rank"),
+            doc.get("latin_name"),
+            doc.get("display_name"),
+            json.dumps(doc.get("tags", [])) if doc.get("tags") else None
+        ))
+        docs_inserted += 1
+    
+    print_success(f"Inserted {docs_inserted} documentation records")
+
 # Final commit and summary
 print("\n" + "=" * 50)
 print("📊 COMPILATION SUMMARY")
@@ -246,6 +312,7 @@ cur = con.cursor()
 node_count = cur.execute("SELECT COUNT(*) FROM nodes").fetchone()[0]
 synonym_count = cur.execute("SELECT COUNT(*) FROM synonyms").fetchone()[0]
 attr_count = cur.execute("SELECT COUNT(*) FROM attr_def").fetchone()[0]
+docs_count = cur.execute("SELECT COUNT(*) FROM taxon_doc").fetchone()[0]
 
 # Get rank distribution
 rank_stats = cur.execute("SELECT rank, COUNT(*) FROM nodes GROUP BY rank ORDER BY COUNT(*) DESC").fetchall()
@@ -254,6 +321,7 @@ print(f"✅ Database created: {args.out_path}")
 print(f"📈 Total nodes: {node_count}")
 print(f"🏷️  Total synonyms: {synonym_count}")
 print(f"🔧 Total attributes: {attr_count}")
+print(f"📚 Total documentation records: {docs_count}")
 print(f"\n📊 Node distribution by rank:")
 for rank, count in rank_stats:
     print(f"  • {rank}: {count}")

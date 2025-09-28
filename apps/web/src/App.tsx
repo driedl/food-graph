@@ -52,6 +52,7 @@ export default function App() {
   const nodeQuery = trpc.taxonomy.getNode.useQuery({ id: currentId! }, { enabled: !!currentId })
   const path = trpc.taxonomy.pathToRoot.useQuery({ id: currentId! }, { enabled: !!currentId })
   const children = trpc.taxonomy.getChildren.useQuery({ id: currentId! }, { enabled: !!currentId })
+  const docs = trpc.docs.getByTaxon.useQuery({ taxonId: currentId! }, { enabled: !!currentId })
 
   // Siblings (fetch parent’s children once)
   const parentId = (nodeQuery.data as TaxonNode | undefined)?.parentId ?? null
@@ -140,7 +141,7 @@ export default function App() {
   }, [nodeQuery.data, children.data])
 
   // Inspector tabs
-  const [tab, setTab] = useState<'overview' | 'lineage' | 'path'>('overview')
+  const [tab, setTab] = useState<'overview' | 'lineage' | 'path' | 'docs'>('overview')
 
   // Search keyboard nav
   useEffect(() => {
@@ -359,6 +360,9 @@ export default function App() {
               <Button size="sm" variant={tab === 'path' ? 'default' : 'outline'} onClick={() => setTab('path')}>
                 Path Builder
               </Button>
+              <Button size="sm" variant={tab === 'docs' ? 'default' : 'outline'} onClick={() => setTab('docs')}>
+                Docs
+              </Button>
             </div>
 
             {/* Panels */}
@@ -392,6 +396,21 @@ export default function App() {
                             </button>
                           ) : (
                             '—'
+                          )}
+                        </div>
+                        <div className="text-xs text-muted-foreground">Documentation</div>
+                        <div className="text-xs">
+                          {docs.data ? (
+                            <button 
+                              className="text-blue-600 hover:text-blue-800 underline" 
+                              onClick={() => setTab('docs')}
+                            >
+                              Available
+                            </button>
+                          ) : docs.isLoading ? (
+                            'Loading...'
+                          ) : (
+                            'Not available'
                           )}
                         </div>
                       </div>
@@ -433,11 +452,80 @@ export default function App() {
                     Compose a FoodState identity (client-only preview).
                   </div>
                   <Separator />
-                  {/* Tiny local “builder” with a few illustrative choices */}
+                  {/* Tiny local "builder" with a few illustrative choices */}
                   <PathBuilder
                     taxonPath={((path.data as TaxonNode[]) ?? []).map((p) => p.slug)}
                     onCopy={(s) => navigator.clipboard.writeText(s)}
                   />
+                </div>
+              )}
+
+              {tab === 'docs' && (
+                <div className="space-y-3 text-sm">
+                  {docs.isLoading ? (
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-5/6" />
+                    </div>
+                  ) : docs.data ? (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="text-base font-medium">{(docs.data as any).display_name || (nodeQuery.data as TaxonNode)?.name}</div>
+                        <div className="flex items-center gap-2">
+                          {(docs.data as any).rank && (
+                            <span
+                              className={`inline-flex items-center rounded border px-2 py-0.5 text-[10px] uppercase ${rankColor[(docs.data as any).rank] || 'bg-zinc-100 text-zinc-700 border-zinc-200'}`}
+                            >
+                              {(docs.data as any).rank}
+                            </span>
+                          )}
+                          {(docs.data as any).latin_name && (
+                            <span className="text-xs text-muted-foreground italic">
+                              {(docs.data as any).latin_name}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {(docs.data as any).summary && (
+                        <div className="space-y-2">
+                          <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Summary</div>
+                          <div className="text-sm leading-relaxed">{(docs.data as any).summary}</div>
+                        </div>
+                      )}
+
+                      {(docs.data as any).description_md && (
+                        <div className="space-y-2">
+                          <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Description</div>
+                          <div className="text-sm leading-relaxed whitespace-pre-wrap">{(docs.data as any).description_md}</div>
+                        </div>
+                      )}
+
+                      {(docs.data as any).tags && (docs.data as any).tags.length > 0 && (
+                        <div className="space-y-2">
+                          <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Tags</div>
+                          <div className="flex flex-wrap gap-1">
+                            {(docs.data as any).tags.map((tag: string, i: number) => (
+                              <Badge key={i} variant="secondary" className="text-xs">
+                                {tag}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <Separator />
+                      <div className="text-xs text-muted-foreground">
+                        Last updated: {(docs.data as any).updated_at}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center text-muted-foreground py-8">
+                      <div className="text-sm">No documentation available</div>
+                      <div className="text-xs mt-1">Documentation is sparse and only available for some taxa</div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
