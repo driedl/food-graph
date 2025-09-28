@@ -48,34 +48,6 @@ interface FileInfo {
 // ---- File Categories ------------------------------------------------------
 
 const FILE_CATEGORIES: Record<string, FileCategory> = {
-  all: {
-    name: 'All Project Files',
-    pattern: [
-      'apps/**/*.ts',
-      'apps/**/*.tsx',
-      'apps/**/*.js',
-      'apps/**/*.jsx',
-      'apps/**/*.json',
-      'apps/**/*.html',
-      'apps/**/*.css',
-      'apps/**/*.config.*',
-      'packages/**/*.ts',
-      'packages/**/*.tsx',
-      'packages/**/*.js',
-      'packages/**/*.jsx',
-      'packages/**/*.json',
-      'etl/**/*.py',
-      'etl/**/*.md',
-      'data/ontology/**/*.json',
-      'data/ontology/**/*.jsonl',
-      'data/sql/**/*.json',
-      'data/builds/*.json', // Include metadata JSON files from builds
-      'package.json',
-      'pnpm-workspace.yaml',
-      'README.md',
-    ],
-    description: 'All code and config files (excludes scripts and large data)',
-  },
   web: {
     name: 'Web App',
     pattern: [
@@ -87,8 +59,13 @@ const FILE_CATEGORIES: Record<string, FileCategory> = {
       'apps/web/**/*.html',
       'apps/web/**/*.css',
       'apps/web/**/*.config.*',
+      'packages/api-contract/**/*.ts',
+      'packages/api-contract/**/*.tsx',
+      'packages/api-contract/**/*.js',
+      'packages/api-contract/**/*.jsx',
+      'packages/api-contract/**/*.json',
     ],
-    description: 'React frontend with tRPC client',
+    description: 'React frontend with tRPC client and API contracts',
   },
   api: {
     name: 'API Server',
@@ -96,20 +73,35 @@ const FILE_CATEGORIES: Record<string, FileCategory> = {
       'apps/api/**/*.ts',
       'apps/api/**/*.js',
       'apps/api/**/*.json',
+      'apps/api/**/*.sql',
+      'packages/api-contract/**/*.ts',
+      'packages/api-contract/**/*.tsx',
+      'packages/api-contract/**/*.js',
+      'packages/api-contract/**/*.jsx',
+      'packages/api-contract/**/*.json',
     ],
-    description: 'tRPC server with SQLite',
+    description: 'tRPC server with SQLite, migrations, and API contracts',
   },
   etl: {
     name: 'ETL Processing',
     pattern: [
       'etl/**/*.py',
       'etl/**/*.md',
+      'packages/shared/**/*.ts',
+      'packages/shared/**/*.js',
+      'packages/shared/**/*.json',
+    ],
+    description: 'Python scripts and shared utilities',
+  },
+  ontology: {
+    name: 'Ontology Data',
+    pattern: [
       'data/ontology/**/*.json',
       'data/ontology/**/*.jsonl',
       'data/sql/**/*.json',
       'data/builds/*.json', // Include metadata JSON files from builds
     ],
-    description: 'Python scripts and data files',
+    description: 'Food ontology data and schemas',
   },
   scripts: {
     name: 'Project Scripts',
@@ -125,6 +117,7 @@ const FILE_CATEGORIES: Record<string, FileCategory> = {
     pattern: [
       'docs/**/*.md',
       'README.md',
+      'CONTRIBUTING.md',
     ],
     description: 'Project documentation',
   },
@@ -231,6 +224,7 @@ function shouldExclude(filePath: string, workspaceRoot: string): boolean {
     '*.db-shm',
     '*.db-wal',
     '.generated/',
+    'generated/code.md', // Exclude the output artifact from this script
     "routeTree.gen.ts",
     'apps/web/src/components/ui/' // Exclude shadcn UI components to reduce bloat
   ];
@@ -275,8 +269,14 @@ function getFileInfo(filePath: string, workspaceRoot: string): FileInfo | null {
 async function discoverFiles(categories: string[], workspaceRoot: string): Promise<FileInfo[]> {
   const files: FileInfo[] = [];
 
+  // Handle "all" category by selecting all other categories
+  let categoriesToProcess = categories;
+  if (categories.includes('all')) {
+    categoriesToProcess = Object.keys(FILE_CATEGORIES).filter(cat => cat !== 'all');
+  }
+
   // Collect all files from included categories
-  for (const categoryName of categories) {
+  for (const categoryName of categoriesToProcess) {
     const category = FILE_CATEGORIES[categoryName];
     if (category) {
       for (const pattern of category.pattern) {
@@ -381,10 +381,13 @@ async function getInteractiveOptions(): Promise<AggregateOptions> {
   ]);
 
   // Step 2: Category selection
-  const categoryChoices = Object.entries(FILE_CATEGORIES).map(([key, cat]) => ({
-    name: `${cat.name} - ${cat.description}`,
-    value: key,
-  }));
+  const categoryChoices = [
+    { name: 'All Project Files - Select all categories', value: 'all' },
+    ...Object.entries(FILE_CATEGORIES).map(([key, cat]) => ({
+      name: `${cat.name} - ${cat.description}`,
+      value: key,
+    }))
+  ];
 
   const categoriesAnswer = await inquirer.prompt([
     {
@@ -439,10 +442,13 @@ Content Levels:
   verbose    - Full file contents (perfect for AI context)
 
 File Categories:
-  all        - All code and configuration files in the project
-  web        - React frontend application with tRPC client
-  api        - tRPC server with SQLite database
-  etl        - Python scripts for data extraction and processing
+  all        - All project files (selects all other categories)
+  web        - React frontend application with tRPC client and API contracts
+  api        - tRPC server with SQLite database and API contracts
+  etl        - Python scripts and shared utilities
+  ontology   - Food ontology data and schemas
+  scripts    - Build and utility scripts
+  docs       - Project documentation
   config     - Project configuration, package management, and documentation
 
 Output Destinations:
@@ -466,6 +472,8 @@ Examples:
   pnpm ag --compact --categories api         # API code summary
   pnpm ag --verbose --categories all         # Everything
   pnpm ag --verbose --categories web,api     # Web app + API
+  pnpm ag --verbose --categories ontology    # Ontology data only
+  pnpm ag --verbose --categories scripts,docs # Scripts and documentation
 `);
 }
 

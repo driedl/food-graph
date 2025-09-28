@@ -5,6 +5,7 @@ _Last updated: 2025-09-28_
 Start here, then follow the numbered docs in order.
 
 ## Table of Contents
+
 1. [00_VISION](./00_VISION.md)
 2. [01_ARCHITECTURE](./01_ARCHITECTURE.md)
 3. [02_ONTOLOGY_KIT](./02_ONTOLOGY_KIT.md)
@@ -19,9 +20,11 @@ Start here, then follow the numbered docs in order.
 12. [11_STORAGE_AND_ARTIFACTS](./11_STORAGE_AND_ARTIFACTS.md) — Repo structure, models/, vocab/, build outputs.
 
 ### Sources & Guides
-- [FDC Foundation — Curation Guide](./sources/FDC_FOUNDATION_GUIDE.md)
+
+- [FDC Foundation — Curation Guide](./sources/FDC_FOUNDATION_IMPORT.md)
 
 ## Quick Start (Dev)
+
 ```bash
 pnpm install
 pnpm db:build

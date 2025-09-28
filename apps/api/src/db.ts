@@ -33,8 +33,12 @@ export function migrate() {
 }
 
 export function isEmpty() {
-  const row = db.prepare('SELECT COUNT(*) as c FROM nodes').get() as { c: number }
-  return row.c === 0
+  try {
+    const row = db.prepare('SELECT COUNT(*) as c FROM nodes').get() as { c: number }
+    return row.c === 0
+  } catch {
+    return true
+  }
 }
 
 export function seedMinimal() {

@@ -11,7 +11,7 @@
   "properties": {
     "id": {
       "type": "string",
-      "description": "attr:fad_pct, attr:salt_level"
+      "description": "attr:fat_pct, attr:salt_level"
     },
     "name": {
       "type": "string"

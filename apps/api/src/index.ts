@@ -8,7 +8,9 @@ import { env } from '@nutrition/config'
 
 async function main() {
   const app = Fastify({ logger: false })
-  await app.register(cors, { origin: true })
+  await app.register(cors, { 
+    origin: env.NODE_ENV === 'production' ? ['https://your.app'] : true 
+  })
 
   migrate()
   if (isEmpty()) seedMinimal()

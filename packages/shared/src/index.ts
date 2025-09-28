@@ -1,4 +1,7 @@
-export type NodeRank = 'root' | 'kingdom' | 'phylum' | 'class' | 'order' | 'family' | 'genus' | 'species' | 'variety' | 'form'
+export type NodeRank =
+  | 'root' | 'domain' | 'kingdom' | 'phylum' | 'class' | 'order'
+  | 'family' | 'genus' | 'species' | 'cultivar' | 'variety'
+  | 'breed' | 'product' | 'form'
 
 export interface TaxNode {
   id: string

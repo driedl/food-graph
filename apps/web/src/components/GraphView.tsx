@@ -1,5 +1,6 @@
 import React, { Suspense, lazy } from 'react'
-import { Node, Edge, Background, Controls, MiniMap } from 'reactflow'
+import type { Node, Edge } from 'reactflow'
+import 'reactflow/dist/style.css' // add this
 
 export interface GraphViewProps {
   nodes: Node[]
@@ -7,30 +8,29 @@ export interface GraphViewProps {
   onNodeClick?: (id: string) => void
 }
 
-// Lazy load React Flow to keep initial bundle smaller
-const ReactFlow = lazy(() => import('reactflow').then(module => ({ default: module.default })))
-
-function GraphViewInner({ nodes, edges, onNodeClick }: GraphViewProps) {
-  
-  return (
-    <ReactFlow
+// lazy-load the entire module and pluck what we need inside
+const Flow = lazy(async () => {
+  const m = await import('reactflow')
+  const Cmp = ({ nodes, edges, onNodeClick }: GraphViewProps) => (
+    <m.ReactFlow
       nodes={nodes}
       edges={edges}
       onNodeClick={(_, n) => onNodeClick?.(n.id)}
       fitView
     >
-      <MiniMap />
-      <Controls />
-      <Background />
-    </ReactFlow>
+      <m.MiniMap />
+      <m.Controls />
+      <m.Background />
+    </m.ReactFlow>
   )
-}
+  return { default: Cmp }
+})
 
 export default function GraphView(props: GraphViewProps) {
   return (
     <div className="min-h-[400px] h-[60vh] rounded-lg border">
       <Suspense fallback={<div className="h-full flex items-center justify-center text-muted-foreground">Loading graph...</div>}>
-        <GraphViewInner {...props} />
+        <Flow {...props} />
       </Suspense>
     </div>
   )

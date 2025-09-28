@@ -4,8 +4,12 @@ import { db } from './db'
 
 const t = initTRPC.create()
 
-const nullToNotFound = t.middleware(({ next }) => {
-  return next()
+const nullToNotFound = t.middleware(async ({ next }) => {
+  const res = await next()
+  if (res.ok && res.data === null) {
+    throw new TRPCError({ code: 'NOT_FOUND' })
+  }
+  return res
 })
 
 export const appRouter = t.router({
@@ -22,7 +26,7 @@ export const appRouter = t.router({
       return stmt.all(input.id)
     }),
 
-    getNode: t.procedure.input(z.object({ id: z.string() })).query(({ input }) => {
+    getNode: t.procedure.use(nullToNotFound).input(z.object({ id: z.string() })).query(({ input }) => {
       const stmt = db.prepare('SELECT id, name, slug, rank, parent_id as parentId FROM nodes WHERE id = ?')
       const node = stmt.get(input.id)
       return node ?? null
