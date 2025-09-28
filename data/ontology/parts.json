@@ -64,5 +64,63 @@
     "applies_to": [
       "tx:animalia:phasianidae:gallus:gallus_domesticus"
     ]
+  },
+  {
+    "id": "part:cut:belly",
+    "name": "Belly",
+    "kind": "animal",
+    "applies_to": [],
+    "notes": "Pork belly / bacon source"
+  },
+  {
+    "id": "part:cut:loin",
+    "name": "Loin",
+    "kind": "animal",
+    "applies_to": []
+  },
+  {
+    "id": "part:cut:brisket",
+    "name": "Brisket",
+    "kind": "animal",
+    "applies_to": [],
+    "notes": "Beef brisket"
+  },
+  {
+    "id": "part:cut:round",
+    "name": "Round",
+    "kind": "animal",
+    "applies_to": [],
+    "notes": "Beef round/leg"
+  },
+  {
+    "id": "part:organ:liver",
+    "name": "Liver",
+    "kind": "animal",
+    "applies_to": []
+  },
+  {
+    "id": "part:organ:kidney",
+    "name": "Kidney",
+    "kind": "animal",
+    "applies_to": []
+  },
+  {
+    "id": "part:organ:heart",
+    "name": "Heart",
+    "kind": "animal",
+    "applies_to": []
+  },
+  {
+    "id": "part:fat:leaf",
+    "name": "Leaf fat",
+    "kind": "animal",
+    "applies_to": [],
+    "notes": "Perirenal fat"
+  },
+  {
+    "id": "part:fat:subcutaneous",
+    "name": "Subcutaneous fat",
+    "kind": "animal",
+    "applies_to": []
   }
 ]

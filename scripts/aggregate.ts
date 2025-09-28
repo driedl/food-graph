@@ -111,6 +111,7 @@ const FILE_CATEGORIES: Record<string, FileCategory> = {
     pattern: [
       'scripts/**/*.ts',
       'scripts/**/*.js',
+      'scripts/**/*.py',
       'scripts/**/*.md',
     ],
     description: 'Build and utility scripts',
@@ -219,7 +220,6 @@ function shouldExclude(filePath: string, workspaceRoot: string): boolean {
     'Thumbs.db',
     'data/builds/', // Exclude builds directory (includes DB files)
     'data/sources/', // Exclude sources directory (can be huge)
-    'scripts/', // Exclude scripts directory
     'artifacts/',
     '*.duckdb*',
     '*.db',
@@ -229,6 +229,7 @@ function shouldExclude(filePath: string, workspaceRoot: string): boolean {
     '.generated/',
     'generated/code.md', // Exclude the output artifact from this script
     "routeTree.gen.ts",
+    'scripts/aggregate.ts', // Exclude this utility script
     'apps/web/src/components/ui/' // Exclude shadcn UI components to reduce bloat
   ];
 

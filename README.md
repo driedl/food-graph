@@ -43,17 +43,122 @@ pnpm dev
 
 ```
 apps/
-  api/                  # Fastify + tRPC + better-sqlite3
-  web/                  # Vite React UI, React Flow explorer
-etl/
-  py/                   # lightweight compiler & utilities
-data/
-  ontology/             # NDJSON/JSON ontology sources (authoritative)
-  builds/               # compiled SQLite DB(s) (artifacts)
-docs/                   # project documentation (start at INDEX.md)
+  api/                  # Fastify + tRPC + better-sqlite3 backend
+    ├── src/            # TypeScript source code
+    │   ├── db.ts       # Database connection & queries
+    │   ├── index.ts    # Fastify server setup
+    │   └── router.ts   # tRPC router & endpoints
+    ├── migrations/     # SQL migration files
+    │   ├── 0001_init.sql
+    │   ├── 0002_nodes_fts.sql
+    │   └── 0003_taxon_docs.sql
+    └── dist/           # Compiled JavaScript output
+
+  web/                  # Vite + React frontend with React Flow
+    ├── src/
+    │   ├── components/ # React components
+    │   │   ├── GraphView.tsx     # Main graph visualization
+    │   │   ├── ErrorBoundary.tsx # Error handling
+    │   │   └── ui/              # Reusable UI components
+    │   ├── lib/        # Utilities & tRPC client setup
+    │   └── styles/     # CSS & Tailwind configuration
+    └── index.html      # Entry point
+
 packages/
-  shared/               # shared TS types
+  shared/               # Shared TypeScript types & interfaces
+    └── src/index.ts   # TaxNode, NodeAttribute, NodeRank types
+
+  api-contract/         # tRPC router type exports (no runtime)
+    └── src/index.ts   # Re-exports AppRouter type for frontend
+
+  config/              # Environment configuration & validation
+    └── src/index.ts   # Zod schemas for env vars (NODE_ENV, PORT, DB_PATH)
+
+data/
+  ontology/            # Authoritative NDJSON/JSON ontology sources
+    ├── taxa/          # Taxonomic hierarchy data
+    │   ├── animalia/  # Animal taxa
+    │   ├── fungi/     # Fungal taxa
+    │   ├── plantae/   # Plant taxa (38 family files)
+    │   └── docs/      # Taxonomic documentation (.tx.md files)
+    ├── attributes.json # Attribute definitions
+    ├── nutrients.json # Nutrient catalog
+    ├── parts.json     # Food part definitions
+    ├── transforms.json # Processing transform definitions
+    └── compiled/      # Intermediate compilation artifacts
+
+  builds/              # Final compiled SQLite databases
+    ├── graph.dev.sqlite      # Main development database
+    ├── id_churn_report.json  # ID mapping reports
+    └── id_map.json          # ID translation mappings
+
+  sources/             # External data sources
+    └── fdc/           # USDA FoodData Central imports
+        ├── food.csv
+        ├── food_nutrient.csv
+        ├── food_portion.csv
+        └── nutrient.csv
+
+  sql/                 # Database schema definitions
+    └── schema/        # JSON schema files for validation
+
+etl/                   # Data compilation pipeline
+  └── py/             # Python ETL scripts
+      └── compile.py  # Main ontology → SQLite compiler
+
+scripts/               # Development & maintenance utilities
+  ├── aggregate.ts    # Data aggregation tools
+  ├── compile_docs.py # Documentation compilation
+  ├── compile_taxa.py # Taxonomic data compilation
+  ├── print-trpc-routes.ts # API route inspection
+  ├── run-sql.ts      # SQL query execution
+  ├── validate_ndjson.ts # NDJSON validation
+  ├── validate_taxa.py # Taxonomic data validation
+  └── ontology/       # Ontology-specific utilities
+      ├── diff.ts     # Ontology diffing
+      └── validate.ts # Ontology validation
+
+docs/                  # Comprehensive project documentation
+  ├── INDEX.md        # Start here - documentation overview
+  ├── 00_VISION.md    # Project vision & principles
+  ├── 01_ARCHITECTURE.md # System architecture
+  ├── 02_ONTOLOGY_KIT.md # Ontology authoring guide
+  ├── 03_ID_CONVENTIONS.md # ID naming & stability
+  ├── 04_ATTRIBUTES.md # Attribute system design
+  ├── 05_TRANSFORMS.md # Processing transforms
+  ├── 06_EVIDENCE_MODEL.md # Evidence & nutrition data
+  ├── 07_ROADMAP.md   # Development roadmap
+  ├── 08_PRIORS_EMBEDDINGS.md # ML embeddings strategy
+  ├── 09_CLASSIFICATIONS_AND_OVERLAYS.md # Classification systems
+  ├── 10_QA_GUARDS.md # Quality assurance
+  ├── 11_STORAGE_AND_ARTIFACTS.md # Storage architecture
+  ├── AGENT_GUIDE.md  # AI agent development guide
+  ├── adr/            # Architecture Decision Records
+  │   ├── 0001-foodstate-identity-is-path.md
+  │   └── 0002-fdc-as-evidence-not-identity.md
+  └── sources/        # Source-specific documentation
+      └── FDC_FOUNDATION_IMPORT.md
+
+generated/             # Auto-generated content
+  └── code.md         # Generated code documentation
+
+Root configuration:
+├── package.json      # Root package.json with Turbo scripts
+├── turbo.json        # Turbo monorepo configuration
+├── pnpm-workspace.yaml # PNPM workspace definition
+├── tsconfig.base.json # Shared TypeScript configuration
+├── Makefile          # Build automation
+└── CONTRIBUTING.md   # Contribution guidelines
 ```
+
+### Key architectural decisions:
+
+- **Workspace packages**: Shared types flow from `packages/shared` → `packages/api-contract` → frontend
+- **Data pipeline**: `data/ontology/` (source) → `data/ontology/compiled/` (intermediate) → `data/builds/` (final)
+- **Type safety**: Full TypeScript coverage with tRPC providing end-to-end type safety
+- **Build system**: Turbo for monorepo orchestration, Vite for frontend, tsx for backend
+- **Database**: SQLite with migrations and FTS (Full-Text Search) support
+- **UI**: React + Tailwind + React Flow for graph visualization
 
 ---
 

@@ -58,6 +58,59 @@ export const appRouter = t.router({
       `)
       return stmt.all(q)
     }),
+
+    getPartsForTaxon: t.procedure
+      .input(z.object({ id: z.string() }))
+      .query(({ input }) => {
+        const stmt = db.prepare(`
+          WITH RECURSIVE lineage(id, parent_id) AS (
+            SELECT id, parent_id FROM nodes WHERE id = ?
+            UNION ALL
+            SELECT n.id, n.parent_id FROM nodes n
+            JOIN lineage l ON n.id = l.parent_id
+          )
+          SELECT DISTINCT p.id as id, p.name as name, p.kind as kind
+          FROM has_part hp
+          JOIN part_def p ON p.id = hp.part_id
+          WHERE hp.taxon_id IN (SELECT id FROM lineage)
+          ORDER BY p.kind, p.name
+        `)
+        try {
+          return stmt.all(input.id)
+        } catch {
+          // If compiled DB is older and lacks tables, return empty gracefully
+          return []
+        }
+      }),
+
+    getTransformsFor: t.procedure
+      .input(z.object({ taxonId: z.string(), partId: z.string() }))
+      .query(({ input }) => {
+        const stmt = db.prepare(`
+          WITH RECURSIVE lineage(id, parent_id) AS (
+            SELECT id, parent_id FROM nodes WHERE id = ?
+            UNION ALL
+            SELECT n.id, n.parent_id FROM nodes n
+            JOIN lineage l ON n.id = l.parent_id
+          )
+          SELECT DISTINCT td.id, td.name, td.identity, td.schema_json
+          FROM transform_applicability ta
+          JOIN transform_def td ON td.id = ta.transform_id
+          WHERE ta.part_id = ? AND ta.taxon_id IN (SELECT id FROM lineage)
+          ORDER BY td.name
+        `)
+        try {
+          const rows = stmt.all(input.taxonId, input.partId) as any[]
+          return rows.map(r => ({
+            id: r.id,
+            name: r.name,
+            identity: !!r.identity,
+            schema: r.schema_json ? JSON.parse(r.schema_json) : null
+          }))
+        } catch {
+          return []
+        }
+      }),
   }),
 
   docs: t.router({

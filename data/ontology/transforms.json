@@ -114,5 +114,54 @@
       }
     ],
     "notes": "Post-mill enrichment of select micronutrients"
+  },
+  {
+    "id": "tf:cure",
+    "name": "Cure (salt/nitrite)",
+    "identity": true,
+    "params": [
+      {
+        "key": "style",
+        "kind": "enum",
+        "enum": [
+          "dry",
+          "wet"
+        ]
+      },
+      {
+        "key": "nitrite",
+        "kind": "boolean"
+      }
+    ],
+    "notes": "Meat curing (e.g., bacon, pastrami); sodium-bearing and water-binding"
+  },
+  {
+    "id": "tf:smoke",
+    "name": "Smoke",
+    "identity": true,
+    "params": [
+      {
+        "key": "style",
+        "kind": "enum",
+        "enum": [
+          "cold",
+          "hot"
+        ]
+      }
+    ],
+    "notes": "Cold/hot smoking; often combined with cure"
+  },
+  {
+    "id": "tf:trim",
+    "name": "Trim/Lean standardization",
+    "identity": true,
+    "params": [
+      {
+        "key": "lean_pct",
+        "kind": "number",
+        "unit": "% m/m"
+      }
+    ],
+    "notes": "Standardize lean/fat ratio (ties to attr:lean_pct)"
   }
 ]

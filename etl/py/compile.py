@@ -94,9 +94,36 @@ CREATE TABLE IF NOT EXISTS taxon_doc (
 CREATE INDEX IF NOT EXISTS idx_taxon_doc_taxon_id ON taxon_doc(taxon_id);
 CREATE INDEX IF NOT EXISTS idx_taxon_doc_lang ON taxon_doc(lang);
 CREATE INDEX IF NOT EXISTS idx_taxon_doc_updated ON taxon_doc(updated_at);
+CREATE TABLE IF NOT EXISTS part_def (
+  id   TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  kind TEXT,
+  notes TEXT
+);
+CREATE TABLE IF NOT EXISTS has_part (
+  taxon_id TEXT NOT NULL REFERENCES nodes(id) ON DELETE CASCADE,
+  part_id  TEXT NOT NULL REFERENCES part_def(id) ON DELETE RESTRICT,
+  PRIMARY KEY (taxon_id, part_id)
+);
+CREATE TABLE IF NOT EXISTS transform_def (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  identity INTEGER NOT NULL,
+  schema_json TEXT
+);
+CREATE TABLE IF NOT EXISTS transform_applicability (
+  taxon_id TEXT NOT NULL REFERENCES nodes(id) ON DELETE CASCADE,
+  part_id TEXT NOT NULL REFERENCES part_def(id) ON DELETE RESTRICT,
+  transform_id TEXT NOT NULL REFERENCES transform_def(id) ON DELETE RESTRICT,
+  PRIMARY KEY (taxon_id, part_id, transform_id)
+);
 """)
 
 print_info("Clearing existing data...")
+cur.execute("DELETE FROM transform_applicability")
+cur.execute("DELETE FROM transform_def")
+cur.execute("DELETE FROM has_part")
+cur.execute("DELETE FROM part_def")
 cur.execute("DELETE FROM taxon_doc")
 cur.execute("DELETE FROM synonyms")
 cur.execute("DELETE FROM node_attributes")
@@ -126,6 +153,50 @@ for i, a in enumerate(attrs):
         print(f"  • {a['id']} ({kind}) - {a.get('name', 'No name')}")
 
 print_success(f"Loaded {len(attrs)} attribute definitions")
+
+# Load parts registry
+print_step("2.5/5", "Loading part definitions...")
+parts_file = os.path.join(args.in_dir, "parts.json")
+if not os.path.exists(parts_file):
+    print_error(f"Parts file not found: {parts_file}")
+    sys.exit(1)
+
+with open(parts_file, "r", encoding="utf-8") as f:
+    parts = json.load(f)
+
+print_info(f"Found {len(parts)} parts")
+for p in parts:
+    cur.execute(
+        "INSERT OR REPLACE INTO part_def(id,name,kind,notes) VALUES (?,?,?,?)",
+        (p["id"], p["name"], p.get("kind"), p.get("notes"))
+    )
+
+# Capture any built-in applies_to on parts as rules
+builtin_part_rules = []
+for p in parts:
+    if p.get("applies_to"):
+        builtin_part_rules.append({"part": p["id"], "applies_to": p["applies_to"]})
+
+print_success(f"Loaded {len(parts)} parts (and {len(builtin_part_rules)} built-in applicability rules)")
+
+# Load transform definitions
+print_step("2.7/5", "Loading transform definitions...")
+transforms_file = os.path.join(args.in_dir, "transforms.json")
+if not os.path.exists(transforms_file):
+    print_error(f"Transforms file not found: {transforms_file}")
+    sys.exit(1)
+
+with open(transforms_file, "r", encoding="utf-8") as f:
+    tdefs = json.load(f)
+
+print_info(f"Found {len(tdefs)} transform families")
+for t in tdefs:
+    schema_json = json.dumps(t.get("params", []), ensure_ascii=False)
+    cur.execute(
+        "INSERT OR REPLACE INTO transform_def(id,name,identity,schema_json) VALUES (?,?,?,?)",
+        (t["id"], t["name"], 1 if t.get("identity") else 0, schema_json)
+    )
+print_success(f"Loaded {len(tdefs)} transforms")
 
 # Collect all taxa lines
 print_step("3/5", "Loading taxa data...")
@@ -184,6 +255,47 @@ if os.path.exists(docs_file):
     print_success(f"Loaded {len(docs_rows)} documentation records")
 else:
     print_info("No documentation file found, skipping...")
+
+# Load rules file
+print_step("3.6/5", "Loading parts applicability rules...")
+rules_dir = os.path.join(args.in_dir, "rules")
+os.makedirs(rules_dir, exist_ok=True)
+parts_rules_file = os.path.join(rules_dir, "parts_applicability.jsonl")
+parts_rules = []
+if os.path.exists(parts_rules_file):
+    with open(parts_rules_file, "r", encoding="utf-8") as f:
+        for line_num, line in enumerate(f, 1):
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                obj = json.loads(line)
+                parts_rules.append(obj)
+            except json.JSONDecodeError as e:
+                print_error(f"JSON decode error in parts_applicability line {line_num}: {e}")
+else:
+    print_info("No parts_applicability.jsonl found, proceeding with built-in applies_to only.")
+
+print_success(f"Loaded {len(parts_rules)} parts applicability rules")
+
+# Load transform applicability rules
+print_step("3.7/5", "Loading transform applicability rules...")
+tx_rules_file = os.path.join(args.in_dir, "rules", "transform_applicability.jsonl")
+tx_rules = []
+if os.path.exists(tx_rules_file):
+    with open(tx_rules_file, "r", encoding="utf-8") as f:
+        for line_num, line in enumerate(f, 1):
+            line = line.strip()
+            if not line: 
+                continue
+            try:
+                obj = json.loads(line)
+                tx_rules.append(obj)
+            except json.JSONDecodeError as e:
+                print_error(f"JSON decode error in transform_applicability line {line_num}: {e}")
+else:
+    print_info("No transform_applicability.jsonl found; continuing without explicit rules.")
+print_success(f"Loaded {len(tx_rules)} transform applicability rules")
 
 # Insert nodes in parent-first order using topological sort
 print_step("4/5", "Sorting taxa by hierarchy depth...")
@@ -270,6 +382,64 @@ for i, o in enumerate(rows):
 
 print_success(f"Inserted {nodes_inserted} nodes and {synonyms_inserted} synonyms")
 
+# Materialize has_part relationships
+print_step("5.1/5", "Materializing has_part (taxon ↔ part) from rules...")
+
+# Gather all taxa ids from DB
+all_taxa = [row[0] for row in cur.execute("SELECT id FROM nodes").fetchall()]
+
+def expand_applies_to(rule, all_ids):
+    prefixes = rule.get("applies_to", [])
+    exclude = set(rule.get("exclude", []))
+    for pref in prefixes:
+        for tid in all_ids:
+            if tid.startswith(pref) and tid not in exclude:
+                yield (tid, rule["part"])
+
+pairs = set()
+
+# Built-in part applies_to from parts.json
+for r in builtin_part_rules:
+    for pair in expand_applies_to(r, all_taxa):
+        pairs.add(pair)
+
+# External rules JSONL
+for r in parts_rules:
+    for pair in expand_applies_to(r, all_taxa):
+        pairs.add(pair)
+
+cur.executemany("INSERT OR IGNORE INTO has_part(taxon_id, part_id) VALUES (?,?)", list(pairs))
+print_success(f"has_part rows inserted: {len(pairs)}")
+
+# Materialize transform_applicability
+print_step("5.2/5", "Materializing transform_applicability...")
+
+# Cache: all taxa, and has_part pairs
+all_taxa = [row[0] for row in cur.execute("SELECT id FROM nodes").fetchall()]
+hp_pairs = set((row[0], row[1]) for row in cur.execute("SELECT taxon_id, part_id FROM has_part").fetchall())
+
+def expand_taxa(prefix: str):
+    for tid in all_taxa:
+        if tid.startswith(prefix):
+            yield tid
+
+rows = set()
+for rule in tx_rules:
+    t_id = rule["transform"]
+    for ap in rule.get("applies_to", []):
+        tx_prefix = ap["taxon_prefix"]
+        parts = ap.get("parts", [])
+        for tid in expand_taxa(tx_prefix):
+            for pid in parts:
+                if (tid, pid) in hp_pairs:
+                    rows.add((tid, pid, t_id))
+
+cur.executemany(
+    "INSERT OR IGNORE INTO transform_applicability(taxon_id, part_id, transform_id) VALUES (?,?,?)",
+    list(rows)
+)
+print_success(f"transform_applicability rows inserted: {len(rows)}")
+
 # Insert documentation
 if docs_rows:
     print_step("5.5/5", "Inserting documentation...")
@@ -313,6 +483,9 @@ node_count = cur.execute("SELECT COUNT(*) FROM nodes").fetchone()[0]
 synonym_count = cur.execute("SELECT COUNT(*) FROM synonyms").fetchone()[0]
 attr_count = cur.execute("SELECT COUNT(*) FROM attr_def").fetchone()[0]
 docs_count = cur.execute("SELECT COUNT(*) FROM taxon_doc").fetchone()[0]
+has_part_count = cur.execute("SELECT COUNT(*) FROM has_part").fetchone()[0]
+tf_count = cur.execute("SELECT COUNT(*) FROM transform_def").fetchone()[0]
+tfap_count = cur.execute("SELECT COUNT(*) FROM transform_applicability").fetchone()[0]
 
 # Get rank distribution
 rank_stats = cur.execute("SELECT rank, COUNT(*) FROM nodes GROUP BY rank ORDER BY COUNT(*) DESC").fetchall()
@@ -322,6 +495,9 @@ print(f"📈 Total nodes: {node_count}")
 print(f"🏷️  Total synonyms: {synonym_count}")
 print(f"🔧 Total attributes: {attr_count}")
 print(f"📚 Total documentation records: {docs_count}")
+print(f"🧩 Total has_part rows: {has_part_count}")
+print(f"🛠️  Total transform defs: {tf_count}")
+print(f"🔗 Total transform_applicability rows: {tfap_count}")
 print(f"\n📊 Node distribution by rank:")
 for rank, count in rank_stats:
     print(f"  • {rank}: {count}")

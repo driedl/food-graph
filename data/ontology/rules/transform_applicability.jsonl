@@ -1,0 +1,3 @@
+{"transform":"tf:trim","applies_to":[{"taxon_prefix":"tx:animalia:chordata:mammalia","parts":["part:muscle","part:cut:loin","part:cut:round","part:cut:brisket","part:cut:belly"]}]}
+{"transform":"tf:cure","applies_to":[{"taxon_prefix":"tx:animalia:chordata:mammalia:artiodactyla:suidae:sus:scrofa_domesticus","parts":["part:cut:belly"]}]}
+{"transform":"tf:smoke","applies_to":[{"taxon_prefix":"tx:animalia:chordata:mammalia:artiodactyla:suidae:sus:scrofa_domesticus","parts":["part:cut:belly"]},{"taxon_prefix":"tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus","parts":["part:cut:brisket"]}]}
