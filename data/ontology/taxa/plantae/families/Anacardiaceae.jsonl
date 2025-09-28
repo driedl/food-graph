@@ -1,0 +1,9 @@
+{"id": "tx:plantae:anacardiaceae", "parent": "tx:plantae", "rank": "family", "display_name": "Anacardiaceae", "latin_name": "Anacardiaceae", "aliases": []}
+{"id": "tx:plantae:anacardiaceae:mangifera", "parent": "tx:plantae:anacardiaceae", "rank": "genus", "display_name": "Mangifera", "latin_name": "Mangifera", "aliases": []}
+{"id": "tx:plantae:anacardiaceae:mangifera:indica", "parent": "tx:plantae:anacardiaceae:mangifera", "rank": "species", "display_name": "Mango", "latin_name": "Mangifera indica", "aliases": ["mango"]}
+{"id": "tx:plantae:anacardiaceae:mangifera:indica:ataulfo", "parent": "tx:plantae:anacardiaceae:mangifera:indica", "rank": "cultivar", "display_name": "Mango (Ataulfo)", "latin_name": "Mangifera indica 'Ataulfo'", "aliases": ["ataulfo", "honey mango"]}
+{"id": "tx:plantae:anacardiaceae:mangifera:indica:tommy_atkins", "parent": "tx:plantae:anacardiaceae:mangifera:indica", "rank": "cultivar", "display_name": "Mango (Tommy Atkins)", "latin_name": "Mangifera indica 'Tommy Atkins'", "aliases": ["tommy atkins"]}
+{"id": "tx:plantae:anacardiaceae:anacardium", "parent": "tx:plantae:anacardiaceae", "rank": "genus", "display_name": "Anacardium", "latin_name": "Anacardium", "aliases": []}
+{"id": "tx:plantae:anacardiaceae:anacardium:occidentale", "parent": "tx:plantae:anacardiaceae:anacardium", "rank": "species", "display_name": "Cashew", "latin_name": "Anacardium occidentale", "aliases": ["cashew", "cashews"]}
+{"id": "tx:plantae:anacardiaceae:pistacia", "parent": "tx:plantae:anacardiaceae", "rank": "genus", "display_name": "Pistachio (genus)", "latin_name": "Pistacia", "aliases": []}
+{"id": "tx:plantae:anacardiaceae:pistacia:vera", "parent": "tx:plantae:anacardiaceae:pistacia", "rank": "species", "display_name": "Pistachio", "latin_name": "Pistacia vera", "aliases": ["pistachio", "pistachios"]}

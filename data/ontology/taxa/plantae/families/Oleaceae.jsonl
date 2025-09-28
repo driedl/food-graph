@@ -1,0 +1,3 @@
+{"id": "tx:plantae:oleaceae", "parent": "tx:plantae", "rank": "family", "display_name": "Oleaceae", "latin_name": "Oleaceae", "aliases": []}
+{"id": "tx:plantae:oleaceae:olea", "parent": "tx:plantae:oleaceae", "rank": "genus", "display_name": "Olea", "latin_name": "Olea", "aliases": []}
+{"id": "tx:plantae:oleaceae:olea:europaea", "parent": "tx:plantae:oleaceae:olea", "rank": "species", "display_name": "Olive", "latin_name": "Olea europaea", "aliases": ["olive", "olives"]}

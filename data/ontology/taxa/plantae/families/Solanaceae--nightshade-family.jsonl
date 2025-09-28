@@ -1,0 +1,14 @@
+{"id": "tx:plantae:solanaceae", "parent": "tx:plantae", "rank": "family", "display_name": "Solanaceae", "latin_name": "Solanaceae", "aliases": []}
+{"id": "tx:plantae:solanaceae:solanum", "parent": "tx:plantae:solanaceae", "rank": "genus", "display_name": "Solanum", "latin_name": "Solanum", "aliases": []}
+{"id": "tx:plantae:solanaceae:solanum:lycopersicum", "parent": "tx:plantae:solanaceae:solanum", "rank": "species", "display_name": "Tomato", "latin_name": "Solanum lycopersicum", "aliases": ["tomato", "tomatoes"]}
+{"id": "tx:plantae:solanaceae:solanum:lycopersicum:roma", "parent": "tx:plantae:solanaceae:solanum:lycopersicum", "rank": "cultivar", "display_name": "Tomato (Roma)", "latin_name": "Solanum lycopersicum 'Roma'", "aliases": ["roma tomato"]}
+{"id": "tx:plantae:solanaceae:solanum:lycopersicum:grape", "parent": "tx:plantae:solanaceae:solanum:lycopersicum", "rank": "cultivar", "display_name": "Tomato (Grape)", "latin_name": "Solanum lycopersicum 'Grape'", "aliases": ["grape tomato"]}
+{"id": "tx:plantae:solanaceae:solanum:melongena", "parent": "tx:plantae:solanaceae:solanum", "rank": "species", "display_name": "Eggplant", "latin_name": "Solanum melongena", "aliases": ["eggplant"]}
+{"id": "tx:plantae:solanaceae:solanum:tuberosum", "parent": "tx:plantae:solanaceae:solanum", "rank": "species", "display_name": "Potato", "latin_name": "Solanum tuberosum", "aliases": ["potato", "potatoes"]}
+{"id": "tx:plantae:solanaceae:solanum:tuberosum:russet", "parent": "tx:plantae:solanaceae:solanum:tuberosum", "rank": "cultivar", "display_name": "Potato (Russet)", "latin_name": "Solanum tuberosum 'Russet'", "aliases": ["russet potato"]}
+{"id": "tx:plantae:solanaceae:solanum:tuberosum:yukon_gold", "parent": "tx:plantae:solanaceae:solanum:tuberosum", "rank": "cultivar", "display_name": "Potato (Yukon Gold)", "latin_name": "Solanum tuberosum 'Yukon Gold'", "aliases": ["yukon gold"]}
+{"id": "tx:plantae:solanaceae:solanum:tuberosum:red_skin", "parent": "tx:plantae:solanaceae:solanum:tuberosum", "rank": "cultivar", "display_name": "Potato (Red skin)", "latin_name": "Solanum tuberosum (red-skinned cvs.)", "aliases": ["red potato"]}
+{"id": "tx:plantae:solanaceae:capsicum", "parent": "tx:plantae:solanaceae", "rank": "genus", "display_name": "Capsicum", "latin_name": "Capsicum", "aliases": []}
+{"id": "tx:plantae:solanaceae:capsicum:annuum", "parent": "tx:plantae:solanaceae:capsicum", "rank": "species", "display_name": "Bell pepper", "latin_name": "Capsicum annuum", "aliases": ["bell pepper", "capsicum"]}
+{"id": "tx:plantae:solanaceae:physalis", "parent": "tx:plantae:solanaceae", "rank": "genus", "display_name": "Physalis", "latin_name": "Physalis", "aliases": []}
+{"id": "tx:plantae:solanaceae:physalis:philadelphica", "parent": "tx:plantae:solanaceae:physalis", "rank": "species", "display_name": "Tomatillo", "latin_name": "Physalis philadelphica", "aliases": ["tomatillo"]}

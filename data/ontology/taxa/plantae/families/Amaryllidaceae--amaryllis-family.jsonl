@@ -1,0 +1,7 @@
+{"id": "tx:plantae:amaryllidaceae", "parent": "tx:plantae", "rank": "family", "display_name": "Amaryllidaceae", "latin_name": "Amaryllidaceae", "aliases": []}
+{"id": "tx:plantae:amaryllidaceae:allium", "parent": "tx:plantae:amaryllidaceae", "rank": "genus", "display_name": "Allium", "latin_name": "Allium", "aliases": []}
+{"id": "tx:plantae:amaryllidaceae:allium:cepa", "parent": "tx:plantae:amaryllidaceae:allium", "rank": "species", "display_name": "Onion", "latin_name": "Allium cepa", "aliases": ["onion", "onions"]}
+{"id": "tx:plantae:amaryllidaceae:allium:cepa:shallot", "parent": "tx:plantae:amaryllidaceae:allium:cepa", "rank": "form", "display_name": "Shallot", "latin_name": "Allium cepa (Aggregatum Group)", "aliases": ["shallot"]}
+{"id": "tx:plantae:amaryllidaceae:allium:sativum", "parent": "tx:plantae:amaryllidaceae:allium", "rank": "species", "display_name": "Garlic", "latin_name": "Allium sativum", "aliases": ["garlic"]}
+{"id": "tx:plantae:amaryllidaceae:allium:porrum", "parent": "tx:plantae:amaryllidaceae:allium", "rank": "species", "display_name": "Leek", "latin_name": "Allium porrum", "aliases": ["leek", "leeks"]}
+{"id": "tx:plantae:amaryllidaceae:allium:fistulosum", "parent": "tx:plantae:amaryllidaceae:allium", "rank": "species", "display_name": "Scallion (green onion)", "latin_name": "Allium fistulosum", "aliases": ["scallion", "green onion"]}

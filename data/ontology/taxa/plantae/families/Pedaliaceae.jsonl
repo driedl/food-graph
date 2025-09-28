@@ -1,0 +1,3 @@
+{"id": "tx:plantae:pedaliaceae", "parent": "tx:plantae", "rank": "family", "display_name": "Pedaliaceae", "latin_name": "Pedaliaceae", "aliases": []}
+{"id": "tx:plantae:pedaliaceae:sesamum", "parent": "tx:plantae:pedaliaceae", "rank": "genus", "display_name": "Sesamum", "latin_name": "Sesamum", "aliases": []}
+{"id": "tx:plantae:pedaliaceae:sesamum:indicum", "parent": "tx:plantae:pedaliaceae:sesamum", "rank": "species", "display_name": "Sesame", "latin_name": "Sesamum indicum", "aliases": ["sesame", "sesame seeds"]}

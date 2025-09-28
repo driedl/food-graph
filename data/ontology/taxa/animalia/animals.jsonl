@@ -1,0 +1,91 @@
+// Chordata (vertebrates)
+{"id": "tx:animalia:chordata", "parent": "tx:animalia", "rank": "phylum", "display_name": "Chordata", "latin_name": "Chordata", "aliases": []}
+
+// Mammals
+{"id": "tx:animalia:chordata:mammalia", "parent": "tx:animalia:chordata", "rank": "class", "display_name": "Mammalia", "latin_name": "Mammalia", "aliases": []}
+
+// Artiodactyla (even-toed ungulates)
+{"id": "tx:animalia:chordata:mammalia:artiodactyla", "parent": "tx:animalia:chordata:mammalia", "rank": "order", "display_name": "Artiodactyla", "latin_name": "Artiodactyla", "aliases": []}
+
+// Bovidae (cattle, sheep, goats, etc.)
+{"id": "tx:animalia:chordata:mammalia:artiodactyla:bovidae", "parent": "tx:animalia:chordata:mammalia:artiodactyla", "rank": "family", "display_name": "Bovidae", "latin_name": "Bovidae", "aliases": []}
+{"id": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos", "parent": "tx:animalia:chordata:mammalia:artiodactyla:bovidae", "rank": "genus", "display_name": "Cattle (genus)", "latin_name": "Bos", "aliases": []}
+{"id": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus", "parent": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos", "rank": "species", "display_name": "Cow", "latin_name": "Bos taurus", "aliases": ["cow"]}
+{"id": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:ovis", "parent": "tx:animalia:chordata:mammalia:artiodactyla:bovidae", "rank": "genus", "display_name": "Ovis", "latin_name": "Ovis", "aliases": []}
+{"id": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:ovis:aries", "parent": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:ovis", "rank": "species", "display_name": "Sheep (lamb)", "latin_name": "Ovis aries", "aliases": ["lamb", "mutton"]}
+{"id": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bison", "parent": "tx:animalia:chordata:mammalia:artiodactyla:bovidae", "rank": "genus", "display_name": "Bison", "latin_name": "Bison", "aliases": []}
+{"id": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bison:bison", "parent": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bison", "rank": "species", "display_name": "American bison", "latin_name": "Bison bison", "aliases": ["bison"]}
+
+// Suidae (pigs)
+{"id": "tx:animalia:chordata:mammalia:artiodactyla:suidae", "parent": "tx:animalia:chordata:mammalia:artiodactyla", "rank": "family", "display_name": "Suidae", "latin_name": "Suidae", "aliases": []}
+{"id": "tx:animalia:chordata:mammalia:artiodactyla:suidae:sus", "parent": "tx:animalia:chordata:mammalia:artiodactyla:suidae", "rank": "genus", "display_name": "Sus", "latin_name": "Sus", "aliases": []}
+{"id": "tx:animalia:chordata:mammalia:artiodactyla:suidae:sus:scrofa_domesticus", "parent": "tx:animalia:chordata:mammalia:artiodactyla:suidae:sus", "rank": "species", "display_name": "Pig", "latin_name": "Sus scrofa domesticus", "aliases": ["pork", "pig"]}
+
+// Birds (Aves)
+{"id": "tx:animalia:chordata:aves", "parent": "tx:animalia:chordata", "rank": "class", "display_name": "Aves", "latin_name": "Aves", "aliases": []}
+
+// Galliformes (chicken-like birds)
+{"id": "tx:animalia:chordata:aves:galliformes", "parent": "tx:animalia:chordata:aves", "rank": "order", "display_name": "Galliformes", "latin_name": "Galliformes", "aliases": []}
+{"id": "tx:animalia:chordata:aves:galliformes:phasianidae", "parent": "tx:animalia:chordata:aves:galliformes", "rank": "family", "display_name": "Phasianidae", "latin_name": "Phasianidae", "aliases": []}
+{"id": "tx:animalia:chordata:aves:galliformes:phasianidae:gallus", "parent": "tx:animalia:chordata:aves:galliformes:phasianidae", "rank": "genus", "display_name": "Gallus", "latin_name": "Gallus", "aliases": []}
+{"id": "tx:animalia:chordata:aves:galliformes:phasianidae:gallus:gallus_domesticus", "parent": "tx:animalia:chordata:aves:galliformes:phasianidae:gallus", "rank": "species", "display_name": "Chicken", "latin_name": "Gallus gallus domesticus", "aliases": ["chicken"]}
+
+// Meleagrididae (turkeys)
+{"id": "tx:animalia:chordata:aves:galliformes:meleagrididae", "parent": "tx:animalia:chordata:aves:galliformes", "rank": "family", "display_name": "Meleagrididae", "latin_name": "Meleagrididae", "aliases": []}
+{"id": "tx:animalia:chordata:aves:galliformes:meleagrididae:meleagris", "parent": "tx:animalia:chordata:aves:galliformes:meleagrididae", "rank": "genus", "display_name": "Meleagris", "latin_name": "Meleagris", "aliases": []}
+{"id": "tx:animalia:chordata:aves:galliformes:meleagrididae:meleagris:gallopavo", "parent": "tx:animalia:chordata:aves:galliformes:meleagrididae:meleagris", "rank": "species", "display_name": "Turkey", "latin_name": "Meleagris gallopavo", "aliases": ["turkey"]}
+
+// Fish (Actinopterygii)
+{"id": "tx:animalia:chordata:actinopterygii", "parent": "tx:animalia:chordata", "rank": "class", "display_name": "Actinopterygii", "latin_name": "Actinopterygii", "aliases": []}
+
+// Gadiformes (cod-like fish)
+{"id": "tx:animalia:chordata:actinopterygii:gadiformes", "parent": "tx:animalia:chordata:actinopterygii", "rank": "order", "display_name": "Gadiformes", "latin_name": "Gadiformes", "aliases": []}
+{"id": "tx:animalia:chordata:actinopterygii:gadiformes:gadidae", "parent": "tx:animalia:chordata:actinopterygii:gadiformes", "rank": "family", "display_name": "Gadidae", "latin_name": "Gadidae", "aliases": []}
+{"id": "tx:animalia:chordata:actinopterygii:gadiformes:gadidae:gadus", "parent": "tx:animalia:chordata:actinopterygii:gadiformes:gadidae", "rank": "genus", "display_name": "Gadus", "latin_name": "Gadus", "aliases": []}
+{"id": "tx:animalia:chordata:actinopterygii:gadiformes:gadidae:gadus:morhua", "parent": "tx:animalia:chordata:actinopterygii:gadiformes:gadidae:gadus", "rank": "species", "display_name": "Atlantic cod", "latin_name": "Gadus morhua", "aliases": ["cod"]}
+{"id": "tx:animalia:chordata:actinopterygii:gadiformes:gadidae:gadus:chalcogrammus", "parent": "tx:animalia:chordata:actinopterygii:gadiformes:gadidae:gadus", "rank": "species", "display_name": "Alaska pollock", "latin_name": "Gadus chalcogrammus", "aliases": ["pollock"]}
+{"id": "tx:animalia:chordata:actinopterygii:gadiformes:gadidae:melanogrammus", "parent": "tx:animalia:chordata:actinopterygii:gadiformes:gadidae", "rank": "genus", "display_name": "Melanogrammus", "latin_name": "Melanogrammus", "aliases": []}
+{"id": "tx:animalia:chordata:actinopterygii:gadiformes:gadidae:melanogrammus:aeglefinus", "parent": "tx:animalia:chordata:actinopterygii:gadiformes:gadidae:melanogrammus", "rank": "species", "display_name": "Haddock", "latin_name": "Melanogrammus aeglefinus", "aliases": ["haddock"]}
+
+// Salmoniformes (salmon-like fish)
+{"id": "tx:animalia:chordata:actinopterygii:salmoniformes", "parent": "tx:animalia:chordata:actinopterygii", "rank": "order", "display_name": "Salmoniformes", "latin_name": "Salmoniformes", "aliases": []}
+{"id": "tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae", "parent": "tx:animalia:chordata:actinopterygii:salmoniformes", "rank": "family", "display_name": "Salmonidae", "latin_name": "Salmonidae", "aliases": []}
+{"id": "tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae:salmo", "parent": "tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae", "rank": "genus", "display_name": "Salmo", "latin_name": "Salmo", "aliases": []}
+{"id": "tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae:salmo:salar", "parent": "tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae:salmo", "rank": "species", "display_name": "Atlantic salmon", "latin_name": "Salmo salar", "aliases": ["salmon"]}
+{"id": "tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae:oncorhynchus", "parent": "tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae", "rank": "genus", "display_name": "Oncorhynchus", "latin_name": "Oncorhynchus", "aliases": []}
+{"id": "tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae:oncorhynchus:nerka", "parent": "tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae:oncorhynchus", "rank": "species", "display_name": "Sockeye salmon", "latin_name": "Oncorhynchus nerka", "aliases": ["sockeye"]}
+
+// Perciformes (perch-like fish)
+{"id": "tx:animalia:chordata:actinopterygii:perciformes", "parent": "tx:animalia:chordata:actinopterygii", "rank": "order", "display_name": "Perciformes", "latin_name": "Perciformes", "aliases": []}
+{"id": "tx:animalia:chordata:actinopterygii:perciformes:cichlidae", "parent": "tx:animalia:chordata:actinopterygii:perciformes", "rank": "family", "display_name": "Cichlidae", "latin_name": "Cichlidae", "aliases": []}
+{"id": "tx:animalia:chordata:actinopterygii:perciformes:cichlidae:oreochromis", "parent": "tx:animalia:chordata:actinopterygii:perciformes:cichlidae", "rank": "genus", "display_name": "Oreochromis", "latin_name": "Oreochromis", "aliases": []}
+{"id": "tx:animalia:chordata:actinopterygii:perciformes:cichlidae:oreochromis:niloticus", "parent": "tx:animalia:chordata:actinopterygii:perciformes:cichlidae:oreochromis", "rank": "species", "display_name": "Nile tilapia", "latin_name": "Oreochromis niloticus", "aliases": ["tilapia"]}
+
+// Siluriformes (catfish)
+{"id": "tx:animalia:chordata:actinopterygii:siluriformes", "parent": "tx:animalia:chordata:actinopterygii", "rank": "order", "display_name": "Siluriformes", "latin_name": "Siluriformes", "aliases": []}
+{"id": "tx:animalia:chordata:actinopterygii:siluriformes:ictaluridae", "parent": "tx:animalia:chordata:actinopterygii:siluriformes", "rank": "family", "display_name": "Ictaluridae", "latin_name": "Ictaluridae", "aliases": []}
+{"id": "tx:animalia:chordata:actinopterygii:siluriformes:ictaluridae:ictalurus", "parent": "tx:animalia:chordata:actinopterygii:siluriformes:ictaluridae", "rank": "genus", "display_name": "Ictalurus", "latin_name": "Ictalurus", "aliases": []}
+{"id": "tx:animalia:chordata:actinopterygii:siluriformes:ictaluridae:ictalurus:punctatus", "parent": "tx:animalia:chordata:actinopterygii:siluriformes:ictaluridae:ictalurus", "rank": "species", "display_name": "Channel catfish", "latin_name": "Ictalurus punctatus", "aliases": ["catfish"]}
+
+// Scombriformes (mackerel-like fish)
+{"id": "tx:animalia:chordata:actinopterygii:scombriformes", "parent": "tx:animalia:chordata:actinopterygii", "rank": "order", "display_name": "Scombriformes", "latin_name": "Scombriformes", "aliases": []}
+{"id": "tx:animalia:chordata:actinopterygii:scombriformes:scombridae", "parent": "tx:animalia:chordata:actinopterygii:scombriformes", "rank": "family", "display_name": "Scombridae", "latin_name": "Scombridae", "aliases": []}
+{"id": "tx:animalia:chordata:actinopterygii:scombriformes:scombridae:katsuwonus", "parent": "tx:animalia:chordata:actinopterygii:scombriformes:scombridae", "rank": "genus", "display_name": "Katsuwonus", "latin_name": "Katsuwonus", "aliases": []}
+{"id": "tx:animalia:chordata:actinopterygii:scombriformes:scombridae:katsuwonus:pelamis", "parent": "tx:animalia:chordata:actinopterygii:scombriformes:scombridae:katsuwonus", "rank": "species", "display_name": "Skipjack tuna", "latin_name": "Katsuwonus pelamis", "aliases": ["skipjack", "light tuna"]}
+
+// Arthropoda (crustaceans)
+{"id": "tx:animalia:arthropoda", "parent": "tx:animalia", "rank": "phylum", "display_name": "Arthropoda", "latin_name": "Arthropoda", "aliases": []}
+{"id": "tx:animalia:arthropoda:malacostraca", "parent": "tx:animalia:arthropoda", "rank": "class", "display_name": "Malacostraca", "latin_name": "Malacostraca", "aliases": []}
+{"id": "tx:animalia:arthropoda:malacostraca:decapoda", "parent": "tx:animalia:arthropoda:malacostraca", "rank": "order", "display_name": "Decapoda", "latin_name": "Decapoda", "aliases": []}
+
+// Dendrobranchiata (shrimp)
+{"id": "tx:animalia:arthropoda:malacostraca:decapoda:dendrobranchiata", "parent": "tx:animalia:arthropoda:malacostraca:decapoda", "rank": "suborder", "display_name": "Dendrobranchiata", "latin_name": "Dendrobranchiata", "aliases": []}
+{"id": "tx:animalia:arthropoda:malacostraca:decapoda:dendrobranchiata:penaeidae", "parent": "tx:animalia:arthropoda:malacostraca:decapoda:dendrobranchiata", "rank": "family", "display_name": "Penaeidae", "latin_name": "Penaeidae", "aliases": []}
+{"id": "tx:animalia:arthropoda:malacostraca:decapoda:dendrobranchiata:penaeidae:litopenaeus", "parent": "tx:animalia:arthropoda:malacostraca:decapoda:dendrobranchiata:penaeidae", "rank": "genus", "display_name": "Litopenaeus", "latin_name": "Litopenaeus", "aliases": []}
+{"id": "tx:animalia:arthropoda:malacostraca:decapoda:dendrobranchiata:penaeidae:litopenaeus:vannamei", "parent": "tx:animalia:arthropoda:malacostraca:decapoda:dendrobranchiata:penaeidae:litopenaeus", "rank": "species", "display_name": "Whiteleg shrimp", "latin_name": "Litopenaeus vannamei", "aliases": ["pacific white shrimp", "whiteleg shrimp", "shrimp"]}
+
+// Pleocyemata (crabs)
+{"id": "tx:animalia:arthropoda:malacostraca:decapoda:pleocyemata", "parent": "tx:animalia:arthropoda:malacostraca:decapoda", "rank": "suborder", "display_name": "Pleocyemata", "latin_name": "Pleocyemata", "aliases": []}
+{"id": "tx:animalia:arthropoda:malacostraca:decapoda:pleocyemata:portunidae", "parent": "tx:animalia:arthropoda:malacostraca:decapoda:pleocyemata", "rank": "family", "display_name": "Portunidae", "latin_name": "Portunidae", "aliases": []}
+{"id": "tx:animalia:arthropoda:malacostraca:decapoda:pleocyemata:portunidae:portunus", "parent": "tx:animalia:arthropoda:malacostraca:decapoda:pleocyemata:portunidae", "rank": "genus", "display_name": "Portunus", "latin_name": "Portunus", "aliases": []}
+{"id": "tx:animalia:arthropoda:malacostraca:decapoda:pleocyemata:portunidae:portunus:pelagicus", "parent": "tx:animalia:arthropoda:malacostraca:decapoda:pleocyemata:portunidae:portunus", "rank": "species", "display_name": "Blue swimming crab", "latin_name": "Portunus pelagicus", "aliases": ["blue swimming crab", "portunus"]}

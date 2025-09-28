@@ -1,0 +1,3 @@
+{"id": "tx:plantae:convolvulaceae", "parent": "tx:plantae", "rank": "family", "display_name": "Convolvulaceae", "latin_name": "Convolvulaceae", "aliases": []}
+{"id": "tx:plantae:convolvulaceae:ipomoea", "parent": "tx:plantae:convolvulaceae", "rank": "genus", "display_name": "Ipomoea", "latin_name": "Ipomoea", "aliases": []}
+{"id": "tx:plantae:convolvulaceae:ipomoea:batatas", "parent": "tx:plantae:convolvulaceae:ipomoea", "rank": "species", "display_name": "Sweet potato", "latin_name": "Ipomoea batatas", "aliases": ["sweet potato", "yams (market)"]}

@@ -1,0 +1,5 @@
+{"id": "tx:life", "rank": "root", "display_name": "Life", "latin_name": "Life", "aliases": []}
+{"id": "tx:eukaryota", "parent": "tx:life", "rank": "domain", "display_name": "Eukaryota", "latin_name": "Eukaryota", "aliases": []}
+{"id": "tx:plantae", "parent": "tx:eukaryota", "rank": "kingdom", "display_name": "Plants", "latin_name": "Plantae", "aliases": []}
+{"id": "tx:fungi", "parent": "tx:eukaryota", "rank": "kingdom", "display_name": "Fungi", "latin_name": "Fungi", "aliases": []}
+{"id": "tx:animalia", "parent": "tx:eukaryota", "rank": "kingdom", "display_name": "Animals", "latin_name": "Animalia", "aliases": []}

@@ -1,0 +1,5 @@
+{"id": "tx:plantae:vitaceae", "parent": "tx:plantae", "rank": "family", "display_name": "Vitaceae", "latin_name": "Vitaceae", "aliases": []}
+{"id": "tx:plantae:vitaceae:vitis", "parent": "tx:plantae:vitaceae", "rank": "genus", "display_name": "Vitis", "latin_name": "Vitis", "aliases": []}
+{"id": "tx:plantae:vitaceae:vitis:vinifera", "parent": "tx:plantae:vitaceae:vitis", "rank": "species", "display_name": "Grape", "latin_name": "Vitis vinifera", "aliases": ["grape", "table grape"]}
+{"id": "tx:plantae:vitaceae:vitis:vinifera:thompson_seedless", "parent": "tx:plantae:vitaceae:vitis:vinifera", "rank": "cultivar", "display_name": "Grape (Thompson Seedless)", "latin_name": "Vitis vinifera 'Thompson Seedless'", "aliases": ["green seedless grape"]}
+{"id": "tx:plantae:vitaceae:vitis:vinifera:crimson_seedless", "parent": "tx:plantae:vitaceae:vitis:vinifera", "rank": "cultivar", "display_name": "Grape (Crimson Seedless)", "latin_name": "Vitis vinifera 'Crimson Seedless'", "aliases": ["red seedless grape"]}

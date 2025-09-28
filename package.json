@@ -10,7 +10,7 @@
     "lint": "turbo run lint && eslint .",
     "lint:fix": "eslint . --fix && prettier --write .",
     "typecheck": "turbo run typecheck",
-    "db:build": "python3 etl/py/compile.py --in ./data/ontology --out ./data/builds/graph.dev.sqlite",
+    "db:build": "python3 etl/py/compile.py --in ./data/ontology/compiled --out ./data/builds/graph.dev.sqlite",
     "db:open": "sqlite3 data/builds/graph.dev.sqlite",
     "sql": "tsx scripts/run-sql.ts",
     "sql:repl": "tsx scripts/run-sql.ts --repl",

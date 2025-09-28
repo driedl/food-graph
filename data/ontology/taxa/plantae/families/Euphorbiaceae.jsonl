@@ -1,0 +1,3 @@
+{"id": "tx:plantae:euphorbiaceae", "parent": "tx:plantae", "rank": "family", "display_name": "Euphorbiaceae", "latin_name": "Euphorbiaceae", "aliases": []}
+{"id": "tx:plantae:euphorbiaceae:manihot", "parent": "tx:plantae:euphorbiaceae", "rank": "genus", "display_name": "Manihot", "latin_name": "Manihot", "aliases": []}
+{"id": "tx:plantae:euphorbiaceae:manihot:esculenta", "parent": "tx:plantae:euphorbiaceae:manihot", "rank": "species", "display_name": "Cassava", "latin_name": "Manihot esculenta", "aliases": ["cassava", "yuca", "manioc"]}

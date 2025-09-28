@@ -1,0 +1,5 @@
+{"id": "tx:plantae:juglandaceae", "parent": "tx:plantae", "rank": "family", "display_name": "Juglandaceae", "latin_name": "Juglandaceae", "aliases": []}
+{"id": "tx:plantae:juglandaceae:juglans", "parent": "tx:plantae:juglandaceae", "rank": "genus", "display_name": "Juglans", "latin_name": "Juglans", "aliases": []}
+{"id": "tx:plantae:juglandaceae:juglans:regia", "parent": "tx:plantae:juglandaceae:juglans", "rank": "species", "display_name": "Walnut (English)", "latin_name": "Juglans regia", "aliases": ["walnut", "english walnut"]}
+{"id": "tx:plantae:juglandaceae:carya", "parent": "tx:plantae:juglandaceae", "rank": "genus", "display_name": "Carya", "latin_name": "Carya", "aliases": []}
+{"id": "tx:plantae:juglandaceae:carya:illinoinensis", "parent": "tx:plantae:juglandaceae:carya", "rank": "species", "display_name": "Pecan", "latin_name": "Carya illinoinensis", "aliases": ["pecan", "pecans"]}

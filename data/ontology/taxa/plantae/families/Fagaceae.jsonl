@@ -1,0 +1,3 @@
+{"id": "tx:plantae:fagaceae", "parent": "tx:plantae", "rank": "family", "display_name": "Fagaceae", "latin_name": "Fagaceae", "aliases": []}
+{"id": "tx:plantae:fagaceae:castanea", "parent": "tx:plantae:fagaceae", "rank": "genus", "display_name": "Castanea", "latin_name": "Castanea", "aliases": []}
+{"id": "tx:plantae:fagaceae:castanea:sativa", "parent": "tx:plantae:fagaceae:castanea", "rank": "species", "display_name": "Chestnut", "latin_name": "Castanea sativa", "aliases": ["chestnut", "chestnuts"]}

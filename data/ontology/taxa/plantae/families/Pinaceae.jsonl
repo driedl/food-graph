@@ -1,0 +1,3 @@
+{"id": "tx:plantae:pinaceae", "parent": "tx:plantae", "rank": "family", "display_name": "Pinaceae", "latin_name": "Pinaceae", "aliases": []}
+{"id": "tx:plantae:pinaceae:pinus", "parent": "tx:plantae:pinaceae", "rank": "genus", "display_name": "Pine", "latin_name": "Pinus", "aliases": []}
+{"id": "tx:plantae:pinaceae:pinus:pinea", "parent": "tx:plantae:pinaceae:pinus", "rank": "species", "display_name": "Pine nut (stone pine)", "latin_name": "Pinus pinea", "aliases": ["pine nut", "pignoli"]}

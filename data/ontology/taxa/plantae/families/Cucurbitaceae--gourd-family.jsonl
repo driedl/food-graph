@@ -1,0 +1,11 @@
+{"id": "tx:plantae:cucurbitaceae", "parent": "tx:plantae", "rank": "family", "display_name": "Cucurbitaceae", "latin_name": "Cucurbitaceae", "aliases": []}
+{"id": "tx:plantae:cucurbitaceae:cucumis", "parent": "tx:plantae:cucurbitaceae", "rank": "genus", "display_name": "Cucumis", "latin_name": "Cucumis", "aliases": []}
+{"id": "tx:plantae:cucurbitaceae:cucumis:melo", "parent": "tx:plantae:cucurbitaceae:cucumis", "rank": "species", "display_name": "Melon", "latin_name": "Cucumis melo", "aliases": ["melon"]}
+{"id": "tx:plantae:cucurbitaceae:cucumis:melo:cantalupensis", "parent": "tx:plantae:cucurbitaceae:cucumis:melo", "rank": "variety", "display_name": "Cantaloupe", "latin_name": "Cucumis melo var. cantalupensis", "aliases": ["cantaloupe"]}
+{"id": "tx:plantae:cucurbitaceae:cucumis:melo:inodorus", "parent": "tx:plantae:cucurbitaceae:cucumis:melo", "rank": "variety", "display_name": "Honeydew", "latin_name": "Cucumis melo var. inodorus", "aliases": ["honeydew"]}
+{"id": "tx:plantae:cucurbitaceae:cucumis:sativus", "parent": "tx:plantae:cucurbitaceae:cucumis", "rank": "species", "display_name": "Cucumber", "latin_name": "Cucumis sativus", "aliases": ["cucumber"]}
+{"id": "tx:plantae:cucurbitaceae:cucurbita", "parent": "tx:plantae:cucurbitaceae", "rank": "genus", "display_name": "Cucurbita", "latin_name": "Cucurbita", "aliases": []}
+{"id": "tx:plantae:cucurbitaceae:cucurbita:pepo", "parent": "tx:plantae:cucurbitaceae:cucurbita", "rank": "species", "display_name": "Squash (C. pepo)", "latin_name": "Cucurbita pepo", "aliases": ["zucchini", "summer squash", "acorn squash", "spaghetti squash", "pumpkin seed source"]}
+{"id": "tx:plantae:cucurbitaceae:cucurbita:pepo:acorn", "parent": "tx:plantae:cucurbitaceae:cucurbita:pepo", "rank": "variety", "display_name": "Acorn squash", "latin_name": "Cucurbita pepo (Acorn group)", "aliases": ["acorn squash"]}
+{"id": "tx:plantae:cucurbitaceae:cucurbita:pepo:spaghetti", "parent": "tx:plantae:cucurbitaceae:cucurbita:pepo", "rank": "variety", "display_name": "Spaghetti squash", "latin_name": "Cucurbita pepo (Spaghetti group)", "aliases": ["spaghetti squash"]}
+{"id": "tx:plantae:cucurbitaceae:cucurbita:moschata", "parent": "tx:plantae:cucurbitaceae:cucurbita", "rank": "species", "display_name": "Squash (C. moschata)", "latin_name": "Cucurbita moschata", "aliases": ["butternut squash"]}

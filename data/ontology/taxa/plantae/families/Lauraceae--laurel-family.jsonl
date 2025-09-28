@@ -1,0 +1,8 @@
+{"id": "tx:plantae:lauraceae", "parent": "tx:plantae", "rank": "family", "display_name": "Lauraceae", "latin_name": "Lauraceae", "aliases": []}
+{"id": "tx:plantae:lauraceae:persea", "parent": "tx:plantae:lauraceae", "rank": "genus", "display_name": "Persea", "latin_name": "Persea", "aliases": []}
+{"id": "tx:plantae:lauraceae:persea:americana", "parent": "tx:plantae:lauraceae:persea", "rank": "species", "display_name": "Avocado", "latin_name": "Persea americana", "aliases": ["avocado"]}
+{"id": "tx:plantae:lauraceae:persea:americana:hass", "parent": "tx:plantae:lauraceae:persea:americana", "rank": "cultivar", "display_name": "Avocado (Hass)", "latin_name": "Persea americana 'Hass'", "aliases": ["hass avocado", "hass"]}
+{"id": "tx:plantae:lauraceae:cinnamomum", "parent": "tx:plantae:lauraceae", "rank": "genus", "display_name": "Cinnamomum", "latin_name": "Cinnamomum", "aliases": []}
+{"id": "tx:plantae:lauraceae:cinnamomum:cassia", "parent": "tx:plantae:lauraceae:cinnamomum", "rank": "species", "display_name": "Cinnamon (cassia)", "latin_name": "Cinnamomum cassia", "aliases": ["cinnamon (cassia)"]}
+{"id": "tx:plantae:lauraceae:laurus", "parent": "tx:plantae:lauraceae", "rank": "genus", "display_name": "Laurus", "latin_name": "Laurus", "aliases": []}
+{"id": "tx:plantae:lauraceae:laurus:nobilis", "parent": "tx:plantae:lauraceae:laurus", "rank": "species", "display_name": "Bay Leaf", "latin_name": "Laurus nobilis", "aliases": ["bay leaf"]}

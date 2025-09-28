@@ -1,0 +1,7 @@
+{"id": "tx:plantae:asteraceae", "parent": "tx:plantae", "rank": "family", "display_name": "Asteraceae", "latin_name": "Asteraceae", "aliases": ["Compositae"]}
+{"id": "tx:plantae:asteraceae:lactuca", "parent": "tx:plantae:asteraceae", "rank": "genus", "display_name": "Lactuca", "latin_name": "Lactuca", "aliases": []}
+{"id": "tx:plantae:asteraceae:lactuca:sativa", "parent": "tx:plantae:asteraceae:lactuca", "rank": "species", "display_name": "Lettuce", "latin_name": "Lactuca sativa", "aliases": ["lettuce"]}
+{"id": "tx:plantae:asteraceae:lactuca:sativa:romaine", "parent": "tx:plantae:asteraceae:lactuca:sativa", "rank": "variety", "display_name": "Lettuce (Romaine)", "latin_name": "Lactuca sativa var. longifolia", "aliases": ["romaine lettuce", "cos lettuce"]}
+{"id": "tx:plantae:asteraceae:lactuca:sativa:iceberg", "parent": "tx:plantae:asteraceae:lactuca:sativa", "rank": "variety", "display_name": "Lettuce (Iceberg)", "latin_name": "Lactuca sativa var. capitata", "aliases": ["iceberg lettuce"]}
+{"id": "tx:plantae:asteraceae:helianthus", "parent": "tx:plantae:asteraceae", "rank": "genus", "display_name": "Helianthus", "latin_name": "Helianthus", "aliases": []}
+{"id": "tx:plantae:asteraceae:helianthus:annuus", "parent": "tx:plantae:asteraceae:helianthus", "rank": "species", "display_name": "Sunflower", "latin_name": "Helianthus annuus", "aliases": ["sunflower"]}

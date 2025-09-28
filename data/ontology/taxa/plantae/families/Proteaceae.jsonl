@@ -1,0 +1,3 @@
+{"id": "tx:plantae:proteaceae", "parent": "tx:plantae", "rank": "family", "display_name": "Proteaceae", "latin_name": "Proteaceae", "aliases": []}
+{"id": "tx:plantae:proteaceae:macadamia", "parent": "tx:plantae:proteaceae", "rank": "genus", "display_name": "Macadamia", "latin_name": "Macadamia", "aliases": []}
+{"id": "tx:plantae:proteaceae:macadamia:integrifolia", "parent": "tx:plantae:proteaceae:macadamia", "rank": "species", "display_name": "Macadamia", "latin_name": "Macadamia integrifolia", "aliases": ["macadamia", "macadamia nuts"]}

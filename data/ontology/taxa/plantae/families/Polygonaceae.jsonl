@@ -1,0 +1,3 @@
+{"id": "tx:plantae:polygonaceae", "parent": "tx:plantae", "rank": "family", "display_name": "Polygonaceae", "latin_name": "Polygonaceae", "aliases": []}
+{"id": "tx:plantae:polygonaceae:fagopyrum", "parent": "tx:plantae:polygonaceae", "rank": "genus", "display_name": "Fagopyrum", "latin_name": "Fagopyrum", "aliases": []}
+{"id": "tx:plantae:polygonaceae:fagopyrum:esculentum", "parent": "tx:plantae:polygonaceae:fagopyrum", "rank": "species", "display_name": "Buckwheat", "latin_name": "Fagopyrum esculentum", "aliases": ["buckwheat"]}

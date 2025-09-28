@@ -1,0 +1,3 @@
+{"id": "tx:plantae:actinidiaceae", "parent": "tx:plantae", "rank": "family", "display_name": "Actinidiaceae", "latin_name": "Actinidiaceae", "aliases": []}
+{"id": "tx:plantae:actinidiaceae:actinidia", "parent": "tx:plantae:actinidiaceae", "rank": "genus", "display_name": "Actinidia", "latin_name": "Actinidia", "aliases": []}
+{"id": "tx:plantae:actinidiaceae:actinidia:deliciosa", "parent": "tx:plantae:actinidiaceae:actinidia", "rank": "species", "display_name": "Kiwifruit (green)", "latin_name": "Actinidia deliciosa", "aliases": ["kiwifruit", "kiwi"]}

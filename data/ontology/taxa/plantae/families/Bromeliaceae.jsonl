@@ -1,0 +1,3 @@
+{"id": "tx:plantae:bromeliaceae", "parent": "tx:plantae", "rank": "family", "display_name": "Bromeliaceae", "latin_name": "Bromeliaceae", "aliases": []}
+{"id": "tx:plantae:bromeliaceae:ananas", "parent": "tx:plantae:bromeliaceae", "rank": "genus", "display_name": "Ananas", "latin_name": "Ananas", "aliases": []}
+{"id": "tx:plantae:bromeliaceae:ananas:comosus", "parent": "tx:plantae:bromeliaceae:ananas", "rank": "species", "display_name": "Pineapple", "latin_name": "Ananas comosus", "aliases": ["pineapple"]}

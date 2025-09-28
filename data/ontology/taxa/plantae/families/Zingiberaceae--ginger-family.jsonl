@@ -1,0 +1,5 @@
+{"id": "tx:plantae:zingiberaceae", "parent": "tx:plantae", "rank": "family", "display_name": "Zingiberaceae", "latin_name": "Zingiberaceae", "aliases": []}
+{"id": "tx:plantae:zingiberaceae:curcuma", "parent": "tx:plantae:zingiberaceae", "rank": "genus", "display_name": "Curcuma", "latin_name": "Curcuma", "aliases": []}
+{"id": "tx:plantae:zingiberaceae:curcuma:longa", "parent": "tx:plantae:zingiberaceae:curcuma", "rank": "species", "display_name": "Turmeric", "latin_name": "Curcuma longa", "aliases": ["turmeric"]}
+{"id": "tx:plantae:zingiberaceae:elettaria", "parent": "tx:plantae:zingiberaceae", "rank": "genus", "display_name": "Elettaria", "latin_name": "Elettaria", "aliases": []}
+{"id": "tx:plantae:zingiberaceae:elettaria:cardamomum", "parent": "tx:plantae:zingiberaceae:elettaria", "rank": "species", "display_name": "Cardamom", "latin_name": "Elettaria cardamomum", "aliases": ["cardamom"]}
