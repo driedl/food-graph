@@ -67,16 +67,17 @@ const FILE_CATEGORIES: Record<string, FileCategory> = {
       'etl/**/*.py',
       'etl/**/*.md',
       'data/ontology/**/*.json',
+      'data/ontology/**/*.jsonl',
       'data/sql/**/*.json',
       'data/builds/*.json', // Include metadata JSON files from builds
       'package.json',
       'pnpm-workspace.yaml',
       'README.md',
     ],
-    description: 'All code and configuration files in the project (excludes scripts and large data files)',
+    description: 'All code and config files (excludes scripts and large data)',
   },
   web: {
-    name: 'Web App (React Frontend)',
+    name: 'Web App',
     pattern: [
       'apps/web/**/*.ts',
       'apps/web/**/*.tsx',
@@ -87,33 +88,54 @@ const FILE_CATEGORIES: Record<string, FileCategory> = {
       'apps/web/**/*.css',
       'apps/web/**/*.config.*',
     ],
-    description: 'React frontend application with tRPC client',
+    description: 'React frontend with tRPC client',
   },
   api: {
-    name: 'API (Backend Server)',
+    name: 'API Server',
     pattern: [
       'apps/api/**/*.ts',
       'apps/api/**/*.js',
       'apps/api/**/*.json',
     ],
-    description: 'tRPC server with SQLite database',
+    description: 'tRPC server with SQLite',
   },
   etl: {
-    name: 'ETL (Data Processing)',
+    name: 'ETL Processing',
     pattern: [
       'etl/**/*.py',
       'etl/**/*.md',
       'data/ontology/**/*.json',
+      'data/ontology/**/*.jsonl',
       'data/sql/**/*.json',
       'data/builds/*.json', // Include metadata JSON files from builds
     ],
-    description: 'Python scripts for data extraction and processing, plus ontology, schema, and build metadata files',
+    description: 'Python scripts and data files',
+  },
+  scripts: {
+    name: 'Project Scripts',
+    pattern: [
+      'scripts/**/*.ts',
+      'scripts/**/*.js',
+      'scripts/**/*.md',
+    ],
+    description: 'Build and utility scripts',
+  },
+  docs: {
+    name: 'Documentation',
+    pattern: [
+      'docs/**/*.md',
+      'README.md',
+    ],
+    description: 'Project documentation',
   },
   config: {
-    name: 'Configuration Files',
+    name: 'Configuration',
     pattern: [
       'package.json',
       'pnpm-workspace.yaml',
+      'turbo.json',
+      'tsconfig.base.json',
+      '.gitignore',
       'README.md',
       'apps/*/package.json',
       'apps/*/tsconfig.json',
@@ -123,7 +145,7 @@ const FILE_CATEGORIES: Record<string, FileCategory> = {
       'packages/*/package.json',
       'packages/*/tsconfig.json',
     ],
-    description: 'Project configuration, package management, and documentation',
+    description: 'Project config and package files',
   },
 };
 
@@ -134,7 +156,7 @@ function isCodeOrConfigFile(filePath: string): boolean {
   const fileName = basename(filePath).toLowerCase();
   
   // Code files
-  const codeExtensions = ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs'];
+  const codeExtensions = ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.py'];
   if (codeExtensions.includes(ext)) {
     return true;
   }
@@ -160,7 +182,7 @@ function isCodeOrConfigFile(filePath: string): boolean {
   }
   
   // Config extensions (but exclude lock files)
-  const configExtensions = ['.json', '.yaml', '.yml', '.toml', '.env'];
+  const configExtensions = ['.json', '.jsonl', '.yaml', '.yml', '.toml', '.env'];
   if (configExtensions.includes(ext)) {
     const excludeConfigFiles = [
       'pnpm-lock.yaml',

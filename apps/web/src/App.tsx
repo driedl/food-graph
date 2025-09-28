@@ -69,19 +69,27 @@ export default function App() {
           </div>
           {q && (
             <div className="max-h-60 overflow-auto border rounded-md">
+              <div className="bg-muted/50 border-b px-3 py-2 text-sm font-medium">
+                Search Results {search.data && `(${search.data.length})`}
+              </div>
               <table className="w-full text-sm">
-                <thead className="bg-muted/50 border-b">
+                <thead className="bg-muted/30 border-b">
                   <tr><th className="text-left p-2">Name</th><th className="text-left p-2">Rank</th></tr>
                 </thead>
                 <tbody>
                   {search.data?.map((n) => (
                     <tr key={n.id} className="hover:bg-muted/40 cursor-pointer" onClick={() => { setCurrentId(n.id); setQ('') }}>
                       <td className="p-2">{n.name}</td>
-                      <td className="p-2">{n.rank}</td>
+                      <td className="p-2"><Badge variant="outline" className="text-xs">{n.rank}</Badge></td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+              {search.data?.length === 0 && (
+                <div className="p-4 text-center text-muted-foreground">
+                  No results found for "{q}"
+                </div>
+              )}
             </div>
           )}
         </CardContent>

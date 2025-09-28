@@ -10,7 +10,7 @@ if (fs.existsSync(rootEnvPath)) {
   // best-effort: load root .env in case index.ts wasn't the one to do it
   await import('dotenv/config')
 }
-const DB_PATH = process.env.DB_PATH ?? path.join(process.cwd(), 'data', 'builds', 'graph.dev.sqlite')
+const DB_PATH = process.env.DB_PATH ?? path.join(process.cwd(), '..', '..', 'data', 'builds', 'graph.dev.sqlite')
 const DATA_DIR = path.dirname(DB_PATH)
 const DB_FILE = DB_PATH
 
@@ -57,6 +57,8 @@ export function isEmpty() {
 }
 
 export function seedMinimal() {
+  console.warn('⚠️  Using minimal seed data. Run "pnpm db:build" to load full ontology data.')
+  
   const insertNode = db.prepare('INSERT INTO nodes (id, name, slug, rank, parent_id) VALUES (?, ?, ?, ?, ?)')
   const makeId = (slug: string) => slug + ':' + ulid().slice(0,6)
 
