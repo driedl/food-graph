@@ -17,8 +17,6 @@ export default function NodeHeader({
   node?: { id: string; name: string; slug: string; rank: string }
   siblings?: Array<{ id: string; name: string }>
   rankColor: Record<string, string>
-  childCount: number
-  descendants: number
   onJump: (id: string) => void
 }) {
   if (loading) {
@@ -50,8 +48,6 @@ export default function NodeHeader({
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <Badge variant="secondary" className="text-[10px]">children {childCount}</Badge>
-        <Badge variant="secondary" className="text-[10px]">desc {descendants}</Badge>
         {siblings && siblings.length > 0 && (
           <select
             className="text-xs border rounded px-1.5 py-0.5 bg-background"

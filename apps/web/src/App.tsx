@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { trpc } from './lib/trpc'
 import ErrorBoundary from './components/ErrorBoundary'
 import { DocsPanel } from './components/inspector/DocsPanel'
@@ -12,7 +12,6 @@ import { Badge } from '@ui/badge'
 import LeftRail from './components/layout/LeftRail'
 import NodeHeader from './components/NodeHeader'
 import StructureExplorer from './components/StructureExplorer'
-import MiniMapGraph from './components/MiniMapGraph'
 
 /** Shared types matching API rows */
 interface TaxonNode {
@@ -75,8 +74,8 @@ export default function App() {
 
 
 
-  // Inspector tabs: Docs is FIRST-CLASS and DEFAULT
-  const [tab, setTab] = useState<'docs' | 'taxon' | 'parts' | 'transforms' | 'foodstate'>('docs')
+  // Inspector tabs: Taxon is DEFAULT
+  const [tab, setTab] = useState<'taxon' | 'parts' | 'transforms' | 'foodstate'>('taxon')
 
   // Parts/Transforms builder state
   const [selectedPartId, setSelectedPartId] = useState<string>('')
@@ -192,15 +191,13 @@ export default function App() {
                   node={nodeData}
                   siblings={siblingsData}
                   rankColor={rankColor}
-                  childCount={(neighborhood.data as any)?.childCount ?? 0}
-                  descendants={(neighborhood.data as any)?.descendants ?? 0}
                   onJump={(id) => setCurrentId(id)}
                 />
               </ErrorBoundary>
             </CardHeader>
             <CardContent className="flex-1 min-h-0 flex gap-3 pt-3">
               {/* LEFT: Docs */}
-              <Card className="min-h-0 flex flex-col w-96 flex-shrink-0">
+              <Card className="min-h-0 flex flex-col flex-1">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm">Documentation</CardTitle>
                 </CardHeader>
@@ -232,7 +229,7 @@ export default function App() {
           </Card>
         </div>
 
-        {/* Right rail: Parts / Transforms / FoodState composer + Mini map */}
+        {/* Right rail: Parts / Transforms / FoodState composer */}
         <div className="min-h-0 flex flex-col gap-3">
           <Card className="flex-1 min-h-0 flex flex-col">
             <CardHeader className="pb-2">
@@ -240,7 +237,6 @@ export default function App() {
             </CardHeader>
             <CardContent className="flex-1 min-h-0 overflow-auto space-y-3">
               <div className="flex flex-wrap gap-2">
-                <Button size="sm" variant={tab === 'docs' ? 'outline' : 'secondary'} onClick={() => setTab('docs')}>Docs</Button>
                 <Button size="sm" variant={tab === 'taxon' ? 'default' : 'outline'} onClick={() => setTab('taxon')}>Taxon</Button>
                 <Button size="sm" variant={tab === 'parts' ? 'default' : 'outline'} onClick={() => setTab('parts')}>Parts</Button>
                 <Button size="sm" variant={tab === 'transforms' ? 'default' : 'outline'} onClick={() => setTab('transforms')}>Transforms</Button>
@@ -266,13 +262,19 @@ export default function App() {
                   />
                 )}
                 {tab === 'transforms' && (
-                  <TransformsPanel
-                    loading={transforms.isLoading}
-                    data={transforms.data as any}
-                    chosen={chosen}
-                    onToggleTx={onToggleTx}
-                    onParamChange={onParamChange}
-                  />
+                  <>
+                    {!selectedPartId ? (
+                      <div className="text-sm text-muted-foreground">Select a part to view transforms.</div>
+                    ) : (
+                      <TransformsPanel
+                        loading={transforms.isLoading}
+                        data={transforms.data as any}
+                        chosen={chosen}
+                        onToggleTx={onToggleTx}
+                        onParamChange={onParamChange}
+                      />
+                    )}
+                  </>
                 )}
                 {tab === 'foodstate' && (
                   <FoodStatePanel
@@ -288,21 +290,6 @@ export default function App() {
             </CardContent>
           </Card>
 
-          {/* Bottom context: mini map graph */}
-          <Card className="min-h-[160px]">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm">Context Map</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ErrorBoundary>
-                <MiniMapGraph
-                  lineage={(lineageQ.data as any[] | undefined) ?? []}
-                  children={childrenData}
-                  onPick={(id) => setCurrentId(id)}
-                />
-              </ErrorBoundary>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </div>

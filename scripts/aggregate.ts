@@ -65,6 +65,9 @@ const FILE_CATEGORIES: Record<string, FileCategory> = {
       'packages/api-contract/**/*.jsx',
       'packages/api-contract/**/*.json',
     ],
+    ignore: [
+      'apps/web/dist/**', // Exclude dist directory from web category
+    ],
     description: 'React frontend with tRPC client and API contracts',
   },
   api: {
