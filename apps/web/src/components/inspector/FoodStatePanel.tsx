@@ -1,5 +1,7 @@
 import { Button } from '@ui/button'
+import { Input } from '@ui/input'
 import { Separator } from '@ui/separator'
+import { useState } from 'react'
 
 export function FoodStatePanel({
   fsPreview,
@@ -7,17 +9,54 @@ export function FoodStatePanel({
   result,
   onCopy,
   onValidate,
+  onParse,
 }: {
   fsPreview: string
   loadingValidate: boolean
   result?: { id: string | null; errors: string[] } | null
   onCopy: (s: string) => void
   onValidate: () => void
+  onParse?: (fs: string) => void
 }) {
+  const [parseInput, setParseInput] = useState('')
+
   return (
     <div className="space-y-3 text-sm">
       <div className="text-muted-foreground">Compose a FoodState identity (client-only preview).</div>
       <Separator />
+      
+      {/* Parse input */}
+      {onParse && (
+        <div className="space-y-2">
+          <div className="text-xs text-muted-foreground">Paste FoodState path to jump to node/part</div>
+          <div className="flex gap-2">
+            <Input
+              placeholder="fs:/path/to/taxon/part:name/tf:transform"
+              value={parseInput}
+              onChange={(e) => setParseInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && parseInput.trim()) {
+                  onParse(parseInput.trim())
+                  setParseInput('')
+                }
+              }}
+            />
+            <Button 
+              size="sm" 
+              onClick={() => {
+                if (parseInput.trim()) {
+                  onParse(parseInput.trim())
+                  setParseInput('')
+                }
+              }}
+              disabled={!parseInput.trim()}
+            >
+              Jump
+            </Button>
+          </div>
+        </div>
+      )}
+
       <div className="text-xs text-muted-foreground">Preview</div>
       <div className="text-xs font-mono border rounded p-2 bg-muted/30 break-all">{fsPreview || '—'}</div>
       <div className="flex gap-2">

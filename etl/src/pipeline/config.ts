@@ -14,7 +14,7 @@ export const pipelineConfig: PipelineConfig = {
       name: 'Compile taxonomic data',
       description: 'Compile taxonomic hierarchy into JSONL format',
       command: 'python3',
-      args: ['python/compile_taxa.py', '--taxa-root', 'data/ontology/taxa', '--out', 'data/ontology/compiled/taxa/taxa.jsonl'],
+      args: ['python/compile_taxa.py', '--taxa-root', 'data/ontology/taxa', '--out', 'etl/dist/compiled/taxa/taxa.jsonl'],
       dependencies: ['validate']
     },
     {
@@ -22,7 +22,7 @@ export const pipelineConfig: PipelineConfig = {
       name: 'Compile documentation',
       description: 'Compile taxonomic documentation from .tx.md files',
       command: 'python3',
-      args: ['python/compile_docs.py', '--taxa-root', 'data/ontology/taxa', '--compiled-taxa', 'data/ontology/compiled/taxa/taxa.jsonl', '--out', 'data/ontology/compiled/docs.jsonl'],
+      args: ['python/compile_docs.py', '--taxa-root', 'data/ontology/taxa', '--compiled-taxa', 'etl/dist/compiled/taxa/taxa.jsonl', '--out', 'etl/dist/compiled/docs.jsonl'],
       dependencies: ['compile-taxa']
     },
     {
@@ -30,7 +30,7 @@ export const pipelineConfig: PipelineConfig = {
       name: 'Build database',
       description: 'Compile ontology data into SQLite database with FTS',
       command: 'python3',
-      args: ['python/compile.py', '--in', './data/ontology/compiled', '--out', './data/builds/graph.dev.sqlite'],
+      args: ['python/compile.py', '--in', './etl/dist/compiled', '--out', './etl/dist/database/graph.dev.sqlite'],
       dependencies: ['compile-docs']
     },
     {
@@ -44,12 +44,12 @@ export const pipelineConfig: PipelineConfig = {
   ],
   inputs: {
     ontologyRoot: 'data/ontology',
-    compiledDir: 'data/ontology/compiled',
-    buildsDir: 'data/builds'
+    compiledDir: 'etl/dist/compiled',
+    buildsDir: 'etl/dist/database'
   },
   outputs: {
-    taxaJsonl: 'data/ontology/compiled/taxa/taxa.jsonl',
-    docsJsonl: 'data/ontology/compiled/docs.jsonl',
-    database: 'data/builds/graph.dev.sqlite'
+    taxaJsonl: 'etl/dist/compiled/taxa/taxa.jsonl',
+    docsJsonl: 'etl/dist/compiled/docs.jsonl',
+    database: 'etl/dist/database/graph.dev.sqlite'
   }
 }

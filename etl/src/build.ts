@@ -10,11 +10,11 @@ async function runCommand(command: string, args: string[] = [], cwd: string = pr
       cwd
     })
 
-    child.on('close', (code) => {
+    child.on('close', (code: number | null) => {
       resolve(code === 0)
     })
 
-    child.on('error', (error) => {
+    child.on('error', (error: Error) => {
       console.error(`Error running ${command}:`, error)
       resolve(false)
     })
@@ -23,7 +23,7 @@ async function runCommand(command: string, args: string[] = [], cwd: string = pr
 
 async function main() {
   console.log('🌱 Food Graph ETL Pipeline')
-  console.log('=' * 50)
+  console.log('='.repeat(50))
   console.log()
 
   const repoRoot = process.cwd().replace('/etl', '')
@@ -38,17 +38,22 @@ async function main() {
     {
       name: 'Compile taxonomic data',
       command: 'python3', 
-      args: ['etl/python/compile_taxa.py', '--taxa-root', 'data/ontology/taxa', '--out', 'data/ontology/compiled/taxa/taxa.jsonl']
+      args: ['etl/python/compile_taxa.py', '--taxa-root', 'data/ontology/taxa', '--out', 'etl/dist/compiled/taxa/taxa.jsonl']
     },
     {
       name: 'Compile documentation',
       command: 'python3',
-      args: ['etl/python/compile_docs.py', '--taxa-root', 'data/ontology/taxa', '--compiled-taxa', 'data/ontology/compiled/taxa/taxa.jsonl', '--out', 'data/ontology/compiled/docs.jsonl']
+      args: ['etl/python/compile_docs.py', '--taxa-root', 'data/ontology/taxa', '--compiled-taxa', 'etl/dist/compiled/taxa/taxa.jsonl', '--out', 'etl/dist/compiled/docs.jsonl']
     },
     {
       name: 'Build database',
       command: 'python3',
-      args: ['etl/python/compile.py', '--in', './data/ontology/compiled', '--out', './data/builds/graph.dev.sqlite']
+      args: ['etl/python/compile.py', '--in', './etl/dist/compiled', '--out', './etl/dist/database/graph.dev.sqlite']
+    },
+    {
+      name: 'Verify database and run smoke tests',
+      command: 'tsx',
+      args: ['etl/src/pipeline/steps/verify.ts']
     }
   ]
 

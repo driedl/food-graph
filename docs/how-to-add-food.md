@@ -335,7 +335,7 @@ Two ways:
 
 5. **Composition**
    - [ ] Add/extend `smoke_tests/edible_paths.json` with representative cases.
-   - [ ] Run compiler; run smoke (`smoke-edible-paths.ts`). All **pass**.
+   - [ ] Run ETL pipeline: `pnpm etl:build` (includes smoke tests automatically).
    - [ ] Ensure composer rejects non-identity transforms (enforced code path is in place).
 
 6. **Docs (optional but nice)**

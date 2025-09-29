@@ -8,6 +8,8 @@
         "dev": "tsx watch src/pipeline/index.ts",
         "build:pipeline": "tsx src/build.ts",
         "validate": "tsx src/pipeline/index.ts --step=validate",
+        "smoke-tests": "tsx src/pipeline/steps/smoke-tests.ts",
+        "verify": "tsx src/pipeline/steps/verify.ts",
         "clean": "tsx src/scripts/clean.ts",
         "typecheck": "tsc -p tsconfig.json --noEmit",
         "lint": "eslint ."

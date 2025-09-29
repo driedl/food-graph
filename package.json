@@ -12,6 +12,8 @@
     "typecheck": "turbo run typecheck",
     "etl:build": "cd etl && pnpm build:pipeline",
     "etl:validate": "turbo run etl:validate",
+    "etl:smoke-tests": "cd etl && pnpm smoke-tests",
+    "etl:verify": "cd etl && pnpm verify",
     "etl:clean": "turbo run etl:clean",
     "db:open": "sqlite3 data/builds/graph.dev.sqlite",
     "sql": "tsx scripts/run-sql.ts",

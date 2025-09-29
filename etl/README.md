@@ -17,11 +17,32 @@ pnpm etl:clean
 
 ## Pipeline Overview
 
-The ETL pipeline processes food taxonomy data through 4 main steps:
+The ETL pipeline processes food taxonomy data through 5 main steps:
 
 ```
 📁 Raw Ontology Data → 🔍 Validate → 📦 Compile → 🗄️ Database → ✅ Verify
 ```
+
+### Build Artifacts
+
+The pipeline creates build artifacts in the `etl/dist/` directory:
+
+```
+etl/dist/
+├── compiled/              # Intermediate compilation artifacts
+│   ├── taxa/
+│   │   └── taxa.jsonl    # Compiled taxonomic hierarchy
+│   ├── docs.jsonl        # Compiled documentation
+│   ├── attributes.json   # Copied attribute definitions
+│   ├── parts.json        # Copied part definitions
+│   ├── nutrients.json    # Copied nutrient definitions
+│   ├── transforms.json   # Copied transform definitions
+│   └── rules/            # Copied applicability rules
+└── database/             # Final build outputs
+    └── graph.dev.sqlite  # SQLite database with FTS
+```
+
+**API Access**: The API accesses the database via a symlink at `data/builds/graph.dev.sqlite` → `etl/dist/database/graph.dev.sqlite`. This maintains compatibility with existing API configuration while keeping build artifacts organized in the ETL package.
 
 ### Step 1: Validate
 
@@ -63,7 +84,8 @@ The pipeline is orchestrated by TypeScript code in `src/`:
   - **`config.ts`** - Pipeline step definitions and paths
   - **`runner.ts`** - Pipeline execution engine with error handling
   - **`types.ts`** - TypeScript interfaces for pipeline data
-  - **`steps/verify.ts`** - Database verification and smoke tests
+  - **`steps/verify.ts`** - Comprehensive database verification including smoke tests
+  - **`steps/smoke-tests.ts`** - Food composition model smoke tests
 
 ### Python Scripts
 
@@ -116,6 +138,8 @@ pnpm build:pipeline
 
 # Individual steps
 pnpm validate
+pnpm smoke-tests
+pnpm verify
 pnpm clean
 ```
 
@@ -170,6 +194,26 @@ Typical build times:
 - **Database build**: ~100ms
 
 The pipeline is optimized for fast iteration during development.
+
+## Cleanup & Maintenance
+
+### Clean Build Artifacts
+
+To remove all build artifacts:
+
+```bash
+# Remove compiled files and database
+rm -rf etl/dist/
+
+# Recreate symlink (will be recreated on next build)
+rm -f data/builds/graph.dev.sqlite
+```
+
+### Build Artifact Lifecycle
+
+- **Compiled files** (`etl/dist/compiled/`): Intermediate artifacts, can be safely deleted
+- **Database** (`etl/dist/database/`): Final SQLite database, required for API
+- **Symlink** (`data/builds/graph.dev.sqlite`): Auto-created by pipeline, points to actual database
 
 ## Troubleshooting
 

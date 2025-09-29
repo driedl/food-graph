@@ -1,6 +1,8 @@
 #!/usr/bin/env tsx
-import { Database } from 'better-sqlite3'
+import Database from 'better-sqlite3'
+import path from 'node:path'
 import { pipelineConfig } from '../config.js'
+import { runSmokeTests } from './smoke-tests.js'
 
 const DB_PATH = pipelineConfig.outputs.database
 
@@ -32,6 +34,7 @@ function verifyDatabase(): boolean {
       console.log(`     - ${riceResults[0].name} (${riceResults[0].rank})`)
     } else {
       console.log(`   • FTS search test: FAILED (no rice results found)`)
+      db.close()
       return false
     }
     
@@ -45,8 +48,36 @@ function verifyDatabase(): boolean {
   }
 }
 
+function runAllVerification(): boolean {
+  console.log('🔍 Running comprehensive verification...')
+  console.log()
+  
+  // Step 1: Basic database verification
+  const dbVerification = verifyDatabase()
+  if (!dbVerification) {
+    return false
+  }
+  
+  console.log()
+  
+  // Step 2: Smoke tests for composition model
+  const repoRoot = process.cwd().replace('/etl', '')
+  const smokeTestsPath = path.resolve(repoRoot, 'data/ontology/smoke_tests/edible_paths.json')
+  const smokeTestsPass = runSmokeTests(DB_PATH, smokeTestsPath)
+  
+  console.log()
+  
+  if (smokeTestsPass) {
+    console.log('✅ All verification steps passed')
+    return true
+  } else {
+    console.log('❌ Verification failed')
+    return false
+  }
+}
+
 function main() {
-  const success = verifyDatabase()
+  const success = runAllVerification()
   process.exit(success ? 0 : 1)
 }
 

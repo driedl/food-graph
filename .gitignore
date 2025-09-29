@@ -1,6 +1,7 @@
 .turbo
 node_modules
 .env
-data/builds
+data/builds/graph.dev.sqlite
 data/ontology/compiled
+etl/dist
 generated

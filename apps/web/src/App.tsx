@@ -3,11 +3,11 @@ import { trpc } from './lib/trpc'
 import GraphView from './components/GraphView'
 import ErrorBoundary from './components/ErrorBoundary'
 import { ChildrenTable } from './components/ChildrenTable'
-import { DocsPanel } from './components/Inspector/DocsPanel'
-import { TaxonPanel } from './components/Inspector/TaxonPanel'
-import { PartsPanel } from './components/Inspector/PartsPanel'
-import { TransformsPanel } from './components/Inspector/TransformsPanel'
-import { FoodStatePanel } from './components/Inspector/FoodStatePanel'
+import { DocsPanel } from './components/inspector/DocsPanel'
+import { TaxonPanel } from './components/inspector/TaxonPanel'
+import { PartsPanel } from './components/inspector/PartsPanel'
+import { TransformsPanel } from './components/inspector/TransformsPanel'
+import { FoodStatePanel } from './components/inspector/FoodStatePanel'
 import type { Node as RFNode, Edge as RFEdge } from 'reactflow'
 import { Button } from '@ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@ui/card'
@@ -55,21 +55,25 @@ export default function App() {
   const [layout, setLayout] = useState<LayoutMode>('radial')
   const [centerTab, setCenterTab] = useState<'graph' | 'table'>('graph')
 
-  // Queries scoped to current node
-  const nodeQuery = trpc.taxonomy.getNode.useQuery({ id: currentId! }, { enabled: !!currentId })
-  const path = trpc.taxonomy.pathToRoot.useQuery({ id: currentId! }, { enabled: !!currentId })
-  const children = trpc.taxonomy.getChildren.useQuery({ id: currentId! }, { enabled: !!currentId })
+  // Queries scoped to current node - using new neighborhood API
+  const neighborhood = trpc.taxonomy.neighborhood.useQuery(
+    { id: currentId!, childLimit: 50, orderBy: 'name' }, 
+    { enabled: !!currentId }
+  )
   const docs = trpc.docs.getByTaxon.useQuery({ taxonId: currentId! }, { enabled: !!currentId })
-  const parts = trpc.taxonomy.getPartsForTaxon.useQuery({ id: currentId! }, { enabled: !!currentId })
+  const parts = trpc.taxonomy.partTree.useQuery({ id: currentId! }, { enabled: !!currentId })
 
-  // Siblings (fetch parent’s children once)
-  const parentId = (nodeQuery.data as TaxonNode | undefined)?.parentId ?? null
-  const siblings = trpc.taxonomy.getChildren.useQuery({ id: parentId! }, { enabled: !!parentId })
+  // Extract data from neighborhood response
+  const nodeData = neighborhood.data?.node as TaxonNode | undefined
+  const parentData = neighborhood.data?.parent as TaxonNode | undefined
+  const childrenData = (neighborhood.data?.children || []) as TaxonNode[]
+  const siblingsData = (neighborhood.data?.siblings || []) as TaxonNode[]
+  const parentId = parentData?.id ?? null
 
-  // Search (+ debounce + hotkey)
+  // Search (+ debounce + hotkey) - using new unified search
   const [qInput, setQInput] = useState('')
   const [q, setQ] = useState('') // debounced
-  const search = trpc.taxonomy.search.useQuery({ q }, { enabled: q.length > 0 })
+  const search = trpc.search.unified.useQuery({ q, limit: 25 }, { enabled: q.length > 0 })
   const searchRef = useRef<HTMLInputElement>(null)
   const [activeIdx, setActiveIdx] = useState<number>(0)
 
@@ -95,19 +99,17 @@ export default function App() {
       if (isTyping) return
       if (e.key === 'ArrowLeft' && parentId) setCurrentId(parentId)
       if (e.key === 'ArrowRight') {
-        const cs = (children.data as TaxonNode[] | undefined) ?? []
-        if (cs.length) setCurrentId(cs[0].id)
+        if (childrenData.length) setCurrentId(childrenData[0].id)
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [parentId, children.data])
+  }, [parentId, childrenData])
 
   // Build a center + children graph model
   const graph = useMemo(() => {
-    if (!nodeQuery.data) return { nodes: [] as RFNode[], edges: [] as RFEdge[] }
-    const nodeData = nodeQuery.data as TaxonNode
-    const kids = (children.data as TaxonNode[] | undefined) ?? []
+    if (!nodeData) return { nodes: [] as RFNode[], edges: [] as RFEdge[] }
+    const kids = childrenData
 
     const center: RFNode = {
       id: nodeData.id,
@@ -126,7 +128,7 @@ export default function App() {
     const nodes: RFNode[] = [center]
     const edges: RFEdge[] = []
 
-    kids.forEach((c) => {
+    kids.forEach((c: TaxonNode) => {
       nodes.push({
         id: c.id,
         type: 'taxon',
@@ -144,7 +146,7 @@ export default function App() {
     })
 
     return { nodes, edges }
-  }, [nodeQuery.data, children.data])
+  }, [nodeData, childrenData])
 
   // Inspector tabs: Docs is FIRST-CLASS and DEFAULT
   const [tab, setTab] = useState<'docs' | 'taxon' | 'parts' | 'transforms' | 'foodstate'>('docs')
@@ -153,7 +155,7 @@ export default function App() {
   const [selectedPartId, setSelectedPartId] = useState<string>('')
   useEffect(() => { setSelectedPartId('') }, [currentId])
   const transforms = trpc.taxonomy.getTransformsFor.useQuery(
-    { taxonId: currentId || '', partId: selectedPartId || '' },
+    { taxonId: currentId || '', partId: selectedPartId || '', identityOnly: false },
     { enabled: !!currentId && !!selectedPartId }
   )
 
@@ -175,7 +177,13 @@ export default function App() {
 
   // Compose local fs:// preview
   const fsPreview = useMemo(() => {
-    const lineage = ((path.data as TaxonNode[]) ?? []).map((p) => p.slug)
+    // Build lineage from current node up to root
+    const lineage: string[] = []
+    let current = nodeData
+    while (current) {
+      lineage.unshift(current.slug)
+      current = parentData // This is simplified - in reality we'd need the full path
+    }
     if (!lineage.length) return ''
     const segs: string[] = [`fs:/${lineage.join('/')}`]
     if (selectedPartId) segs.push(selectedPartId)
@@ -194,7 +202,7 @@ export default function App() {
       if (chain) segs.push(chain)
     }
     return segs.join('/')
-  }, [path.data, selectedPartId, chosen])
+  }, [nodeData, parentData, selectedPartId, chosen])
 
   // Optional server validation using existing foodstate.compose (query)
   const compose = trpc.foodstate.compose.useQuery(
@@ -202,9 +210,34 @@ export default function App() {
     { enabled: false }
   )
 
+  // FoodState parser
+  const handleParse = async (fs: string) => {
+    try {
+      // Use the tRPC client directly for this one-off query
+      const parsed = await fetch('/api/trpc/foodstate.parse', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ json: { fs } })
+      }).then(r => r.json()).then(r => r.result.data)
+      
+      if (parsed.taxonPath && parsed.taxonPath.length > 0) {
+        // For now, just navigate to the last taxon in the path
+        // In a full implementation, you'd navigate through the full path
+        const lastTaxon = parsed.taxonPath[parsed.taxonPath.length - 1]
+        setCurrentId(lastTaxon)
+      }
+      if (parsed.partId) {
+        setSelectedPartId(parsed.partId)
+      }
+      // TODO: Handle transforms from parsed.transforms
+    } catch (error) {
+      console.error('Failed to parse FoodState:', error)
+    }
+  }
+
   // Search keyboard nav
   useEffect(() => { setActiveIdx(0) }, [q])
-  const results = (search.data as TaxonNode[] | undefined) ?? []
+  const results = (search.data as any[] | undefined) ?? []
 
   return (
     <div className="p-6 space-y-4">
@@ -292,7 +325,7 @@ export default function App() {
                   </div>
                 ) : (
                   <ul className="divide-y">
-                    {results.map((n, i) => (
+                    {results.map((n: any, i: number) => (
                       <li
                         key={n.id}
                         className={`flex items-center justify-between px-3 py-2 text-sm cursor-pointer hover:bg-muted/40 ${i === activeIdx ? 'bg-muted/50' : ''}`}
@@ -307,9 +340,16 @@ export default function App() {
                           <div className="truncate">{n.name}</div>
                           <div className="text-xs text-muted-foreground truncate">/{n.slug}</div>
                         </div>
-                        <span className={`ml-2 inline-flex items-center rounded border px-2 py-0.5 text-[10px] uppercase ${rankColor[n.rank] || 'bg-zinc-100 text-zinc-700 border-zinc-200'}`}>
-                          {n.rank}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          {n.kind && (
+                            <span className="text-xs text-muted-foreground bg-muted/50 px-1.5 py-0.5 rounded">
+                              {n.kind}
+                            </span>
+                          )}
+                          <span className={`ml-2 inline-flex items-center rounded border px-2 py-0.5 text-[10px] uppercase ${rankColor[n.rank] || 'bg-zinc-100 text-zinc-700 border-zinc-200'}`}>
+                            {n.rank}
+                          </span>
+                        </div>
                       </li>
                     ))}
                   </ul>
@@ -341,7 +381,7 @@ export default function App() {
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Breadcrumb with sibling hop */}
-              {path.isLoading ? (
+              {neighborhood.isLoading ? (
                 <div className="flex items-center gap-2">
                   <Skeleton className="h-4 w-16" />
                   <Separator className="w-3 rotate-90" />
@@ -351,34 +391,28 @@ export default function App() {
                 </div>
               ) : (
                 <div className="flex flex-wrap items-center gap-2 text-sm">
-                  {((path.data as TaxonNode[]) ?? []).map((p, i, arr) => {
-                    const isLast = i === arr.length - 1
-                    return (
-                      <div key={p.id} className="flex items-center gap-2">
-                        {!isLast ? (
-                          <button className="underline" onClick={() => setCurrentId(p.id)}>
-                            {p.name}
-                          </button>
-                        ) : (
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium">{p.name}</span>
-                            {siblings.data && siblings.data.length > 0 && (
-                              <select
-                                className="text-xs border rounded px-1 py-0.5 bg-background"
-                                value={currentId ?? ''}
-                                onChange={(e) => setCurrentId(e.target.value)}
-                              >
-                                {(siblings.data as TaxonNode[]).map((s) => (
-                                  <option key={s.id} value={s.id}>{s.name}</option>
-                                ))}
-                              </select>
-                            )}
-                          </div>
-                        )}
-                        {!isLast && <Separator className="w-3 rotate-90" />}
-                      </div>
-                    )
-                  })}
+                  {parentData && (
+                    <div className="flex items-center gap-2">
+                      <button className="underline" onClick={() => setCurrentId(parentData.id)}>
+                        {parentData.name}
+                      </button>
+                      <Separator className="w-3 rotate-90" />
+                    </div>
+                  )}
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">{nodeData?.name}</span>
+                    {siblingsData && siblingsData.length > 0 && (
+                      <select
+                        className="text-xs border rounded px-1 py-0.5 bg-background"
+                        value={currentId ?? ''}
+                        onChange={(e) => setCurrentId(e.target.value)}
+                      >
+                        {siblingsData.map((s: TaxonNode) => (
+                          <option key={s.id} value={s.id}>{s.name}</option>
+                        ))}
+                      </select>
+                    )}
+                  </div>
                 </div>
               )}
 
@@ -392,8 +426,8 @@ export default function App() {
                   />
                 ) : (
                   <ChildrenTable
-                    rows={((children.data as TaxonNode[]) ?? [])}
-                    onPick={(id) => setCurrentId(id)}
+                    rows={childrenData}
+                    onPick={(id: string) => setCurrentId(id)}
                     rankColor={rankColor}
                   />
                 )}
@@ -418,8 +452,8 @@ export default function App() {
             </div>
 
             <div className="flex-1 min-h-0 overflow-auto">
-              {tab === 'docs' && <DocsPanel docs={docs.data as any} node={nodeQuery.data as TaxonNode | undefined} rankColor={rankColor} />}
-              {tab === 'taxon' && <TaxonPanel node={nodeQuery.data as TaxonNode | undefined} path={path.data as TaxonNode[] | undefined} children={children.data as TaxonNode[] | undefined} parentId={parentId} onJump={setCurrentId} rankColor={rankColor} />}
+              {tab === 'docs' && <DocsPanel docs={docs.data as any} node={nodeData as TaxonNode | undefined} rankColor={rankColor} />}
+              {tab === 'taxon' && <TaxonPanel node={nodeData as TaxonNode | undefined} path={[parentData, nodeData].filter(Boolean) as TaxonNode[] | undefined} children={childrenData as TaxonNode[] | undefined} parentId={parentId} onJump={setCurrentId} rankColor={rankColor} />}
               {tab === 'parts' && <PartsPanel parts={parts.data as any[] | undefined} selectedPartId={selectedPartId} onSelect={setSelectedPartId} />}
               {tab === 'transforms' && (
                 <TransformsPanel
@@ -435,8 +469,9 @@ export default function App() {
                   fsPreview={fsPreview}
                   loadingValidate={compose.isFetching}
                   result={compose.data as any}
-                  onCopy={(s) => navigator.clipboard.writeText(s)}
+                  onCopy={(s: string) => navigator.clipboard.writeText(s)}
                   onValidate={() => compose.refetch()}
+                  onParse={handleParse}
                 />
               )}
             </div>

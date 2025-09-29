@@ -162,6 +162,17 @@ def main():
         else:
             print(f"  ⚠️  Warning: {asset} not found at {src}")
     
+    # Copy rules directory
+    rules_src = root.parent / "rules"
+    rules_dst = compiled_dir / "rules"
+    if rules_src.exists():
+        if rules_dst.exists():
+            shutil.rmtree(rules_dst)
+        shutil.copytree(rules_src, rules_dst)
+        print(f"  ✓ Copied rules/ directory")
+    else:
+        print(f"  ⚠️  Warning: rules/ directory not found at {rules_src}")
+    
     print(f"✓ All assets copied to {compiled_dir}")
 
 if __name__ == "__main__":
