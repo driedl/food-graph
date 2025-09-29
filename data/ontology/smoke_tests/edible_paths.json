@@ -1,0 +1,23 @@
+[
+  {
+    "name": "Bacon (pork belly, cured+smoked)",
+    "taxonId": "tx:animalia",
+    "partId": "part:cut:belly",
+    "transforms": [
+      {"id":"tf:cure","params":{"style":"wet","nitrite":true}},
+      {"id":"tf:smoke","params":{"style":"hot"}}
+    ]
+  },
+  {
+    "name": "Beef brisket, smoked",
+    "taxonId": "tx:animalia",
+    "partId": "part:cut:brisket",
+    "transforms": [{"id":"tf:smoke","params":{"style":"hot"}}]
+  },
+  {
+    "name": "Chicken breast, roasted",
+    "taxonId": "tx:animalia",
+    "partId": "part:cut:breast",
+    "transforms": [{"id":"tf:cook","params":{"method":"roast","fat_added":false}}]
+  }
+]

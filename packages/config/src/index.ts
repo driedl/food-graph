@@ -8,7 +8,7 @@ const schema = z.object({
   DB_PATH: z.string().default(() => {
     // default to repo-root/data/builds/graph.dev.sqlite
     const __dirname = path.dirname(fileURLToPath(import.meta.url))
-    const repoRoot = path.resolve(__dirname, '..', '..')
+    const repoRoot = path.resolve(__dirname, '..', '..', '..')
     return path.join(repoRoot, 'data', 'builds', 'graph.dev.sqlite')
   }),
 })

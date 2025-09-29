@@ -1,3 +1,7 @@
-{"transform":"tf:trim","applies_to":[{"taxon_prefix":"tx:animalia:chordata:mammalia","parts":["part:muscle","part:cut:loin","part:cut:round","part:cut:brisket","part:cut:belly"]}]}
-{"transform":"tf:cure","applies_to":[{"taxon_prefix":"tx:animalia:chordata:mammalia:artiodactyla:suidae:sus:scrofa_domesticus","parts":["part:cut:belly"]}]}
-{"transform":"tf:smoke","applies_to":[{"taxon_prefix":"tx:animalia:chordata:mammalia:artiodactyla:suidae:sus:scrofa_domesticus","parts":["part:cut:belly"]},{"taxon_prefix":"tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus","parts":["part:cut:brisket"]}]}
+{"transform":"tf:trim","applies_to":[{"taxon_prefix":"tx:animalia","parts":["part:muscle","part:cut:loin","part:cut:round","part:cut:brisket","part:cut:belly"]}]}
+{"transform":"tf:cure","applies_to":[{"taxon_prefix":"tx:animalia","parts":["part:cut:belly"]}]}
+{"transform":"tf:smoke","applies_to":[{"taxon_prefix":"tx:animalia","parts":["part:cut:belly","part:cut:brisket"]}]}
+{"transform":"tf:cook","applies_to":[{"taxon_prefix":"tx:animalia","parts":["part:cut:belly","part:cut:brisket","part:cut:breast"]}]}
+{"transform":"tf:brine","applies_to":[{"taxon_prefix":"tx:animalia","parts":["part:cut:breast","part:cut:brisket"]}]}
+{"transform":"tf:cure","applies_to":[{"taxon_prefix":"tx:animalia","parts":["part:cut:brisket"]}]}
+{"transform":"tf:cook","applies_to":[{"taxon_prefix":"tx:animalia","parts":["part:muscle","part:cut:loin","part:cut:round","part:cut:brisket","part:cut:brisket:flat","part:cut:brisket:point","part:cut:belly","part:cut:breast","part:cut:thigh","part:cut:wing","part:cut:drumstick","part:organ:liver"]}]}

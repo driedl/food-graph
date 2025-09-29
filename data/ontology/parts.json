@@ -122,5 +122,12 @@
     "name": "Subcutaneous fat",
     "kind": "animal",
     "applies_to": []
+  },
+  {
+    "id": "part:cut:breast",
+    "name": "Breast",
+    "kind": "animal",
+    "applies_to": [],
+    "notes": "Chicken breast cut"
   }
 ]

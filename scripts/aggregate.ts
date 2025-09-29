@@ -70,15 +70,19 @@ const FILE_CATEGORIES: Record<string, FileCategory> = {
   api: {
     name: 'API Server',
     pattern: [
-      'apps/api/**/*.ts',
-      'apps/api/**/*.js',
-      'apps/api/**/*.json',
-      'apps/api/**/*.sql',
-      'packages/api-contract/**/*.ts',
-      'packages/api-contract/**/*.tsx',
-      'packages/api-contract/**/*.js',
-      'packages/api-contract/**/*.jsx',
-      'packages/api-contract/**/*.json',
+      'apps/api/src/**/*.ts',
+      'apps/api/migrations/**/*.sql',
+      'apps/api/package.json',
+      'apps/api/tsconfig.json',
+      'packages/api-contract/src/**/*.ts',
+      'packages/api-contract/src/**/*.tsx',
+      'packages/api-contract/package.json',
+      'packages/api-contract/tsconfig.json',
+    ],
+    ignore: [
+      'apps/api/dist/**',           // Exclude compiled JavaScript
+      'apps/api/node_modules/**',   // Exclude dependencies
+      'packages/api-contract/node_modules/**', // Exclude dependencies
     ],
     description: 'tRPC server with SQLite, migrations, and API contracts',
   },
@@ -93,8 +97,17 @@ const FILE_CATEGORIES: Record<string, FileCategory> = {
     ],
     description: 'Python scripts and shared utilities',
   },
-  ontology: {
-    name: 'Ontology Data',
+  ontology_taxa: {
+    name: 'Ontology - Taxa',
+    pattern: [
+      'data/ontology/taxa/**/*.json',
+      'data/ontology/taxa/**/*.jsonl',
+      'data/ontology/taxa/**/*.md',
+    ],
+    description: 'Taxonomic classification data (animals, plants, fungi, etc.)',
+  },
+  ontology_core: {
+    name: 'Ontology - Core',
     pattern: [
       'data/ontology/**/*.json',
       'data/ontology/**/*.jsonl',
@@ -103,8 +116,9 @@ const FILE_CATEGORIES: Record<string, FileCategory> = {
     ],
     ignore: [
       'data/ontology/compiled/**', // Exclude all compiled files (redundant with source files)
+      'data/ontology/taxa/**', // Exclude taxa folder (handled by ontology_taxa category)
     ],
-    description: 'Food ontology data and schemas',
+    description: 'Core ontology data (attributes, nutrients, parts, rules, transforms) - excludes taxa',
   },
   scripts: {
     name: 'Project Scripts',
@@ -153,7 +167,7 @@ function isCodeOrConfigFile(filePath: string): boolean {
   const fileName = basename(filePath).toLowerCase();
   
   // Code files
-  const codeExtensions = ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.py'];
+  const codeExtensions = ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.py', '.sql'];
   if (codeExtensions.includes(ext)) {
     return true;
   }
@@ -450,7 +464,8 @@ File Categories:
   web        - React frontend application with tRPC client and API contracts
   api        - tRPC server with SQLite database and API contracts
   etl        - Python scripts and shared utilities
-  ontology   - Food ontology data and schemas
+  ontology_taxa - Taxonomic classification data (animals, plants, fungi, etc.)
+  ontology_core - Core ontology data (attributes, nutrients, parts, rules, transforms) - excludes taxa
   scripts    - Build and utility scripts
   docs       - Project documentation
   config     - Project configuration, package management, and documentation
@@ -476,7 +491,9 @@ Examples:
   pnpm ag --compact --categories api         # API code summary
   pnpm ag --verbose --categories all         # Everything
   pnpm ag --verbose --categories web,api     # Web app + API
-  pnpm ag --verbose --categories ontology    # Ontology data only
+  pnpm ag --verbose --categories ontology_taxa # Taxonomic data only
+  pnpm ag --verbose --categories ontology_core # Core ontology data only
+  pnpm ag --verbose --categories ontology_taxa,ontology_core # All ontology data
   pnpm ag --verbose --categories scripts,docs # Scripts and documentation
 `);
 }

@@ -1,0 +1,9 @@
+{
+  "taxa": ["tx:animalia"],
+  "parts": [
+    { "id":"part:cut:breast", "name":"Breast" },
+    { "id":"part:cut:thigh", "name":"Thigh" },
+    { "id":"part:cut:wing", "name":"Wing" },
+    { "id":"part:cut:drumstick", "name":"Drumstick" }
+  ]
+}

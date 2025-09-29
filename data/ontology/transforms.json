@@ -3,6 +3,7 @@
     "id": "tf:skim",
     "name": "Standardize fat (skim/fortify)",
     "identity": true,
+    "order": 10,
     "params": [
       {
         "key": "fat_pct",
@@ -16,6 +17,7 @@
     "id": "tf:strain",
     "name": "Strain (whey removal)",
     "identity": true,
+    "order": 80,
     "params": [
       {
         "key": "yield_factor",
@@ -34,6 +36,7 @@
     "id": "tf:cook",
     "name": "Cook",
     "identity": true,
+    "order": 90,
     "params": [
       {
         "key": "method",
@@ -59,6 +62,7 @@
     "id": "tf:brine",
     "name": "Brine/Can (Salt)",
     "identity": true,
+    "order": 30,
     "params": [
       {
         "key": "salt_level",
@@ -76,6 +80,7 @@
     "id": "tf:mill",
     "name": "Mill / Refine / Flake",
     "identity": true,
+    "order": 60,
     "params": [
       {
         "key": "refinement",
@@ -102,6 +107,7 @@
     "id": "tf:enrich",
     "name": "Enrich fortification",
     "identity": true,
+    "order": 70,
     "params": [
       {
         "key": "enrichment",
@@ -119,6 +125,7 @@
     "id": "tf:cure",
     "name": "Cure (salt/nitrite)",
     "identity": true,
+    "order": 40,
     "params": [
       {
         "key": "style",
@@ -139,6 +146,7 @@
     "id": "tf:smoke",
     "name": "Smoke",
     "identity": true,
+    "order": 50,
     "params": [
       {
         "key": "style",
@@ -155,6 +163,7 @@
     "id": "tf:trim",
     "name": "Trim/Lean standardization",
     "identity": true,
+    "order": 20,
     "params": [
       {
         "key": "lean_pct",

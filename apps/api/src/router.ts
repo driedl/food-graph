@@ -70,7 +70,7 @@ export const appRouter = t.router({
             SELECT n.id, n.parent_id FROM nodes n
             JOIN lineage l ON n.id = l.parent_id
           )
-          SELECT DISTINCT p.id as id, p.name as name, p.kind as kind
+          SELECT DISTINCT p.id as id, p.name as name, p.kind as kind, p.parent_id as parentId
           FROM has_part hp
           JOIN part_def p ON p.id = hp.part_id
           WHERE hp.taxon_id IN (SELECT id FROM lineage)

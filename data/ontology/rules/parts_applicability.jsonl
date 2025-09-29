@@ -6,3 +6,4 @@
 {"part":"part:organ:liver","applies_to":["tx:animalia:chordata:mammalia","tx:animalia:chordata:aves"]}
 {"part":"part:fat:leaf","applies_to":["tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus","tx:animalia:chordata:mammalia:artiodactyla:suidae:sus:scrofa_domesticus"]}
 {"part":"part:milk","applies_to":["tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus"]}
+{"part":"part:cut:breast","applies_to":["tx:animalia:chordata:aves:galliformes:phasianidae:gallus:gallus_domesticus"]}

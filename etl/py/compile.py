@@ -75,7 +75,13 @@ CREATE TABLE IF NOT EXISTS node_attributes (
 );
 CREATE TABLE IF NOT EXISTS attr_def (
   attr TEXT PRIMARY KEY,
-  kind TEXT NOT NULL DEFAULT 'categorical' -- numeric|boolean|categorical
+  kind TEXT NOT NULL DEFAULT 'categorical', -- numeric|boolean|categorical
+  role TEXT
+);
+CREATE TABLE IF NOT EXISTS attr_enum (
+  attr TEXT NOT NULL REFERENCES attr_def(attr) ON DELETE CASCADE,
+  val  TEXT NOT NULL,
+  PRIMARY KEY (attr, val)
 );
 CREATE TABLE IF NOT EXISTS taxon_doc (
   taxon_id TEXT NOT NULL,
@@ -98,7 +104,13 @@ CREATE TABLE IF NOT EXISTS part_def (
   id   TEXT PRIMARY KEY,
   name TEXT NOT NULL,
   kind TEXT,
-  notes TEXT
+  notes TEXT,
+  parent_id TEXT REFERENCES part_def(id) ON DELETE SET NULL
+);
+CREATE TABLE IF NOT EXISTS part_synonym (
+  part_id TEXT NOT NULL REFERENCES part_def(id) ON DELETE CASCADE,
+  synonym TEXT NOT NULL,
+  PRIMARY KEY (part_id, synonym)
 );
 CREATE TABLE IF NOT EXISTS has_part (
   taxon_id TEXT NOT NULL REFERENCES nodes(id) ON DELETE CASCADE,
@@ -109,7 +121,9 @@ CREATE TABLE IF NOT EXISTS transform_def (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
   identity INTEGER NOT NULL,
-  schema_json TEXT
+  schema_json TEXT,
+  ordering INTEGER DEFAULT 999,
+  notes TEXT
 );
 CREATE TABLE IF NOT EXISTS transform_applicability (
   taxon_id TEXT NOT NULL REFERENCES nodes(id) ON DELETE CASCADE,
@@ -148,7 +162,12 @@ print_info(f"Found {len(attrs)} attribute definitions")
 for i, a in enumerate(attrs):
     kind_map = {"enum": "categorical", "string": "categorical", "number": "numeric", "boolean": "boolean"}
     kind = kind_map.get(a["kind"], "categorical")
-    cur.execute("INSERT OR IGNORE INTO attr_def(attr, kind) VALUES (?,?)", (a["id"].replace("attr:", ""), kind))
+    role = a.get("role")
+    cur.execute("INSERT OR IGNORE INTO attr_def(attr, kind, role) VALUES (?,?,?)", (a["id"].replace("attr:", ""), kind, role))
+    # enums (if any)
+    if a.get("enum"):
+        for ev in a["enum"]:
+            cur.execute("INSERT OR IGNORE INTO attr_enum(attr, val) VALUES (?,?)", (a["id"].replace("attr:", ""), ev))
     if args.verbose:
         print(f"  • {a['id']} ({kind}) - {a.get('name', 'No name')}")
 
@@ -179,6 +198,43 @@ for p in parts:
 
 print_success(f"Loaded {len(parts)} parts (and {len(builtin_part_rules)} built-in applicability rules)")
 
+# Load animal cut maps
+print_step("2.6/5", "Loading animal cut maps...")
+cuts_dir = os.path.join(args.in_dir, "animal_cuts")
+cut_files = sorted(glob.glob(os.path.join(cuts_dir, "*.json")))
+cut_pairs = []  # (taxon_id, part_id)
+
+def ingest_node(node, parent_id=None):
+    pid = node["id"]
+    pname = node.get("name", pid.split(":")[-1])
+    cur.execute(
+        "INSERT OR REPLACE INTO part_def(id,name,kind,notes,parent_id) VALUES (?,?,?,?,?)",
+        (pid, pname, "animal", node.get("notes"), parent_id)
+    )
+    for syn in node.get("aliases", []) or []:
+        cur.execute("INSERT OR IGNORE INTO part_synonym(part_id, synonym) VALUES (?,?)", (pid, syn.lower().strip()))
+    for ch in node.get("children", []) or []:
+        ingest_node(ch, pid)
+
+for cf in cut_files:
+    with open(cf, "r", encoding="utf-8") as f:
+        obj = json.load(f)
+    taxa_for_file = obj.get("taxa", [])
+    for root in obj.get("parts", []):
+        ingest_node(root, None)
+        # collect all part ids from this subtree for has_part
+        stack = [root]
+        ids = []
+        while stack:
+            n = stack.pop()
+            ids.append(n["id"])
+            stack.extend(n.get("children", []) or [])
+        for tid in taxa_for_file:
+            for pid in ids:
+                cut_pairs.append((tid, pid))
+
+print_success(f"Loaded animal cuts from {len(cut_files)} files")
+
 # Load transform definitions
 print_step("2.7/5", "Loading transform definitions...")
 transforms_file = os.path.join(args.in_dir, "transforms.json")
@@ -192,9 +248,11 @@ with open(transforms_file, "r", encoding="utf-8") as f:
 print_info(f"Found {len(tdefs)} transform families")
 for t in tdefs:
     schema_json = json.dumps(t.get("params", []), ensure_ascii=False)
+    order = t.get("order", 999)
+    notes = t.get("notes")
     cur.execute(
-        "INSERT OR REPLACE INTO transform_def(id,name,identity,schema_json) VALUES (?,?,?,?)",
-        (t["id"], t["name"], 1 if t.get("identity") else 0, schema_json)
+        "INSERT OR REPLACE INTO transform_def(id,name,identity,schema_json,ordering,notes) VALUES (?,?,?,?,?,?)",
+        (t["id"], t["name"], 1 if t.get("identity") else 0, schema_json, order, notes)
     )
 print_success(f"Loaded {len(tdefs)} transforms")
 
@@ -408,6 +466,10 @@ for r in parts_rules:
     for pair in expand_applies_to(r, all_taxa):
         pairs.add(pair)
 
+# Animal cut pairs
+for pair in cut_pairs:
+    pairs.add(pair)
+
 cur.executemany("INSERT OR IGNORE INTO has_part(taxon_id, part_id) VALUES (?,?)", list(pairs))
 print_success(f"has_part rows inserted: {len(pairs)}")
 
@@ -419,19 +481,40 @@ all_taxa = [row[0] for row in cur.execute("SELECT id FROM nodes").fetchall()]
 hp_pairs = set((row[0], row[1]) for row in cur.execute("SELECT taxon_id, part_id FROM has_part").fetchall())
 
 def expand_taxa(prefix: str):
-    for tid in all_taxa:
-        if tid.startswith(prefix):
-            yield tid
+    matched = [tid for tid in all_taxa if tid.startswith(prefix)]
+    return matched
+
+# Lint: unknown transform ids
+known_tf = set(r[0] for r in cur.execute("SELECT id FROM transform_def").fetchall())
+for rule in tx_rules:
+    if rule["transform"] not in known_tf:
+        print_error(f"Unknown transform in rule: {rule['transform']}")
+
+# Lint: unknown parts in rules
+known_parts = set(r[0] for r in cur.execute("SELECT id FROM part_def").fetchall())
+for r in parts_rules:
+    p = r["part"]
+    if p not in known_parts:
+        print_error(f"Unknown part in parts_applicability: {p}")
 
 rows = set()
 for rule in tx_rules:
     t_id = rule["transform"]
-    for ap in rule.get("applies_to", []):
-        tx_prefix = ap["taxon_prefix"]
+    applies = rule.get("applies_to", [])
+    excludes = rule.get("exclude", [])
+    excluded = set()
+    for ex in excludes:
+        for tid in expand_taxa(ex["taxon_prefix"]):
+            for pid in ex.get("parts", []):
+                excluded.add((tid, pid))
+    for ap in applies:
         parts = ap.get("parts", [])
-        for tid in expand_taxa(tx_prefix):
+        matched = expand_taxa(ap["taxon_prefix"])
+        if not matched:
+            print_error(f"No taxa matched for transform rule prefix: {ap['taxon_prefix']}")
+        for tid in matched:
             for pid in parts:
-                if (tid, pid) in hp_pairs:
+                if (tid, pid) in hp_pairs and (tid, pid) not in excluded:
                     rows.add((tid, pid, t_id))
 
 cur.executemany(

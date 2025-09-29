@@ -19,21 +19,11 @@ export type ComposeResult = {
   }
 }
 
-const TRANSFORM_ORDER = [
-  'tf:skim',
-  'tf:trim',
-  'tf:brine',
-  'tf:cure',
-  'tf:smoke',
-  'tf:mill',
-  'tf:enrich',
-  'tf:strain',
-  'tf:cook',
-] as const
-
-function orderKey(id: string) {
-  const idx = TRANSFORM_ORDER.indexOf(id as any)
-  return idx === -1 ? 999 : idx
+function orderKeyFromDB(db: Database) {
+  const rows = db.prepare('SELECT id, ordering FROM transform_def').all() as Array<{id:string; ordering:number|null}>
+  const map = new Map<string, number>()
+  for (const r of rows) map.set(r.id, (r.ordering ?? 999))
+  return (id: string) => map.get(id) ?? 999
 }
 
 function lastSeg(txId: string) {
@@ -55,6 +45,9 @@ function encodeParams(obj: KV): string {
 export function composeFoodState(db: Database, input: ComposeInput): ComposeResult {
   const errors: string[] = []
   const { taxonId, partId } = input
+
+  // build order key once
+  const ok = orderKeyFromDB(db)
 
   // 1) Basic existence checks
   const tx = db.prepare('SELECT id, parent_id FROM nodes WHERE id = ?').get(taxonId) as { id: string; parent_id: string | null } | undefined
@@ -139,7 +132,7 @@ export function composeFoodState(db: Database, input: ComposeInput): ComposeResu
   if (errors.length) return { id: null, errors }
 
   // 5) Canonicalize order and params encoding
-  normTransforms.sort((a, b) => orderKey(a.id) - orderKey(b.id))
+  normTransforms.sort((a, b) => ok(a.id) - ok(b.id))
 
   const chain = normTransforms.map(t => {
     const p = encodeParams(t.params || {})
