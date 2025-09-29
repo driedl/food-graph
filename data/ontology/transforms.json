@@ -14,25 +14,6 @@
     "notes": "Standardization of dairy fat percentage"
   },
   {
-    "id": "tf:strain",
-    "name": "Strain (whey removal)",
-    "identity": true,
-    "order": 80,
-    "params": [
-      {
-        "key": "yield_factor",
-        "kind": "number",
-        "unit": "ratio"
-      },
-      {
-        "key": "water_loss",
-        "kind": "number",
-        "unit": "% m/m"
-      }
-    ],
-    "notes": "Covers Greek-style yogurt via whey removal"
-  },
-  {
     "id": "tf:cook",
     "name": "Cook",
     "identity": true,
@@ -172,5 +153,617 @@
       }
     ],
     "notes": "Standardize lean/fat ratio (ties to attr:lean_pct)"
+  },
+  {
+    "id": "tf:cure",
+    "name": "Cure",
+    "identity": true,
+    "order": 20,
+    "params": [
+      {
+        "key": "method",
+        "kind": "enum",
+        "enum": [
+          "dry",
+          "wet"
+        ]
+      },
+      {
+        "key": "salt_pct",
+        "kind": "number"
+      },
+      {
+        "key": "sugar_pct",
+        "kind": "number"
+      },
+      {
+        "key": "nitrite_ppm",
+        "kind": "number"
+      },
+      {
+        "key": "time_d",
+        "kind": "number"
+      }
+    ]
+  },
+  {
+    "id": "tf:smoke",
+    "name": "Smoke",
+    "identity": true,
+    "order": 40,
+    "params": [
+      {
+        "key": "mode",
+        "kind": "enum",
+        "enum": [
+          "cold",
+          "hot"
+        ]
+      },
+      {
+        "key": "time_h",
+        "kind": "number"
+      }
+    ]
+  },
+  {
+    "id": "tf:dry",
+    "name": "Dry / Dehydrate",
+    "identity": true,
+    "order": 45,
+    "params": [
+      {
+        "key": "method",
+        "kind": "enum",
+        "enum": [
+          "air",
+          "oven",
+          "dehydrator",
+          "sun",
+          "freeze_dry"
+        ]
+      },
+      {
+        "key": "target_moisture_pct",
+        "kind": "number"
+      }
+    ]
+  },
+  {
+    "id": "tf:roast",
+    "name": "Roast / Toast",
+    "identity": true,
+    "order": 70,
+    "params": [
+      {
+        "key": "temp_C",
+        "kind": "number"
+      },
+      {
+        "key": "time_min",
+        "kind": "number"
+      }
+    ]
+  },
+  {
+    "id": "tf:cook",
+    "name": "Cook",
+    "identity": true,
+    "order": 75,
+    "params": [
+      {
+        "key": "method",
+        "kind": "enum",
+        "enum": [
+          "boil",
+          "steam",
+          "bake",
+          "roast",
+          "grill",
+          "saute",
+          "stir_fry",
+          "deep_fry",
+          "pressure_cook",
+          "sous_vide"
+        ]
+      },
+      {
+        "key": "core_temp_C",
+        "kind": "number"
+      },
+      {
+        "key": "time_min",
+        "kind": "number"
+      }
+    ]
+  },
+  {
+    "id": "tf:strain",
+    "name": "Strain / Drain",
+    "identity": true,
+    "order": 34,
+    "params": [
+      {
+        "key": "target_TS_pct",
+        "kind": "number"
+      },
+      {
+        "key": "drain_time_min",
+        "kind": "number"
+      }
+    ]
+  },
+  {
+    "id": "tf:press",
+    "name": "Press",
+    "identity": true,
+    "order": 40,
+    "params": [
+      {
+        "key": "pressure_kPa",
+        "kind": "number"
+      },
+      {
+        "key": "time_min",
+        "kind": "number"
+      }
+    ]
+  },
+  {
+    "id": "tf:refine_oil",
+    "name": "Refine oil",
+    "identity": false,
+    "order": 62,
+    "params": [
+      {
+        "key": "steps",
+        "kind": "enum",
+        "enum": [
+          "neutralize",
+          "bleach",
+          "deodorize",
+          "winterize"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tf:mill",
+    "name": "Mill / Grind",
+    "identity": true,
+    "order": 55,
+    "params": [
+      {
+        "key": "extraction_pct",
+        "kind": "number"
+      },
+      {
+        "key": "target",
+        "kind": "enum",
+        "enum": [
+          "wholemeal",
+          "white",
+          "semolina",
+          "meal",
+          "flour"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tf:polish",
+    "name": "Polish / Pearling",
+    "identity": true,
+    "order": 56,
+    "params": [
+      {
+        "key": "degree",
+        "kind": "number"
+      }
+    ]
+  },
+  {
+    "id": "tf:soak",
+    "name": "Soak",
+    "identity": false,
+    "order": 15,
+    "params": [
+      {
+        "key": "water_ratio",
+        "kind": "number"
+      },
+      {
+        "key": "time_h",
+        "kind": "number"
+      },
+      {
+        "key": "salt_pct",
+        "kind": "number"
+      }
+    ]
+  },
+  {
+    "id": "tf:blanch",
+    "name": "Blanch",
+    "identity": false,
+    "order": 35,
+    "params": [
+      {
+        "key": "time_min",
+        "kind": "number"
+      }
+    ]
+  },
+  {
+    "id": "tf:pasteurize",
+    "name": "Pasteurize",
+    "identity": false,
+    "order": 10,
+    "params": [
+      {
+        "key": "regime",
+        "kind": "enum",
+        "enum": [
+          "LTLT",
+          "HTST",
+          "UHT",
+          "thermize"
+        ]
+      },
+      {
+        "key": "time_s",
+        "kind": "number"
+      },
+      {
+        "key": "temp_C",
+        "kind": "number"
+      }
+    ]
+  },
+  {
+    "id": "tf:homogenize",
+    "name": "Homogenize",
+    "identity": false,
+    "order": 12,
+    "params": [
+      {
+        "key": "pressure_MPa",
+        "kind": "number"
+      },
+      {
+        "key": "passes",
+        "kind": "number"
+      }
+    ]
+  },
+  {
+    "id": "tf:standardize_fat",
+    "name": "Standardize fat",
+    "identity": true,
+    "order": 14,
+    "params": [
+      {
+        "key": "fat_pct",
+        "kind": "number"
+      }
+    ]
+  },
+  {
+    "id": "tf:separate",
+    "name": "Separate (cream/skim)",
+    "identity": true,
+    "order": 16,
+    "params": [
+      {
+        "key": "method",
+        "kind": "enum",
+        "enum": [
+          "gravity",
+          "centrifuge"
+        ]
+      },
+      {
+        "key": "target_fat_pct",
+        "kind": "number"
+      }
+    ]
+  },
+  {
+    "id": "tf:coagulate",
+    "name": "Coagulate",
+    "identity": true,
+    "order": 30,
+    "params": [
+      {
+        "key": "agent",
+        "kind": "enum",
+        "enum": [
+          "acid",
+          "rennet",
+          "cultured_acid"
+        ]
+      },
+      {
+        "key": "temp_C",
+        "kind": "number"
+      },
+      {
+        "key": "time_min",
+        "kind": "number"
+      },
+      {
+        "key": "substrate",
+        "kind": "enum",
+        "enum": [
+          "milk",
+          "whey",
+          "cream"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tf:ferment",
+    "name": "Ferment",
+    "identity": true,
+    "order": 32,
+    "params": [
+      {
+        "key": "starter",
+        "kind": "enum",
+        "enum": [
+          "yogurt_thermo",
+          "yogurt_meso",
+          "kefir",
+          "culture_generic"
+        ]
+      },
+      {
+        "key": "temp_C",
+        "kind": "number"
+      },
+      {
+        "key": "time_h",
+        "kind": "number"
+      }
+    ]
+  },
+  {
+    "id": "tf:churn",
+    "name": "Churn",
+    "identity": true,
+    "order": 50,
+    "params": [
+      {
+        "key": "time_min",
+        "kind": "number"
+      }
+    ]
+  },
+  {
+    "id": "tf:age",
+    "name": "Age / Affinage",
+    "identity": true,
+    "order": 80,
+    "params": [
+      {
+        "key": "time_d",
+        "kind": "number"
+      },
+      {
+        "key": "temp_C",
+        "kind": "number"
+      },
+      {
+        "key": "humidity_pct",
+        "kind": "number"
+      }
+    ]
+  },
+  {
+    "id": "tf:dehull",
+    "name": "Dehull",
+    "identity": true,
+    "order": 52,
+    "params": [
+      {
+        "key": "degree_pct",
+        "kind": "number"
+      }
+    ]
+  },
+  {
+    "id": "tf:split",
+    "name": "Split (dal)",
+    "identity": true,
+    "order": 53,
+    "params": [
+      {
+        "key": "fraction",
+        "kind": "enum",
+        "enum": [
+          "cotyledon_halves",
+          "coarse_split"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tf:sprout",
+    "name": "Sprout / Germinate",
+    "identity": true,
+    "order": 25,
+    "params": [
+      {
+        "key": "time_d",
+        "kind": "number"
+      },
+      {
+        "key": "temp_C",
+        "kind": "number"
+      }
+    ]
+  },
+  {
+    "id": "tf:can",
+    "name": "Can (retort)",
+    "identity": true,
+    "order": 85,
+    "params": [
+      {
+        "key": "brine_salt_pct",
+        "kind": "number"
+      },
+      {
+        "key": "F0",
+        "kind": "number"
+      }
+    ]
+  },
+  {
+    "id": "tf:cook_curd",
+    "name": "Cook curd / Scald",
+    "identity": true,
+    "order": 36,
+    "params": [
+      {
+        "key": "temp_C",
+        "kind": "number"
+      },
+      {
+        "key": "time_min",
+        "kind": "number"
+      }
+    ]
+  },
+  {
+    "id": "tf:stretch",
+    "name": "Stretch (pasta filata)",
+    "identity": true,
+    "order": 45,
+    "params": [
+      {
+        "key": "temp_C",
+        "kind": "number"
+      },
+      {
+        "key": "time_min",
+        "kind": "number"
+      }
+    ]
+  },
+  {
+    "id": "tf:salt",
+    "name": "Salt / Brine",
+    "identity": true,
+    "order": 60,
+    "params": [
+      {
+        "key": "method",
+        "kind": "enum",
+        "enum": [
+          "dry",
+          "brine"
+        ]
+      },
+      {
+        "key": "salt_pct",
+        "kind": "number"
+      },
+      {
+        "key": "time_h",
+        "kind": "number"
+      }
+    ]
+  },
+  {
+    "id": "tf:evaporate",
+    "name": "Evaporate / Concentrate",
+    "identity": true,
+    "order": 70,
+    "params": [
+      {
+        "key": "target_TS_pct",
+        "kind": "number"
+      },
+      {
+        "key": "reduction_pct",
+        "kind": "number"
+      }
+    ]
+  },
+  {
+    "id": "tf:add_sugar",
+    "name": "Add sugar",
+    "identity": true,
+    "order": 72,
+    "params": [
+      {
+        "key": "sugar_pct",
+        "kind": "number"
+      }
+    ]
+  },
+  {
+    "id": "tf:dry",
+    "name": "Dry / Dehydrate",
+    "identity": true,
+    "order": 90,
+    "params": [
+      {
+        "key": "method",
+        "kind": "enum",
+        "enum": [
+          "spray",
+          "drum",
+          "freeze"
+        ]
+      },
+      {
+        "key": "target_moisture_pct",
+        "kind": "number"
+      }
+    ]
+  },
+  {
+    "id": "tf:clarify_butter",
+    "name": "Clarify butter",
+    "identity": true,
+    "order": 55,
+    "params": [
+      {
+        "key": "stage",
+        "kind": "enum",
+        "enum": [
+          "clarified",
+          "ghee",
+          "brown_butter"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tf:smoke",
+    "name": "Smoke",
+    "identity": true,
+    "order": 65,
+    "params": [
+      {
+        "key": "mode",
+        "kind": "enum",
+        "enum": [
+          "cold",
+          "hot"
+        ]
+      },
+      {
+        "key": "time_h",
+        "kind": "number"
+      },
+      {
+        "key": "temp_C",
+        "kind": "number"
+      }
+    ]
   }
 ]

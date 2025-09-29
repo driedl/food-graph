@@ -1,6 +1,6 @@
 export type NodeRank =
   | 'root' | 'domain' | 'kingdom' | 'phylum' | 'class' | 'order'
-  | 'family' | 'genus' | 'species' | 'cultivar' | 'variety'
+  | 'family' | 'genus' | 'species' | 'subspecies' | 'cultivar' | 'variety'
   | 'breed' | 'product' | 'form'
 
 export interface TaxNode {

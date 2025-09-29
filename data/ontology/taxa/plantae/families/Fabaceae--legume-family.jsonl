@@ -20,3 +20,8 @@
 {"id": "tx:plantae:fabaceae:lens:culinaris", "parent": "tx:plantae:fabaceae:lens", "rank": "species", "display_name": "Lentil", "latin_name": "Lens culinaris", "aliases": ["lentil", "lentils"]}
 {"id": "tx:plantae:fabaceae:vigna", "parent": "tx:plantae:fabaceae", "rank": "genus", "display_name": "Vigna", "latin_name": "Vigna", "aliases": []}
 {"id": "tx:plantae:fabaceae:vigna:unguiculata", "parent": "tx:plantae:fabaceae:vigna", "rank": "species", "display_name": "Cowpea (black-eyed pea)", "latin_name": "Vigna unguiculata", "aliases": ["black-eyed pea", "cowpea"]}
+{"id": "tx:plantae:fabaceae:glycine", "parent": "tx:plantae:fabaceae", "rank": "genus", "display_name": "Glycine", "latin_name": "Glycine", "aliases": []}
+{"id": "tx:plantae:fabaceae:glycine:max", "parent": "tx:plantae:fabaceae:glycine", "rank": "species", "display_name": "Soybean", "latin_name": "Glycine max", "aliases": ["soybean","soy"]}
+
+{"id": "tx:plantae:fabaceae:arachis", "parent": "tx:plantae:fabaceae", "rank": "genus", "display_name": "Arachis", "latin_name": "Arachis", "aliases": []}
+{"id": "tx:plantae:fabaceae:arachis:hypogaea", "parent": "tx:plantae:fabaceae:arachis", "rank": "species", "display_name": "Peanut", "latin_name": "Arachis hypogaea", "aliases": ["peanut","groundnut"]}

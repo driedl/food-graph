@@ -84,6 +84,12 @@ export function composeFoodState(db: Database, input: ComposeInput): ComposeResu
     const def = defMap.get(t.id)
     if (!def) { errors.push(`Unknown transform: ${t.id}`); continue }
 
+    // NEW: enforce identity flag
+    if (!def.identity) {
+      errors.push(`Transform ${t.id} is non-identity and cannot appear in the identity chain`);
+      continue;
+    }
+
     // applicability against lineage + part
     const allowed = db.prepare(`
       WITH RECURSIVE lineage(id) AS (
@@ -134,7 +140,14 @@ export function composeFoodState(db: Database, input: ComposeInput): ComposeResu
   // 5) Canonicalize order and params encoding
   normTransforms.sort((a, b) => ok(a.id) - ok(b.id))
 
-  const chain = normTransforms.map(t => {
+  // Only identity transforms affect the canonical fs path
+  const identitySet = new Set<string>()
+  for (const [id, def] of defMap.entries()) {
+    if (def.identity) identitySet.add(id)
+  }
+  const identityTransforms = normTransforms.filter(t => identitySet.has(t.id))
+
+  const chain = identityTransforms.map(t => {
     const p = encodeParams(t.params || {})
     return p ? `${t.id}{${p}}` : `${t.id}`
   }).join('/')

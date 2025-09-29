@@ -129,5 +129,180 @@
     "kind": "animal",
     "applies_to": [],
     "notes": "Chicken breast cut"
+  },
+  {
+    "id": "part:stem",
+    "name": "Stem",
+    "kind": "plant"
+  },
+  {
+    "id": "part:root",
+    "name": "Root",
+    "kind": "plant"
+  },
+  {
+    "id": "part:tuber",
+    "name": "Tuber",
+    "kind": "plant"
+  },
+  {
+    "id": "part:bulb",
+    "name": "Bulb",
+    "kind": "plant"
+  },
+  {
+    "id": "part:rhizome",
+    "name": "Rhizome",
+    "kind": "plant"
+  },
+  {
+    "id": "part:kernel",
+    "name": "Kernel",
+    "kind": "plant"
+  },
+  {
+    "id": "part:peel",
+    "name": "Peel / Rind",
+    "kind": "plant"
+  },
+  {
+    "id": "part:pith",
+    "name": "Pith / Albedo",
+    "kind": "plant"
+  },
+  {
+    "id": "part:flavedo",
+    "name": "Flavedo (Zest layer)",
+    "kind": "plant"
+  },
+  {
+    "id": "part:bran",
+    "name": "Bran",
+    "kind": "plant"
+  },
+  {
+    "id": "part:germ",
+    "name": "Germ",
+    "kind": "plant"
+  },
+  {
+    "id": "part:endosperm",
+    "name": "Endosperm",
+    "kind": "plant"
+  },
+  {
+    "id": "part:hull",
+    "name": "Hull / Husk",
+    "kind": "plant"
+  },
+  {
+    "id": "part:expressed_juice",
+    "name": "Expressed juice",
+    "kind": "derived"
+  },
+  {
+    "id": "part:expressed_oil",
+    "name": "Expressed oil",
+    "kind": "derived"
+  },
+  {
+    "id": "part:fruiting_body",
+    "name": "Fruiting body",
+    "kind": "fungus"
+  },
+  {
+    "id": "part:cap",
+    "name": "Cap",
+    "kind": "fungus",
+    "parent_id": "part:fruiting_body"
+  },
+  {
+    "id": "part:stipe",
+    "name": "Stipe (stem)",
+    "kind": "fungus",
+    "parent_id": "part:fruiting_body"
+  },
+  {
+    "id": "part:skin",
+    "name": "Skin",
+    "kind": "animal"
+  },
+  {
+    "id": "part:fat",
+    "name": "Fat",
+    "kind": "animal"
+  },
+  {
+    "id": "part:bone",
+    "name": "Bone",
+    "kind": "animal"
+  },
+  {
+    "id": "part:marrow",
+    "name": "Marrow",
+    "kind": "animal"
+  },
+  {
+    "id": "part:liver",
+    "name": "Liver",
+    "kind": "animal"
+  },
+  {
+    "id": "part:roe",
+    "name": "Roe",
+    "kind": "animal"
+  },
+  {
+    "id": "part:fillet",
+    "name": "Fillet",
+    "kind": "animal"
+  },
+  {
+    "id": "part:egg",
+    "name": "Egg",
+    "kind": "bird"
+  },
+  {
+    "id": "part:egg:white",
+    "name": "Egg white",
+    "kind": "bird",
+    "parent_id": "part:egg"
+  },
+  {
+    "id": "part:egg:yolk",
+    "name": "Egg yolk",
+    "kind": "bird",
+    "parent_id": "part:egg"
+  },
+  {
+    "id": "part:milk",
+    "name": "Milk",
+    "kind": "animal"
+  },
+  {
+    "id": "part:cream",
+    "name": "Cream",
+    "kind": "animal",
+    "parent_id": "part:milk"
+  },
+  {
+    "id": "part:curd",
+    "name": "Curd",
+    "kind": "animal"
+  },
+  {
+    "id": "part:whey",
+    "name": "Whey",
+    "kind": "animal"
+  },
+  {
+    "id": "part:butter",
+    "name": "Butter",
+    "kind": "animal"
+  },
+  {
+    "id": "part:buttermilk",
+    "name": "Buttermilk",
+    "kind": "animal"
   }
 ]

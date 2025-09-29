@@ -15,7 +15,7 @@
 {"id": "tx:plantae:poaceae:hordeum", "parent": "tx:plantae:poaceae", "rank": "genus", "display_name": "Barley (genus)", "latin_name": "Hordeum", "aliases": []}
 {"id": "tx:plantae:poaceae:hordeum:vulgare", "parent": "tx:plantae:poaceae:hordeum", "rank": "species", "display_name": "Barley", "latin_name": "Hordeum vulgare", "aliases": ["barley"]}
 {"id": "tx:plantae:poaceae:zea", "parent": "tx:plantae:poaceae", "rank": "genus", "display_name": "Maize (genus)", "latin_name": "Zea", "aliases": []}
-{"id": "tx:plantae:poaceae:zea:mays", "parent": "tx:plantae:poaceae:zea", "rank": "species", "display_name": "Corn (sweet)", "latin_name": "Zea mays", "aliases": ["corn", "sweet corn"]}
+{"id": "tx:plantae:poaceae:zea:mays", "parent": "tx:plantae:poaceae:zea", "rank": "species", "display_name": "Maize (corn)", "latin_name": "Zea mays", "aliases": ["corn","maize","sweet corn"]}
 {"id": "tx:plantae:poaceae:digitaria", "parent": "tx:plantae:poaceae", "rank": "genus", "display_name": "Fonio (genus)", "latin_name": "Digitaria", "aliases": []}
 {"id": "tx:plantae:poaceae:digitaria:exilis", "parent": "tx:plantae:poaceae:digitaria", "rank": "species", "display_name": "Fonio", "latin_name": "Digitaria exilis", "aliases": ["fonio"]}
 {"id": "tx:plantae:poaceae:pennisetum", "parent": "tx:plantae:poaceae", "rank": "genus", "display_name": "Pennisetum", "latin_name": "Pennisetum", "aliases": []}
