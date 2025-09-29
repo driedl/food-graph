@@ -16,7 +16,7 @@ export class PipelineRunner {
 
   async run(stepsToRun?: string[], skipSteps?: string[]): Promise<BuildReport> {
     console.log(chalk.cyan('🌱 Food Graph ETL Pipeline'))
-    console.log(chalk.cyan('=' * 50))
+    console.log(chalk.cyan('='.repeat(50)))
     console.log()
 
     const steps = this.filterSteps(config.steps, stepsToRun, skipSteps)
@@ -72,7 +72,7 @@ export class PipelineRunner {
     
     console.log()
     console.log(chalk.cyan('📊 COMPILATION SUMMARY'))
-    console.log(chalk.cyan('=' * 50))
+    console.log(chalk.cyan('='.repeat(50)))
     console.log(chalk.green('✅ Build completed successfully'))
     console.log(`📈 Total nodes: ${this.report.summary.taxaCount}`)
     console.log(`🏷️  Total synonyms: ${this.report.summary.synonymsCount}`)
@@ -126,9 +126,11 @@ export class PipelineRunner {
   private async runStep(step: PipelineStep): Promise<boolean> {
     return new Promise((resolve) => {
       const args = step.args || []
+      // Run from repo root, not ETL directory
+      const repoRoot = process.cwd().replace('/etl', '')
       const child = spawn(step.command, args, {
         stdio: ['inherit', 'pipe', 'pipe'],
-        cwd: process.cwd()
+        cwd: repoRoot
       })
 
       let stdout = ''
@@ -143,10 +145,16 @@ export class PipelineRunner {
       })
 
       child.on('close', (code) => {
+        if (code !== 0) {
+          console.log(`Command failed with exit code ${code}`)
+          if (stdout) console.log('STDOUT:', stdout)
+          if (stderr) console.log('STDERR:', stderr)
+        }
         resolve(code === 0)
       })
 
-      child.on('error', () => {
+      child.on('error', (error) => {
+        console.log('Command error:', error)
         resolve(false)
       })
     })
@@ -154,8 +162,10 @@ export class PipelineRunner {
 
   private async generateSummary(): Promise<void> {
     try {
-      const { Database } = await import('better-sqlite3')
-      const db = new Database(config.outputs.database)
+      const Database = (await import('better-sqlite3')).default
+      const path = await import('node:path')
+      const dbPath = path.resolve('..', config.outputs.database)
+      const db = new Database(dbPath)
       
       const nodeCount = db.prepare('SELECT COUNT(*) as count FROM nodes').get() as { count: number }
       const synonymCount = db.prepare('SELECT COUNT(*) as count FROM synonyms').get() as { count: number }

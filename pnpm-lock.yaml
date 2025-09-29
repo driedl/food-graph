@@ -41,6 +41,9 @@ importers:
       '@nutrition/config':
         specifier: workspace:*
         version: link:../../packages/config
+      '@nutrition/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       '@trpc/server':
         specifier: ^10.45.2
         version: 10.45.2
@@ -152,7 +155,15 @@ importers:
         specifier: ^3.22.4
         version: 3.25.76
 
-  packages/shared: {}
+  packages/shared:
+    dependencies:
+      better-sqlite3:
+        specifier: ^9.4.0
+        version: 9.6.0
+    devDependencies:
+      '@types/better-sqlite3':
+        specifier: ^7.6.8
+        version: 7.6.13
 
 packages:
 

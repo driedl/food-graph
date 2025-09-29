@@ -3,6 +3,21 @@ import { z } from 'zod'
 import { db } from './db'
 import { composeFoodState } from './lib/foodstate'
 
+// Type definitions for database query results
+interface Node {
+  id: string
+  name: string
+  slug: string
+  rank: string
+  parentId: string | null
+}
+
+interface SearchResult {
+  id: string
+  score: number
+  [key: string]: any
+}
+
 const t = initTRPC.create()
 
 const nullToNotFound = t.middleware(async ({ next }) => {
@@ -116,41 +131,41 @@ export const appRouter = t.router({
         const node = db.prepare(`
           SELECT id,name,slug,rank,parent_id AS parentId
           FROM nodes WHERE id = ?
-        `).get(id)
+        `).get(id) as Node | undefined
 
         if (!node) return null
 
         const parent = node.parentId ? db.prepare(`
           SELECT id,name,slug,rank,parent_id AS parentId
           FROM nodes WHERE id = ?
-        `).get(node.parentId) : null
+        `).get(node.parentId) as Node : null
 
         const children = db.prepare(`
           SELECT id,name,slug,rank,parent_id AS parentId
           FROM nodes WHERE parent_id = ?
           ORDER BY ${orderBy === 'rank' ? 'rank,name' : 'name'}
           LIMIT ?
-        `).all(id, childLimit)
+        `).all(id, childLimit) as Node[]
 
-        const childCount = db.prepare(`
+        const childCount = (db.prepare(`
           SELECT COUNT(*) AS c FROM nodes WHERE parent_id = ?
-        `).get(id).c as number
+        `).get(id) as { c: number }).c
 
         const siblings = node.parentId ? db.prepare(`
           SELECT id,name,slug,rank,parent_id AS parentId
           FROM nodes WHERE parent_id = ?
           ORDER BY name
           LIMIT 200
-        `).all(node.parentId) : []
+        `).all(node.parentId) as Node[] : []
 
         // optional: fast descendant count
-        const descendants = db.prepare(`
+        const descendants = (db.prepare(`
           WITH RECURSIVE d(id) AS (
             SELECT id FROM nodes WHERE parent_id = ?
             UNION ALL
             SELECT n.id FROM nodes n JOIN d ON n.parent_id = d.id
           ) SELECT COUNT(*) AS c FROM d
-        `).get(id).c as number
+        `).get(id) as { c: number }).c
 
         return { node, parent, siblings, children, childCount, descendants }
       }),
@@ -299,8 +314,8 @@ export const appRouter = t.router({
         `).all(docQ, ...(input.rankFilter || []), input.limit)
 
         // Merge & re-rank (simple: take best unique per id)
-        const byId = new Map<string, any>()
-        for (const r of [...nodes, ...docs]) {
+        const byId = new Map<string, SearchResult>()
+        for (const r of [...nodes, ...docs] as SearchResult[]) {
           const prev = byId.get(r.id)
           if (!prev || r.score < prev.score) byId.set(r.id, r)
         }

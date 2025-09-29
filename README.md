@@ -26,7 +26,7 @@ pnpm install
 # pnpm ontology:fix-newlines
 
 # compile ontology → SQLite
-pnpm db:build     # writes ./data/builds/graph.dev.sqlite
+pnpm db:build     # writes ./etl/dist/database/graph.dev.sqlite
 
 # run API + Web (concurrently via Turbo)
 pnpm dev
@@ -154,7 +154,7 @@ Root configuration:
 ### Key architectural decisions:
 
 - **Workspace packages**: Shared types flow from `packages/shared` → `packages/api-contract` → frontend
-- **Data pipeline**: `data/ontology/` (source) → `data/ontology/compiled/` (intermediate) → `data/builds/` (final)
+- **Data pipeline**: `data/ontology/` (source) → `data/ontology/compiled/` (intermediate) → `etl/dist/database/` (final)
 - **Type safety**: Full TypeScript coverage with tRPC providing end-to-end type safety
 - **Build system**: Turbo for monorepo orchestration, Vite for frontend, tsx for backend
 - **Database**: SQLite with migrations and FTS (Full-Text Search) support
@@ -168,7 +168,7 @@ At repo root:
 
 - `pnpm dev` — run API + Web together (Turbo pipeline)
 - `pnpm dev:api` / `pnpm dev:web` — run individually
-- `pnpm db:build` — compile ontology → `data/builds/graph.dev.sqlite`
+- `pnpm db:build` — compile ontology → `etl/dist/database/graph.dev.sqlite`
 - `pnpm db:open` — open the current DB in `sqlite3`
 - `pnpm lint` / `pnpm typecheck` — standard hygiene
 
@@ -181,7 +181,7 @@ At repo root:
 The API looks for a SQLite DB path:
 
 - **Env var:** `DB_PATH`
-- **Default (if unset):** `<process.cwd()>/data/builds/graph.dev.sqlite`
+- **Default (if unset):** `<process.cwd()>/etl/dist/database/graph.dev.sqlite`
 
 Because `apps/api` runs from its own working directory, we recommend setting an explicit path.
 
@@ -192,10 +192,10 @@ Create `apps/api/.env`:
 PORT=3000
 
 # Point to the compiled DB at repo root
-DB_PATH=../../data/builds/graph.dev.sqlite
+DB_PATH=../../etl/dist/database/graph.dev.sqlite
 ```
 
-(Alternatively, keep the default and compile into `apps/api/data/builds/…`.)
+(Alternatively, keep the default and compile into `apps/api/etl/dist/database/…`.)
 
 ---
 

@@ -5,7 +5,7 @@ Thanks for improving the project! This repo is **Git-first**: ontology files (ND
 ## TL;DR
 
 1. `pnpm install` (Node 20+, pnpm 9+, Python 3.10+)
-2. Compile: `pnpm db:build` → `data/builds/graph.dev.sqlite`
+2. Compile: `pnpm db:build` → `etl/dist/database/graph.dev.sqlite`
 3. Run locally: `pnpm dev` (API :3000, Web :5173)
 4. Open a PR with a clear title and, when needed, an **ADR**.
 
@@ -53,7 +53,7 @@ Set `DB_PATH` if you keep builds outside the repo root. Example `apps/api/.env`:
 
 ```
 PORT=3000
-DB_PATH=../../data/builds/graph.dev.sqlite
+DB_PATH=../../etl/dist/database/graph.dev.sqlite
 ```
 
 ## Code style

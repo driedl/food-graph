@@ -1,5 +1,5 @@
 import React, { Suspense, lazy, useEffect, useMemo, useState } from 'react'
-import type { Node, Edge } from 'reactflow'
+import type { Node, Edge, NodeProps, ReactFlowInstance } from 'reactflow'
 import 'reactflow/dist/style.css'
 
 export interface GraphViewProps {
@@ -35,9 +35,15 @@ function RankPill({ rank }: { rank?: string }) {
 }
 
 const Flow = lazy(async () => {
-  const m = await import('reactflow')
+  const { 
+    ReactFlow, 
+    MiniMap, 
+    Controls, 
+    Background, 
+    MarkerType
+  } = await import('reactflow')
 
-  const TaxonNode: React.FC<m.NodeProps<any>> = ({ data, selected }) => {
+  const TaxonNode: React.FC<NodeProps> = ({ data, selected }) => {
     return (
       <div className={`rounded-lg border bg-white px-3 py-2 shadow-sm ${selected ? 'ring-2 ring-blue-300' : ''}`}>
         <div className="flex items-center justify-between gap-3">
@@ -57,10 +63,10 @@ const Flow = lazy(async () => {
   }
 
   const nodeTypes = { taxon: TaxonNode }
-  const defaultEdgeOptions: m.DefaultEdgeOptions = {
+  const defaultEdgeOptions = {
     type: 'smoothstep',
     animated: false,
-    markerEnd: { type: m.MarkerType.ArrowClosed, width: 16, height: 16 },
+    markerEnd: { type: MarkerType.ArrowClosed, width: 16, height: 16 },
     style: { strokeWidth: 1.5 },
   }
 
@@ -107,7 +113,7 @@ const Flow = lazy(async () => {
       return { nodes: arranged, edges }
     }, [nodes, edges, centerId, layout])
 
-    const [rfInstance, setRfInstance] = useState<m.ReactFlowInstance | null>(null)
+    const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null)
     useEffect(() => {
       if (rfInstance) {
         const t = setTimeout(() => rfInstance.fitView({ padding: 0.2, includeHiddenNodes: false }), 0)
@@ -116,7 +122,7 @@ const Flow = lazy(async () => {
     }, [rfInstance, laidOut.nodes])
 
     return (
-      <m.ReactFlow
+      <ReactFlow
         nodes={laidOut.nodes}
         edges={laidOut.edges}
         nodeTypes={nodeTypes}
@@ -129,10 +135,10 @@ const Flow = lazy(async () => {
         proOptions={{ hideAttribution: true }}
         onInit={(inst) => setRfInstance(inst)}
       >
-        <m.MiniMap pannable zoomable />
-        <m.Controls />
-        <m.Background />
-      </m.ReactFlow>
+        <MiniMap pannable zoomable />
+        <Controls />
+        <Background />
+      </ReactFlow>
     )
   }
 

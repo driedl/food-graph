@@ -62,6 +62,7 @@ export default function App() {
   )
   const docs = trpc.docs.getByTaxon.useQuery({ taxonId: currentId! }, { enabled: !!currentId })
   const parts = trpc.taxonomy.partTree.useQuery({ id: currentId! }, { enabled: !!currentId })
+  const lineageQ = trpc.taxonomy.pathToRoot.useQuery({ id: currentId! }, { enabled: !!currentId })
 
   // Extract data from neighborhood response
   const nodeData = neighborhood.data?.node as TaxonNode | undefined
@@ -177,15 +178,12 @@ export default function App() {
 
   // Compose local fs:// preview
   const fsPreview = useMemo(() => {
-    // Build lineage from current node up to root
-    const lineage: string[] = []
-    let current = nodeData
-    while (current) {
-      lineage.unshift(current.slug)
-      current = parentData // This is simplified - in reality we'd need the full path
-    }
-    if (!lineage.length) return ''
-    const segs: string[] = [`fs:/${lineage.join('/')}`]
+    // Prefer full lineage when available; fall back to current node only.
+    const pathSlugs =
+      (lineageQ.data?.map((n: any) => n.slug) ??
+       (nodeData ? [nodeData.slug] : []))
+    if (!pathSlugs.length) return ''
+    const segs: string[] = [`fs:/${pathSlugs.join('/')}`]
     if (selectedPartId) segs.push(selectedPartId)
     if (chosen.length) {
       const ordered = [...chosen].sort((a, b) => a.id.localeCompare(b.id))
@@ -202,7 +200,7 @@ export default function App() {
       if (chain) segs.push(chain)
     }
     return segs.join('/')
-  }, [nodeData, parentData, selectedPartId, chosen])
+  }, [lineageQ.data, nodeData, selectedPartId, chosen])
 
   // Optional server validation using existing foodstate.compose (query)
   const compose = trpc.foodstate.compose.useQuery(
@@ -213,12 +211,10 @@ export default function App() {
   // FoodState parser
   const handleParse = async (fs: string) => {
     try {
-      // Use the tRPC client directly for this one-off query
-      const parsed = await fetch('/api/trpc/foodstate.parse', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ json: { fs } })
-      }).then(r => r.json()).then(r => r.result.data)
+      // Use direct tRPC HTTP query: /trpc/route?input=...
+      const res = await fetch(`/trpc/foodstate.parse?input=${encodeURIComponent(JSON.stringify({ fs }))}`)
+      const json = await res.json()
+      const parsed = json?.result?.data
       
       if (parsed.taxonPath && parsed.taxonPath.length > 0) {
         // For now, just navigate to the last taxon in the path

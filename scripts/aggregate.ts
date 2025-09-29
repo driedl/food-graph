@@ -112,7 +112,7 @@ const FILE_CATEGORIES: Record<string, FileCategory> = {
       'data/ontology/**/*.json',
       'data/ontology/**/*.jsonl',
       'data/sql/**/*.json',
-      'data/builds/*.json', // Include metadata JSON files from builds
+      'etl/dist/database/*.json', // Include metadata JSON files from builds
     ],
     ignore: [
       'data/ontology/compiled/**', // Exclude all compiled files (redundant with source files)
@@ -232,7 +232,7 @@ function shouldExclude(filePath: string, workspaceRoot: string): boolean {
     '*.cache',
     '.DS_Store',
     'Thumbs.db',
-    'data/builds/', // Exclude builds directory (includes DB files)
+    'etl/dist/database/', // Exclude database directory (includes DB files)
     'data/sources/', // Exclude sources directory (can be huge)
     'artifacts/',
     '*.duckdb*',

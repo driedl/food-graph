@@ -21,7 +21,7 @@
     },
     "etl:build": {
       "outputs": [
-        "data/builds/**",
+        "etl/dist/**",
         "data/ontology/compiled/**"
       ]
     },

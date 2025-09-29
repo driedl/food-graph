@@ -1,7 +1,28 @@
 .turbo
 node_modules
 .env
-data/builds/graph.dev.sqlite
+etl/dist/database/graph.dev.sqlite
 data/ontology/compiled
 etl/dist
 generated
+reports
+
+# Build outputs
+dist/
+**/dist/
+apps/web/dist/
+apps/api/dist/
+
+# Compiled JavaScript files in source directories (build artifacts)
+**/src/**/*.js
+**/src/**/*.js.map
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Coverage reports
+coverage/
+
+# Environment files
+.env.local
+.env.*.local

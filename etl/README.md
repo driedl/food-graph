@@ -42,7 +42,7 @@ etl/dist/
     └── graph.dev.sqlite  # SQLite database with FTS
 ```
 
-**API Access**: The API accesses the database via a symlink at `data/builds/graph.dev.sqlite` → `etl/dist/database/graph.dev.sqlite`. This maintains compatibility with existing API configuration while keeping build artifacts organized in the ETL package.
+**API Access**: The API accesses the database directly at `etl/dist/database/graph.dev.sqlite`. This keeps build artifacts organized in the ETL package.
 
 ### Step 1: Validate
 
@@ -71,7 +71,7 @@ etl/dist/
 - **Script**: `python/compile.py`
 - **Purpose**: Compiles ontology data into SQLite database with full-text search
 - **Input**: `data/ontology/compiled/`
-- **Output**: `data/builds/graph.dev.sqlite`
+- **Output**: `etl/dist/database/graph.dev.sqlite`
 
 ## Pipeline Architecture
 
@@ -166,12 +166,12 @@ export const pipelineConfig: PipelineConfig = {
   inputs: {
     ontologyRoot: 'data/ontology',
     compiledDir: 'data/ontology/compiled',
-    buildsDir: 'data/builds'
+    buildsDir: 'etl/dist/database'
   },
   outputs: {
     taxaJsonl: 'data/ontology/compiled/taxa/taxa.jsonl',
     docsJsonl: 'data/ontology/compiled/docs.jsonl',
-    database: 'data/builds/graph.dev.sqlite'
+    database: 'etl/dist/database/graph.dev.sqlite'
   }
 }
 ```
@@ -206,14 +206,14 @@ To remove all build artifacts:
 rm -rf etl/dist/
 
 # Recreate symlink (will be recreated on next build)
-rm -f data/builds/graph.dev.sqlite
+rm -f etl/dist/database/graph.dev.sqlite
 ```
 
 ### Build Artifact Lifecycle
 
 - **Compiled files** (`etl/dist/compiled/`): Intermediate artifacts, can be safely deleted
 - **Database** (`etl/dist/database/`): Final SQLite database, required for API
-- **Symlink** (`data/builds/graph.dev.sqlite`): Auto-created by pipeline, points to actual database
+- **Database** (`etl/dist/database/graph.dev.sqlite`): Built by pipeline, accessed directly by API
 
 ## Troubleshooting
 

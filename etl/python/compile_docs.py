@@ -66,7 +66,24 @@ def parse_doc_file(file_path: Path) -> Optional[dict]:
         return None
     
     try:
-        front_matter = yaml.safe_load(parts[1])
+        # Try to parse YAML, but handle common issues with unquoted strings containing colons
+        yaml_content = parts[1]
+        # Quote any unquoted strings that contain colons in display_name or summary fields
+        # and escape any existing quotes in the content
+        def quote_field(match):
+            field_name = match.group(1)
+            content = match.group(2)
+            # Escape any existing quotes in the content
+            escaped_content = content.replace('"', '\\"')
+            return f'{field_name}: "{escaped_content}"'
+        
+        yaml_content = re.sub(
+            r'^(display_name|summary):\s*([^"\n][^\n]*:[^\n]*)$',
+            quote_field,
+            yaml_content,
+            flags=re.MULTILINE
+        )
+        front_matter = yaml.safe_load(yaml_content)
         markdown_body = parts[2].strip()
     except yaml.YAMLError as e:
         print(f"ERROR: Invalid YAML in {file_path}: {e}", file=sys.stderr)
@@ -88,24 +105,9 @@ def discover_doc_files(taxa_root: Path) -> List[Path]:
     """Find all .tx.md files in the taxa tree."""
     doc_files = []
     
-    # Look for docs in various locations
-    search_paths = [
-        taxa_root / "docs",  # Root docs folder
-        taxa_root / "animalia" / "docs",  # Kingdom-specific docs
-        taxa_root / "fungi" / "docs",
-        taxa_root / "plantae" / "docs",
-    ]
-    
-    # Also search for docs folders next to family JSONL files
-    for family_file in taxa_root.rglob("families/*.jsonl"):
-        docs_dir = family_file.parent / "docs"
-        if docs_dir.exists():
-            search_paths.append(docs_dir)
-    
-    for search_path in search_paths:
-        if search_path.exists():
-            for doc_file in search_path.glob("*.tx.md"):
-                doc_files.append(doc_file)
+    # Recursively search for all .tx.md files throughout the taxa tree
+    for doc_file in taxa_root.rglob("*.tx.md"):
+        doc_files.append(doc_file)
     
     return sorted(doc_files)
 

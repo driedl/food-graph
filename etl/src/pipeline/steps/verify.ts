@@ -1,10 +1,10 @@
 #!/usr/bin/env tsx
 import Database from 'better-sqlite3'
 import path from 'node:path'
-import { pipelineConfig } from '../config.js'
 import { runSmokeTests } from './smoke-tests.js'
 
-const DB_PATH = pipelineConfig.outputs.database
+// Use absolute path to database
+const DB_PATH = path.resolve(process.cwd().replace('/etl', ''), 'etl/dist/database/graph.dev.sqlite')
 
 function verifyDatabase(): boolean {
   console.log('🔍 Verifying database integrity...')
@@ -62,7 +62,7 @@ function runAllVerification(): boolean {
   
   // Step 2: Smoke tests for composition model
   const repoRoot = process.cwd().replace('/etl', '')
-  const smokeTestsPath = path.resolve(repoRoot, 'data/ontology/smoke_tests/edible_paths.json')
+  const smokeTestsPath = path.resolve(repoRoot, 'data/tests/smoke/edible_paths.json')
   const smokeTestsPass = runSmokeTests(DB_PATH, smokeTestsPath)
   
   console.log()

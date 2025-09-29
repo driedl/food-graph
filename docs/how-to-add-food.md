@@ -53,7 +53,7 @@ This is the single source of truth for how to extend our food ontology and make 
 - **Rules**:
   `data/ontology/rules/parts_applicability.jsonl`
   `data/ontology/rules/transform_applicability.jsonl`
-- **Smoke tests**: `data/ontology/smoke_tests/edible_paths.json`
+- **Smoke tests**: `data/tests/smoke/edible_paths.json`
 
 ---
 
@@ -334,7 +334,7 @@ Two ways:
    - [ ] Exclusions added where needed.
 
 5. **Composition**
-   - [ ] Add/extend `smoke_tests/edible_paths.json` with representative cases.
+   - [ ] Add/extend `data/tests/smoke/edible_paths.json` with representative cases.
    - [ ] Run ETL pipeline: `pnpm etl:build` (includes smoke tests automatically).
    - [ ] Ensure composer rejects non-identity transforms (enforced code path is in place).
 

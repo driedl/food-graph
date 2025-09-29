@@ -11,25 +11,78 @@ const DB_FILE = env.DB_PATH
 
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true })
 
+console.log('[api] Connecting to database:', DB_FILE)
 export const db = new Database(DB_FILE)
 db.pragma('journal_mode = WAL')
 
 export function migrate() {
+  // Ensure schema_version table exists
   db.exec(`CREATE TABLE IF NOT EXISTS schema_version (version INTEGER PRIMARY KEY);`)
-  const get = db.prepare('SELECT max(version) as v FROM schema_version').get() as { v: number | null }
-  const current = get.v ?? 0
+  
+  // Check if database is already built by ETL pipeline
+  const etlBuilt = checkETLDatabase()
+  const migrationVersion = getCurrentMigrationVersion()
+  
+  if (etlBuilt && migrationVersion >= 4) {
+    console.log('[api] Database built by ETL pipeline with migrations up-to-date, skipping')
+    return
+  }
+  
+  if (etlBuilt && migrationVersion < 4) {
+    console.log('[api] Database built by ETL pipeline but migrations need to be applied')
+  } else if (!etlBuilt) {
+    console.log('[api] Database not built by ETL pipeline, running migrations')
+  }
+
   const files = fs.readdirSync(path.join(__dirname, '..', 'migrations')).sort()
   let applied = 0
   for (const f of files) {
     const ver = Number(f.split('_')[0])
-    if (ver > current) {
+    if (ver > migrationVersion) {
       const sql = fs.readFileSync(path.join(__dirname, '..', 'migrations', f), 'utf-8')
-      db.exec(sql)
-      db.prepare('INSERT INTO schema_version(version) VALUES (?)').run(ver)
-      applied++
+      try {
+        db.exec(sql)
+        db.prepare('INSERT INTO schema_version(version) VALUES (?)').run(ver)
+        applied++
+      } catch (error: any) {
+        // Ignore duplicate column errors when ETL database already has the columns
+        if (error.code === 'SQLITE_ERROR' && error.message.includes('duplicate column name')) {
+          console.log(`[api] Migration ${ver} skipped: column already exists (ETL database)`)
+          db.prepare('INSERT INTO schema_version(version) VALUES (?)').run(ver)
+          applied++
+        } else {
+          throw error
+        }
+      }
     }
   }
   if (applied) console.log(`[api] migrations applied: ${applied}`)
+}
+
+function checkETLDatabase(): boolean {
+  try {
+    // Check for key ETL-created tables
+    const tables = ['part_def', 'transform_def', 'nodes_fts']
+    for (const table of tables) {
+      const result = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name=?").get(table)
+      console.log(`[api] Checking table ${table}:`, result ? 'found' : 'missing')
+      if (!result) return false
+    }
+    console.log('[api] ETL database detected: all required tables found')
+    return true
+  } catch (error) {
+    console.log('[api] ETL database check failed:', error)
+    return false
+  }
+}
+
+function getCurrentMigrationVersion(): number {
+  try {
+    const get = db.prepare('SELECT max(version) as v FROM schema_version').get() as { v: number | null }
+    return get.v ?? 0
+  } catch {
+    return 0
+  }
 }
 
 export function isEmpty() {

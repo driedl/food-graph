@@ -27,7 +27,7 @@ The compiler ingests **Taxa + Synonyms + Attribute registry** and writes a SQLit
 
 ```bash
 pnpm db:build
-# -> data/builds/graph.dev.sqlite
+# -> etl/dist/database/graph.dev.sqlite
 ```
 
 Current tables:

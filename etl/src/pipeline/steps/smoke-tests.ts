@@ -2,7 +2,7 @@
 import Database from 'better-sqlite3'
 import fs from 'node:fs'
 import path from 'node:path'
-import { composeFoodState, type ComposeInput } from '../../../../apps/api/src/lib/foodstate.js'
+import { composeFoodState, type ComposeInput } from '../../../../packages/shared/src/index.js'
 
 type SmokeTestCase = {
   name: string
@@ -79,7 +79,7 @@ export function runSmokeTests(dbPath: string, smokeTestsPath: string): boolean {
 function main() {
   const repoRoot = process.cwd().replace('/etl', '')
   const dbPath = path.resolve(repoRoot, 'etl/dist/database/graph.dev.sqlite')
-  const smokeTestsPath = path.resolve(repoRoot, 'data/ontology/smoke_tests/edible_paths.json')
+  const smokeTestsPath = path.resolve(repoRoot, 'data/tests/smoke/edible_paths.json')
   
   const success = runSmokeTests(dbPath, smokeTestsPath)
   process.exit(success ? 0 : 1)

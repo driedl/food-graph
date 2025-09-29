@@ -15,7 +15,7 @@
     "etl:smoke-tests": "cd etl && pnpm smoke-tests",
     "etl:verify": "cd etl && pnpm verify",
     "etl:clean": "turbo run etl:clean",
-    "db:open": "sqlite3 data/builds/graph.dev.sqlite",
+    "db:open": "sqlite3 etl/dist/database/graph.dev.sqlite",
     "sql": "tsx scripts/run-sql.ts",
     "sql:repl": "tsx scripts/run-sql.ts --repl",
     "api:routes": "tsx scripts/print-trpc-routes.ts",

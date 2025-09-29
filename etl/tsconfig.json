@@ -2,7 +2,6 @@
     "extends": "../tsconfig.base.json",
     "compilerOptions": {
         "outDir": "./dist",
-        "rootDir": "./src",
         "baseUrl": "./src",
         "lib": [
             "ES2022"
@@ -10,6 +9,12 @@
         "paths": {
             "@/*": [
                 "./*"
+            ],
+            "@nutrition/shared": [
+                "../../packages/shared/src"
+            ],
+            "@nutrition/config": [
+                "../../packages/config/src"
             ]
         }
     },

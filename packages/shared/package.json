@@ -10,5 +10,11 @@
     "build": "echo shared:build",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint ."
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.4.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.8"
   }
 }

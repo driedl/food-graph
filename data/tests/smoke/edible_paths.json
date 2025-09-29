@@ -1,0 +1,524 @@
+[
+  {
+    "name": "Bacon (pork belly, cured+smoked)",
+    "taxonId": "tx:animalia:chordata:mammalia:artiodactyla:suidae:sus:scrofa_domesticus",
+    "partId": "part:cut:belly",
+    "transforms": [
+      {
+        "id": "tf:cure",
+        "params": {
+          "method": "wet",
+          "nitrite_ppm": 150
+        }
+      },
+      {
+        "id": "tf:smoke",
+        "params": {
+          "mode": "hot"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Beef brisket, smoked",
+    "taxonId": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus",
+    "partId": "part:cut:brisket",
+    "transforms": [
+      {
+        "id": "tf:smoke",
+        "params": {
+          "mode": "hot"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Chicken breast, roasted",
+    "taxonId": "tx:animalia:chordata:aves:galliformes:phasianidae:gallus:gallus_domesticus",
+    "partId": "part:cut:breast",
+    "transforms": [
+      {
+        "id": "tf:cook",
+        "params": {
+          "method": "roast"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Yogurt (cow, thermo)",
+    "taxonId": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus",
+    "partId": "part:curd",
+    "transforms": [
+      {
+        "id": "tf:ferment",
+        "params": {
+          "starter": "yogurt_thermo",
+          "temp_C": 42,
+          "time_h": 4
+        }
+      }
+    ]
+  },
+  {
+    "name": "Greek yogurt (cow, strained)",
+    "taxonId": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus",
+    "partId": "part:curd",
+    "transforms": [
+      {
+        "id": "tf:ferment",
+        "params": {
+          "starter": "yogurt_thermo",
+          "temp_C": 42,
+          "time_h": 5
+        }
+      },
+      {
+        "id": "tf:strain",
+        "params": {
+          "target_TS_pct": 12,
+          "drain_time_min": 60
+        }
+      }
+    ]
+  },
+  {
+    "name": "Labneh (from yogurt, extra strained)",
+    "taxonId": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus",
+    "partId": "part:curd",
+    "transforms": [
+      {
+        "id": "tf:ferment",
+        "params": {
+          "starter": "yogurt_thermo",
+          "temp_C": 42,
+          "time_h": 5
+        }
+      },
+      {
+        "id": "tf:strain",
+        "params": {
+          "target_TS_pct": 20,
+          "drain_time_min": 240
+        }
+      }
+    ]
+  },
+  {
+    "name": "Sour milk (cultured)",
+    "taxonId": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus",
+    "partId": "part:milk",
+    "transforms": [
+      {
+        "id": "tf:ferment",
+        "params": {
+          "starter": "culture_generic",
+          "temp_C": 22,
+          "time_h": 18
+        }
+      }
+    ]
+  },
+  {
+    "name": "Kefir",
+    "taxonId": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus",
+    "partId": "part:milk",
+    "transforms": [
+      {
+        "id": "tf:ferment",
+        "params": {
+          "starter": "kefir",
+          "temp_C": 22,
+          "time_h": 24
+        }
+      }
+    ]
+  },
+  {
+    "name": "Sour cream / crème fraîche",
+    "taxonId": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus",
+    "partId": "part:cream",
+    "transforms": [
+      {
+        "id": "tf:ferment",
+        "params": {
+          "starter": "yogurt_meso",
+          "temp_C": 22,
+          "time_h": 16
+        }
+      }
+    ]
+  },
+  {
+    "name": "Paneer (acid set, pressed)",
+    "taxonId": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus",
+    "partId": "part:curd",
+    "transforms": [
+      {
+        "id": "tf:coagulate",
+        "params": {
+          "agent": "acid",
+          "substrate": "milk",
+          "temp_C": 90,
+          "time_min": 5
+        }
+      },
+      {
+        "id": "tf:press",
+        "params": {
+          "pressure_kPa": 20,
+          "time_min": 30
+        }
+      }
+    ]
+  },
+  {
+    "name": "Cottage cheese (acid curd, cooked)",
+    "taxonId": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus",
+    "partId": "part:curd",
+    "transforms": [
+      {
+        "id": "tf:coagulate",
+        "params": {
+          "agent": "acid",
+          "substrate": "milk",
+          "temp_C": 32,
+          "time_min": 30
+        }
+      },
+      {
+        "id": "tf:cook_curd",
+        "params": {
+          "temp_C": 54,
+          "time_min": 30
+        }
+      },
+      {
+        "id": "tf:strain",
+        "params": {
+          "drain_time_min": 30
+        }
+      },
+      {
+        "id": "tf:salt",
+        "params": {
+          "method": "dry",
+          "salt_pct": 1,
+          "time_h": 0.5
+        }
+      }
+    ]
+  },
+  {
+    "name": "Ricotta (whey set)",
+    "taxonId": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus",
+    "partId": "part:curd",
+    "transforms": [
+      {
+        "id": "tf:coagulate",
+        "params": {
+          "agent": "acid",
+          "substrate": "whey",
+          "temp_C": 90,
+          "time_min": 10
+        }
+      },
+      {
+        "id": "tf:strain",
+        "params": {
+          "drain_time_min": 20
+        }
+      }
+    ]
+  },
+  {
+    "name": "Quark (cultured-acid, strained)",
+    "taxonId": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus",
+    "partId": "part:curd",
+    "transforms": [
+      {
+        "id": "tf:coagulate",
+        "params": {
+          "agent": "cultured_acid",
+          "substrate": "milk",
+          "temp_C": 22,
+          "time_min": 720
+        }
+      },
+      {
+        "id": "tf:strain",
+        "params": {
+          "target_TS_pct": 28,
+          "drain_time_min": 90
+        }
+      }
+    ]
+  },
+  {
+    "name": "Cream cheese (cultured cream, strained)",
+    "taxonId": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus",
+    "partId": "part:curd",
+    "transforms": [
+      {
+        "id": "tf:coagulate",
+        "params": {
+          "agent": "cultured_acid",
+          "substrate": "cream",
+          "temp_C": 22,
+          "time_min": 720
+        }
+      },
+      {
+        "id": "tf:strain",
+        "params": {
+          "target_TS_pct": 35,
+          "drain_time_min": 120
+        }
+      }
+    ]
+  },
+  {
+    "name": "Mascarpone (acidified cream, strained)",
+    "taxonId": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus",
+    "partId": "part:curd",
+    "transforms": [
+      {
+        "id": "tf:coagulate",
+        "params": {
+          "agent": "acid",
+          "substrate": "cream",
+          "temp_C": 85,
+          "time_min": 5
+        }
+      },
+      {
+        "id": "tf:strain",
+        "params": {
+          "target_TS_pct": 40,
+          "drain_time_min": 60
+        }
+      }
+    ]
+  },
+  {
+    "name": "Mozzarella (pasta filata)",
+    "taxonId": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus",
+    "partId": "part:curd",
+    "transforms": [
+      {
+        "id": "tf:coagulate",
+        "params": {
+          "agent": "rennet",
+          "substrate": "milk",
+          "temp_C": 37,
+          "time_min": 30
+        }
+      },
+      {
+        "id": "tf:stretch",
+        "params": {
+          "temp_C": 75,
+          "time_min": 10
+        }
+      },
+      {
+        "id": "tf:salt",
+        "params": {
+          "method": "brine",
+          "salt_pct": 2,
+          "time_h": 2
+        }
+      }
+    ]
+  },
+  {
+    "name": "Halloumi (cooked, brined)",
+    "taxonId": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:ovis:aries",
+    "partId": "part:curd",
+    "transforms": [
+      {
+        "id": "tf:coagulate",
+        "params": {
+          "agent": "rennet",
+          "substrate": "milk",
+          "temp_C": 37,
+          "time_min": 45
+        }
+      },
+      {
+        "id": "tf:cook_curd",
+        "params": {
+          "temp_C": 90,
+          "time_min": 60
+        }
+      },
+      {
+        "id": "tf:press",
+        "params": {
+          "pressure_kPa": 30,
+          "time_min": 60
+        }
+      },
+      {
+        "id": "tf:salt",
+        "params": {
+          "method": "brine",
+          "salt_pct": 3,
+          "time_h": 4
+        }
+      }
+    ]
+  },
+  {
+    "name": "Feta (sheep, brined, aged)",
+    "taxonId": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:ovis:aries",
+    "partId": "part:curd",
+    "transforms": [
+      {
+        "id": "tf:coagulate",
+        "params": {
+          "agent": "rennet",
+          "substrate": "milk",
+          "temp_C": 35,
+          "time_min": 45
+        }
+      },
+      {
+        "id": "tf:salt",
+        "params": {
+          "method": "brine",
+          "salt_pct": 3,
+          "time_h": 24
+        }
+      },
+      {
+        "id": "tf:age",
+        "params": {
+          "time_d": 30,
+          "temp_C": 8,
+          "humidity_pct": 85
+        }
+      }
+    ]
+  },
+  {
+    "name": "Smoked mozzarella",
+    "taxonId": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus",
+    "partId": "part:curd",
+    "transforms": [
+      {
+        "id": "tf:coagulate",
+        "params": {
+          "agent": "rennet",
+          "substrate": "milk",
+          "temp_C": 37,
+          "time_min": 30
+        }
+      },
+      {
+        "id": "tf:stretch",
+        "params": {
+          "temp_C": 75,
+          "time_min": 10
+        }
+      },
+      {
+        "id": "tf:salt",
+        "params": {
+          "method": "brine",
+          "salt_pct": 2,
+          "time_h": 2
+        }
+      },
+      {
+        "id": "tf:smoke",
+        "params": {
+          "mode": "cold",
+          "time_h": 6,
+          "temp_C": 20
+        }
+      }
+    ]
+  },
+  {
+    "name": "Evaporated milk",
+    "taxonId": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus",
+    "partId": "part:milk",
+    "transforms": [
+      {
+        "id": "tf:evaporate",
+        "params": {
+          "target_TS_pct": 26,
+          "reduction_pct": 60
+        }
+      }
+    ]
+  },
+  {
+    "name": "Sweetened condensed milk",
+    "taxonId": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus",
+    "partId": "part:milk",
+    "transforms": [
+      {
+        "id": "tf:add_sugar",
+        "params": {
+          "sugar_pct": 55
+        }
+      },
+      {
+        "id": "tf:evaporate",
+        "params": {
+          "target_TS_pct": 74,
+          "reduction_pct": 60
+        }
+      }
+    ]
+  },
+  {
+    "name": "Milk powder (spray dried)",
+    "taxonId": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus",
+    "partId": "part:milk",
+    "transforms": [
+      {
+        "id": "tf:evaporate",
+        "params": {
+          "reduction_pct": 60
+        }
+      },
+      {
+        "id": "tf:dry",
+        "params": {
+          "method": "spray",
+          "target_moisture_pct": 4
+        }
+      }
+    ]
+  },
+  {
+    "name": "Whey powder",
+    "taxonId": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus",
+    "partId": "part:whey",
+    "transforms": [
+      {
+        "id": "tf:dry",
+        "params": {
+          "method": "spray",
+          "target_moisture_pct": 5
+        }
+      }
+    ]
+  },
+  {
+    "name": "Ghee (clarified butter)",
+    "taxonId": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus",
+    "partId": "part:butter",
+    "transforms": [
+      {
+        "id": "tf:clarify_butter",
+        "params": {
+          "stage": "ghee"
+        }
+      }
+    ]
+  }
+]

@@ -17,7 +17,8 @@
     "better-sqlite3": "^9.4.0",
     "dotenv": "^16.4.5",
     "ulid": "^2.3.0",
-    "@nutrition/config": "workspace:*"
+    "@nutrition/config": "workspace:*",
+    "@nutrition/shared": "workspace:*"
   },
   "devDependencies": {
     "tsx": "^4.16.2",

@@ -51,7 +51,7 @@ program
     
     try {
       await execAsync('rm -rf data/ontology/compiled/*')
-      await execAsync('rm -rf data/builds/*')
+      await execAsync('rm -rf etl/dist/database/*')
       console.log(chalk.green('✅ Clean completed'))
     } catch (error) {
       console.error(chalk.red('❌ Clean failed:'), error)
