@@ -1,6 +1,7 @@
 import { initTRPC, TRPCError } from '@trpc/server'
 import { z } from 'zod'
 import { db } from './db'
+import { composeFoodState } from './lib/foodstate'
 
 const t = initTRPC.create()
 
@@ -168,6 +169,22 @@ export const appRouter = t.router({
           WHERE taxon_id IN (${placeholders}) AND lang = ?
         `)
         return stmt.all(...input.taxonIds, input.lang)
+      }),
+  }),
+
+  foodstate: t.router({
+    compose: t.procedure
+      .input(z.object({
+        taxonId: z.string(),
+        partId: z.string(),
+        transforms: z.array(z.object({
+          id: z.string(),
+          params: z.record(z.any()).optional()
+        })).default([])
+      }))
+      .query(({ input }) => {
+        const res = composeFoodState(db as any, input)
+        return res
       }),
   }),
 })
