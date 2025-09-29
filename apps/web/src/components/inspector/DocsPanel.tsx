@@ -1,14 +1,13 @@
 import { Badge } from '@ui/badge'
 import { Separator } from '@ui/separator'
+import { MarkdownRenderer } from '@ui/markdown-renderer'
 
 export function DocsPanel({
   docs,
   node,
-  rankColor,
 }: {
   docs: any
   node?: { id: string; name: string }
-  rankColor: Record<string, string>
 }) {
   if (!node) return <div className="text-sm text-muted-foreground">Select a node</div>
   if (!docs) {
@@ -21,17 +20,6 @@ export function DocsPanel({
   }
   return (
     <div className="space-y-3 text-sm">
-      <div className="flex items-center justify-between">
-        <div className="text-base font-medium">{docs.display_name || node.name}</div>
-        <div className="flex items-center gap-2">
-          {docs.rank && (
-            <span className={`inline-flex items-center rounded border px-2 py-0.5 text-[10px] uppercase ${rankColor[docs.rank] || 'bg-zinc-100 text-zinc-700 border-zinc-200'}`}>
-              {docs.rank}
-            </span>
-          )}
-          {docs.latin_name && <span className="text-xs text-muted-foreground italic">{docs.latin_name}</span>}
-        </div>
-      </div>
       {docs.summary && (
         <div className="space-y-2">
           <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Summary</div>
@@ -41,7 +29,7 @@ export function DocsPanel({
       {docs.description_md && (
         <div className="space-y-2">
           <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Description</div>
-          <div className="text-sm leading-relaxed whitespace-pre-wrap">{docs.description_md}</div>
+          <MarkdownRenderer>{docs.description_md}</MarkdownRenderer>
         </div>
       )}
       {docs.tags && docs.tags.length > 0 && (

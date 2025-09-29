@@ -80,7 +80,6 @@ const FILE_CATEGORIES: Record<string, FileCategory> = {
       'packages/api-contract/tsconfig.json',
     ],
     ignore: [
-      'apps/api/dist/**',           // Exclude compiled JavaScript
       'apps/api/node_modules/**',   // Exclude dependencies
       'packages/api-contract/node_modules/**', // Exclude dependencies
     ],
@@ -91,11 +90,16 @@ const FILE_CATEGORIES: Record<string, FileCategory> = {
     pattern: [
       'etl/**/*.py',
       'etl/**/*.md',
+      'etl/src/**/*.ts',
+      'etl/src/**/*.js',
       'packages/shared/**/*.ts',
       'packages/shared/**/*.js',
       'packages/shared/**/*.json',
     ],
-    description: 'Python scripts and shared utilities',
+    ignore: [
+      'etl/node_modules/**',  // Exclude dependencies
+    ],
+    description: 'Python scripts, TypeScript ETL pipeline, and shared utilities',
   },
   ontology_taxa: {
     name: 'Ontology - Taxa',
@@ -103,6 +107,9 @@ const FILE_CATEGORIES: Record<string, FileCategory> = {
       'data/ontology/taxa/**/*.json',
       'data/ontology/taxa/**/*.jsonl',
       'data/ontology/taxa/**/*.md',
+    ],
+    ignore: [
+      'data/ontology/taxa/**/*.tx.md', // Exclude taxonomic markdown files
     ],
     description: 'Taxonomic classification data (animals, plants, fungi, etc.)',
   },
@@ -219,7 +226,7 @@ function shouldExclude(filePath: string, workspaceRoot: string): boolean {
   const excludePatterns = [
     'node_modules',
     '.git',
-    'dist',
+    'dist/**', // Exclude entire dist folder from all categories
     'build',
     '.next',
     '.nuxt',
@@ -232,7 +239,6 @@ function shouldExclude(filePath: string, workspaceRoot: string): boolean {
     '*.cache',
     '.DS_Store',
     'Thumbs.db',
-    'etl/dist/database/', // Exclude database directory (includes DB files)
     'data/sources/', // Exclude sources directory (can be huge)
     'artifacts/',
     '*.duckdb*',

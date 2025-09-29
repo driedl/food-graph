@@ -5,6 +5,7 @@ This guide helps AI agents understand how to work with the nutrition-graph codeb
 ## Quick Commands
 
 ### Database Access
+
 ```bash
 # Interactive SQL REPL
 pnpm sql:repl
@@ -17,12 +18,14 @@ echo 'SELECT count(*) c FROM nodes;' | pnpm sql --stdin
 ```
 
 ### API Routes
+
 ```bash
 # List all available TRPC routes
 pnpm api:routes
 ```
 
 ### Development
+
 ```bash
 # Start both API and web app
 pnpm dev
@@ -37,6 +40,7 @@ pnpm db:build
 ## Database Schema
 
 ### Core Tables
+
 - `nodes`: Main taxonomy nodes (id, name, slug, rank, parent_id)
 - `synonyms`: Alternative names for nodes
 - `node_attributes`: Key-value attributes on nodes
@@ -53,8 +57,8 @@ SELECT * FROM nodes WHERE parent_id IS NULL;
 SELECT * FROM nodes WHERE parent_id = 'node-id';
 
 -- Search using FTS5
-SELECT n.* FROM nodes n 
-JOIN nodes_fts fts ON n.rowid = fts.rowid 
+SELECT n.* FROM nodes n
+JOIN nodes_fts fts ON n.rowid = fts.rowid
 WHERE nodes_fts MATCH 'search terms';
 
 -- Get path to root (recursive)
@@ -69,7 +73,7 @@ SELECT id,name,slug,rank,parent_id FROM lineage ORDER BY depth DESC;
 
 ## API Endpoints
 
-All endpoints are under `/trpc/`:
+Some endpoints are under `/trpc/`:
 
 - `health`: API health check
 - `taxonomy.getRoot`: Get root taxonomy node
@@ -81,6 +85,7 @@ All endpoints are under `/trpc/`:
 ## Configuration
 
 Environment variables (via `@nutrition/config`):
+
 - `PORT`: API server port (default: 3000)
 - `DB_PATH`: SQLite database path
 - `NODE_ENV`: development|test|production
@@ -96,6 +101,7 @@ Environment variables (via `@nutrition/config`):
 ## Migrations
 
 Database migrations are in `apps/api/migrations/`:
+
 - `0001_init.sql`: Core schema (nodes, synonyms, attributes)
 - `0002_nodes_fts.sql`: FTS5 search index
 

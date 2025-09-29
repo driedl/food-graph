@@ -173,24 +173,20 @@ export const appRouter = t.router({
     partTree: t.procedure
       .input(z.object({ id: z.string() }))
       .query(({ input }) => {
-        // All parts (tree structure)
+        // Only get parts that apply to this taxon (via lineage)
         const parts = db.prepare(`
-          SELECT p.id, p.name, p.kind, p.parent_id AS parentId
-          FROM part_def p
-          ORDER BY COALESCE(p.kind,''), p.name
-        `).all()
-
-        // Which parts apply to this taxon (via lineage)
-        const applicable = db.prepare(`
           WITH RECURSIVE lineage(id) AS (
             SELECT id FROM nodes WHERE id = ?
             UNION ALL
             SELECT n.parent_id FROM nodes n JOIN lineage l ON n.id = l.id
             WHERE n.parent_id IS NOT NULL
           )
-          SELECT DISTINCT part_id FROM has_part
-          WHERE taxon_id IN (SELECT id FROM lineage)
-        `).all(input.id).map((r: any) => r.part_id)
+          SELECT DISTINCT p.id, p.name, p.kind, p.parent_id AS parentId
+          FROM has_part hp
+          JOIN part_def p ON p.id = hp.part_id
+          WHERE hp.taxon_id IN (SELECT id FROM lineage)
+          ORDER BY COALESCE(p.kind,''), p.name
+        `).all(input.id)
 
         // Transform availability per part (counts of identity/non-identity)
         const txCounts = db.prepare(`
@@ -210,7 +206,6 @@ export const appRouter = t.router({
         `).all(input.id)
 
         const countsMap = new Map(txCounts.map((r: any) => [r.partId, r]))
-        const applicableSet = new Set(applicable)
 
         // Part synonyms
         const syn = db.prepare(`
@@ -227,7 +222,7 @@ export const appRouter = t.router({
         // Build simple tree (flat array is fine; UI can group by parentId)
         return parts.map((p: any) => ({
           ...p,
-          applicable: applicableSet.has(p.id),
+          applicable: true, // All returned parts are applicable by definition
           identityCount: countsMap.get(p.id)?.identityCount ?? 0,
           nonIdentityCount: countsMap.get(p.id)?.nonIdentityCount ?? 0,
           synonyms: synMap.get(p.id) ?? []
@@ -272,6 +267,22 @@ export const appRouter = t.router({
           return []
         }
       }),
+
+    /** Distribution of child ranks for a given node (for compact histograms) */
+    childrenRankCounts: t.procedure
+      .input(z.object({ id: z.string() }))
+      .query(({ input }) => {
+        const stmt = db.prepare(`
+          SELECT rank, COUNT(*) AS count
+          FROM nodes
+          WHERE parent_id = ?
+          GROUP BY rank
+          ORDER BY count DESC, rank ASC
+        `)
+        const rows = stmt.all(input.id) as Array<{ rank: string; count: number }>
+        return rows
+      }),
+
   }),
 
   search: t.router({
@@ -294,7 +305,7 @@ export const appRouter = t.router({
           SELECT n.id, n.name, n.slug, n.rank,
                  bm25(nodes_fts, 1.0, 0.5, 0.2, 0.1) AS score, 'taxon' AS kind
           FROM nodes n
-          JOIN nodes_fts fts ON n.rowid = fts.rowid
+          JOIN nodes_fts fts ON n.name = fts.name AND n.rank = fts.taxon_rank
           WHERE nodes_fts MATCH ?
           ${filter}
           ORDER BY score ASC, n.name
@@ -415,6 +426,27 @@ export const appRouter = t.router({
         `)
         return stmt.all(...input.taxonIds, input.lang)
       }),
+
+    /** Fast boolean doc presence for arbitrary ids (UI table badges) */
+    hasDocs: t.procedure
+      .input(z.object({
+        taxonIds: z.array(z.string()).min(1),
+        lang: z.string().default('en'),
+      }))
+      .query(({ input }) => {
+        const placeholders = input.taxonIds.map(() => '?').join(',')
+        const sql = `
+          SELECT taxon_id
+          FROM taxon_doc
+          WHERE lang = ? AND taxon_id IN (${placeholders})
+        `
+        const rows = placeholders
+          ? (db.prepare(sql).all(input.lang, ...input.taxonIds) as Array<{ taxon_id: string }>)
+          : []
+        const present = new Set(rows.map(r => r.taxon_id))
+        return input.taxonIds.map(id => ({ id, hasDoc: present.has(id) }))
+      }),
+
   }),
 
   foodstate: t.router({
@@ -462,6 +494,23 @@ export const appRouter = t.router({
           taxonPath,
           partId: part,
           transforms: txSegs.map(parseTx),
+        }
+      }),
+  }),
+
+  /** Evidence endpoints (stubbed for now; returns safe, zeroed shape) */
+  evidence: t.router({
+    summaryByTaxon: t.procedure
+      .input(z.object({ taxonId: z.string() }))
+      .query(({ input }) => {
+        // Placeholder structure for future integration.
+        // Keep the shape stable so the UI can render badges/empty states today.
+        return {
+          taxonId: input.taxonId,
+          hasDirect: false,
+          directCount: 0,
+          rollupCount: 0,
+          lastUpdated: null as string | null,
         }
       }),
   }),
