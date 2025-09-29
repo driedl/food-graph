@@ -10,7 +10,6 @@ export interface GraphViewProps {
   layout?: 'radial' | 'tree'
 }
 
-/** Lightweight presentational helpers */
 function RankPill({ rank }: { rank?: string }) {
   const map: Record<string, string> = {
     root: 'bg-slate-100 text-slate-700 border-slate-200',
@@ -35,11 +34,6 @@ function RankPill({ rank }: { rank?: string }) {
   )
 }
 
-/**
- * We lazy-load reactflow and define nodeTypes inside to keep the main bundle small.
- * We also re-compute simple positions for a center + children graph so we can support
- * 'radial' and 'tree' layouts without external libs.
- */
 const Flow = lazy(async () => {
   const m = await import('reactflow')
 
@@ -71,12 +65,10 @@ const Flow = lazy(async () => {
   }
 
   const Cmp = ({ nodes, edges, onNodeClick, layout = 'radial' }: GraphViewProps) => {
-    // find center (node with indegree 0)
     const centerId = useMemo(() => {
       const indeg: Record<string, number> = {}
       nodes.forEach((n) => (indeg[n.id] = 0))
       edges.forEach((e) => { indeg[e.target] = (indeg[e.target] ?? 0) + 1 })
-      // prefer provided 'isCenter' flag if present
       const explicitCenter = nodes.find((n: any) => n.data?.isCenter)?.id
       if (explicitCenter) return explicitCenter
       const id = Object.entries(indeg).find(([, v]) => v === 0)?.[0]
@@ -85,21 +77,14 @@ const Flow = lazy(async () => {
 
     const laidOut = useMemo(() => {
       if (!nodes.length) return { nodes, edges }
-
-      // derive children of center only (current API returns a star)
       const children = edges.filter((e) => e.source === centerId).map((e) => e.target)
-
-      // shallow clone nodes and assign positions
       const arranged = nodes.map((n) => ({ ...n }))
 
       if (layout === 'tree') {
-        // Center at top, children stacked below
-        const gapX = 220
-        const gapY = 140
+        const gapX = 220, gapY = 140
         arranged.forEach((n) => {
-          if (n.id === centerId) {
-            n.position = { x: 0, y: 0 }
-          } else {
+          if (n.id === centerId) n.position = { x: 0, y: 0 }
+          else {
             const idx = children.indexOf(n.id)
             const x = (idx - (children.length - 1) / 2) * gapX
             const y = gapY
@@ -107,13 +92,10 @@ const Flow = lazy(async () => {
           }
         })
       } else {
-        // Radial layout around the center
-        const radiusX = 280
-        const radiusY = 140
+        const radiusX = 280, radiusY = 140
         arranged.forEach((n) => {
-          if (n.id === centerId) {
-            n.position = { x: 0, y: 0 }
-          } else {
+          if (n.id === centerId) n.position = { x: 0, y: 0 }
+          else {
             const idx = children.indexOf(n.id)
             const angle = (idx / Math.max(children.length, 1)) * Math.PI * 2
             const x = Math.cos(angle) * radiusX
@@ -122,16 +104,12 @@ const Flow = lazy(async () => {
           }
         })
       }
-
       return { nodes: arranged, edges }
     }, [nodes, edges, centerId, layout])
 
-    // fitView when the set of nodes changes
     const [rfInstance, setRfInstance] = useState<m.ReactFlowInstance | null>(null)
     useEffect(() => {
       if (rfInstance) {
-        const idList = laidOut.nodes.map((n) => n.id).join('|')
-        // next tick to allow layout to apply
         const t = setTimeout(() => rfInstance.fitView({ padding: 0.2, includeHiddenNodes: false }), 0)
         return () => clearTimeout(t)
       }

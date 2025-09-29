@@ -21,10 +21,6 @@
 
 > Large lists stay in NDJSON for clean diffs and line-by-line validation.
 
-## Newline Integrity (NDJSON)
-
-If a file accidentally contains literal `\n` or `/n` strings instead of real line breaks, you can fix them manually or create a simple script to handle this.
-
 ## Compile (v0.1)
 
 The compiler ingests **Taxa + Synonyms + Attribute registry** and writes a SQLite DB:
@@ -45,13 +41,6 @@ Future compiles will add:
 
 - `foodstate`, `mixture`, `transform_def`, `evidence`, and materialized rollups.
 - Validation report and ID churn report (planned).
-
-## Authoring Workflow
-
-1. Add/modify NDJSON/JSON files.
-2. Run `pnpm db:build`.
-3. Start API/UI: `pnpm dev` and browse the graph.
-4. Open PR with the diff and include any rationale (ADR optional).
 
 ## Validation (near-term)
 

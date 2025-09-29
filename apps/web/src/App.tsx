@@ -2,6 +2,12 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { trpc } from './lib/trpc'
 import GraphView from './components/GraphView'
 import ErrorBoundary from './components/ErrorBoundary'
+import { ChildrenTable } from './components/ChildrenTable'
+import { DocsPanel } from './components/Inspector/DocsPanel'
+import { TaxonPanel } from './components/Inspector/TaxonPanel'
+import { PartsPanel } from './components/Inspector/PartsPanel'
+import { TransformsPanel } from './components/Inspector/TransformsPanel'
+import { FoodStatePanel } from './components/Inspector/FoodStatePanel'
 import type { Node as RFNode, Edge as RFEdge } from 'reactflow'
 import { Button } from '@ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@ui/card'
@@ -21,7 +27,7 @@ interface TaxonNode {
 
 type LayoutMode = 'radial' | 'tree'
 
-/** Small helpers */
+/** Compact rank → style map (fallback default if unknown) */
 const rankColor: Record<string, string> = {
   root: 'bg-slate-100 text-slate-700 border-slate-200',
   domain: 'bg-zinc-100 text-zinc-700 border-zinc-200',
@@ -47,12 +53,14 @@ export default function App() {
   // Focus / navigation state
   const [currentId, setCurrentId] = useState<string | null>(null)
   const [layout, setLayout] = useState<LayoutMode>('radial')
+  const [centerTab, setCenterTab] = useState<'graph' | 'table'>('graph')
 
   // Queries scoped to current node
   const nodeQuery = trpc.taxonomy.getNode.useQuery({ id: currentId! }, { enabled: !!currentId })
   const path = trpc.taxonomy.pathToRoot.useQuery({ id: currentId! }, { enabled: !!currentId })
   const children = trpc.taxonomy.getChildren.useQuery({ id: currentId! }, { enabled: !!currentId })
   const docs = trpc.docs.getByTaxon.useQuery({ taxonId: currentId! }, { enabled: !!currentId })
+  const parts = trpc.taxonomy.getPartsForTaxon.useQuery({ id: currentId! }, { enabled: !!currentId })
 
   // Siblings (fetch parent’s children once)
   const parentId = (nodeQuery.data as TaxonNode | undefined)?.parentId ?? null
@@ -75,14 +83,13 @@ export default function App() {
     if (root.data && !currentId) setCurrentId((root.data as TaxonNode).id)
   }, [root.data, currentId])
 
-  // Cmd/Ctrl+K → focus search
+  // Cmd/Ctrl+K → focus search & lineage arrow nav
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault()
         searchRef.current?.focus()
       }
-      // Quick lineage nav on arrow keys when not typing in an input
       const tag = (e.target as HTMLElement)?.tagName
       const isTyping = tag === 'INPUT' || tag === 'TEXTAREA' || (e.target as HTMLElement)?.isContentEditable
       if (isTyping) return
@@ -96,10 +103,9 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKey)
   }, [parentId, children.data])
 
-  // Build a richer node/edge model for the canvas
+  // Build a center + children graph model
   const graph = useMemo(() => {
     if (!nodeQuery.data) return { nodes: [] as RFNode[], edges: [] as RFEdge[] }
-
     const nodeData = nodeQuery.data as TaxonNode
     const kids = (children.data as TaxonNode[] | undefined) ?? []
 
@@ -124,7 +130,7 @@ export default function App() {
       nodes.push({
         id: c.id,
         type: 'taxon',
-        position: { x: 0, y: 0 }, // GraphView will lay out
+        position: { x: 0, y: 0 },
         data: {
           id: c.id,
           name: c.name,
@@ -140,14 +146,64 @@ export default function App() {
     return { nodes, edges }
   }, [nodeQuery.data, children.data])
 
-  // Inspector tabs
-  const [tab, setTab] = useState<'overview' | 'lineage' | 'path' | 'docs'>('overview')
+  // Inspector tabs: Docs is FIRST-CLASS and DEFAULT
+  const [tab, setTab] = useState<'docs' | 'taxon' | 'parts' | 'transforms' | 'foodstate'>('docs')
+
+  // Parts/Transforms builder state
+  const [selectedPartId, setSelectedPartId] = useState<string>('')
+  useEffect(() => { setSelectedPartId('') }, [currentId])
+  const transforms = trpc.taxonomy.getTransformsFor.useQuery(
+    { taxonId: currentId || '', partId: selectedPartId || '' },
+    { enabled: !!currentId && !!selectedPartId }
+  )
+
+  type ChosenTx = { id: string; params: Record<string, any> }
+  const [chosen, setChosen] = useState<ChosenTx[]>([])
+  useEffect(() => { setChosen([]) }, [selectedPartId, currentId])
+
+  const onToggleTx = (txId: string, isIdentity: boolean) => {
+    if (!isIdentity) return // non-identity cannot be in identity chain
+    setChosen((prev) => {
+      const idx = prev.findIndex((t) => t.id === txId)
+      if (idx >= 0) return prev.filter((t) => t.id !== txId)
+      return [...prev, { id: txId, params: {} }]
+    })
+  }
+  const onParamChange = (txId: string, key: string, value: any) => {
+    setChosen((prev) => prev.map((t) => (t.id === txId ? { ...t, params: { ...t.params, [key]: value } } : t)))
+  }
+
+  // Compose local fs:// preview
+  const fsPreview = useMemo(() => {
+    const lineage = ((path.data as TaxonNode[]) ?? []).map((p) => p.slug)
+    if (!lineage.length) return ''
+    const segs: string[] = [`fs:/${lineage.join('/')}`]
+    if (selectedPartId) segs.push(selectedPartId)
+    if (chosen.length) {
+      const ordered = [...chosen].sort((a, b) => a.id.localeCompare(b.id))
+      const chain = ordered.map((t) => {
+        const keys = Object.keys(t.params || {}).sort()
+        const p = keys.map((k) => {
+          const v: any = (t.params as any)[k]
+          if (typeof v === 'number') return `${k}=${Number(v.toFixed(6)).toString()}`
+          if (typeof v === 'boolean') return `${k}=${v ? 'true' : 'false'}`
+          return `${k}=${String(v)}`
+        }).join(',')
+        return p ? `${t.id}{${p}}` : `${t.id}`
+      }).join('/')
+      if (chain) segs.push(chain)
+    }
+    return segs.join('/')
+  }, [path.data, selectedPartId, chosen])
+
+  // Optional server validation using existing foodstate.compose (query)
+  const compose = trpc.foodstate.compose.useQuery(
+    { taxonId: currentId || '', partId: selectedPartId || '', transforms: chosen },
+    { enabled: false }
+  )
 
   // Search keyboard nav
-  useEffect(() => {
-    setActiveIdx(0)
-  }, [q])
-
+  useEffect(() => { setActiveIdx(0) }, [q])
   const results = (search.data as TaxonNode[] | undefined) ?? []
 
   return (
@@ -171,25 +227,17 @@ export default function App() {
       </div>
 
       {/* 3-pane grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-[300px,1fr,360px] gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-[300px,1fr,380px] gap-4">
         {/* Left: Search */}
-        <Card className="h-[72vh] flex flex-col">
+        <Card className="h-[74vh] flex flex-col">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center justify-between">
               <span>Find</span>
               <div className="flex items-center gap-2">
-                <Button
-                  size="sm"
-                  variant={layout === 'radial' ? 'default' : 'outline'}
-                  onClick={() => setLayout('radial')}
-                >
+                <Button size="sm" variant={layout === 'radial' ? 'default' : 'outline'} onClick={() => setLayout('radial')}>
                   Radial
                 </Button>
-                <Button
-                  size="sm"
-                  variant={layout === 'tree' ? 'default' : 'outline'}
-                  onClick={() => setLayout('tree')}
-                >
+                <Button size="sm" variant={layout === 'tree' ? 'default' : 'outline'} onClick={() => setLayout('tree')}>
                   Tree
                 </Button>
               </div>
@@ -247,9 +295,7 @@ export default function App() {
                     {results.map((n, i) => (
                       <li
                         key={n.id}
-                        className={`flex items-center justify-between px-3 py-2 text-sm cursor-pointer hover:bg-muted/40 ${
-                          i === activeIdx ? 'bg-muted/50' : ''
-                        }`}
+                        className={`flex items-center justify-between px-3 py-2 text-sm cursor-pointer hover:bg-muted/40 ${i === activeIdx ? 'bg-muted/50' : ''}`}
                         onMouseEnter={() => setActiveIdx(i)}
                         onClick={() => {
                           setCurrentId(n.id)
@@ -261,9 +307,7 @@ export default function App() {
                           <div className="truncate">{n.name}</div>
                           <div className="text-xs text-muted-foreground truncate">/{n.slug}</div>
                         </div>
-                        <span
-                          className={`ml-2 inline-flex items-center rounded border px-2 py-0.5 text-[10px] uppercase ${rankColor[n.rank] || 'bg-zinc-100 text-zinc-700 border-zinc-200'}`}
-                        >
+                        <span className={`ml-2 inline-flex items-center rounded border px-2 py-0.5 text-[10px] uppercase ${rankColor[n.rank] || 'bg-zinc-100 text-zinc-700 border-zinc-200'}`}>
                           {n.rank}
                         </span>
                       </li>
@@ -279,11 +323,21 @@ export default function App() {
           </CardContent>
         </Card>
 
-        {/* Center: Graph */}
-        <div className="min-h-[72vh]">
+        {/* Center: Graph & Table */}
+        <div className="min-h-[74vh]">
           <Card className="h-full">
             <CardHeader className="pb-2">
-              <CardTitle>Browse</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle>Browse</CardTitle>
+                <div className="flex gap-2">
+                  <Button size="sm" variant={centerTab === 'graph' ? 'default' : 'outline'} onClick={() => setCenterTab('graph')}>
+                    Graph
+                  </Button>
+                  <Button size="sm" variant={centerTab === 'table' ? 'default' : 'outline'} onClick={() => setCenterTab('table')}>
+                    Table
+                  </Button>
+                </div>
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Breadcrumb with sibling hop */}
@@ -308,7 +362,6 @@ export default function App() {
                         ) : (
                           <div className="flex items-center gap-2">
                             <span className="font-medium">{p.name}</span>
-                            {/* Sibling dropdown */}
                             {siblings.data && siblings.data.length > 0 && (
                               <select
                                 className="text-xs border rounded px-1 py-0.5 bg-background"
@@ -316,9 +369,7 @@ export default function App() {
                                 onChange={(e) => setCurrentId(e.target.value)}
                               >
                                 {(siblings.data as TaxonNode[]).map((s) => (
-                                  <option key={s.id} value={s.id}>
-                                    {s.name}
-                                  </option>
+                                  <option key={s.id} value={s.id}>{s.name}</option>
                                 ))}
                               </select>
                             )}
@@ -332,262 +383,65 @@ export default function App() {
               )}
 
               <ErrorBoundary>
-                <GraphView
-                  nodes={graph.nodes}
-                  edges={graph.edges}
-                  layout={layout}
-                  onNodeClick={(id) => setCurrentId(id)}
-                />
+                {centerTab === 'graph' ? (
+                  <GraphView
+                    nodes={graph.nodes}
+                    edges={graph.edges}
+                    layout={layout}
+                    onNodeClick={(id) => setCurrentId(id)}
+                  />
+                ) : (
+                  <ChildrenTable
+                    rows={((children.data as TaxonNode[]) ?? [])}
+                    onPick={(id) => setCurrentId(id)}
+                    rankColor={rankColor}
+                  />
+                )}
               </ErrorBoundary>
             </CardContent>
           </Card>
         </div>
 
         {/* Right: Inspector */}
-        <Card className="h-[72vh] flex flex-col">
+        <Card className="h-[74vh] flex flex-col">
           <CardHeader className="pb-2">
             <CardTitle>Inspector</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-3 overflow-hidden">
-            {/* Tabs */}
-            <div className="flex gap-2">
-              <Button size="sm" variant={tab === 'overview' ? 'default' : 'outline'} onClick={() => setTab('overview')}>
-                Overview
-              </Button>
-              <Button size="sm" variant={tab === 'lineage' ? 'default' : 'outline'} onClick={() => setTab('lineage')}>
-                Lineage
-              </Button>
-              <Button size="sm" variant={tab === 'path' ? 'default' : 'outline'} onClick={() => setTab('path')}>
-                Path Builder
-              </Button>
-              <Button size="sm" variant={tab === 'docs' ? 'default' : 'outline'} onClick={() => setTab('docs')}>
-                Docs
-              </Button>
+            {/* Tabs - Docs FIRST */}
+            <div className="flex flex-wrap gap-2">
+              <Button size="sm" variant={tab === 'docs' ? 'default' : 'outline'} onClick={() => setTab('docs')}>Docs</Button>
+              <Button size="sm" variant={tab === 'taxon' ? 'default' : 'outline'} onClick={() => setTab('taxon')}>Taxon</Button>
+              <Button size="sm" variant={tab === 'parts' ? 'default' : 'outline'} onClick={() => setTab('parts')}>Parts</Button>
+              <Button size="sm" variant={tab === 'transforms' ? 'default' : 'outline'} onClick={() => setTab('transforms')}>Transforms</Button>
+              <Button size="sm" variant={tab === 'foodstate' ? 'default' : 'outline'} onClick={() => setTab('foodstate')}>FoodState</Button>
             </div>
 
-            {/* Panels */}
             <div className="flex-1 min-h-0 overflow-auto">
-              {tab === 'overview' && (
-                <div className="space-y-3 text-sm">
-                  {!nodeQuery.data ? (
-                    <Skeleton className="h-6 w-40" />
-                  ) : (
-                    <>
-                      <div className="flex items-center justify-between">
-                        <div className="text-base font-medium">{(nodeQuery.data as TaxonNode).name}</div>
-                        <span
-                          className={`ml-2 inline-flex items-center rounded border px-2 py-0.5 text-[10px] uppercase ${rankColor[(nodeQuery.data as TaxonNode).rank] || 'bg-zinc-100 text-zinc-700 border-zinc-200'}`}
-                        >
-                          {(nodeQuery.data as TaxonNode).rank}
-                        </span>
-                      </div>
-                      <div className="text-xs text-muted-foreground">/{(nodeQuery.data as TaxonNode).slug}</div>
-                      <Separator />
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="text-xs text-muted-foreground">ID</div>
-                        <div className="text-xs break-all">{(nodeQuery.data as TaxonNode).id}</div>
-                        <div className="text-xs text-muted-foreground">Children</div>
-                        <div className="text-xs">{(children.data as TaxonNode[] | undefined)?.length ?? 0}</div>
-                        <div className="text-xs text-muted-foreground">Parent</div>
-                        <div className="text-xs">
-                          {parentId ? (
-                            <button className="underline" onClick={() => setCurrentId(parentId)}>
-                              {parentId}
-                            </button>
-                          ) : (
-                            '—'
-                          )}
-                        </div>
-                        <div className="text-xs text-muted-foreground">Documentation</div>
-                        <div className="text-xs">
-                          {docs.data ? (
-                            <button 
-                              className="text-blue-600 hover:text-blue-800 underline" 
-                              onClick={() => setTab('docs')}
-                            >
-                              Available
-                            </button>
-                          ) : docs.isLoading ? (
-                            'Loading...'
-                          ) : (
-                            'Not available'
-                          )}
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </div>
+              {tab === 'docs' && <DocsPanel docs={docs.data as any} node={nodeQuery.data as TaxonNode | undefined} rankColor={rankColor} />}
+              {tab === 'taxon' && <TaxonPanel node={nodeQuery.data as TaxonNode | undefined} path={path.data as TaxonNode[] | undefined} children={children.data as TaxonNode[] | undefined} parentId={parentId} onJump={setCurrentId} rankColor={rankColor} />}
+              {tab === 'parts' && <PartsPanel parts={parts.data as any[] | undefined} selectedPartId={selectedPartId} onSelect={setSelectedPartId} />}
+              {tab === 'transforms' && (
+                <TransformsPanel
+                  loading={transforms.isLoading}
+                  data={transforms.data as any[] | undefined}
+                  chosen={chosen}
+                  onToggleTx={onToggleTx}
+                  onParamChange={onParamChange}
+                />
               )}
-
-              {tab === 'lineage' && (
-                <div className="space-y-2 text-sm">
-                  {!path.data ? (
-                    <div className="space-y-2">
-                      {Array.from({ length: 6 }).map((_, i) => (
-                        <Skeleton key={i} className="h-4 w-3/4" />
-                      ))}
-                    </div>
-                  ) : (
-                    <ul className="space-y-1">
-                      {((path.data as TaxonNode[]) ?? []).map((p) => (
-                        <li key={p.id} className="flex items-center justify-between">
-                          <button className="underline text-left" onClick={() => setCurrentId(p.id)}>
-                            {p.name}
-                          </button>
-                          <span
-                            className={`ml-2 inline-flex items-center rounded border px-2 py-0.5 text-[10px] uppercase ${rankColor[p.rank] || 'bg-zinc-100 text-zinc-700 border-zinc-200'}`}
-                          >
-                            {p.rank}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              )}
-
-              {tab === 'path' && (
-                <div className="space-y-3 text-sm">
-                  <div className="text-muted-foreground">
-                    Compose a FoodState identity (client-only preview).
-                  </div>
-                  <Separator />
-                  {/* Tiny local "builder" with a few illustrative choices */}
-                  <PathBuilder
-                    taxonPath={((path.data as TaxonNode[]) ?? []).map((p) => p.slug)}
-                    onCopy={(s) => navigator.clipboard.writeText(s)}
-                  />
-                </div>
-              )}
-
-              {tab === 'docs' && (
-                <div className="space-y-3 text-sm">
-                  {docs.isLoading ? (
-                    <div className="space-y-2">
-                      <Skeleton className="h-4 w-3/4" />
-                      <Skeleton className="h-4 w-full" />
-                      <Skeleton className="h-4 w-5/6" />
-                    </div>
-                  ) : docs.data ? (
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <div className="text-base font-medium">{(docs.data as any).display_name || (nodeQuery.data as TaxonNode)?.name}</div>
-                        <div className="flex items-center gap-2">
-                          {(docs.data as any).rank && (
-                            <span
-                              className={`inline-flex items-center rounded border px-2 py-0.5 text-[10px] uppercase ${rankColor[(docs.data as any).rank] || 'bg-zinc-100 text-zinc-700 border-zinc-200'}`}
-                            >
-                              {(docs.data as any).rank}
-                            </span>
-                          )}
-                          {(docs.data as any).latin_name && (
-                            <span className="text-xs text-muted-foreground italic">
-                              {(docs.data as any).latin_name}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      
-                      {(docs.data as any).summary && (
-                        <div className="space-y-2">
-                          <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Summary</div>
-                          <div className="text-sm leading-relaxed">{(docs.data as any).summary}</div>
-                        </div>
-                      )}
-
-                      {(docs.data as any).description_md && (
-                        <div className="space-y-2">
-                          <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Description</div>
-                          <div className="text-sm leading-relaxed whitespace-pre-wrap">{(docs.data as any).description_md}</div>
-                        </div>
-                      )}
-
-                      {(docs.data as any).tags && (docs.data as any).tags.length > 0 && (
-                        <div className="space-y-2">
-                          <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Tags</div>
-                          <div className="flex flex-wrap gap-1">
-                            {(docs.data as any).tags.map((tag: string, i: number) => (
-                              <Badge key={i} variant="secondary" className="text-xs">
-                                {tag}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      <Separator />
-                      <div className="text-xs text-muted-foreground">
-                        Last updated: {(docs.data as any).updated_at}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="text-center text-muted-foreground py-8">
-                      <div className="text-sm">No documentation available</div>
-                      <div className="text-xs mt-1">Documentation is sparse and only available for some taxa</div>
-                    </div>
-                  )}
-                </div>
+              {tab === 'foodstate' && (
+                <FoodStatePanel
+                  fsPreview={fsPreview}
+                  loadingValidate={compose.isFetching}
+                  result={compose.data as any}
+                  onCopy={(s) => navigator.clipboard.writeText(s)}
+                  onValidate={() => compose.refetch()}
+                />
               )}
             </div>
           </CardContent>
         </Card>
-      </div>
-    </div>
-  )
-}
-
-/** Simple client-only builder to preview FoodState identity strings */
-function PathBuilder({ taxonPath, onCopy }: { taxonPath: string[]; onCopy: (s: string) => void }) {
-  const [part, setPart] = useState<'fruit' | 'seed' | 'leaf' | 'grain' | 'milk' | ''>('')
-  const [refinement, setRefinement] = useState<'whole' | 'refined' | '00' | ''>('')
-  const [process, setProcess] = useState<'raw' | 'boil' | 'steam' | 'bake' | 'roast' | 'fry' | 'broil' | ''>('')
-
-  const fs = useMemo(() => {
-    const segments = [`fs://${taxonPath.join('/')}`]
-    if (part) segments.push(`part:${part}`)
-    if (refinement) segments.push(`tf:mill{refinement=${refinement}}`)
-    if (process) segments.push(`tf:cook{method=${process}}`)
-    return segments.join('/')
-  }, [taxonPath, part, refinement, process])
-
-  return (
-    <div className="space-y-3">
-      <div className="grid grid-cols-3 gap-2 items-center">
-        <div>Part</div>
-        <select className="col-span-2 border rounded px-2 py-1 bg-background" value={part} onChange={(e) => setPart(e.target.value as any)}>
-          <option value="">—</option>
-          <option value="fruit">fruit</option>
-          <option value="seed">seed</option>
-          <option value="leaf">leaf</option>
-          <option value="grain">grain</option>
-          <option value="milk">milk</option>
-        </select>
-
-        <div>Mill</div>
-        <select className="col-span-2 border rounded px-2 py-1 bg-background" value={refinement} onChange={(e) => setRefinement(e.target.value as any)}>
-          <option value="">—</option>
-          <option value="whole">whole</option>
-          <option value="refined">refined</option>
-          <option value="00">00</option>
-        </select>
-
-        <div>Cook</div>
-        <select className="col-span-2 border rounded px-2 py-1 bg-background" value={process} onChange={(e) => setProcess(e.target.value as any)}>
-          <option value="">—</option>
-          <option value="raw">raw</option>
-          <option value="boil">boil</option>
-          <option value="steam">steam</option>
-          <option value="bake">bake</option>
-          <option value="roast">roast</option>
-          <option value="fry">fry</option>
-          <option value="broil">broil</option>
-        </select>
-      </div>
-
-      <div className="text-xs text-muted-foreground">Preview</div>
-      <div className="text-xs font-mono border rounded p-2 bg-muted/30 break-all">{fs}</div>
-      <div>
-        <Button size="sm" onClick={() => onCopy(fs)}>Copy</Button>
       </div>
     </div>
   )

@@ -125,7 +125,7 @@ Add an optional `overrides` object to taxa items when truly exceptional:
 
 ## Compiler changes (minimal v0)
 
-Extend `etl/py/compile.py`:
+Extend `etl/python/compile.py`:
 
 1. **Load registries** into new tables (read-only):
 

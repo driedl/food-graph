@@ -52,7 +52,7 @@ export const appRouter = t.router({
       const stmt = db.prepare(`
         SELECT n.id, n.name, n.slug, n.rank, n.parent_id as parentId 
         FROM nodes n 
-        JOIN nodes_fts fts ON n.rowid = fts.rowid
+        JOIN nodes_fts fts ON n.name = fts.name AND n.rank = fts.taxon_rank
         WHERE nodes_fts MATCH ?
         ORDER BY bm25(nodes_fts) ASC, n.name
         LIMIT 50

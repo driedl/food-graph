@@ -147,7 +147,7 @@ Root configuration:
 ├── turbo.json        # Turbo monorepo configuration
 ├── pnpm-workspace.yaml # PNPM workspace definition
 ├── tsconfig.base.json # Shared TypeScript configuration
-├── Makefile          # Build automation
+├── etl/              # ETL pipeline and build automation
 └── CONTRIBUTING.md   # Contribution guidelines
 ```
 

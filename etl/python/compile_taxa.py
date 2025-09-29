@@ -10,7 +10,7 @@ Compiles all validated shards into a single JSONL and copies required assets:
   data/ontology/compiled/transforms.json
 
 Steps:
-- Optionally run a light, embedded validation (or invoke validate_taxa.py first in your Makefile).
+- Optionally run a light, embedded validation (or invoke validate_taxa.py first in your ETL pipeline).
 - Read index.jsonl, plantae family/genus shards, fungi.jsonl, animals.jsonl.
 - Drop the 'tags' field if present (belt & suspenders).
 - Enforce unique ids.

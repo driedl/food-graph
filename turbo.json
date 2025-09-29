@@ -1,10 +1,38 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "tasks": {
-    "dev": { "cache": false, "persistent": true },
-    "build": { "dependsOn": ["^build"], "outputs": ["dist/**"] },
-    "lint": { "outputs": [] },
-    "typecheck": { "outputs": [] }
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "build": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "dist/**"
+      ]
+    },
+    "lint": {
+      "outputs": []
+    },
+    "typecheck": {
+      "outputs": []
+    },
+    "etl:build": {
+      "outputs": [
+        "data/builds/**",
+        "data/ontology/compiled/**"
+      ]
+    },
+    "etl:validate": {
+      "outputs": []
+    },
+    "etl:clean": {
+      "outputs": []
+    }
   },
-  "globalDependencies": ["**/.env*"]
+  "globalDependencies": [
+    "**/.env*"
+  ]
 }

@@ -134,6 +134,12 @@ CREATE TABLE IF NOT EXISTS transform_applicability (
 """)
 
 print_info("Clearing existing data...")
+cur.execute("DROP TRIGGER IF EXISTS trg_nodes_ai")
+cur.execute("DROP TRIGGER IF EXISTS trg_nodes_ad") 
+cur.execute("DROP TRIGGER IF EXISTS trg_nodes_au")
+cur.execute("DROP TRIGGER IF EXISTS trg_synonyms_ai")
+cur.execute("DROP TRIGGER IF EXISTS trg_synonyms_ad")
+cur.execute("DROP TABLE IF EXISTS nodes_fts")
 cur.execute("DELETE FROM transform_applicability")
 cur.execute("DELETE FROM transform_def")
 cur.execute("DELETE FROM has_part")
@@ -550,6 +556,71 @@ if docs_rows:
     
     print_success(f"Inserted {docs_inserted} documentation records")
 
+# Create and populate FTS table for search functionality
+print_step("6/6", "Creating full-text search index...")
+
+# Create FTS table
+cur.execute("""
+    CREATE VIRTUAL TABLE IF NOT EXISTS nodes_fts
+    USING fts5(name, synonyms, taxon_rank);
+""")
+
+# Populate FTS table with nodes and synonyms
+cur.execute("""
+    INSERT INTO nodes_fts(name,synonyms,taxon_rank)
+    SELECT n.name, COALESCE(GROUP_CONCAT(s.synonym,' '), ''), n.rank
+    FROM nodes n
+    LEFT JOIN synonyms s ON s.node_id = n.id
+    GROUP BY n.id;
+""")
+
+fts_count = cur.execute("SELECT COUNT(*) FROM nodes_fts").fetchone()[0]
+print_success(f"Created FTS index with {fts_count} entries")
+
+# Create triggers to keep FTS in sync
+cur.execute("""
+    CREATE TRIGGER IF NOT EXISTS trg_nodes_ai AFTER INSERT ON nodes BEGIN
+      INSERT INTO nodes_fts(name,synonyms,taxon_rank)
+      VALUES (NEW.name, '', NEW.rank);
+    END;
+""")
+
+cur.execute("""
+    CREATE TRIGGER IF NOT EXISTS trg_nodes_ad AFTER DELETE ON nodes BEGIN
+      DELETE FROM nodes_fts WHERE name = OLD.name AND taxon_rank = OLD.rank;
+    END;
+""")
+
+cur.execute("""
+    CREATE TRIGGER IF NOT EXISTS trg_nodes_au AFTER UPDATE OF name,rank ON nodes BEGIN
+      UPDATE nodes_fts SET name = NEW.name, taxon_rank = NEW.rank 
+      WHERE name = OLD.name AND taxon_rank = OLD.rank;
+    END;
+""")
+
+cur.execute("""
+    CREATE TRIGGER IF NOT EXISTS trg_synonyms_ai AFTER INSERT ON synonyms BEGIN
+      UPDATE nodes_fts SET synonyms = TRIM(
+        COALESCE(synonyms,'') || ' ' || NEW.synonym
+      ) WHERE rowid = (
+        SELECT n.rowid FROM nodes n WHERE n.id = NEW.node_id
+      );
+    END;
+""")
+
+cur.execute("""
+    CREATE TRIGGER IF NOT EXISTS trg_synonyms_ad AFTER DELETE ON synonyms BEGIN
+      UPDATE nodes_fts SET synonyms = (
+        SELECT TRIM(COALESCE(GROUP_CONCAT(s2.synonym,' '), ''))
+        FROM synonyms s2 WHERE s2.node_id = OLD.node_id
+      ) WHERE rowid = (
+        SELECT n.rowid FROM nodes n WHERE n.id = OLD.node_id
+      );
+    END;
+""")
+
+print_success("Created FTS triggers for automatic synchronization")
+
 # Final commit and summary
 print("\n" + "=" * 50)
 print("📊 COMPILATION SUMMARY")
@@ -569,6 +640,7 @@ docs_count = cur.execute("SELECT COUNT(*) FROM taxon_doc").fetchone()[0]
 has_part_count = cur.execute("SELECT COUNT(*) FROM has_part").fetchone()[0]
 tf_count = cur.execute("SELECT COUNT(*) FROM transform_def").fetchone()[0]
 tfap_count = cur.execute("SELECT COUNT(*) FROM transform_applicability").fetchone()[0]
+fts_count = cur.execute("SELECT COUNT(*) FROM nodes_fts").fetchone()[0]
 
 # Get rank distribution
 rank_stats = cur.execute("SELECT rank, COUNT(*) FROM nodes GROUP BY rank ORDER BY COUNT(*) DESC").fetchall()
@@ -581,6 +653,7 @@ print(f"📚 Total documentation records: {docs_count}")
 print(f"🧩 Total has_part rows: {has_part_count}")
 print(f"🛠️  Total transform defs: {tf_count}")
 print(f"🔗 Total transform_applicability rows: {tfap_count}")
+print(f"🔍 Total FTS entries: {fts_count}")
 print(f"\n📊 Node distribution by rank:")
 for rank, count in rank_stats:
     print(f"  • {rank}: {count}")

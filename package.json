@@ -10,13 +10,15 @@
     "lint": "turbo run lint && eslint .",
     "lint:fix": "eslint . --fix && prettier --write .",
     "typecheck": "turbo run typecheck",
-    "db:build": "python3 etl/py/compile.py --in ./data/ontology/compiled --out ./data/builds/graph.dev.sqlite",
+    "etl:build": "cd etl && pnpm build:pipeline",
+    "etl:validate": "turbo run etl:validate",
+    "etl:clean": "turbo run etl:clean",
     "db:open": "sqlite3 data/builds/graph.dev.sqlite",
     "sql": "tsx scripts/run-sql.ts",
     "sql:repl": "tsx scripts/run-sql.ts --repl",
     "api:routes": "tsx scripts/print-trpc-routes.ts",
     "ag": "tsx scripts/aggregate.ts",
-    "check": "pnpm typecheck && pnpm lint && pnpm db:build"
+    "check": "pnpm typecheck && pnpm lint && pnpm etl:build"
   },
   "devDependencies": {
     "turbo": "^2.1.0",
