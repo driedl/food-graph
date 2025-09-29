@@ -74,8 +74,8 @@ export default function App() {
 
 
 
-  // Inspector tabs: Taxon is DEFAULT
-  const [tab, setTab] = useState<'taxon' | 'parts' | 'transforms' | 'foodstate'>('taxon')
+  // Right-rail tabs
+  const [tab, setTab] = useState<'taxon' | 'pt' | 'foodstate'>('taxon')
 
   // Parts/Transforms builder state
   const [selectedPartId, setSelectedPartId] = useState<string>('')
@@ -189,7 +189,6 @@ export default function App() {
                   loading={neighborhood.isLoading}
                   lineage={lineageQ.data as any[] | undefined}
                   node={nodeData}
-                  siblings={siblingsData}
                   rankColor={rankColor}
                   onJump={(id) => setCurrentId(id)}
                 />
@@ -238,8 +237,7 @@ export default function App() {
             <CardContent className="flex-1 min-h-0 overflow-auto space-y-3">
               <div className="flex flex-wrap gap-2">
                 <Button size="sm" variant={tab === 'taxon' ? 'default' : 'outline'} onClick={() => setTab('taxon')}>Taxon</Button>
-                <Button size="sm" variant={tab === 'parts' ? 'default' : 'outline'} onClick={() => setTab('parts')}>Parts</Button>
-                <Button size="sm" variant={tab === 'transforms' ? 'default' : 'outline'} onClick={() => setTab('transforms')}>Transforms</Button>
+                <Button size="sm" variant={tab === 'pt' ? 'default' : 'outline'} onClick={() => setTab('pt')}>Parts+Transforms</Button>
                 <Button size="sm" variant={tab === 'foodstate' ? 'default' : 'outline'} onClick={() => setTab('foodstate')}>FoodState</Button>
               </div>
 
@@ -254,15 +252,13 @@ export default function App() {
                     rankColor={rankColor}
                   />
                 )}
-                {tab === 'parts' && (
-                  <PartsPanel
-                    parts={parts.data as any}
-                    selectedPartId={selectedPartId}
-                    onSelect={setSelectedPartId}
-                  />
-                )}
-                {tab === 'transforms' && (
-                  <>
+                {tab === 'pt' && (
+                  <div className="space-y-3">
+                    <PartsPanel
+                      parts={parts.data as any}
+                      selectedPartId={selectedPartId}
+                      onSelect={setSelectedPartId}
+                    />
                     {!selectedPartId ? (
                       <div className="text-sm text-muted-foreground">Select a part to view transforms.</div>
                     ) : (
@@ -274,7 +270,7 @@ export default function App() {
                         onParamChange={onParamChange}
                       />
                     )}
-                  </>
+                  </div>
                 )}
                 {tab === 'foodstate' && (
                   <FoodStatePanel

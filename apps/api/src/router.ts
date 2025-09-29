@@ -237,20 +237,30 @@ export const appRouter = t.router({
       }))
       .query(({ input }) => {
         const stmt = db.prepare(`
-          WITH RECURSIVE lineage(id) AS (
-            SELECT id FROM nodes WHERE id = ?
+          WITH RECURSIVE lineage(id, depth) AS (
+            SELECT id, 0 FROM nodes WHERE id = ?
             UNION ALL
-            SELECT n.parent_id FROM nodes n JOIN lineage l ON n.id = l.id
+            SELECT n.parent_id, l.depth + 1 FROM nodes n JOIN lineage l ON n.id = l.id
+            WHERE n.parent_id IS NOT NULL
+          ),
+          transform_priority AS (
+            SELECT ta.transform_id, MIN(l.depth) as min_depth
+            FROM transform_applicability ta
+            JOIN lineage l ON ta.taxon_id = l.id
+            WHERE ta.part_id = ?
+            GROUP BY ta.transform_id
           )
-          SELECT td.id, td.name, td.identity, td.schema_json, td.ordering, td.notes
+          SELECT DISTINCT td.id, td.name, td.identity, td.schema_json, td.ordering, td.notes
           FROM transform_applicability ta
           JOIN transform_def td ON td.id = ta.transform_id
-          WHERE ta.part_id = ? AND ta.taxon_id IN (SELECT id FROM lineage)
+          JOIN lineage l ON ta.taxon_id = l.id
+          JOIN transform_priority tp ON ta.transform_id = tp.transform_id AND l.depth = tp.min_depth
+          WHERE ta.part_id = ?
           ${input.identityOnly ? 'AND td.identity = 1' : ''}
           ORDER BY td.ordering ASC, td.name ASC
         `)
         try {
-          const rows = stmt.all(input.taxonId, input.partId) as any[]
+          const rows = stmt.all(input.taxonId, input.partId, input.partId) as any[]
           return rows.map(r => {
             const fam = r.id.split(':').slice(0, 2).join(':') // e.g. "tf:ferment"
             return {

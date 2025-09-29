@@ -1,21 +1,16 @@
 import { Skeleton } from '@ui/skeleton'
 import { Separator } from '@ui/separator'
-import { Badge } from '@ui/badge'
 
 export default function NodeHeader({
   loading,
   lineage,
   node,
-  siblings,
   rankColor,
-  childCount,
-  descendants,
   onJump,
 }: {
   loading: boolean
   lineage?: Array<{ id: string; name: string; slug: string; rank: string }>
   node?: { id: string; name: string; slug: string; rank: string }
-  siblings?: Array<{ id: string; name: string }>
   rankColor: Record<string, string>
   onJump: (id: string) => void
 }) {
@@ -47,17 +42,7 @@ export default function NodeHeader({
           ))}
         </div>
       </div>
-      <div className="flex items-center gap-2">
-        {siblings && siblings.length > 0 && (
-          <select
-            className="text-xs border rounded px-1.5 py-0.5 bg-background"
-            value={node.id}
-            onChange={(e) => onJump(e.target.value)}
-          >
-            {siblings.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
-          </select>
-        )}
-      </div>
+      <div className="flex items-center gap-2" />
     </div>
   )
 }
