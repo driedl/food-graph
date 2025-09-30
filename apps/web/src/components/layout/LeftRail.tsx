@@ -13,18 +13,22 @@ export default function LeftRail({
   rankColor,
   rootId,
   currentId,
-  onPick
+  onPick,
+  onPickTP,
 }: {
   rankColor: Record<string, string>
   rootId?: string
   currentId: string
   onPick: (id: string) => void
+  /** Navigate directly to a FoodState context by setting taxon + part. */
+  onPickTP: (taxonId: string, partId: string) => void
 }) {
   // Search + filters
   const [qInput, setQInput] = useState('')
   const [q, setQ] = useState('')
   const [rankFilter, setRankFilter] = useState<string[]>([])
-  const search = trpc.search.unified.useQuery({ q, limit: 25, rankFilter: rankFilter.length ? rankFilter : undefined }, { enabled: q.length > 0 })
+  // Combined search returns taxa + taxon_part; rankFilter applied client-side to taxa only
+  const search = trpc.search.combined.useQuery({ q, limit: 25 }, { enabled: q.length > 0 })
   useEffect(() => {
     const t = setTimeout(() => setQ(qInput.trim()), 220)
     return () => clearTimeout(t)
@@ -40,7 +44,23 @@ export default function LeftRail({
     { enabled: !!rootId }
   )
 
-  const results = (search.data as any[] | undefined) ?? []
+  const rawResults = (search.data as any[] | undefined) ?? []
+  // Apply rank filter to *taxon* rows only; keep taxon_part rows so foods still show up.
+  const results = useMemo(() => {
+    if (!rankFilter.length) return rawResults
+    return rawResults.filter((r: any) => {
+      if (r.kind === 'taxon_part') return true
+      // taxon row: keep only if rank included
+      return rankFilter.includes(r.rank)
+    })
+  }, [rawResults, rankFilter])
+
+  const clickResult = (row: any) => {
+    const nav = row.nav
+    if (!nav) return
+    if (nav.target === 'taxon') onPick(nav.taxonId)
+    else if (nav.target === 'taxon_part') onPickTP(nav.taxonId, nav.partId)
+  }
 
   return (
     <Card className="h-full flex flex-col">
@@ -50,7 +70,7 @@ export default function LeftRail({
       <CardContent className="flex-1 min-h-0 flex flex-col gap-3">
         <div className="flex gap-2">
           <Input
-            placeholder="Search taxa (⌘K)…"
+            placeholder="Search taxa & foods (⌘K)…"
             value={qInput}
             onChange={(e) => setQInput(e.target.value)}
           />
@@ -96,17 +116,23 @@ export default function LeftRail({
                   <li
                     key={n.id}
                     className="flex items-center justify-between px-3 py-2 text-sm cursor-pointer hover:bg-muted/40"
-                    onClick={() => onPick(n.id)}
+                    onClick={() => clickResult(n)}
                   >
                     <div className="min-w-0">
                       <div className="truncate">{n.name}</div>
                       <div className="text-xs text-muted-foreground truncate">/{n.slug}</div>
                     </div>
-                    <span
-                      className={`inline-flex items-center rounded border px-2 py-0.5 text-[10px] uppercase ${rankColor[n.rank] || 'bg-zinc-100 text-zinc-700 border-zinc-200'}`}
-                    >
-                      {n.rank}
-                    </span>
+                    {n.kind === 'taxon_part' ? (
+                      <span className="inline-flex items-center rounded border px-2 py-0.5 text-[10px] uppercase bg-amber-100 text-amber-700 border-amber-200">
+                        Food
+                      </span>
+                    ) : (
+                      <span
+                        className={`inline-flex items-center rounded border px-2 py-0.5 text-[10px] uppercase ${rankColor[n.rank] || 'bg-zinc-100 text-zinc-700 border-zinc-200'}`}
+                      >
+                        {n.rank}
+                      </span>
+                    )}
                   </li>
                 ))}
               </ul>

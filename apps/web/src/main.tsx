@@ -31,16 +31,13 @@ const router = createRouter({
 
 if (import.meta.env.DEV) {
   // eslint-disable-next-line no-console
-  console.log('[router] routeTree loaded:', routeTree)
 }
 
 // Add router event listeners for debugging
 router.subscribe('onLoad', (e) => {
-  console.log('Router onLoad:', e)
 })
 
 router.subscribe('onBeforeLoad', (e) => {
-  console.log('Router onBeforeLoad:', e)
 })
 
 // Note: onError is not available in current TanStack Router version

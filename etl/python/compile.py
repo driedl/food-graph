@@ -707,7 +707,6 @@ for pid, syn in cur.execute("SELECT part_id, synonym FROM part_synonym"):
     part_syn.setdefault(pid, set()).add(syn.strip().lower())
 
 rows = []
-fts_tp_rows = []  # (name, synonyms, 'taxon_part', kind)
 
 for taxon_id, part_id in hp_pairs:
     tax_name, tax_rank = node_info.get(taxon_id, (None, None))
@@ -757,17 +756,15 @@ for taxon_id, part_id in hp_pairs:
     slug = f"{taxon_id.split(':')[-1]}-{part_id.split(':')[-1]}".lower()
     rows.append((tp_id, taxon_id, part_id, name, display_name, slug, "taxon_part", p_kind))
 
-    # Build synonyms for FTS (part synonyms + curated TP synonyms)
-    syns = set()
-    syns |= set(part_syn.get(part_id, set()))
-    syns |= set(_tp_extra_synonyms(taxon_id, part_id))
-    fts_tp_rows.append((name, " ".join(sorted(syns)), "taxon_part", p_kind))
+    # FTS TP synonyms will be computed later with rowid parity
 
 cur.executemany(
     "INSERT OR REPLACE INTO taxon_part_nodes(id,taxon_id,part_id,name,display_name,slug,rank,kind) VALUES (?,?,?,?,?,?,?,?)",
     rows
 )
 print_success(f"Taxon+Part nodes generated: {len(rows)}")
+
+# Note: fts_tp_rows no longer used; we'll build TP→FTS with rowid parity later
 
 # Insert documentation
 if docs_rows:
@@ -799,7 +796,7 @@ if docs_rows:
 # Create and populate FTS table for search functionality
 print_step("6/6", "Creating full-text search index...")
 
-# Create contentless FTS table and align rowids with nodes.rowid
+# Create contentless FTS table (columns read as NULL; index-only)
 cur.execute("""
     CREATE VIRTUAL TABLE IF NOT EXISTS nodes_fts
     USING fts5(name, synonyms, taxon_rank, kind, content='',
@@ -826,11 +823,21 @@ cur.execute("""
     FROM nodes n;
 """)
 
-# TP rows (no stable rowid to mirror; they don't get triggers anyway)
-if fts_tp_rows:
+# TP → FTS with rowid parity (so API can join on rowid)
+tpn_for_fts = cur.execute(
+    "SELECT rowid, taxon_id, part_id, name, COALESCE(kind,'') FROM taxon_part_nodes"
+).fetchall()
+
+fts_tp_rows_with_rowid = []
+for rowid, tid, pid, nm, kind in tpn_for_fts:
+    syns = set(part_syn.get(pid, set()))
+    syns |= set(_tp_extra_synonyms(tid, pid))
+    fts_tp_rows_with_rowid.append((rowid, nm, " ".join(sorted(syns)), "taxon_part", kind))
+
+if fts_tp_rows_with_rowid:
     cur.executemany(
-        "INSERT INTO nodes_fts(name, synonyms, taxon_rank, kind) VALUES (?,?,?,?)",
-        fts_tp_rows
+        "INSERT INTO nodes_fts(rowid, name, synonyms, taxon_rank, kind) VALUES (?,?,?,?,?)",
+        fts_tp_rows_with_rowid
     )
 
 fts_count = cur.execute("SELECT COUNT(*) FROM nodes_fts").fetchone()[0]
@@ -900,7 +907,7 @@ print_success("Created FTS triggers for automatic synchronization")
 # Artifact metadata (schema versioning for API startup checks)
 # ---------------------------------------------------------------------
 print_step("6.5/6", "Writing artifact metadata...")
-SCHEMA_VERSION = 5  # bump when you change compiled DB schema/shape
+SCHEMA_VERSION = 6  # bump when you change compiled DB schema/shape
 
 cur.execute("""
   CREATE TABLE IF NOT EXISTS meta (

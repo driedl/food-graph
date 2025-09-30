@@ -27,6 +27,7 @@ interface TaxonNode {
 
 
 const rankColor = RANK_COLOR
+const stripPart = (id: string) => id.replace(/^part:/, '')
 
 export default function App() {
   const router = useRouter()
@@ -77,15 +78,12 @@ export default function App() {
       const { pathname } = router.state.location
       const currentPath = lastPathRef.current
       
-      console.log('[URL→State] pathname:', pathname, 'lastPath:', currentPath, 'match:', pathname === currentPath)
       
       // Skip if this is the path we just wrote (prevents loops)
       if (pathname === currentPath && currentPath !== '') {
-        console.log('[URL→State] Skipping - we just wrote this path')
         return
       }
       
-      console.log('[URL→State] Applying from location...')
       // Set flags and update lastPathRef BEFORE setting any state to prevent State→URL from interfering
       isApplyingFromUrl.current = true
       isParsingUrl.current = true // Prevent auto-clear of selectedPartId
@@ -95,10 +93,8 @@ export default function App() {
       const nodeId = pathToNodeId(pathname)
 
       if (fs) {
-        console.log('[URL→State] Parsing FS:', fs)
         await handleParse(fs) // will set currentId, selectedPartId
       } else if (nodeId) {
-        console.log('[URL→State] Setting node:', nodeId)
         setCurrentId(nodeId)
         setSelectedPartId('')
         setChosen([])
@@ -202,7 +198,6 @@ export default function App() {
   useEffect(() => {
     const parsed: any = parseQ.data
     if (!fsToParse || !parsed) return
-    console.log('[Parser] Parse response:', parsed)
     try {
       if (parsed.taxonPath && parsed.taxonPath.length > 0) {
         const kingdoms = ['plantae', 'animalia', 'fungi']
@@ -210,7 +205,6 @@ export default function App() {
         if (kingdomIndex >= 0) {
           const taxonomicPath = parsed.taxonPath.slice(kingdomIndex)
           const taxonId = 'tx:' + taxonomicPath.join(':')
-          console.log('[Parser] Constructed taxon ID:', taxonId, 'from path:', taxonomicPath)
           setCurrentId(taxonId)
         } else {
           console.warn('[Parser] No kingdom found in path:', parsed.taxonPath)
@@ -218,7 +212,6 @@ export default function App() {
       }
       if (parsed.partId) {
         const partId = normalizePartId(parsed.partId)
-        console.log('[Parser] Setting selectedPartId to:', partId)
         setSelectedPartId(partId)
       }
       if (parsed.transforms && parsed.transforms.length) {
@@ -230,12 +223,10 @@ export default function App() {
         pendingFromParse.current = null
       }
     } finally {
-      console.log('[Parser] Parse complete')
       setFsToParse(null)
     }
   }, [parseQ.data, fsToParse])
   const handleParse = async (fs: string) => {
-    console.log('[Parser] Starting parse of:', fs)
     setFsToParse(fs)
   }
 
@@ -244,11 +235,9 @@ export default function App() {
   const isApplyingFromUrl = useRef(false) // Track when we're syncing FROM url to prevent loops
   
   useEffect(() => {
-    console.log('[State→URL] currentId:', currentId, 'isApplying:', isApplyingFromUrl.current, 'selectedPartId:', selectedPartId, 'lastPath:', lastPathRef.current)
     if (!currentId || isApplyingFromUrl.current) return
     // Hold only while we are actively applying from URL (not just because we are on an FS route)
     if (isParsingUrl.current && !selectedPartId && !chosen.length) {
-      console.log('[State→URL] During URL parse, no part/tx yet — holding position')
       return
     }
     const fs = fsPreview
@@ -256,7 +245,6 @@ export default function App() {
     // have enough data to build it yet, don't downgrade to /node/:id.
     // Wait for lineage to load (it will trigger this effect again when ready).
     if ((selectedPartId || chosen.length) && !fs) {
-      console.log('[State→URL] Waiting for FS preview...', { selectedPartId, fs })
       return
     }
     // Prefer fs form when part/tx chosen; fallback to node form for "just node"
@@ -265,7 +253,6 @@ export default function App() {
         ? fsToPath(fs)
         : `/workbench/node/${currentId}`
 
-    console.log('[State→URL] targetPath:', targetPath, 'lastPath:', lastPathRef.current)
 
     // Idempotence: avoid churn if FS string hasn't meaningfully changed
     if (fs) {
@@ -278,7 +265,6 @@ export default function App() {
 
     if (targetPath && targetPath !== lastPathRef.current) {
       const isFirstWrite = !lastPathRef.current
-      console.log('[State→URL] Navigating to:', targetPath, 'replace:', isFirstWrite)
       // Update lastPathRef BEFORE navigation so it's available immediately
       lastPathRef.current = targetPath
       // Use router.navigate to properly update TanStack Router state
@@ -310,7 +296,18 @@ export default function App() {
           rankColor={rankColor}
           rootId={(root.data as any)?.id}
           currentId={currentId ?? ''}
-          onPick={(id) => setCurrentId(id)}
+          onPick={(id) => {
+            setSelectedPartId('')   // leaving FS flow → plain taxon view
+            setChosen([])
+            setTab('taxon')
+            setCurrentId(id)
+          }}
+          onPickTP={(taxonId, partId) => {
+            setCurrentId(taxonId)
+            setSelectedPartId(stripPart(partId))
+            setChosen([])
+            setTab('pt')
+          }}
         />
 
         {/* Center: Header + Two-up panels */}

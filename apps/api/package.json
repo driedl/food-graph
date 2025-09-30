@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "cd ../../ && tsx watch apps/api/src/index.ts",
-    "db:sync": "tsx apps/api/scripts/sync-graph-db.ts",
+    "db:sync": "tsx scripts/sync-graph-db.ts",
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint ."
