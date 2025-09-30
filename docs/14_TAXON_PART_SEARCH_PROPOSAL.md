@@ -16,6 +16,55 @@ We propose adding **materialized taxon+part nodes** to enable intuitive food sea
 
 ---
 
+## Progress Report (Updated 2025-01-27)
+
+### ✅ What's Done (Design & Data)
+
+**Design decisions locked:**
+
+- Materialize **Taxon+Part (TP) nodes** for search (leaf-only by default)
+- **Implied parts** mechanism so names collapse (e.g., "Potato" not "Potato (tuber)")
+- Keep **docs out of search** (no taxon_doc FTS in combined search)
+- **Name generation**: overrides > implied-part collapse > generic rules
+- Leave **Phase 2 transforms** to a curated list (not combinatorial)
+
+**Rules/metadata added (append-only):**
+
+- `rules/parts_applicability.jsonl` — Base packs (dairy/eggs, meat/poultry) + add-ons C (seafood) & D (staples/vegetables/grains/legumes/nuts)
+- `rules/implied_parts.jsonl` — Mark tuber, root, bulb, leaf, stem, flower, fruit, grain, seed as implied for common crops
+- `rules/name_overrides.jsonl` — Seafood disambiguations (Cod, Haddock, Salmon, Shrimp/Lobster/Crab, Oysters/Clams/Scallops, Roe → Caviar/Salmon Roe)
+- `rules/taxon_part_synonyms.jsonl` — Seafood synonyms (e.g., "ahi", "lox", "bacalhau", "ikura", "mentaiko"…)
+
+### 🔄 What's Left (Implementation)
+
+**ETL changes (compile.py):**
+
+- Read the new files: `implied_parts.jsonl`, `name_overrides.jsonl`, `taxon_part_synonyms.jsonl`
+- **Step 5.3**: build `taxon_part_nodes` (leaf-only) using `has_part` + implied-part collapse + name overrides + TP synonyms
+- **FTS**: extend/populate unified `nodes_fts` with both taxa and TP rows (docs excluded)
+- **(Optional)** lightweight triggers for TP ↔ has_part sync inside ETL-built DB
+
+**API changes:**
+
+- Update combined search to query **taxa + TP** only (no docs); tune weights so foody queries favor TP
+- New `getTaxonPart` read endpoint (details for a TP id)
+- (Optional) facet flags (`kind=animal/plant/fungus`, `rank=taxon_part`) for filtering
+
+**UI changes:**
+
+- Treat `taxon_part` as "Food" item in results; route to `/workbench/tp/:id`
+- TP detail shows lineage, part, and (later) applicable transforms
+
+### 📋 To Revisit (Metadata/Backlog)
+
+- **Beef/Pork/Lamb naming**: broaden `name_overrides.jsonl` for muscle → "Beef", "Pork", "Lamb/Mutton", plus common **cuts** where helpful
+- **Plant-part synonyms** (pulp/flesh/stone/bran/germ/greens, etc.) for better recall
+- **Herbs & spices pack** (leaf/seed/bark/flower) and **fruits-by-cultivar** niceties
+- **Curated Phase-2 derived foods** (`derived_foods.jsonl`): cheeses, yogurts, cultured dairy, etc.
+- **Ranking polish**: BM25 weights, dedupe when TP name == taxon name (prefer TP)
+
+---
+
 ## 1. Problem Statement
 
 ### Current State
@@ -885,3 +934,286 @@ WHERE hp.taxon_id IN (SELECT id FROM lineage);
 ---
 
 _End of Proposal_
+Awesome—here’s a **tight, revised plan** that bakes in your feedback (implicit parts, leaf-only policy with kingdom fallbacks, no doc FTS, ontology-friendly changes, and a curated path for Phase 2).
+
+# Revised Plan — Taxon ✕ Part Search (v2)
+
+## 0) What’s changing vs. v1
+
+- **Implicit parts**: “Honeycrisp” resolves to fruit, “Potato” to tuber, but we don’t show “(fruit)”/“(tuber)” when it’s obvious.
+- **No doc search**: Docs are out of the FTS story.
+- **Ontology-first**: we add small, expressive rules files; minimal code hardcoding.
+- **Leaf-first materialization** with **kingdom policies + exceptions**; breeds can co-exist with species (e.g., Wagyu beef and beef).
+- **Separate FTS for taxon_part** remains (safer, cleaner).
+- **Phase 2 (derived foods)** is curated via a data file.
+
+---
+
+## 1) Ontology assets (new/updated)
+
+### A) Implied parts (new)
+
+`data/ontology/rules/implied_parts.jsonl`
+
+```jsonl
+{"applies_to":["tx:plantae:...:malus:"],"part":"part:fruit","exclude":[]}
+{"applies_to":["tx:plantae:...:solanum:tuberosum"],"part":"part:tuber"}
+{"applies_to":["tx:plantae:...:triticum:"],"part":"part:grain"}
+{"applies_to":["tx:plantae:...:oryza:"],"part":"part:grain"}
+{"applies_to":["tx:plantae:...:brassica:oleracea:var:italica"],"part":"part:flower"}
+```
+
+- Prefix-based, with optional `exclude`.
+- One implied part per taxon (if multiple rules match, first specific wins).
+
+### B) Materialization policy (new)
+
+`data/ontology/rules/taxon_part_policy.json`
+
+```json
+{
+  "default": {
+    "animalia": ["species", "breed"],
+    "plantae": ["species", "variety", "cultivar"],
+    "fungi": ["species"]
+  },
+  "allowlist": [
+    // optional non-leaf or higher-rank exceptions, per part
+    { "taxon_id": "tx:animalia:...:bos:taurus", "parts": ["part:muscle"] },
+    {
+      "taxon_id": "tx:plantae:...:citrus",
+      "parts": ["part:peel", "part:fruit"]
+    }
+  ],
+  "blocklist": [
+    // explicit exclusions if needed
+  ]
+}
+```
+
+- We **only materialize leaves** by default (no children in `nodes`) that match the allowed ranks.
+- `allowlist` lets you include well-known non-leaves (rare, but there if needed).
+
+### C) Name overrides (new)
+
+`data/ontology/rules/name_overrides.jsonl`
+
+```jsonl
+{"taxon_id":"tx:animalia:...:bos:taurus","part_id":"part:muscle","name":"Beef","display_name":"Beef"}
+{"taxon_id":"tx:animalia:...:ovis:aries","part_id":"part:muscle","name":"Lamb","display_name":"Lamb"}
+{"taxon_id":"tx:animalia:...:sus:scrofa_domesticus","part_id":"part:muscle","name":"Pork","display_name":"Pork"}
+{"taxon_id":"tx:animalia:...:gallus:gallus_domesticus","part_id":"part:egg","name":"Chicken Egg","display_name":"Chicken Egg"}
+{"taxon_id":"tx:animalia:...:bos:taurus","part_id":"part:milk","name":"Cow Milk","display_name":"Cow Milk"}
+```
+
+- Minimal surface for “market names” and meat nomenclature.
+- Breeds (e.g., Wagyu) can have their own overrides:
+
+```jsonl
+{
+  "taxon_id": "tx:animalia:...:bos:taurus:breed:wagyu",
+  "part_id": "part:muscle",
+  "name": "Wagyu Beef"
+}
+```
+
+### D) Part synonyms enrichment (update)
+
+- Add `aliases` into `parts.json` (e.g., fruit → “flesh”, “pulp”; milk → “dairy”, “whole milk”; grain → “kernels”, “groats”).
+- ETL will ingest these aliases into `part_synonym` (see §3).
+
+### E) Phase 2 curated derived foods (new)
+
+`data/ontology/rules/derived_foods.jsonl`
+
+```jsonl
+{
+  "id": "tpt:bos_taurus:milk:yogurt",
+  "taxon_id": "tx:animalia:...:bos:taurus",
+  "part_id": "part:milk",
+  "transforms": [
+    {
+      "id": "tf:ferment",
+      "params": {
+        "starter": "yogurt_thermo"
+      }
+    }
+  ],
+  "name": "Yogurt",
+  "synonyms": [
+    "Yoghurt",
+    "Dahi"
+  ],
+  "notes": "Curated; identity-safe chain"
+}
+```
+
+- Only **curated** combos appear. No combinatorial explosion.
+
+---
+
+## 2) Database schema (surgical additions)
+
+Keep current schema. Add:
+
+```sql
+-- Searchable food nodes (taxon × part)
+CREATE TABLE IF NOT EXISTS taxon_part_nodes (
+  id TEXT PRIMARY KEY,                    -- "tp:tx:...:part:milk"
+  taxon_id TEXT NOT NULL REFERENCES nodes(id) ON DELETE CASCADE,
+  part_id TEXT NOT NULL REFERENCES part_def(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,                     -- user-facing canonical label
+  display_name TEXT NOT NULL,             -- may equal name
+  slug TEXT NOT NULL,
+  rank TEXT NOT NULL DEFAULT 'taxon_part',
+  kingdom TEXT,                           -- 'animalia'|'plantae'|'fungi' (from taxon_id)
+  is_implicit INTEGER NOT NULL DEFAULT 0, -- 1 if part is implied (hide suffix)
+  UNIQUE(taxon_id, part_id)
+);
+
+-- Dedicated FTS for taxon_part (docs are intentionally excluded)
+CREATE VIRTUAL TABLE IF NOT EXISTS taxon_part_fts
+USING fts5(name, synonyms, kingdom, implicit);
+```
+
+_(No runtime triggers; ETL rebuilds these.)_
+
+---
+
+## 3) ETL changes (fits your current pipeline)
+
+### Load new rules
+
+- Parse **implied_parts**, **policy**, **name_overrides**, **derived_foods**.
+- Extend parts ingestion to push **parts.json `aliases`** into `part_synonym`.
+
+### Materialize taxon_part_nodes (after has_part / transforms)
+
+Rules applied in order:
+
+1. **Candidate pairs** = `has_part` rows.
+2. **Leaf filter** = taxon has no children (by `nodes` table), AND taxon rank in kingdom policy allowlist; OR explicitly allowed in `policy.allowlist`.
+3. **Compute `kingdom`** from `taxon_id`.
+4. **Implied part?**
+   - If taxon matches an implied rule for this `part_id`, set `is_implicit=1`.
+
+5. **Name resolution**:
+   - If `name_overrides` has entry → use it.
+   - Else:
+     - **Implicit** → `name = display_name = taxon.display_name` (e.g., “Honeycrisp”, “Potato”, “Wheat”).
+       (We still index part synonyms so “fruit”, “tuber”, “grain” queries find them.)
+     - **Animal** non-implicit → `"${CommonTaxon} ${PartName}"` (Cow Milk, Chicken Egg).
+     - **Plant fruit at species/var/cultivar** → implicit path above will typically catch it; fallback never shows “(fruit)”.
+     - **Other plants** → `"${Taxon} (${PartName})"` if not implicit and not overridden (e.g., “Potato (Peel)”).
+
+6. **Slug** = `"{lastSeg(taxon)}-{lastSeg(part)}"` unless overridden.
+7. Insert unique `(taxon_id, part_id)` rows.
+
+### Populate `taxon_part_fts`
+
+```sql
+INSERT INTO taxon_part_fts(name, synonyms, kingdom, implicit)
+SELECT
+  tp.name,
+  TRIM(
+    COALESCE(tx_syn.syns,'') || ' ' ||
+    COALESCE(pt_syn.syns,'') || ' ' ||
+    CASE WHEN tp.is_implicit=1 THEN (SELECT name FROM part_def WHERE id=tp.part_id) ELSE '' END
+  ),
+  tp.kingdom,
+  CASE tp.is_implicit WHEN 1 THEN '1' ELSE '0' END
+FROM taxon_part_nodes tp
+LEFT JOIN (
+  SELECT node_id, GROUP_CONCAT(synonym,' ') syns
+  FROM synonyms GROUP BY node_id
+) tx_syn ON tx_syn.node_id = tp.taxon_id
+LEFT JOIN (
+  SELECT part_id, GROUP_CONCAT(synonym,' ') syns
+  FROM part_synonym GROUP BY part_id
+) pt_syn ON pt_syn.part_id = tp.part_id;
+```
+
+- Note: we also tuck the **part name** into synonyms when implicit, so “apple fruit” still finds “Apple”.
+
+_(Leave existing `nodes_fts` exactly as-is.)_
+
+---
+
+## 4) Search behavior (API)
+
+- **No doc FTS**: only `nodes_fts` (taxa) + `taxon_part_fts` (foods).
+- **Ranking & dedupe**:
+  - Execute two queries; normalize to a common shape.
+  - If a **taxon_part** exists for the **same taxon** with `is_implicit=1`, **hide/demote** the raw taxon result for commodity queries.
+    - Heuristic: if query tokens match the taxon’s name OR its synonyms, prefer the **implicit** `taxon_part`.
+
+  - Weight `taxon_part` slightly higher for everyday food queries (milk, egg, apple, potato).
+
+- **Filters**:
+  - Optional param `kinds: ['taxon','taxon_part']` (default both).
+  - Optional param `kingdom` filter on `taxon_part` via FTS column (for “animal milk” vs “plant milk” queries later if needed).
+
+---
+
+## 5) UI behavior
+
+- Results:
+  - **taxon_part** → badge “Food”; show `name` as-is (implicit items display clean: “Honeycrisp”, “Potato”).
+  - **taxon** → badge with rank; generally appears when there’s no implicit mapping.
+
+- Clicking `taxon_part`:
+  - `/workbench/tp/:id` shows taxon lineage, the part (even when implicit), and **available transforms** (from current `transform_applicability`).
+
+---
+
+## 6) Phase 2 — Curated derived foods
+
+- **Data-driven** via `rules/derived_foods.jsonl`.
+- New table `taxon_part_transform_nodes` + `tpt_fts` (separate from v1).
+- Each record must pass `composeFoodState` validation (identity-only chains).
+- Names/synonyms come from the file (e.g., Yogurt, Skim Milk, Buttermilk).
+- Search unions three sources: taxa, taxon_part, **tpt**; default ranking: tpt ≥ taxon_part ≥ taxon for commodity terms.
+
+---
+
+## 7) Testing & acceptance
+
+**Smoke tests** (extend your existing suite):
+
+- “milk” → Cow Milk, Goat Milk, Sheep Milk (taxon_part)
+- “egg” → Chicken Egg (taxon_part)
+- “honeycrisp” → Honeycrisp (implicit fruit, taxon_part, no “(fruit)”)
+- “potato” → Potato (implicit tuber)
+- “wheat”/“rice” → Wheat/Rice (implicit grain)
+- “wagyu beef” → Wagyu Beef (breed muscle override)
+- Ensure raw taxa are **not duplicated** next to their implicit food for the same string.
+
+**ETL invariants**:
+
+- Every `has_part` that passes policy → exactly one `taxon_part_nodes` row.
+- `taxon_part_fts` count ≥ nodes count.
+- No duplicates by `(taxon_id, part_id)`.
+- Implicit rows have `is_implicit=1`.
+
+---
+
+## 8) Rollout steps
+
+1. Add the four rules files (implied parts, policy, overrides, derived foods).
+2. Update ETL:
+   - Load rules, ingest parts aliases, build `taxon_part_nodes`, build `taxon_part_fts`.
+
+3. Adjust API search combiner (union + dedupe + light boosting).
+4. UI: show `taxon_part` badge; keep current workbench view.
+5. Ship smoke tests; verify.
+
+---
+
+## 9) Why this works
+
+- **Implicit parts** give you clean, human labels while remaining formally precise underneath.
+- **Leaf-first policy** keeps the graph tidy, with escape hatches (allowlist) for iconic non-leaf lines.
+- **Separate FTS** avoids destabilizing existing triggers and makes rollback trivial.
+- **Data-over-code** (rules files) lets you iterate naming and coverage fast—perfect for early dev.
+
+If you’re happy with this shape, I’ll draft the concrete ETL diffs (SQL + Python inserts), example rule entries for a handful of staple foods, and the API search union query with the implicit-preference dedupe.

@@ -1,4 +1,6 @@
-export function PartsPanel({
+import { memo } from 'react'
+
+export const PartsPanel = memo(function PartsPanel({
   parts,
   selectedPartId,
   onSelect,
@@ -17,6 +19,7 @@ export function PartsPanel({
   onSelect: (id: string) => void
 }) {
   if (!parts) return <div className="text-sm text-muted-foreground">No parts available</div>
+  const normalize = (id: string) => id.replace(/^part:/, '')
 
   const groups = (parts || []).reduce((acc: Record<string, Array<any>>, p) => {
     const k = p.kind || 'other'
@@ -37,8 +40,8 @@ export function PartsPanel({
             {groups[k].map((p) => (
               <button
                 key={p.id}
-                className={`px-3 py-2 rounded border text-left hover:bg-muted/40 ${selectedPartId === p.id ? 'bg-muted/50 border-blue-300' : ''} ${!p.applicable ? 'opacity-50' : ''}`}
-                onClick={() => onSelect(p.id)}
+                className={`px-3 py-2 rounded border text-left hover:bg-muted/40 ${selectedPartId === normalize(p.id) ? 'bg-muted/50 border-blue-300' : ''} ${!p.applicable ? 'opacity-50' : ''}`}
+                onClick={() => onSelect(normalize(p.id))}
                 disabled={!p.applicable}
               >
                 <div className="flex items-center justify-between">
@@ -71,4 +74,4 @@ export function PartsPanel({
       ))}
     </div>
   )
-}
+})

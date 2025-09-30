@@ -33,7 +33,7 @@ export function FoodStatePanel({
           <div className="text-xs text-muted-foreground">Paste FoodState path to jump to node/part</div>
           <div className="flex gap-2">
             <Input
-              placeholder="fs:/path/to/taxon/part:name/tf:transform"
+              placeholder="fs:/path/to/taxon/part:seed/tx:transform{key=value}"
               value={parseInput}
               onChange={(e) => setParseInput(e.target.value)}
               onKeyDown={(e) => {

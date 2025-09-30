@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { memo, useEffect, useMemo, useRef, useState } from 'react'
+import { useRouter } from '@tanstack/react-router'
 import { trpc } from './lib/trpc'
 import ErrorBoundary from './components/ErrorBoundary'
 import { DocsPanel } from './components/inspector/DocsPanel'
@@ -43,6 +44,10 @@ const rankColor: Record<string, string> = {
 }
 
 export default function App() {
+  const router = useRouter()
+  const onFsRoute = router.state.location.pathname.startsWith('/workbench/fs/')
+  const normalizePartId = (id: string) => id.replace(/^part:/, '')
+  
   // API health + root bootstrap
   const health = trpc.health.useQuery()
   const root = trpc.taxonomy.getRoot.useQuery(undefined, { refetchOnWindowFocus: false })
@@ -54,7 +59,7 @@ export default function App() {
   const [childLimit, setChildLimit] = useState(50)
   const neighborhood = trpc.taxonomy.neighborhood.useQuery(
     { id: currentId!, childLimit, orderBy: 'name' }, 
-    { enabled: !!currentId }
+    { enabled: !!currentId, keepPreviousData: true }
   )
   const docs = trpc.docs.getByTaxon.useQuery({ taxonId: currentId! }, { enabled: !!currentId })
   const parts = trpc.taxonomy.partTree.useQuery({ id: currentId! }, { enabled: !!currentId })
@@ -71,36 +76,54 @@ export default function App() {
 
   // Bootstrap root
   useEffect(() => {
-    if (root.data && !currentId) setCurrentId((root.data as TaxonNode).id)
+    // Only bootstrap to root if we are NOT already deep-linking via /workbench/node/:id or /workbench/fs/*
+    if (root.data && !currentId) {
+      const { pathname } = window.location
+      if (pathToFs(pathname) || pathToNodeId(pathname)) return
+      setCurrentId((root.data as TaxonNode).id)
+    }
   }, [root.data, currentId])
   // Reset limit when node changes
   useEffect(() => { setChildLimit(50) }, [currentId])
 
-  // --- URL → State (initial load + back/forward) ----------------------------
+  // --- URL → State (sync state from URL whenever location changes) ----------
   useEffect(() => {
     const applyFromLocation = async () => {
-      const { pathname } = window.location
+      const { pathname } = router.state.location
+      const currentPath = lastPathRef.current
+      
+      console.log('[URL→State] pathname:', pathname, 'lastPath:', currentPath, 'match:', pathname === currentPath)
+      
+      // Skip if this is the path we just wrote (prevents loops)
+      if (pathname === currentPath && currentPath !== '') {
+        console.log('[URL→State] Skipping - we just wrote this path')
+        return
+      }
+      
+      console.log('[URL→State] Applying from location...')
+      // Set flags and update lastPathRef BEFORE setting any state to prevent State→URL from interfering
+      isApplyingFromUrl.current = true
+      isParsingUrl.current = true // Prevent auto-clear of selectedPartId
+      lastPathRef.current = pathname // Update BEFORE state changes to prevent State→URL from overwriting
+      
       const fs = pathToFs(pathname)
       const nodeId = pathToNodeId(pathname)
 
       if (fs) {
+        console.log('[URL→State] Parsing FS:', fs)
         await handleParse(fs) // will set currentId, selectedPartId
-        return
-      }
-      if (nodeId) {
+      } else if (nodeId) {
+        console.log('[URL→State] Setting node:', nodeId)
         setCurrentId(nodeId)
         setSelectedPartId('')
         setChosen([])
-        return
       }
-      // default: keep existing bootstrap behavior (root)
+      
+      isApplyingFromUrl.current = false
+      isParsingUrl.current = false
     }
     applyFromLocation()
-
-    const onPop = () => applyFromLocation()
-    window.addEventListener('popstate', onPop)
-    return () => window.removeEventListener('popstate', onPop)
-  }, [])
+  }, [router.state.location.pathname])
 
 
 
@@ -108,8 +131,15 @@ export default function App() {
   const [tab, setTab] = useState<'taxon' | 'pt' | 'foodstate'>('taxon')
 
   // Parts/Transforms builder state
+  // Always store WITHOUT the `part:` prefix internally
   const [selectedPartId, setSelectedPartId] = useState<string>('')
-  useEffect(() => { setSelectedPartId('') }, [currentId])
+  const isParsingUrl = useRef(false) // Track when parsing URL to prevent auto-clear
+  useEffect(() => { 
+    // Don't auto-clear part when we're syncing from URL
+    if (!isParsingUrl.current) {
+      setSelectedPartId('') 
+    }
+  }, [currentId])
   const transforms = trpc.taxonomy.getTransformsFor.useQuery(
     { taxonId: currentId || '', partId: selectedPartId || '', identityOnly: false },
     { enabled: !!currentId && !!selectedPartId }
@@ -144,10 +174,16 @@ export default function App() {
 
   // Compose local fs:// preview
   const fsPreview = useMemo(() => {
-    const pathSlugs = (lineageQ.data?.map((n: any) => n.slug) ?? (nodeData ? [nodeData.slug] : []))
+    // Wait for lineage to load - don't build partial paths
+    if (!lineageQ.data || lineageQ.data.length === 0) return ''
+    const pathSlugs = lineageQ.data.map((n: any) => n.slug)
     if (!pathSlugs.length) return ''
     const segs: string[] = [`fs:/${pathSlugs.join('/')}`]
-    if (selectedPartId) segs.push(selectedPartId)
+    // FS requires explicit segment tags; we store part ids WITHOUT the prefix
+    if (selectedPartId) {
+      const partId = `part:${selectedPartId}`
+      segs.push(partId)
+    }
     if (chosen.length) {
       const ordered = [...chosen].sort((a, b) => a.id.localeCompare(b.id))
       const chain = ordered.map((t) => {
@@ -158,12 +194,13 @@ export default function App() {
           if (typeof v === 'boolean') return `${k}=${v ? 'true' : 'false'}`
           return `${k}=${String(v)}`
         }).join(',')
-        return p ? `${t.id}{${p}}` : `${t.id}`
+        // Prefix each transform with tx:
+        return p ? `tx:${t.id}{${p}}` : `tx:${t.id}`
       }).join('/')
       if (chain) segs.push(chain)
     }
     return segs.join('/')
-  }, [lineageQ.data, nodeData, selectedPartId, chosen])
+  }, [lineageQ.data, selectedPartId, chosen, currentId, lineageQ.isLoading])
 
   // Optional server validation using existing foodstate.compose (query)
   const compose = trpc.foodstate.compose.useQuery(
@@ -173,56 +210,90 @@ export default function App() {
 
   // FoodState parser
   const handleParse = async (fs: string) => {
+    console.log('[Parser] Starting parse of:', fs)
     try {
       // Use direct tRPC HTTP query: /trpc/route?input=...
       const res = await fetch(`/trpc/foodstate.parse?input=${encodeURIComponent(JSON.stringify({ fs }))}`)
       const json = await res.json()
+      console.log('[Parser] Parse response:', json)
       const parsed = json?.result?.data
 
       if (parsed.taxonPath && parsed.taxonPath.length > 0) {
-        // For now, just navigate to the last taxon in the path
-        // In a full implementation, you'd navigate through the full path
-        const lastTaxon = parsed.taxonPath[parsed.taxonPath.length - 1]
-        setCurrentId(lastTaxon)
+        // parsed.taxonPath is an array of slugs like ['life', 'eukaryota', 'plantae', 'rosaceae', 'malus', 'domestica']
+        // Taxon IDs follow the pattern: tx:kingdom:family:genus:species
+        // We need to find where the kingdom starts and build from there
+        const kingdoms = ['plantae', 'animalia', 'fungi']
+        const kingdomIndex = parsed.taxonPath.findIndex((slug: string) => kingdoms.includes(slug))
+        
+        if (kingdomIndex >= 0) {
+          // Build the taxon ID from the kingdom onwards
+          const taxonomicPath = parsed.taxonPath.slice(kingdomIndex)
+          const taxonId = 'tx:' + taxonomicPath.join(':')
+          console.log('[Parser] Constructed taxon ID:', taxonId, 'from path:', taxonomicPath)
+          setCurrentId(taxonId)
+        } else {
+          console.warn('[Parser] No kingdom found in path:', parsed.taxonPath)
+        }
       }
       if (parsed.partId) {
-        setSelectedPartId(parsed.partId)
+        // Store normalized (no prefix)
+        const partId = normalizePartId(parsed.partId)
+        console.log('[Parser] Setting selectedPartId to:', partId)
+        setSelectedPartId(partId)
       }
       if (parsed.transforms && parsed.transforms.length) {
         // Stage; will be filtered to identity transforms that exist once query resolves
         pendingFromParse.current = parsed.transforms.map((t: any) => ({
-          id: t.id,
+          id: t.id.replace(/^tx:/, ''), // Remove tx: prefix if present
           params: t.params ?? {},
         }))
       } else {
         pendingFromParse.current = null
       }
+      console.log('[Parser] Parse complete')
     } catch (error) {
-      console.error('Failed to parse FoodState:', error)
+      console.error('[Parser] Failed to parse FoodState:', error)
     }
   }
 
   // --- State → URL (push new history entries when state changes) ------------
   const lastPathRef = useRef<string>('')
+  const isApplyingFromUrl = useRef(false) // Track when we're syncing FROM url to prevent loops
+  
   useEffect(() => {
-    if (!currentId) return
+    console.log('[State→URL] currentId:', currentId, 'isApplying:', isApplyingFromUrl.current, 'selectedPartId:', selectedPartId, 'lastPath:', lastPathRef.current)
+    if (!currentId || isApplyingFromUrl.current) return
+    // If we're already on an FS route but state hasn't re-hydrated part/tx yet,
+    // skip downgrading the URL back to /node/:id. This prevents the flash/revert.
+    if (onFsRoute && !selectedPartId && !chosen.length) {
+      console.log('[State→URL] On FS route with no part/tx yet — holding position')
+      return
+    }
     const fs = fsPreview
+    // If we intend to write an FS URL (because part/tx is present) but don't
+    // have enough data to build it yet, don't downgrade to /node/:id.
+    // Wait for lineage to load (it will trigger this effect again when ready).
+    if ((selectedPartId || chosen.length) && !fs) {
+      console.log('[State→URL] Waiting for FS preview...', { selectedPartId, fs })
+      return
+    }
     // Prefer fs form when part/tx chosen; fallback to node form for "just node"
     const targetPath =
       fs && (selectedPartId || chosen.length)
         ? fsToPath(fs)
         : `/workbench/node/${currentId}`
 
+    console.log('[State→URL] targetPath:', targetPath, 'lastPath:', lastPathRef.current)
+
     if (targetPath && targetPath !== lastPathRef.current) {
-      // Avoid thrashing the stack on initial hydration — replace on first write
-      if (!lastPathRef.current) {
-        window.history.replaceState({}, '', targetPath)
-      } else {
-        window.history.pushState({}, '', targetPath)
-      }
+      const isFirstWrite = !lastPathRef.current
+      console.log('[State→URL] Navigating to:', targetPath, 'replace:', isFirstWrite)
+      // Update lastPathRef BEFORE navigation so it's available immediately
       lastPathRef.current = targetPath
+      // Use router.navigate to properly update TanStack Router state
+      router.navigate({ to: targetPath, replace: isFirstWrite })
     }
-  }, [currentId, fsPreview, selectedPartId, chosen])
+  }, [currentId, fsPreview, selectedPartId, chosen, lineageQ.data, router])
 
   return (
     <div className="p-4">
@@ -332,7 +403,7 @@ export default function App() {
                       <PartsPanel
                         parts={parts.data as any}
                         selectedPartId={selectedPartId}
-                        onSelect={setSelectedPartId}
+                        onSelect={(id) => setSelectedPartId(normalizePartId(id))}
                       />
                     </div>
                     <div className="min-h-0 overflow-auto">

@@ -1,0 +1,102 @@
+{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus","part_id":"part:muscle","name":"Beef","display_name":"Beef"}
+{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:suidae:sus:scrofa_domesticus","part_id":"part:muscle","name":"Pork","display_name":"Pork"}
+{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:bovidae:capra:hircus","part_id":"part:muscle","name":"Goat","display_name":"Goat"}
+{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:bovidae:ovis:aries","part_id":"part:muscle","name":"Lamb","display_name":"Lamb"}
+{"taxon_id":"tx:animalia:chordata:aves:galliformes:phasianidae:gallus:gallus_domesticus","part_id":"part:muscle","name":"Chicken","display_name":"Chicken"}
+{"taxon_id":"tx:animalia:chordata:aves:galliformes:meleagrididae:meleagris:gallopavo_domesticus","part_id":"part:muscle","name":"Turkey","display_name":"Turkey"}
+{"taxon_id":"tx:animalia:chordata:aves:anseriformes:anatidae:anas:platyrhynchos_domesticus","part_id":"part:muscle","name":"Duck","display_name":"Duck"}
+{"taxon_id":"tx:animalia:chordata:aves:anseriformes:anatidae:anser:anser_domesticus","part_id":"part:muscle","name":"Goose","display_name":"Goose"}
+{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:bovidae:bison:bison","part_id":"part:muscle","name":"Bison","display_name":"Bison"}
+{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:cervidae:cervus:elaphus","part_id":"part:muscle","name":"Venison","display_name":"Venison"}
+{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:cervidae:odocoileus:virginianus","part_id":"part:muscle","name":"Venison","display_name":"Venison"}
+
+{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus","part_id":"part:milk","name":"Cow Milk","display_name":"Cow Milk"}
+{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:bovidae:capra:hircus","part_id":"part:milk","name":"Goat Milk","display_name":"Goat Milk"}
+{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:bovidae:ovis:aries","part_id":"part:milk","name":"Sheep Milk","display_name":"Sheep Milk"}
+{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:bovidae:bubalus:bubalis","part_id":"part:milk","name":"Buffalo Milk","display_name":"Buffalo Milk"}
+{"taxon_id":"tx:animalia:chordata:mammalia:perissodactyla:equidae:equus:caballus","part_id":"part:milk","name":"Horse Milk","display_name":"Horse Milk"}
+{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:camelidae:camelus:dromedarius","part_id":"part:milk","name":"Camel Milk","display_name":"Camel Milk"}
+{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:camelidae:camelus:bactrianus","part_id":"part:milk","name":"Camel Milk","display_name":"Camel Milk"}
+{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:cervidae:rangifer:tarandus","part_id":"part:milk","name":"Reindeer Milk","display_name":"Reindeer Milk"}
+
+{"taxon_id":"tx:animalia:chordata:aves:galliformes:phasianidae:gallus:gallus_domesticus","part_id":"part:egg","name":"Chicken Egg","display_name":"Chicken Egg"}
+{"taxon_id":"tx:animalia:chordata:aves:anseriformes:anatidae:anas:platyrhynchos_domesticus","part_id":"part:egg","name":"Duck Egg","display_name":"Duck Egg"}
+{"taxon_id":"tx:animalia:chordata:aves:anseriformes:anatidae:anser:anser_domesticus","part_id":"part:egg","name":"Goose Egg","display_name":"Goose Egg"}
+{"taxon_id":"tx:animalia:chordata:aves:galliformes:meleagrididae:meleagris:gallopavo_domesticus","part_id":"part:egg","name":"Turkey Egg","display_name":"Turkey Egg"}
+{"taxon_id":"tx:animalia:chordata:aves:galliformes:phasianidae:coturnix:japonica","part_id":"part:egg","name":"Quail Egg","display_name":"Quail Egg"}
+
+{"taxon_id":"tx:plantae:poaceae:zea:mays","part_id":"part:grain","name":"Corn","display_name":"Corn"}
+
+{"taxon_id":"tx:animalia:chordata:aves:struthioniformes:struthionidae:struthio:camelus","part_id":"part:muscle","name":"Ostrich","display_name":"Ostrich"}
+{"taxon_id":"tx:animalia:chordata:aves:casuariiformes:dromaiidae:dromaius:novaehollandiae","part_id":"part:muscle","name":"Emu","display_name":"Emu"}
+{"taxon_id":"tx:animalia:chordata:aves:rheiformes:rheidae:rhea:americana","part_id":"part:muscle","name":"Rhea","display_name":"Rhea"}
+{"taxon_id":"tx:animalia:chordata:aves:galliformes:phasianidae:phasianus:colchicus","part_id":"part:muscle","name":"Pheasant","display_name":"Pheasant"}
+{"taxon_id":"tx:animalia:chordata:aves:guineafowliformes:numididae:numida:meleagris","part_id":"part:muscle","name":"Guinea Fowl","display_name":"Guinea Fowl"}
+{"taxon_id":"tx:animalia:chordata:aves:columbiformes:columbidae:columba:livia_domestica","part_id":"part:muscle","name":"Squab","display_name":"Squab"}
+{"taxon_id":"tx:animalia:chordata:mammalia:lagomorpha:leporidae:oryctolagus:cuniculus","part_id":"part:muscle","name":"Rabbit","display_name":"Rabbit"}
+{"taxon_id":"tx:animalia:chordata:mammalia:lagomorpha:leporidae:lepus:europeaus","part_id":"part:muscle","name":"Hare","display_name":"Hare"}
+{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:cervidae:cervus:canadensis","part_id":"part:muscle","name":"Elk","display_name":"Elk"}
+{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:cervidae:alces:alces","part_id":"part:muscle","name":"Moose","display_name":"Moose"}
+{"taxon_id":"tx:animalia:chordata:mammalia:perissodactyla:equidae:equus:caballus","part_id":"part:muscle","name":"Horse","display_name":"Horse"}
+{"taxon_id":"tx:animalia:chordata:mammalia:perissodactyla:equidae:equus:asinus","part_id":"part:muscle","name":"Donkey","display_name":"Donkey"}
+
+{"taxon_id":"tx:animalia:chordata:aves:struthioniformes:struthionidae:struthio:camelus","part_id":"part:egg","name":"Ostrich Egg","display_name":"Ostrich Egg"}
+{"taxon_id":"tx:animalia:chordata:aves:casuariiformes:dromaiidae:dromaius:novaehollandiae","part_id":"part:egg","name":"Emu Egg","display_name":"Emu Egg"}
+{"taxon_id":"tx:animalia:chordata:aves:rheiformes:rheidae:rhea:americana","part_id":"part:egg","name":"Rhea Egg","display_name":"Rhea Egg"}
+{"taxon_id":"tx:animalia:chordata:aves:galliformes:phasianidae:phasianus:colchicus","part_id":"part:egg","name":"Pheasant Egg","display_name":"Pheasant Egg"}
+{"taxon_id":"tx:animalia:chordata:aves:guineafowliformes:numididae:numida:meleagris","part_id":"part:egg","name":"Guinea Fowl Egg","display_name":"Guinea Fowl Egg"}
+{"taxon_id":"tx:animalia:chordata:aves:columbiformes:columbidae:columba:livia_domestica","part_id":"part:egg","name":"Pigeon Egg","display_name":"Pigeon Egg"}
+{"taxon_id":"tx:animalia:chordata:aves:anseriformes:anatidae:cairina:moschata_domestica","part_id":"part:egg","name":"Muscovy Duck Egg","display_name":"Muscovy Duck Egg"}
+
+{"taxon_id":"tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae:salmo:salar","part_id":"part:muscle","name":"Salmon","display_name":"Salmon"}
+{"taxon_id":"tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae:oncorhynchus:mykiss","part_id":"part:muscle","name":"Trout","display_name":"Trout"}
+{"taxon_id":"tx:animalia:chordata:actinopterygii:scombriformes:scombridae:thunnus:albacares","part_id":"part:muscle","name":"Tuna","display_name":"Tuna"}
+{"taxon_id":"tx:animalia:chordata:actinopterygii:scombriformes:scombridae:thunnus:obesus","part_id":"part:muscle","name":"Tuna","display_name":"Tuna"}
+{"taxon_id":"tx:animalia:chordata:actinopterygii:gadiformes:gadoidea:gadus:morhua","part_id":"part:muscle","name":"Cod","display_name":"Cod"}
+{"taxon_id":"tx:animalia:chordata:actinopterygii:gadiformes:gadoidea:melanogrammus:aeglefinus","part_id":"part:muscle","name":"Haddock","display_name":"Haddock"}
+{"taxon_id":"tx:animalia:chordata:actinopterygii:gadiformes:gadoidea:gadus:chalcogrammus","part_id":"part:muscle","name":"Pollock","display_name":"Pollock"}
+{"taxon_id":"tx:animalia:chordata:actinopterygii:clupeiformes:clupeidae:clupea:harengus","part_id":"part:muscle","name":"Herring","display_name":"Herring"}
+{"taxon_id":"tx:animalia:chordata:actinopterygii:clupeiformes:engraulidae:engraulis:encrasicolus","part_id":"part:muscle","name":"Anchovy","display_name":"Anchovy"}
+{"taxon_id":"tx:animalia:chordata:actinopterygii:clupeiformes:clupeidae:sardina:pilchardus","part_id":"part:muscle","name":"Sardine","display_name":"Sardine"}
+{"taxon_id":"tx:animalia:chordata:actinopterygii:scombriformes:scombridae:scomber:scombrus","part_id":"part:muscle","name":"Mackerel","display_name":"Mackerel"}
+{"taxon_id":"tx:animalia:chordata:actinopterygii:carangiformes:xiphiidae:xiphias:gladius","part_id":"part:muscle","name":"Swordfish","display_name":"Swordfish"}
+{"taxon_id":"tx:animalia:chordata:actinopterygii:pleuronectiformes:hippoglossidae:hippoglossus:hippoglossus","part_id":"part:muscle","name":"Halibut","display_name":"Halibut"}
+
+{"taxon_id":"tx:animalia:arthropoda:malacostraca:decapoda:penaeidae:litopenaeus:vannamei","part_id":"part:muscle","name":"Shrimp","display_name":"Shrimp"}
+{"taxon_id":"tx:animalia:arthropoda:malacostraca:decapoda:penaeidae:penaeus:monodon","part_id":"part:muscle","name":"Prawn","display_name":"Prawn"}
+{"taxon_id":"tx:animalia:arthropoda:malacostraca:decapoda:nephropidae:homarus:americanus","part_id":"part:muscle","name":"Lobster","display_name":"Lobster"}
+{"taxon_id":"tx:animalia:arthropoda:malacostraca:decapoda:palinuridae:panulirus:argus","part_id":"part:muscle","name":"Spiny Lobster","display_name":"Spiny Lobster"}
+{"taxon_id":"tx:animalia:arthropoda:malacostraca:decapoda:portunidae:callinectes:sapidus","part_id":"part:muscle","name":"Blue Crab","display_name":"Blue Crab"}
+{"taxon_id":"tx:animalia:arthropoda:malacostraca:decapoda:canceridae:cancer:pagurus","part_id":"part:muscle","name":"Brown Crab","display_name":"Brown Crab"}
+
+{"taxon_id":"tx:animalia:mollusca:bivalvia:ostreida:ostreidae:crassostrea:gigas","part_id":"part:muscle","name":"Pacific Oyster","display_name":"Pacific Oyster"}
+{"taxon_id":"tx:animalia:mollusca:bivalvia:ostreida:ostreidae:crassostrea:virginica","part_id":"part:muscle","name":"Eastern Oyster","display_name":"Eastern Oyster"}
+{"taxon_id":"tx:animalia:mollusca:bivalvia:mytilida:mytilidae:mytilus:edulis","part_id":"part:muscle","name":"Mussel","display_name":"Mussel"}
+{"taxon_id":"tx:animalia:mollusca:bivalvia:venerida:veneridae:ruditapes:philippinarum","part_id":"part:muscle","name":"Manila Clam","display_name":"Manila Clam"}
+{"taxon_id":"tx:animalia:mollusca:bivalvia:venerida:veneridae:mercenaria:mercenaria","part_id":"part:muscle","name":"Hard Clam","display_name":"Hard Clam"}
+{"taxon_id":"tx:animalia:mollusca:bivalvia:pectinida:pectinidae:placopecten:magellanicus","part_id":"part:muscle","name":"Sea Scallop","display_name":"Sea Scallop"}
+{"taxon_id":"tx:animalia:mollusca:bivalvia:pectinida:pectinidae:pecten:maximus","part_id":"part:muscle","name":"King Scallop","display_name":"King Scallop"}
+
+{"taxon_id":"tx:animalia:mollusca:cephalopoda:teuthida:loliginidae:doryteuthis:opalescens","part_id":"part:muscle","name":"Squid","display_name":"Squid"}
+{"taxon_id":"tx:animalia:mollusca:cephalopoda:sepiida:sepiidae:sepia:officinalis","part_id":"part:muscle","name":"Cuttlefish","display_name":"Cuttlefish"}
+{"taxon_id":"tx:animalia:mollusca:cephalopoda:octopoda:octopodidae:octopus:vulgaris","part_id":"part:muscle","name":"Octopus","display_name":"Octopus"}
+
+{"taxon_id":"tx:animalia:chordata:actinopterygii:acipenseriformes:acipenseridae:acipenser:baerii","part_id":"part:roe","name":"Caviar","display_name":"Caviar (Sturgeon)"}
+
+{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus","part_id":"part:milk","name":"Cow Milk","display_name":"Cow Milk"}
+{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:bovidae:capra:hircus","part_id":"part:milk","name":"Goat Milk","display_name":"Goat Milk"}
+{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:bovidae:ovis:aries","part_id":"part:milk","name":"Sheep Milk","display_name":"Sheep Milk"}
+{"taxon_id":"tx:animalia:chordata:aves:galliformes:phasianidae:gallus:gallus_domesticus","part_id":"part:egg","name":"Chicken Egg","display_name":"Chicken Egg"}
+{"taxon_id":"tx:animalia:chordata:actinopterygii:gadiformes:gadidae:gadus:morhua","part_id":"part:muscle","name":"Cod","display_name":"Cod"}
+{"taxon_id":"tx:animalia:chordata:actinopterygii:gadiformes:gadidae:melanogrammus:aeglefinus","part_id":"part:muscle","name":"Haddock","display_name":"Haddock"}
+{"taxon_id":"tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae:salmo:salar","part_id":"part:muscle","name":"Salmon","display_name":"Salmon"}
+{"taxon_id":"tx:animalia:arthropoda:malacostraca:decapoda:penaeidae:litopenaeus:vannamei","part_id":"part:muscle","name":"Shrimp","display_name":"Shrimp"}
+{"taxon_id":"tx:animalia:arthropoda:malacostraca:decapoda:nephropidae:homarus:americanus","part_id":"part:muscle","name":"Lobster","display_name":"Lobster"}
+{"taxon_id":"tx:animalia:arthropoda:malacostraca:decapoda:cancridae:cancer:pagurus","part_id":"part:muscle","name":"Crab","display_name":"Crab"}
+{"taxon_id":"tx:animalia:mollusca:bivalvia:ostreida:ostreidae:crassostrea:virginica","part_id":"part:muscle","name":"Oysters","display_name":"Oysters"}
+{"taxon_id":"tx:animalia:mollusca:bivalvia:venerida:veneridae:mercenaria:mercenaria","part_id":"part:muscle","name":"Clams","display_name":"Clams"}
+{"taxon_id":"tx:animalia:mollusca:bivalvia:pectinida:pectinidae:placopecten:magellanicus","part_id":"part:muscle","name":"Scallops","display_name":"Scallops"}
+{"taxon_id":"tx:animalia:chordata:actinopterygii:acipenseriformes:acipenseridae:huso:huso","part_id":"part:roe","name":"Caviar","display_name":"Caviar (Beluga)"}
+{"taxon_id":"tx:animalia:chordata:actinopterygii:polyodontiformes:polyodontidae:polyodon:spathula","part_id":"part:roe","name":"Caviar","display_name":"Caviar (Paddlefish)"}
+{"taxon_id":"tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae:salmo:salar","part_id":"part:roe","name":"Salmon Roe","display_name":"Salmon Roe"}
+{"taxon_id":"tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae:oncorhynchus:keta","part_id":"part:roe","name":"Salmon Roe","display_name":"Salmon Roe"}

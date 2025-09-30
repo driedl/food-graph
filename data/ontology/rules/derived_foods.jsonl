@@ -1,0 +1,3 @@
+{"id":"tpt:bos_taurus:milk:yogurt","taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus","part_id":"part:milk","transforms":[{"id":"tf:ferment","params":{"starter":"yogurt_thermo"}}],"name":"Yogurt","synonyms":["Yoghurt","Dahi"]}
+{"id":"tpt:capra_hircus:milk:yogurt","taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:bovidae:capra:hircus","part_id":"part:milk","transforms":[{"id":"tf:ferment","params":{"starter":"yogurt_thermo"}}],"name":"Goat Yogurt"}
+{"id":"tpt:bos_taurus:milk:skim","taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus","part_id":"part:milk","transforms":[{"id":"tf:skim"}],"name":"Skim Milk","synonyms":["Nonfat Milk"]}

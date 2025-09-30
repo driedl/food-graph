@@ -14,7 +14,7 @@ import { Route as SplatRouteImport } from './routes/$'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WorkbenchIndexRouteImport } from './routes/workbench.index'
 import { Route as WorkbenchNodeIdRouteImport } from './routes/workbench.node.$id'
-import { Route as WorkbenchFsSplatFsRouteImport } from './routes/workbench.fs.$...fs'
+import { Route as WorkbenchFsSplatRouteImport } from './routes/workbench.fs.$'
 
 const WorkbenchRoute = WorkbenchRouteImport.update({
   id: '/workbench',
@@ -41,9 +41,9 @@ const WorkbenchNodeIdRoute = WorkbenchNodeIdRouteImport.update({
   path: '/node/$id',
   getParentRoute: () => WorkbenchRoute,
 } as any)
-const WorkbenchFsSplatFsRoute = WorkbenchFsSplatFsRouteImport.update({
-  id: '/fs/$/fs',
-  path: '/fs/$/fs',
+const WorkbenchFsSplatRoute = WorkbenchFsSplatRouteImport.update({
+  id: '/fs/$',
+  path: '/fs/$',
   getParentRoute: () => WorkbenchRoute,
 } as any)
 
@@ -52,15 +52,15 @@ export interface FileRoutesByFullPath {
   '/$': typeof SplatRoute
   '/workbench': typeof WorkbenchRouteWithChildren
   '/workbench/': typeof WorkbenchIndexRoute
+  '/workbench/fs/$': typeof WorkbenchFsSplatRoute
   '/workbench/node/$id': typeof WorkbenchNodeIdRoute
-  '/workbench/fs/$/fs': typeof WorkbenchFsSplatFsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/workbench': typeof WorkbenchIndexRoute
+  '/workbench/fs/$': typeof WorkbenchFsSplatRoute
   '/workbench/node/$id': typeof WorkbenchNodeIdRoute
-  '/workbench/fs/$/fs': typeof WorkbenchFsSplatFsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -68,8 +68,8 @@ export interface FileRoutesById {
   '/$': typeof SplatRoute
   '/workbench': typeof WorkbenchRouteWithChildren
   '/workbench/': typeof WorkbenchIndexRoute
+  '/workbench/fs/$': typeof WorkbenchFsSplatRoute
   '/workbench/node/$id': typeof WorkbenchNodeIdRoute
-  '/workbench/fs/$/fs': typeof WorkbenchFsSplatFsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -78,18 +78,18 @@ export interface FileRouteTypes {
     | '/$'
     | '/workbench'
     | '/workbench/'
+    | '/workbench/fs/$'
     | '/workbench/node/$id'
-    | '/workbench/fs/$/fs'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$' | '/workbench' | '/workbench/node/$id' | '/workbench/fs/$/fs'
+  to: '/' | '/$' | '/workbench' | '/workbench/fs/$' | '/workbench/node/$id'
   id:
     | '__root__'
     | '/'
     | '/$'
     | '/workbench'
     | '/workbench/'
+    | '/workbench/fs/$'
     | '/workbench/node/$id'
-    | '/workbench/fs/$/fs'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -135,11 +135,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkbenchNodeIdRouteImport
       parentRoute: typeof WorkbenchRoute
     }
-    '/workbench/fs/$/fs': {
-      id: '/workbench/fs/$/fs'
-      path: '/fs/$/fs'
-      fullPath: '/workbench/fs/$/fs'
-      preLoaderRoute: typeof WorkbenchFsSplatFsRouteImport
+    '/workbench/fs/$': {
+      id: '/workbench/fs/$'
+      path: '/fs/$'
+      fullPath: '/workbench/fs/$'
+      preLoaderRoute: typeof WorkbenchFsSplatRouteImport
       parentRoute: typeof WorkbenchRoute
     }
   }
@@ -147,14 +147,14 @@ declare module '@tanstack/react-router' {
 
 interface WorkbenchRouteChildren {
   WorkbenchIndexRoute: typeof WorkbenchIndexRoute
+  WorkbenchFsSplatRoute: typeof WorkbenchFsSplatRoute
   WorkbenchNodeIdRoute: typeof WorkbenchNodeIdRoute
-  WorkbenchFsSplatFsRoute: typeof WorkbenchFsSplatFsRoute
 }
 
 const WorkbenchRouteChildren: WorkbenchRouteChildren = {
   WorkbenchIndexRoute: WorkbenchIndexRoute,
+  WorkbenchFsSplatRoute: WorkbenchFsSplatRoute,
   WorkbenchNodeIdRoute: WorkbenchNodeIdRoute,
-  WorkbenchFsSplatFsRoute: WorkbenchFsSplatFsRoute,
 }
 
 const WorkbenchRouteWithChildren = WorkbenchRoute._addFileChildren(

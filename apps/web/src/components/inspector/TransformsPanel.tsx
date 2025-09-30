@@ -1,6 +1,7 @@
+import { memo } from 'react'
 import { Badge } from '@ui/badge'
 
-export function TransformsPanel({
+export const TransformsPanel = memo(function TransformsPanel({
   loading,
   data,
   chosen,
@@ -124,4 +125,4 @@ export function TransformsPanel({
       </div>
     </div>
   )
-}
+})

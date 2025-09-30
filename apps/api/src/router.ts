@@ -293,56 +293,92 @@ export const appRouter = t.router({
         return rows
       }),
 
+    getTaxonPart: t.procedure
+      .input(z.object({ id: z.string() })) // "tp:tx:...:part:milk"
+      .query(({ input, ctx }) => {
+        const db = ctx.db
+        const row = db.prepare(`
+          SELECT 
+            tp.id, tp.name, tp.display_name, tp.slug, tp.rank, tp.kind,
+            tp.taxon_id, tp.part_id,
+            n.name as taxon_name, n.rank as taxon_rank,
+            p.name as part_name
+          FROM taxon_part_nodes tp
+          JOIN nodes n ON n.id = tp.taxon_id
+          JOIN part_def p ON p.id = tp.part_id
+          WHERE tp.id = ?
+        `).get(input.id)
+        if (!row) throw new TRPCError({ code: 'NOT_FOUND' })
+        return row
+      }),
+
   }),
 
   search: t.router({
-    unified: t.procedure
-      .input(z.object({
-        q: z.string().min(1),
-        limit: z.number().min(1).max(100).default(25),
-        rankFilter: z.array(z.string()).optional() // e.g. ['species','product']
-      }))
-      .query(({ input }) => {
-        const q = input.q.trim()
-        const filter = input.rankFilter && input.rankFilter.length
-          ? `AND n.rank IN (${input.rankFilter.map(() => '?').join(',')})` : ''
-        const params: any[] = []
-        const nodeQ = q.split(/\s+/).map(t => t + '*').join(' AND ')
-        const docQ = q // FTS5 default syntax is fine here
+    combined: t.procedure
+      .input(
+        z.object({
+          q: z.string().min(1),
+          limit: z.number().min(1).max(100).default(20),
+          kinds: z.array(z.enum(['taxon', 'taxon_part'])).optional()
+        })
+      )
+      .query(({ input, ctx }) => {
+        const { q, limit, kinds } = input
+        const db = ctx.db
 
-        // Nodes FTS
-        const nodes = db.prepare(`
-          SELECT n.id, n.name, n.slug, n.rank,
-                 bm25(nodes_fts, 1.0, 0.5, 0.2, 0.1) AS score, 'taxon' AS kind
-          FROM nodes n
-          JOIN nodes_fts fts ON n.name = fts.name AND n.rank = fts.taxon_rank
-          WHERE nodes_fts MATCH ?
-          ${filter}
-          ORDER BY score ASC, n.name
-          LIMIT ?
-        `).all(nodeQ, ...(input.rankFilter || []), input.limit)
+        const results: any[] = []
 
-        // Docs FTS → mapped to taxon
-        const docs = db.prepare(`
-          SELECT n.id, n.name, n.slug, n.rank,
-                 bm25(taxon_doc_fts, 1.0, 1.0) AS score, 'doc' AS kind
-          FROM taxon_doc_fts d
-          JOIN nodes n ON n.id = d.taxon_id
-          WHERE taxon_doc_fts MATCH ?
-          ${filter}
-          ORDER BY score ASC, n.name
-          LIMIT ?
-        `).all(docQ, ...(input.rankFilter || []), input.limit)
+        const wantTaxa = !kinds || kinds.includes('taxon')
+        const wantTP = !kinds || kinds.includes('taxon_part')
 
-        // Merge & re-rank (simple: take best unique per id)
-        const byId = new Map<string, SearchResult>()
-        for (const r of [...nodes, ...docs] as SearchResult[]) {
-          const prev = byId.get(r.id)
-          if (!prev || r.score < prev.score) byId.set(r.id, r)
+        if (wantTaxa) {
+          const taxa = db.prepare(`
+            SELECT n.id, n.name, n.slug, n.rank, n.parent_id as parentId,
+                   bm25(nodes_fts) AS score, 'taxon' AS kind
+            FROM nodes n
+            JOIN nodes_fts fts ON n.name = fts.name AND n.rank = fts.taxon_rank
+            WHERE nodes_fts MATCH ?
+              AND fts.taxon_rank != 'taxon_part'
+            ORDER BY bm25(nodes_fts) ASC
+            LIMIT ?
+          `).all(q, limit) as any[]
+          results.push(...taxa)
         }
-        return Array.from(byId.values())
+
+        if (wantTP) {
+          const tps = db.prepare(`
+            SELECT tp.id, tp.name, tp.slug, tp.rank, tp.taxon_id as parentId,
+                   /* nudge TP slightly higher for foody queries */
+                   bm25(nodes_fts) * 0.9 AS score,
+                   'taxon_part' AS kind
+            FROM taxon_part_nodes tp
+            JOIN nodes_fts fts ON tp.name = fts.name AND fts.taxon_rank = 'taxon_part'
+            WHERE nodes_fts MATCH ?
+            ORDER BY bm25(nodes_fts) ASC
+            LIMIT ?
+          `).all(q, limit) as any[]
+          results.push(...tps)
+        }
+
+        // De-dupe: when a taxon and its TP share the same display name, prefer TP
+        const byName = new Map<string, any>() // lowercased name -> best row
+        for (const r of results) {
+          const key = (r.name || '').toLowerCase()
+          const prev = byName.get(key)
+          if (!prev) {
+            byName.set(key, r)
+          } else {
+            // prefer taxon_part; else lower score (better rank)
+            const prefer = (r.kind === 'taxon_part' && prev.kind !== 'taxon_part')
+              || (r.score < prev.score)
+            if (prefer) byName.set(key, r)
+          }
+        }
+
+        return Array.from(byName.values())
           .sort((a, b) => a.score - b.score)
-          .slice(0, input.limit)
+          .slice(0, limit)
       }),
   }),
 
