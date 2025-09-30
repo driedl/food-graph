@@ -1,3 +1,0 @@
--- FTS table creation moved to ETL pipeline
--- This migration is now deprecated as FTS is created during database compilation
--- Keeping file for reference but no longer executed

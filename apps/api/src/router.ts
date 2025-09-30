@@ -295,8 +295,7 @@ export const appRouter = t.router({
 
     getTaxonPart: t.procedure
       .input(z.object({ id: z.string() })) // "tp:tx:...:part:milk"
-      .query(({ input, ctx }) => {
-        const db = ctx.db
+      .query(({ input }) => {
         const row = db.prepare(`
           SELECT 
             tp.id, tp.name, tp.display_name, tp.slug, tp.rank, tp.kind,
@@ -323,9 +322,8 @@ export const appRouter = t.router({
           kinds: z.array(z.enum(['taxon', 'taxon_part'])).optional()
         })
       )
-      .query(({ input, ctx }) => {
+      .query(({ input }) => {
         const { q, limit, kinds } = input
-        const db = ctx.db
 
         const results: any[] = []
 

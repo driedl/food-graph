@@ -2,7 +2,6 @@ import Database from 'better-sqlite3'
 import path from 'node:path'
 import fs from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import { ulid } from 'ulid'
 import { env } from '@nutrition/config'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -15,108 +14,138 @@ console.log('[api] Connecting to database:', DB_FILE)
 export const db = new Database(DB_FILE)
 db.pragma('journal_mode = WAL')
 
-export function migrate() {
-  // Ensure schema_version table exists
-  db.exec(`CREATE TABLE IF NOT EXISTS schema_version (version INTEGER PRIMARY KEY);`)
+function copyETLArtifact() {
+  const src = env.ETL_DB_PATH
+  const dst = env.DB_PATH
   
-  // Check if database is already built by ETL pipeline
-  const etlBuilt = checkETLDatabase()
-  const migrationVersion = getCurrentMigrationVersion()
-  
-  if (etlBuilt && migrationVersion >= 4) {
-    console.log('[api] Database built by ETL pipeline with migrations up-to-date, skipping')
-    return
+  if (!fs.existsSync(src)) {
+    throw new Error(`[api] ETL artifact not found at ${src}. Run ETL compile first.`)
   }
   
-  if (etlBuilt && migrationVersion < 4) {
-    console.log('[api] Database built by ETL pipeline but migrations need to be applied')
-  } else if (!etlBuilt) {
-    console.log('[api] Database not built by ETL pipeline, running migrations')
-  }
+  console.log(`[api] Auto-copying ETL artifact: ${src} -> ${dst}`)
+  
+  // Ensure destination directory exists
+  fs.mkdirSync(path.dirname(dst), { recursive: true })
+  
+  // Copy main database file
+  fs.copyFileSync(src, dst)
+  
+  // Copy WAL/SHM files if they exist (for WAL mode)
+  const walSrc = `${src}-wal`
+  const shmSrc = `${src}-shm`
+  const walDst = `${dst}-wal`
+  const shmDst = `${dst}-shm`
+  
+  if (fs.existsSync(walSrc)) fs.copyFileSync(walSrc, walDst)
+  if (fs.existsSync(shmSrc)) fs.copyFileSync(shmSrc, shmDst)
+  
+  console.log('[api] ETL artifact copied successfully')
+}
 
-  const files = fs.readdirSync(path.join(__dirname, '..', 'migrations')).sort()
-  let applied = 0
-  for (const f of files) {
-    const ver = Number(f.split('_')[0])
-    if (ver > migrationVersion) {
-      const sql = fs.readFileSync(path.join(__dirname, '..', 'migrations', f), 'utf-8')
-      try {
-        db.exec(sql)
-        db.prepare('INSERT INTO schema_version(version) VALUES (?)').run(ver)
-        applied++
-      } catch (error: any) {
-        // Ignore duplicate column errors when ETL database already has the columns
-        if (error.code === 'SQLITE_ERROR' && error.message.includes('duplicate column name')) {
-          console.log(`[api] Migration ${ver} skipped: column already exists (ETL database)`)
-          db.prepare('INSERT INTO schema_version(version) VALUES (?)').run(ver)
-          applied++
-        } else {
-          throw error
-        }
-      }
+function tableExists(name: string): boolean {
+  const row = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name=?").get(name)
+  return !!row
+}
+
+function getMetaVersion(): number | null {
+  try {
+    if (!tableExists('meta')) return null
+    const row = db.prepare("SELECT val FROM meta WHERE key='schema_version'").get() as { val?: string } | undefined
+    return row?.val ? Number(row.val) : null
+  } catch { return null }
+}
+
+function getUserVersion(): number | null {
+  try {
+    const row = db.prepare('PRAGMA user_version').get() as { user_version?: number }
+    return typeof row?.user_version === 'number' ? row.user_version : null
+  } catch { return null }
+}
+
+function getArtifactAge(): number | null {
+  try {
+    if (!tableExists('meta')) return null
+    const row = db.prepare("SELECT val FROM meta WHERE key='built_at'").get() as { val?: string } | undefined
+    if (!row?.val) return null
+    
+    const builtAt = new Date(row.val).getTime()
+    const now = Date.now()
+    return Math.floor((now - builtAt) / (1000 * 60 * 60 * 24)) // days
+  } catch { return null }
+}
+
+export function verifyGraphArtifact() {
+  // Basic presence checks
+  const requiredTables = ['nodes', 'nodes_fts', 'part_def', 'has_part', 'taxon_part_nodes']
+  const missing = requiredTables.filter(t => !tableExists(t))
+  if (missing.length) {
+    if (env.AUTO_COPY_ETL_DB === 'true') {
+      console.log(`[api] Graph DB missing required tables: ${missing.join(', ')}. Auto-copying from ETL...`)
+      copyETLArtifact()
+      // Reconnect to the copied database
+      db.close()
+      const newDb = new Database(env.DB_PATH)
+      Object.assign(db, newDb)
+      db.pragma('journal_mode = WAL')
+      // Re-run verification on the copied database
+      return verifyGraphArtifact()
+    } else {
+      throw new Error(
+        `[api] Graph DB is missing required tables: ${missing.join(', ')}. ` +
+        `Rebuild via ETL and copy the artifact to ${env.DB_PATH}.`
+      )
     }
   }
-  if (applied) console.log(`[api] migrations applied: ${applied}`)
-}
 
-function checkETLDatabase(): boolean {
-  try {
-    // Check for key ETL-created tables
-    const tables = ['part_def', 'transform_def', 'nodes_fts']
-    for (const table of tables) {
-      const result = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name=?").get(table)
-      console.log(`[api] Checking table ${table}:`, result ? 'found' : 'missing')
-      if (!result) return false
+  // Version checks
+  const metaVer = getMetaVersion()
+  const pragmaVer = getUserVersion()
+  const ver = metaVer ?? pragmaVer
+  if (ver == null) {
+    if (env.AUTO_COPY_ETL_DB === 'true') {
+      console.log('[api] Graph DB has no schema version. Auto-copying from ETL...')
+      copyETLArtifact()
+      // Reconnect and re-verify
+      db.close()
+      const newDb = new Database(env.DB_PATH)
+      Object.assign(db, newDb)
+      db.pragma('journal_mode = WAL')
+      return verifyGraphArtifact()
+    } else {
+      throw new Error(
+        `[api] Graph DB has no schema version (meta.schema_version or PRAGMA user_version). ` +
+        `Rebuild via ETL >= v${env.MIN_GRAPH_SCHEMA_VERSION} and copy the artifact.`
+      )
     }
-    console.log('[api] ETL database detected: all required tables found')
-    return true
-  } catch (error) {
-    console.log('[api] ETL database check failed:', error)
-    return false
   }
-}
-
-function getCurrentMigrationVersion(): number {
-  try {
-    const get = db.prepare('SELECT max(version) as v FROM schema_version').get() as { v: number | null }
-    return get.v ?? 0
-  } catch {
-    return 0
+  if (ver < env.MIN_GRAPH_SCHEMA_VERSION) {
+    if (env.AUTO_COPY_ETL_DB === 'true') {
+      console.log(`[api] Graph DB schema_version=${ver} is below API requirement=${env.MIN_GRAPH_SCHEMA_VERSION}. Auto-copying from ETL...`)
+      copyETLArtifact()
+      // Reconnect and re-verify
+      db.close()
+      const newDb = new Database(env.DB_PATH)
+      Object.assign(db, newDb)
+      db.pragma('journal_mode = WAL')
+      return verifyGraphArtifact()
+    } else {
+      throw new Error(
+        `[api] Graph DB schema_version=${ver} is below API requirement=${env.MIN_GRAPH_SCHEMA_VERSION}. ` +
+        `Rebuild via ETL and copy the new artifact.`
+      )
+    }
   }
-}
-
-export function isEmpty() {
-  try {
-    const row = db.prepare('SELECT COUNT(*) as c FROM nodes').get() as { c: number }
-    return row.c === 0
-  } catch {
-    return true
-  }
-}
-
-export function seedMinimal() {
-  console.warn('⚠️  Using minimal seed data. Run "pnpm db:build" to load full ontology data.')
   
-  const insertNode = db.prepare('INSERT INTO nodes (id, name, slug, rank, parent_id) VALUES (?, ?, ?, ?, ?)')
-  const makeId = (slug: string) => slug + ':' + ulid().slice(0,6)
-
-  const rootId = makeId('food')
-  insertNode.run(rootId, 'Food', 'food', 'root', null)
-
-  const kingdoms = [
-    ['plant', 'Plant', 'kingdom'],
-    ['animal', 'Animal', 'kingdom'],
-    ['fungi', 'Fungi', 'kingdom'],
-    ['microbe', 'Microbe', 'kingdom'],
-    ['mineral', 'Mineral', 'kingdom'],
-  ] as const
-
-  for (const [slug, name, rank] of kingdoms) {
-    insertNode.run(makeId(slug), name, slug, rank, rootId)
+  const builtAt = tableExists('meta')
+    ? (db.prepare("SELECT val FROM meta WHERE key='built_at'").get() as { val?: string } | undefined)?.val
+    : undefined
+  const age = getArtifactAge()
+  const ageWarning = age && age > 7 ? ` (⚠️ ${age} days old)` : ''
+  
+  console.log(`[api] Graph DB verified (schema_version=${ver}${builtAt ? `, built_at=${builtAt}` : ''}${ageWarning})`)
+  
+  // Warning for old artifacts in development
+  if (env.NODE_ENV === 'development' && age && age > 7) {
+    console.warn(`[api] Graph artifact is ${age} days old. Consider rebuilding with ETL for latest changes.`)
   }
-
-  // seed a few attributes
-  const attrs = ['process','style','fat_class','fat_pct','lean_pct','salt_level','refinement','enrichment','species','color','variety']
-  const insertAttr = db.prepare('INSERT OR IGNORE INTO attr_def (attr, kind) VALUES (?, ?)')
-  for (const a of attrs) insertAttr.run(a, 'categorical')
 }

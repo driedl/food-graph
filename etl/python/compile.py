@@ -896,6 +896,27 @@ cur.execute("""
 
 print_success("Created FTS triggers for automatic synchronization")
 
+# ---------------------------------------------------------------------
+# Artifact metadata (schema versioning for API startup checks)
+# ---------------------------------------------------------------------
+print_step("6.5/6", "Writing artifact metadata...")
+SCHEMA_VERSION = 5  # bump when you change compiled DB schema/shape
+
+cur.execute("""
+  CREATE TABLE IF NOT EXISTS meta (
+    key TEXT PRIMARY KEY,
+    val TEXT NOT NULL
+  )
+""")
+
+from datetime import timezone
+built_at = datetime.now(timezone.utc).isoformat()
+
+cur.execute("INSERT OR REPLACE INTO meta(key,val) VALUES (?,?)", ("schema_version", str(SCHEMA_VERSION)))
+cur.execute("INSERT OR REPLACE INTO meta(key,val) VALUES (?,?)", ("built_at", built_at))
+cur.execute("PRAGMA user_version = {}".format(SCHEMA_VERSION))
+print_success(f"Artifact versioned (schema_version={SCHEMA_VERSION}, built_at={built_at})")
+
 # Final commit and summary
 print("\n" + "=" * 50)
 print("📊 COMPILATION SUMMARY")

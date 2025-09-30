@@ -3,7 +3,7 @@ import Fastify from 'fastify'
 import cors from '@fastify/cors'
 import { fastifyTRPCPlugin } from '@trpc/server/adapters/fastify'
 import { appRouter } from './router'
-import { migrate, seedMinimal, isEmpty } from './db'
+import { verifyGraphArtifact } from './db'
 import { env } from '@nutrition/config'
 
 async function main() {
@@ -12,8 +12,8 @@ async function main() {
     origin: env.NODE_ENV === 'production' ? ['https://your.app'] : true 
   })
 
-  migrate()
-  if (isEmpty()) seedMinimal()
+  // Fail fast if the compiled graph DB is missing/outdated.
+  verifyGraphArtifact()
 
   await app.register(fastifyTRPCPlugin, {
     prefix: '/trpc',
