@@ -143,12 +143,22 @@ CREATE INDEX IF NOT EXISTS idx_tpn_part  ON taxon_part_nodes(part_id);
 """)
 
 print_info("Clearing existing data...")
+# Drop old triggers
 cur.execute("DROP TRIGGER IF EXISTS trg_nodes_ai")
 cur.execute("DROP TRIGGER IF EXISTS trg_nodes_ad") 
 cur.execute("DROP TRIGGER IF EXISTS trg_nodes_au")
 cur.execute("DROP TRIGGER IF EXISTS trg_synonyms_ai")
 cur.execute("DROP TRIGGER IF EXISTS trg_synonyms_ad")
+# Drop new triggers
+cur.execute("DROP TRIGGER IF EXISTS trg_taxa_ai")
+cur.execute("DROP TRIGGER IF EXISTS trg_taxa_ad")
+cur.execute("DROP TRIGGER IF EXISTS trg_taxa_au")
+cur.execute("DROP TRIGGER IF EXISTS trg_taxa_syn_ai")
+cur.execute("DROP TRIGGER IF EXISTS trg_taxa_syn_ad")
+# Drop old and new FTS tables
 cur.execute("DROP TABLE IF EXISTS nodes_fts")
+cur.execute("DROP TABLE IF EXISTS taxa_fts")
+cur.execute("DROP TABLE IF EXISTS tp_fts")
 cur.execute("DELETE FROM transform_applicability")
 cur.execute("DELETE FROM transform_def")
 cur.execute("DELETE FROM has_part")
@@ -793,115 +803,111 @@ if docs_rows:
     
     print_success(f"Inserted {docs_inserted} documentation records")
 
-# Create and populate FTS table for search functionality
-print_step("6/6", "Creating full-text search index...")
+# Create and populate FTS tables for search functionality
+print_step("6/6", "Creating full-text search indexes (taxa + TP)...")
 
-# Create contentless FTS table (columns read as NULL; index-only)
+# -----------------------
+# Taxa FTS (nodes → taxa_fts) with rowid parity + triggers
+# -----------------------
 cur.execute("""
-    CREATE VIRTUAL TABLE IF NOT EXISTS nodes_fts
-    USING fts5(name, synonyms, taxon_rank, kind, content='',
-               tokenize = 'unicode61 remove_diacritics 2');
+  CREATE VIRTUAL TABLE IF NOT EXISTS taxa_fts
+  USING fts5(name, synonyms, taxon_rank, kind, content='',
+             tokenize='unicode61 remove_diacritics 2');
+""")
+cur.execute("DELETE FROM taxa_fts")
+cur.execute("""
+  INSERT INTO taxa_fts(rowid, name, synonyms, taxon_rank, kind)
+  SELECT n.rowid,
+         n.name,
+         (
+           SELECT TRIM(COALESCE(GROUP_CONCAT(syn,' '), '')) FROM (
+             SELECT DISTINCT s2.synonym AS syn
+             FROM synonyms s2
+             WHERE s2.node_id = n.id
+             ORDER BY syn COLLATE NOCASE
+           )
+         ),
+         n.rank,
+         NULL
+  FROM nodes n;
 """)
 
-cur.execute("DELETE FROM nodes_fts")
-
-# TAXA → ensure rowid parity with nodes.rowid
+# Keep taxa_fts in sync while developing (safe even if DB is mostly read-only)
 cur.execute("""
-    INSERT INTO nodes_fts(rowid, name, synonyms, taxon_rank, kind)
-    SELECT n.rowid,
-           n.name,
-           (
-             SELECT TRIM(COALESCE(GROUP_CONCAT(syn,' '), '')) FROM (
-               SELECT DISTINCT s2.synonym AS syn
-               FROM synonyms s2
-               WHERE s2.node_id = n.id
-               ORDER BY syn COLLATE NOCASE
-             )
-           ),
-           n.rank,
-           NULL
-    FROM nodes n;
+  CREATE TRIGGER IF NOT EXISTS trg_taxa_ai AFTER INSERT ON nodes BEGIN
+    INSERT INTO taxa_fts(rowid, name, synonyms, taxon_rank, kind)
+    VALUES (
+      NEW.rowid,
+      NEW.name,
+      (
+        SELECT TRIM(COALESCE(GROUP_CONCAT(s.synonym,' '), ''))
+        FROM synonyms s WHERE s.node_id = NEW.id
+      ),
+      NEW.rank,
+      NULL
+    );
+  END;
+""")
+cur.execute("""
+  CREATE TRIGGER IF NOT EXISTS trg_taxa_ad AFTER DELETE ON nodes BEGIN
+    DELETE FROM taxa_fts WHERE rowid = OLD.rowid;
+  END;
+""")
+cur.execute("""
+  CREATE TRIGGER IF NOT EXISTS trg_taxa_au AFTER UPDATE OF name,rank ON nodes BEGIN
+    UPDATE taxa_fts
+    SET name = NEW.name, taxon_rank = NEW.rank
+    WHERE rowid = OLD.rowid;
+  END;
+""")
+cur.execute("""
+  CREATE TRIGGER IF NOT EXISTS trg_taxa_syn_ai AFTER INSERT ON synonyms BEGIN
+    UPDATE taxa_fts
+    SET synonyms = (
+      SELECT TRIM(COALESCE(GROUP_CONCAT(s2.synonym,' '), ''))
+      FROM synonyms s2 WHERE s2.node_id = NEW.node_id
+    )
+    WHERE rowid = (SELECT n.rowid FROM nodes n WHERE n.id = NEW.node_id);
+  END;
+""")
+cur.execute("""
+  CREATE TRIGGER IF NOT EXISTS trg_taxa_syn_ad AFTER DELETE ON synonyms BEGIN
+    UPDATE taxa_fts
+    SET synonyms = (
+      SELECT TRIM(COALESCE(GROUP_CONCAT(s2.synonym,' '), ''))
+      FROM synonyms s2 WHERE s2.node_id = OLD.node_id
+    )
+    WHERE rowid = (SELECT n.rowid FROM nodes n WHERE n.id = OLD.node_id);
+  END;
 """)
 
-# TP → FTS with rowid parity (so API can join on rowid)
-tpn_for_fts = cur.execute(
-    "SELECT rowid, taxon_id, part_id, name, COALESCE(kind,'') FROM taxon_part_nodes"
-).fetchall()
+# -----------------------
+# TP FTS (taxon_part_nodes → tp_fts) with rowid parity (no triggers required)
+# -----------------------
+cur.execute("""
+  CREATE VIRTUAL TABLE IF NOT EXISTS tp_fts
+  USING fts5(name, synonyms, taxon_rank, kind, content='',
+             tokenize='unicode61 remove_diacritics 2');
+""")
+cur.execute("DELETE FROM tp_fts")
 
-fts_tp_rows_with_rowid = []
-for rowid, tid, pid, nm, kind in tpn_for_fts:
-    syns = set(part_syn.get(pid, set()))
-    syns |= set(_tp_extra_synonyms(tid, pid))
-    fts_tp_rows_with_rowid.append((rowid, nm, " ".join(sorted(syns)), "taxon_part", kind))
-
-if fts_tp_rows_with_rowid:
-    cur.executemany(
-        "INSERT INTO nodes_fts(rowid, name, synonyms, taxon_rank, kind) VALUES (?,?,?,?,?)",
-        fts_tp_rows_with_rowid
+# Build and insert TP FTS rows with rowid parity
+for (tp_id, taxon_id, part_id, name, display_name, slug, rank, p_kind) in rows:
+    # compute synonyms for this TP: part synonyms + curated TP synonyms
+    syns = set(part_syn.get(part_id, set()))
+    syns |= set(_tp_extra_synonyms(taxon_id, part_id))
+    syn_str = " ".join(sorted(syns))
+    tp_rowid = cur.execute("SELECT rowid FROM taxon_part_nodes WHERE id = ?", (tp_id,)).fetchone()[0]
+    cur.execute(
+        "INSERT INTO tp_fts(rowid, name, synonyms, taxon_rank, kind) VALUES (?,?,?,?,?)",
+        (tp_rowid, name, syn_str, 'taxon_part', p_kind)
     )
 
-fts_count = cur.execute("SELECT COUNT(*) FROM nodes_fts").fetchone()[0]
-print_success(f"Created FTS index with {fts_count} entries")
-
-# Create triggers to keep FTS in sync with proper rowid alignment
-cur.execute("""
-    -- INSERT: keep rowid parity and precompute synonyms
-    CREATE TRIGGER IF NOT EXISTS trg_nodes_ai AFTER INSERT ON nodes BEGIN
-      INSERT INTO nodes_fts(rowid, name, synonyms, taxon_rank, kind)
-      VALUES (
-        NEW.rowid,
-        NEW.name,
-        (
-          SELECT TRIM(COALESCE(GROUP_CONCAT(s.synonym,' '), ''))
-          FROM synonyms s WHERE s.node_id = NEW.id
-        ),
-        NEW.rank,
-        NULL
-      );
-    END;
-""")
-
-cur.execute("""
-    -- DELETE: remove exact mirror row
-    CREATE TRIGGER IF NOT EXISTS trg_nodes_ad AFTER DELETE ON nodes BEGIN
-      DELETE FROM nodes_fts WHERE rowid = OLD.rowid;
-    END;
-""")
-
-cur.execute("""
-    -- UPDATE: mutate the mirrored row
-    CREATE TRIGGER IF NOT EXISTS trg_nodes_au AFTER UPDATE OF name,rank ON nodes BEGIN
-      UPDATE nodes_fts
-      SET name = NEW.name, taxon_rank = NEW.rank
-      WHERE rowid = OLD.rowid;
-    END;
-""")
-
-cur.execute("""
-    -- SYN INSERT: recompute synonyms string for that node rowid
-    CREATE TRIGGER IF NOT EXISTS trg_synonyms_ai AFTER INSERT ON synonyms BEGIN
-      UPDATE nodes_fts
-      SET synonyms = (
-        SELECT TRIM(COALESCE(GROUP_CONCAT(s2.synonym,' '), ''))
-        FROM synonyms s2 WHERE s2.node_id = NEW.node_id
-      )
-      WHERE rowid = (SELECT n.rowid FROM nodes n WHERE n.id = NEW.node_id);
-    END;
-""")
-
-cur.execute("""
-    -- SYN DELETE: recompute too
-    CREATE TRIGGER IF NOT EXISTS trg_synonyms_ad AFTER DELETE ON synonyms BEGIN
-      UPDATE nodes_fts
-      SET synonyms = (
-        SELECT TRIM(COALESCE(GROUP_CONCAT(s2.synonym,' '), ''))
-        FROM synonyms s2 WHERE s2.node_id = OLD.node_id
-      )
-      WHERE rowid = (SELECT n.rowid FROM nodes n WHERE n.id = OLD.node_id);
-    END;
-""")
-
-print_success("Created FTS triggers for automatic synchronization")
+fts_count = (
+  cur.execute("SELECT COUNT(*) FROM taxa_fts").fetchone()[0]
+  + cur.execute("SELECT COUNT(*) FROM tp_fts").fetchone()[0]
+)
+print_success(f"Created FTS indexes: total entries = {fts_count}")
 
 # ---------------------------------------------------------------------
 # Artifact metadata (schema versioning for API startup checks)
@@ -943,7 +949,10 @@ docs_count = cur.execute("SELECT COUNT(*) FROM taxon_doc").fetchone()[0]
 has_part_count = cur.execute("SELECT COUNT(*) FROM has_part").fetchone()[0]
 tf_count = cur.execute("SELECT COUNT(*) FROM transform_def").fetchone()[0]
 tfap_count = cur.execute("SELECT COUNT(*) FROM transform_applicability").fetchone()[0]
-fts_count = cur.execute("SELECT COUNT(*) FROM nodes_fts").fetchone()[0]
+fts_count = (
+  cur.execute("SELECT COUNT(*) FROM taxa_fts").fetchone()[0]
+  + cur.execute("SELECT COUNT(*) FROM tp_fts").fetchone()[0]
+)
 
 # Get rank distribution
 rank_stats = cur.execute("SELECT rank, COUNT(*) FROM nodes GROUP BY rank ORDER BY COUNT(*) DESC").fetchall()

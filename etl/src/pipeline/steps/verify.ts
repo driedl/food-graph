@@ -14,18 +14,20 @@ function verifyDatabase(): boolean {
     
     // Test basic connectivity
     const nodeCount = db.prepare('SELECT COUNT(*) as count FROM nodes').get() as { count: number }
-    const ftsCount = db.prepare('SELECT COUNT(*) as count FROM nodes_fts').get() as { count: number }
+    const taxaFtsCount = db.prepare('SELECT COUNT(*) as count FROM taxa_fts').get() as { count: number }
+    const tpFtsCount = db.prepare('SELECT COUNT(*) as count FROM tp_fts').get() as { count: number }
     
     console.log(`   • Database connectivity: OK`)
     console.log(`   • Nodes: ${nodeCount.count}`)
-    console.log(`   • FTS entries: ${ftsCount.count}`)
+    console.log(`   • Taxa FTS entries: ${taxaFtsCount.count}`)
+    console.log(`   • TP FTS entries: ${tpFtsCount.count}`)
     
     // Test FTS search functionality
     const riceResults = db.prepare(`
       SELECT n.id, n.name, n.rank 
       FROM nodes n 
-      JOIN nodes_fts fts ON n.rowid = fts.rowid 
-      WHERE nodes_fts MATCH 'rice*' 
+      JOIN taxa_fts fts ON n.rowid = fts.rowid 
+      WHERE taxa_fts MATCH 'rice*' 
       LIMIT 3
     `).all() as Array<{ id: string; name: string; rank: string }>
     

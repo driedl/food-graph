@@ -76,7 +76,7 @@ function getArtifactAge(): number | null {
 
 export function verifyGraphArtifact() {
   // Basic presence checks
-  const requiredTables = ['nodes', 'nodes_fts', 'part_def', 'has_part', 'taxon_part_nodes']
+  const requiredTables = ['nodes', 'taxa_fts', 'tp_fts', 'part_def', 'has_part', 'taxon_part_nodes']
   const missing = requiredTables.filter(t => !tableExists(t))
   if (missing.length) {
     if (env.AUTO_COPY_ETL_DB === 'true') {

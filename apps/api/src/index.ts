@@ -17,7 +17,10 @@ async function main() {
 
   await app.register(fastifyTRPCPlugin, {
     prefix: '/trpc',
-    trpcOptions: { router: appRouter }
+    trpcOptions: { 
+      router: appRouter,
+      batching: { enabled: true }
+    }
   })
 
   app.get('/', async () => ({ status: 'ok', service: 'nutrition-graph-api' }))

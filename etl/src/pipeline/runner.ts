@@ -170,7 +170,9 @@ export class PipelineRunner {
       const nodeCount = db.prepare('SELECT COUNT(*) as count FROM nodes').get() as { count: number }
       const synonymCount = db.prepare('SELECT COUNT(*) as count FROM synonyms').get() as { count: number }
       const docsCount = db.prepare('SELECT COUNT(*) as count FROM taxon_doc').get() as { count: number }
-      const ftsCount = db.prepare('SELECT COUNT(*) as count FROM nodes_fts').get() as { count: number }
+      const taxaFtsCount = db.prepare('SELECT COUNT(*) as count FROM taxa_fts').get() as { count: number }
+      const tpFtsCount = db.prepare('SELECT COUNT(*) as count FROM tp_fts').get() as { count: number }
+      const ftsCount = { count: taxaFtsCount.count + tpFtsCount.count }
       
       this.report.summary = {
         taxaCount: nodeCount.count,

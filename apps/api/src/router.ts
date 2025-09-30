@@ -87,10 +87,10 @@ export const appRouter = t.router({
         const stmt = db.prepare(`
           SELECT n.id, n.name, n.slug, n.rank, n.parent_id as parentId 
           FROM nodes n 
-          JOIN nodes_fts fts ON fts.rowid = n.rowid
-          WHERE nodes_fts MATCH ?
+          JOIN taxa_fts ON taxa_fts.rowid = n.rowid
+          WHERE taxa_fts MATCH ?
           ${filter}
-          ORDER BY bm25(nodes_fts) ASC, n.name
+          ORDER BY bm25(taxa_fts) ASC, n.name
           LIMIT 50
         `)
         return stmt.all(q, ...(input.rankFilter || []))
@@ -319,12 +319,13 @@ export const appRouter = t.router({
         z.object({
           q: z.string().min(1),
           limit: z.number().min(1).max(100).default(20),
-          kinds: z.array(z.enum(['taxon', 'taxon_part'])).optional()
+          kinds: z.array(z.enum(['taxon', 'taxon_part'])).optional(),
+          rankFilter: z.array(z.string()).optional()  // applies to taxa only
         })
       )
       .query(({ input }) => {
-        const { limit, kinds } = input
-        // match behavior of taxonomy.search: AND-join tokens with wildcard
+        const { limit, kinds, rankFilter } = input
+        // AND-join tokens with wildcard for FTS prefix matches
         const q = input.q.split(/\s+/).map(t => t + '*').join(' AND ')
 
         const results: any[] = []
@@ -333,16 +334,19 @@ export const appRouter = t.router({
         const wantTP = !kinds || kinds.includes('taxon_part')
 
         if (wantTaxa) {
+          const filter = rankFilter && rankFilter.length
+            ? `AND n.rank IN (${rankFilter.map(() => '?').join(',')})` : ''
           const taxa = db.prepare(`
             SELECT n.id, n.name, n.slug, n.rank, n.parent_id as parentId,
-                   bm25(nodes_fts) AS score, 'taxon' AS kind,
+                   bm25(taxa_fts) AS score, 'taxon' AS kind,
                    n.id AS taxonId, NULL AS partId
             FROM nodes n
-            JOIN nodes_fts fts ON fts.rowid = n.rowid
-            WHERE nodes_fts MATCH ?
-            ORDER BY bm25(nodes_fts) ASC
+            JOIN taxa_fts ON taxa_fts.rowid = n.rowid
+            WHERE taxa_fts MATCH ?
+            ${filter}
+            ORDER BY bm25(taxa_fts) ASC, n.name
             LIMIT ?
-          `).all(q, limit) as any[]
+          `).all(q, ...(rankFilter || []), limit) as any[]
           results.push(...taxa)
         }
 
@@ -350,17 +354,15 @@ export const appRouter = t.router({
           try {
             const tps = db.prepare(`
               SELECT tp.id, tp.name, tp.slug, tp.rank, tp.taxon_id as parentId,
-                     /* nudge TP slightly higher for foody queries */
-                     bm25(nodes_fts) * 0.9 AS score,
+                     bm25(tp_fts) AS score,
                      'taxon_part' AS kind,
                      tp.taxon_id AS taxonId,
                      tp.part_id  AS partId,
-                     tp.kind     AS kingdom,
-                     COALESCE(tp.is_implicit, 0) AS isImplicit
+                     tp.kind     AS partKind
               FROM taxon_part_nodes tp
-              JOIN nodes_fts fts ON fts.rowid = tp.rowid
-              WHERE nodes_fts MATCH ?
-              ORDER BY bm25(nodes_fts) ASC
+              JOIN tp_fts ON tp_fts.rowid = tp.rowid
+              WHERE tp_fts MATCH ?
+              ORDER BY bm25(tp_fts) ASC, tp.name
               LIMIT ?
             `).all(q, limit) as any[]
             results.push(...tps)
@@ -369,24 +371,15 @@ export const appRouter = t.router({
           }
         }
 
-        // De-dupe: when a taxon and its TP share the same display name, prefer TP
-        const byName = new Map<string, any>() // lowercased name -> best row
-        for (const r of results) {
-          const key = (r.name || '').toLowerCase()
-          const prev = byName.get(key)
-          if (!prev) {
-            byName.set(key, r)
-          } else {
-            // prefer taxon_part; else lower score (better rank)
-            const prefer = (r.kind === 'taxon_part' && prev.kind !== 'taxon_part')
-              || (r.score < prev.score)
-            if (prefer) byName.set(key, r)
-          }
+        // De-dupe by id (names can legitimately collide)
+        const seen = new Set<string>()
+        const deduped = []
+        for (const r of results.sort((a,b)=>a.score-b.score)) {
+          if (seen.has(r.id)) continue
+          seen.add(r.id)
+          deduped.push(r)
+          if (deduped.length >= limit) break
         }
-
-        const deduped = Array.from(byName.values())
-          .sort((a, b) => a.score - b.score)
-          .slice(0, limit)
 
         // Attach a client-ready nav object to each row
         return deduped.map((r: any) => {
@@ -394,7 +387,7 @@ export const appRouter = t.router({
             r.kind === 'taxon'
               ? { target: 'taxon', taxonId: r.taxonId }
               : r.kind === 'taxon_part'
-              ? { target: 'taxon_part', taxonId: r.taxonId, partId: r.partId, isImplicit: !!r.isImplicit }
+              ? { target: 'taxon_part', taxonId: r.taxonId, partId: r.partId }
               : null
           return { ...r, nav }
         })
