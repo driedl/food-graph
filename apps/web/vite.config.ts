@@ -2,10 +2,12 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { visualizer } from 'rollup-plugin-visualizer'
 import path from 'node:path'
+import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
 
 export default defineConfig({
   plugins: [
-    react(), 
+    react(),
+    TanStackRouterVite(),
     process.env.ANALYZE ? (visualizer({ filename: 'stats.html' }) as any) : undefined
   ].filter(Boolean),
   server: {

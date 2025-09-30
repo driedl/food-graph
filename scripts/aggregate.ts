@@ -149,6 +149,17 @@ const FILE_CATEGORIES: Record<string, FileCategory> = {
     ],
     description: 'Project documentation',
   },
+  ui_routes: {
+    name: 'UI Route Logic',
+    pattern: [
+      'apps/web/src/routes/**/*.tsx',
+      'apps/web/src/routes/**/*.ts',
+      'apps/web/src/routeTree.gen.ts',
+      'apps/web/src/lib/fs-url.ts',
+      'apps/web/vite.config.ts',
+    ],
+    description: 'TanStack Router configuration, route definitions, and related utilities',
+  },
   config: {
     name: 'Configuration',
     pattern: [
@@ -475,6 +486,7 @@ File Categories:
   etl        - Python scripts and shared utilities
   ontology_taxa - Taxonomic classification data (animals, plants, fungi, etc.)
   ontology_core - Core ontology data (attributes, nutrients, parts, rules, transforms) - excludes taxa
+  ui_routes  - TanStack Router configuration, route definitions, and related utilities
   scripts    - Build and utility scripts
   docs       - Project documentation
   config     - Project configuration, package management, and documentation
@@ -500,6 +512,7 @@ Examples:
   pnpm ag --compact --categories api         # API code summary
   pnpm ag --verbose --categories all         # Everything
   pnpm ag --verbose --categories web,api     # Web app + API
+  pnpm ag --verbose --categories ui_routes   # Router configuration and routes only
   pnpm ag --verbose --categories ontology_taxa # Taxonomic data only
   pnpm ag --verbose --categories ontology_core # Core ontology data only
   pnpm ag --verbose --categories ontology_taxa,ontology_core # All ontology data

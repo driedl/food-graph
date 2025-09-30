@@ -20,6 +20,8 @@
     "sql:repl": "tsx scripts/run-sql.ts --repl",
     "api:routes": "tsx scripts/print-trpc-routes.ts",
     "ag": "tsx scripts/aggregate.ts",
+    "stop": "./scripts/stop-all.sh",
+    "stop:force": "./scripts/stop-all.sh --force",
     "check": "pnpm typecheck && pnpm lint && pnpm etl:build"
   },
   "devDependencies": {

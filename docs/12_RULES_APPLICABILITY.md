@@ -123,35 +123,32 @@ Add an optional `overrides` object to taxa items when truly exceptional:
 }
 ```
 
-## Compiler changes (minimal v0)
+## Compiler changes (implemented in v0)
 
-Extend `etl/python/compile.py`:
+Implemented in `etl/python/compile.py`:
 
-1. **Load registries** into new tables (read-only):
+1. **Registry tables** (read-only):
 
    ```sql
    CREATE TABLE IF NOT EXISTS part_def(
      id TEXT PRIMARY KEY,
      name TEXT NOT NULL,
      kind TEXT,
-     notes TEXT
+     notes TEXT,
+     parent_id TEXT REFERENCES part_def(id) ON DELETE SET NULL
    );
    CREATE TABLE IF NOT EXISTS transform_def(
      id TEXT PRIMARY KEY,
      name TEXT NOT NULL,
      identity INTEGER NOT NULL,
-     params_json TEXT NOT NULL
+     schema_json TEXT,
+     ordering INTEGER DEFAULT 999,
+     notes TEXT
    );
-   CREATE TABLE IF NOT EXISTS nutrient_def(
-     id TEXT PRIMARY KEY,
-     name TEXT NOT NULL,
-     unit TEXT NOT NULL,
-     short_name TEXT
-   );
-   -- attr_def already exists
+   -- attr_def, attr_enum already exist
    ```
 
-2. **Materialize applicability** (expand prefixes → rows):
+2. **Materialized applicability** (expand prefixes → rows):
 
    ```sql
    CREATE TABLE IF NOT EXISTS has_part(
@@ -159,20 +156,26 @@ Extend `etl/python/compile.py`:
      part_id  TEXT NOT NULL REFERENCES part_def(id) ON DELETE RESTRICT,
      PRIMARY KEY (taxon_id, part_id)
    );
+   CREATE TABLE IF NOT EXISTS transform_applicability(
+     taxon_id TEXT NOT NULL REFERENCES nodes(id) ON DELETE CASCADE,
+     part_id TEXT NOT NULL REFERENCES part_def(id) ON DELETE RESTRICT,
+     transform_id TEXT NOT NULL REFERENCES transform_def(id) ON DELETE RESTRICT,
+     PRIMARY KEY (taxon_id, part_id, transform_id)
+   );
    ```
 
-   - Read `rules/parts_applicability.jsonl`, expand `applies_to` by prefix against existing `nodes.id`, subtract `exclude`, then write `has_part`.
-   - Apply per-taxon `overrides` after rule expansion.
+   - Reads `rules/parts_applicability.jsonl`, expands `applies_to` by prefix, subtracts `exclude`, writes `has_part`
+   - Reads `rules/transform_applicability.jsonl`, materializes allowed transforms per taxon+part
+   - Applies per-taxon `overrides` after rule expansion
 
-3. (Later) **Allowed transforms / attribute scopes**:
+3. **Future** (planned):
 
    ```sql
-   CREATE TABLE IF NOT EXISTS allowed_transform(
-     taxon_id TEXT NOT NULL,
-     part_id  TEXT,
-     transform_id TEXT NOT NULL,
-     params_schema_json TEXT,
-     PRIMARY KEY(taxon_id, part_id, transform_id)
+   CREATE TABLE IF NOT EXISTS nutrient_def(
+     id TEXT PRIMARY KEY,
+     name TEXT NOT NULL,
+     unit TEXT NOT NULL,
+     short_name TEXT
    );
    CREATE TABLE IF NOT EXISTS attribute_scope(
      attr TEXT NOT NULL,
@@ -183,12 +186,18 @@ Extend `etl/python/compile.py`:
    );
    ```
 
-## API additions (read-only)
+## API additions
 
-- `taxonomy.getPartsForTaxon({ id }) → { part_id, name, kind }[]`
-  Backed by `has_part` with a simple `SELECT ... WHERE taxon_id IN (self + ancestors)` for graceful fallback.
-- (Later) `taxonomy.getAllowedTransforms({ taxonId, partId? })`
-- (Later) `taxonomy.getAttributeScopes({ taxonId, partId? })`
+**Implemented:**
+
+- `taxonomy.getPartsForTaxon({ id }) → { id, name, kind, parentId }[]`
+  Backed by `has_part` with recursive lineage query for graceful inheritance
+- `taxonomy.partTree({ id })` - Returns hierarchical part tree for a taxon
+
+**Future:**
+
+- `taxonomy.getAllowedTransforms({ taxonId, partId })`
+- `taxonomy.getAttributeScopes({ taxonId, partId })`
 
 ## Validation & QA
 

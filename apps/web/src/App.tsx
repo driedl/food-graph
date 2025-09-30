@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { trpc } from './lib/trpc'
 import ErrorBoundary from './components/ErrorBoundary'
 import { DocsPanel } from './components/inspector/DocsPanel'
@@ -12,6 +12,7 @@ import { Badge } from '@ui/badge'
 import LeftRail from './components/layout/LeftRail'
 import NodeHeader from './components/NodeHeader'
 import StructureExplorer from './components/StructureExplorer'
+import { fsToPath, pathToFs, pathToNodeId } from './lib/fs-url'
 
 /** Shared types matching API rows */
 interface TaxonNode {
@@ -50,14 +51,15 @@ export default function App() {
   const [currentId, setCurrentId] = useState<string | null>(null)
 
   // Queries scoped to current node - using new neighborhood API
+  const [childLimit, setChildLimit] = useState(50)
   const neighborhood = trpc.taxonomy.neighborhood.useQuery(
-    { id: currentId!, childLimit: 50, orderBy: 'name' }, 
+    { id: currentId!, childLimit, orderBy: 'name' }, 
     { enabled: !!currentId }
   )
   const docs = trpc.docs.getByTaxon.useQuery({ taxonId: currentId! }, { enabled: !!currentId })
   const parts = trpc.taxonomy.partTree.useQuery({ id: currentId! }, { enabled: !!currentId })
   const lineageQ = trpc.taxonomy.pathToRoot.useQuery({ id: currentId! }, { enabled: !!currentId })
-  const rankCountsQ = trpc.taxonomy.childrenRankCounts.useQuery({ id: currentId! }, { enabled: !!currentId })
+  // rank distribution UI removed; no query needed
 
   // Extract data from neighborhood response
   const nodeData = neighborhood.data?.node as TaxonNode | undefined
@@ -71,6 +73,34 @@ export default function App() {
   useEffect(() => {
     if (root.data && !currentId) setCurrentId((root.data as TaxonNode).id)
   }, [root.data, currentId])
+  // Reset limit when node changes
+  useEffect(() => { setChildLimit(50) }, [currentId])
+
+  // --- URL → State (initial load + back/forward) ----------------------------
+  useEffect(() => {
+    const applyFromLocation = async () => {
+      const { pathname } = window.location
+      const fs = pathToFs(pathname)
+      const nodeId = pathToNodeId(pathname)
+
+      if (fs) {
+        await handleParse(fs) // will set currentId, selectedPartId
+        return
+      }
+      if (nodeId) {
+        setCurrentId(nodeId)
+        setSelectedPartId('')
+        setChosen([])
+        return
+      }
+      // default: keep existing bootstrap behavior (root)
+    }
+    applyFromLocation()
+
+    const onPop = () => applyFromLocation()
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
 
 
 
@@ -88,6 +118,17 @@ export default function App() {
   type ChosenTx = { id: string; params: Record<string, any> }
   const [chosen, setChosen] = useState<ChosenTx[]>([])
   useEffect(() => { setChosen([]) }, [selectedPartId, currentId])
+  // When FS parse provided a tentative transform list, stage it here and hydrate after transforms load
+  const pendingFromParse = useRef<ChosenTx[] | null>(null)
+
+  // Once transform metadata is available, accept only identity transforms that exist for this part
+  useEffect(() => {
+    if (!transforms.data || !pendingFromParse.current) return
+    const ids = new Map(transforms.data.map((t: any) => [t.id, !!t.identity]))
+    const filtered = (pendingFromParse.current || []).filter((t) => ids.has(t.id) && ids.get(t.id))
+    setChosen(filtered)
+    pendingFromParse.current = null
+  }, [transforms.data])
 
   const onToggleTx = (txId: string, isIdentity: boolean) => {
     if (!isIdentity) return // non-identity cannot be in identity chain
@@ -147,11 +188,41 @@ export default function App() {
       if (parsed.partId) {
         setSelectedPartId(parsed.partId)
       }
-      // TODO: Handle transforms from parsed.transforms
+      if (parsed.transforms && parsed.transforms.length) {
+        // Stage; will be filtered to identity transforms that exist once query resolves
+        pendingFromParse.current = parsed.transforms.map((t: any) => ({
+          id: t.id,
+          params: t.params ?? {},
+        }))
+      } else {
+        pendingFromParse.current = null
+      }
     } catch (error) {
       console.error('Failed to parse FoodState:', error)
     }
   }
+
+  // --- State → URL (push new history entries when state changes) ------------
+  const lastPathRef = useRef<string>('')
+  useEffect(() => {
+    if (!currentId) return
+    const fs = fsPreview
+    // Prefer fs form when part/tx chosen; fallback to node form for "just node"
+    const targetPath =
+      fs && (selectedPartId || chosen.length)
+        ? fsToPath(fs)
+        : `/workbench/node/${currentId}`
+
+    if (targetPath && targetPath !== lastPathRef.current) {
+      // Avoid thrashing the stack on initial hydration — replace on first write
+      if (!lastPathRef.current) {
+        window.history.replaceState({}, '', targetPath)
+      } else {
+        window.history.pushState({}, '', targetPath)
+      }
+      lastPathRef.current = targetPath
+    }
+  }, [currentId, fsPreview, selectedPartId, chosen])
 
   return (
     <div className="p-4">
@@ -196,7 +267,7 @@ export default function App() {
             </CardHeader>
             <CardContent className="flex-1 min-h-0 flex gap-3 pt-3">
               {/* LEFT: Docs */}
-              <Card className="min-h-0 flex flex-col flex-1">
+              <Card className="min-h-0 flex flex-col w-1/2">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm">Documentation</CardTitle>
                 </CardHeader>
@@ -207,7 +278,7 @@ export default function App() {
                 </CardContent>
               </Card>
               {/* RIGHT: Structure Explorer */}
-              <Card className="min-h-0 flex flex-col flex-1">
+              <Card className="min-h-0 flex flex-col w-1/2">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm">Structure</CardTitle>
                 </CardHeader>
@@ -217,9 +288,12 @@ export default function App() {
                       node={nodeData as any}
                       childrenRows={childrenData}
                       siblings={siblingsData}
-                      rankCounts={rankCountsQ.data as any[] | undefined}
+                      childCount={(neighborhood.data as any)?.childCount ?? childrenData.length}
                       rankColor={rankColor}
                       onPick={(id) => setCurrentId(id)}
+                      parent={parentData ? { id: parentData.id, name: parentData.name } : null}
+                      hasMore={(neighborhood.data as any)?.childCount > childrenData.length}
+                      onShowMore={() => setChildLimit((n) => n + 50)}
                     />
                   </ErrorBoundary>
                 </CardContent>
@@ -253,23 +327,27 @@ export default function App() {
                   />
                 )}
                 {tab === 'pt' && (
-                  <div className="space-y-3">
-                    <PartsPanel
-                      parts={parts.data as any}
-                      selectedPartId={selectedPartId}
-                      onSelect={setSelectedPartId}
-                    />
-                    {!selectedPartId ? (
-                      <div className="text-sm text-muted-foreground">Select a part to view transforms.</div>
-                    ) : (
-                      <TransformsPanel
-                        loading={transforms.isLoading}
-                        data={transforms.data as any}
-                        chosen={chosen}
-                        onToggleTx={onToggleTx}
-                        onParamChange={onParamChange}
+                  <div className="grid grid-cols-2 gap-3 min-h-0">
+                    <div className="min-h-0 overflow-auto">
+                      <PartsPanel
+                        parts={parts.data as any}
+                        selectedPartId={selectedPartId}
+                        onSelect={setSelectedPartId}
                       />
-                    )}
+                    </div>
+                    <div className="min-h-0 overflow-auto">
+                      {!selectedPartId ? (
+                        <div className="text-sm text-muted-foreground">Select a part to view transforms.</div>
+                      ) : (
+                        <TransformsPanel
+                          loading={transforms.isLoading}
+                          data={transforms.data as any}
+                          chosen={chosen}
+                          onToggleTx={onToggleTx}
+                          onParamChange={onParamChange}
+                        />
+                      )}
+                    </div>
                   </div>
                 )}
                 {tab === 'foodstate' && (
@@ -280,6 +358,7 @@ export default function App() {
                     onCopy={(s: string) => navigator.clipboard.writeText(s)}
                     onValidate={() => compose.refetch()}
                     onParse={handleParse}
+                    permalink={typeof window !== 'undefined' ? window.location.href : undefined}
                   />
                 )}
               </div>

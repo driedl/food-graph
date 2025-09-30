@@ -10,6 +10,7 @@ export function FoodStatePanel({
   onCopy,
   onValidate,
   onParse,
+  permalink,
 }: {
   fsPreview: string
   loadingValidate: boolean
@@ -17,6 +18,7 @@ export function FoodStatePanel({
   onCopy: (s: string) => void
   onValidate: () => void
   onParse?: (fs: string) => void
+  permalink?: string
 }) {
   const [parseInput, setParseInput] = useState('')
 
@@ -64,6 +66,15 @@ export function FoodStatePanel({
         <Button size="sm" variant="outline" onClick={() => onValidate()} disabled={!fsPreview || loadingValidate}>
           {loadingValidate ? 'Validating…' : 'Validate'}
         </Button>
+        {permalink ? (
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={() => navigator.clipboard.writeText(permalink)}
+          >
+            Copy link
+          </Button>
+        ) : null}
       </div>
       {result && (
         <div className="mt-2 text-xs">

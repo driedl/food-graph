@@ -23,24 +23,34 @@
 
 ## Compile (v0.1)
 
-The compiler ingests **Taxa + Synonyms + Attribute registry** and writes a SQLite DB:
+The compiler is a multi-step Python pipeline that ingests ontology data and writes a SQLite DB:
 
 ```bash
-pnpm db:build
+pnpm etl:build
 # -> etl/dist/database/graph.dev.sqlite
 ```
 
-Current tables:
+**Pipeline steps:**
 
-- `nodes(id, name, slug, rank, parent_id)`
-- `synonyms(node_id, synonym)`
-- `node_attributes(node_id, attr, val)` — reserved for future authoring
-- `attr_def(attr, kind)` — from attributes registry
+1. Validate ontology data (schema checks, parent existence)
+2. Compile taxa from `.tx.md` frontmatter → `taxa.jsonl`
+3. Compile documentation from `.tx.md` content → `docs.jsonl`
+4. Build SQLite database with all ontology data
+5. Verify database integrity and FTS functionality
+6. Generate documentation coverage report
 
-Future compiles will add:
+**Current tables:**
 
-- `foodstate`, `mixture`, `transform_def`, `evidence`, and materialized rollups.
-- Validation report and ID churn report (planned).
+- **Taxonomy**: `nodes`, `synonyms`, `node_attributes`, `attr_def`, `attr_enum`
+- **Documentation**: `taxon_doc` (with `taxon_doc_fts` for search)
+- **Parts**: `part_def`, `part_synonym`, `has_part`
+- **Transforms**: `transform_def`, `transform_applicability`
+- **Search**: `nodes_fts` (FTS5 index for taxa + synonyms)
+
+**Future compiles will add:**
+
+- `foodstate`, `mixture`, `evidence`, `classifications`, `functional_class`, `labelings`, and materialized rollups.
+- ID churn detection and reporting.
 
 ## Validation (near-term)
 

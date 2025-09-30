@@ -1,29 +1,49 @@
 # 07 — Roadmap (Ontology & Data)
 
-## Phase 0 — Tooling & Governance
-- NDJSON format, newline fixer, basic compiler.
-- CI: validate schemas, parent existence, acyclicity (planned).
+## Phase 0 — Tooling & Governance ✅ COMPLETE
 
-## Phase 1 — Coverage
-- Pantry-100 complete; fill missing parents for FDC 411 alignment.
-- Add common animal cuts and key plant families.
+- ✅ NDJSON format with `.tx.md` frontmatter compilation
+- ✅ Python ETL pipeline with validation, compilation, and verification
+- ✅ Schema validation (parent existence, acyclicity checks)
+- ✅ FTS5 search infrastructure
 
-## Phase 2 — Transforms & Attributes
-- Lock identity-bearing attributes; finalize v0.1 transform families.
-- Add param schemas and default retention/yield tables (by class).
+## Phase 1 — Coverage (In Progress)
 
-## Phase 3 — Evidence & Canonicalization
-- Curate FDC Foundation as **evidence** mapped to FoodStates (no auto generation).
-- Implement per-nutrient rollups with provenance.
+- 🔄 Expand taxonomy: 200+ taxa across plantae, animalia, fungi
+- 🔄 Animal parts system with applicability rules
+- 🔄 Plant families and common cultivars
+- 📝 FDC Foundation alignment (planned)
 
-## Phase 4 — QA & Signals
-- Distance-based split candidates; sodium/water guards; mass closure.
+## Phase 2 — Transforms & Attributes ✅ COMPLETE
 
-## Phase 5 — Recipes & Mixtures
-- Mixture authoring, nested mixtures, yield handling; public/user namespaces.
+- ✅ Identity-bearing attributes locked (roles: identity_param, covariate, facet)
+- ✅ 29 transform families defined with param schemas
+- ✅ Transform applicability rules system
+- ❌ Default retention/yield tables (deferred to Phase 3)
 
-### Near-term Checklist
-- [ ] Normalize NDJSON newlines where needed.
-- [ ] Compile and browse graph (root = `tx:life`).
-- [ ] Add exemplar FoodStates and mock evidence.
-- [ ] Draft retention tables for `tf:cook` on key classes.
+## Phase 3 — Evidence & Canonicalization (Planned)
+
+- FoodState materialization (currently computed on-demand)
+- Evidence tables and provenance tracking
+- FDC Foundation as evidence mapped to FoodStates
+- Per-nutrient rollups with hierarchical borrowing
+
+## Phase 4 — QA & Signals (Planned)
+
+- Distance-based split candidates
+- Sodium/water guards
+- Mass closure validation
+- Embedding-based anomaly detection
+
+## Phase 5 — Recipes & Mixtures (Planned)
+
+- Mixture DAG evaluation
+- Nested mixtures with version pinning
+- Public/user namespaces
+
+## Current Focus
+
+- [ ] Taxon+part search nodes (see doc 14)
+- [ ] Documentation coverage (166 taxa documented)
+- [ ] Transform chains for common derived foods
+- [ ] Evidence model implementation
