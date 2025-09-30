@@ -1215,5 +1215,3 @@ _(Leave existing `nodes_fts` exactly as-is.)_
 - **Leaf-first policy** keeps the graph tidy, with escape hatches (allowlist) for iconic non-leaf lines.
 - **Separate FTS** avoids destabilizing existing triggers and makes rollback trivial.
 - **Data-over-code** (rules files) lets you iterate naming and coverage fast—perfect for early dev.
-
-If you’re happy with this shape, I’ll draft the concrete ETL diffs (SQL + Python inserts), example rule entries for a handful of staple foods, and the API search union query with the implicit-preference dedupe.

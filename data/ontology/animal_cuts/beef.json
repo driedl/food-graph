@@ -1,11 +1,32 @@
 {
-  "taxa": ["tx:animalia"],
+  "taxa": [
+    "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus"
+  ],
   "parts": [
-    { "id":"part:cut:brisket", "name":"Brisket", "aliases":["plate brisket"], "children": [
-      { "id":"part:cut:brisket:flat", "name":"Brisket (flat)" },
-      { "id":"part:cut:brisket:point", "name":"Brisket (point)" }
-    ]},
-    { "id":"part:cut:round", "name":"Round" },
-    { "id":"part:cut:loin", "name":"Loin" }
+    {
+      "id": "part:cut:brisket",
+      "name": "Brisket",
+      "aliases": [
+        "plate brisket"
+      ],
+      "children": [
+        {
+          "id": "part:cut:brisket:flat",
+          "name": "Brisket (flat)"
+        },
+        {
+          "id": "part:cut:brisket:point",
+          "name": "Brisket (point)"
+        }
+      ]
+    },
+    {
+      "id": "part:cut:round",
+      "name": "Round"
+    },
+    {
+      "id": "part:cut:loin",
+      "name": "Loin"
+    }
   ]
 }

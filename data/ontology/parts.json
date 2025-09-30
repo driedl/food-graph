@@ -28,26 +28,10 @@
     "notes": "Grass family grains"
   },
   {
-    "id": "part:milk",
-    "name": "Milk",
-    "kind": "animal",
-    "applies_to": [
-      "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus"
-    ]
-  },
-  {
     "id": "part:muscle",
     "name": "Muscle",
     "kind": "animal",
     "applies_to": []
-  },
-  {
-    "id": "part:egg",
-    "name": "Egg (whole)",
-    "kind": "animal",
-    "applies_to": [
-      "tx:animalia:phasianidae:gallus:gallus_domesticus"
-    ]
   },
   {
     "id": "part:egg_white",
@@ -133,6 +117,11 @@
   {
     "id": "part:stem",
     "name": "Stem",
+    "kind": "plant"
+  },
+  {
+    "id": "part:flower",
+    "name": "Flower",
     "kind": "plant"
   },
   {

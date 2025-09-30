@@ -6,6 +6,7 @@
  * Usage:
  *   pnpm ag                           # Interactive mode
  *   pnpm ag --compact                 # Quick compact mode
+ *   pnpm ag --summary                 # Summary mode (excerpts/signatures)
  *   pnpm ag --verbose                 # Full verbose mode
  *   pnpm ag --help                    # Show help
  *
@@ -21,7 +22,7 @@ import inquirer from 'inquirer';
 
 // ---- Types ----------------------------------------------------------------
 
-type ContentLevel = 'compact' | 'verbose';
+type ContentLevel = 'compact' | 'summary' | 'verbose';
 type OutputDestination = 'console' | 'file' | 'both';
 
 interface FileCategory {
@@ -401,6 +402,144 @@ function generateCompactOutput(files: FileInfo[]): string {
   return output;
 }
 
+function summarizeFileContent(file: FileInfo): { summary: string; truncated: boolean } {
+  const ext = extname(file.path).toLowerCase();
+  const lines = file.content.split('\n');
+  
+  // JSONL files - first 10 lines
+  if (ext === '.jsonl') {
+    if (lines.length <= 10) {
+      return { summary: file.content, truncated: false };
+    }
+    return { summary: lines.slice(0, 10).join('\n'), truncated: true };
+  }
+  
+  // TypeScript/JavaScript - extract signatures
+  if (['.ts', '.tsx', '.js', '.jsx'].includes(ext)) {
+    const signatures: string[] = [];
+    const imports: string[] = [];
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const trimmed = line.trim();
+      
+      // Collect imports
+      if (trimmed.startsWith('import ')) {
+        imports.push(line);
+      }
+      // Collect exports, functions, classes, interfaces, types
+      else if (
+        trimmed.startsWith('export ') ||
+        trimmed.match(/^(export\s+)?(async\s+)?function\s+\w+/) ||
+        trimmed.match(/^(export\s+)?class\s+\w+/) ||
+        trimmed.match(/^(export\s+)?interface\s+\w+/) ||
+        trimmed.match(/^(export\s+)?type\s+\w+/) ||
+        trimmed.match(/^(export\s+)?const\s+\w+\s*=/)
+      ) {
+        // Include previous line if it's a comment
+        if (i > 0 && lines[i - 1].trim().startsWith('//')) {
+          signatures.push(lines[i - 1]);
+        }
+        signatures.push(line);
+      }
+    }
+    
+    let result = '';
+    if (imports.length > 0) {
+      result += '// Imports\n' + imports.slice(0, 5).join('\n');
+      if (imports.length > 5) result += '\n// ... more imports';
+      result += '\n\n';
+    }
+    if (signatures.length > 0) {
+      result += '// Signatures\n' + signatures.join('\n');
+    }
+    
+    // If we extracted signatures, it's a summary (truncated)
+    const truncated = signatures.length > 0 || imports.length > 0;
+    return { summary: result || lines.slice(0, 20).join('\n'), truncated };
+  }
+  
+  // JSON files - full if small, otherwise first 30 lines
+  if (ext === '.json') {
+    if (lines.length <= 50) {
+      return { summary: file.content, truncated: false };
+    }
+    return { summary: lines.slice(0, 30).join('\n'), truncated: true };
+  }
+  
+  // Markdown - first 50 lines or until section break
+  if (ext === '.md') {
+    let endLine = Math.min(50, lines.length);
+    for (let i = 1; i < endLine; i++) {
+      if (lines[i].startsWith('## ')) {
+        endLine = i;
+        break;
+      }
+    }
+    const truncated = endLine < lines.length;
+    return { summary: lines.slice(0, endLine).join('\n'), truncated };
+  }
+  
+  // Python - extract function/class signatures
+  if (ext === '.py') {
+    const signatures: string[] = [];
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const trimmed = line.trim();
+      if (trimmed.startsWith('def ') || trimmed.startsWith('class ')) {
+        // Include previous line if it's a comment or decorator
+        if (i > 0 && (lines[i - 1].trim().startsWith('#') || lines[i - 1].trim().startsWith('@'))) {
+          signatures.push(lines[i - 1]);
+        }
+        signatures.push(line);
+      }
+    }
+    const truncated = signatures.length > 0;
+    return { summary: signatures.join('\n') || lines.slice(0, 20).join('\n'), truncated };
+  }
+  
+  // SQL - first 20 lines
+  if (ext === '.sql') {
+    if (lines.length <= 20) {
+      return { summary: file.content, truncated: false };
+    }
+    return { summary: lines.slice(0, 20).join('\n'), truncated: true };
+  }
+  
+  // Default fallback - first 20 lines
+  if (lines.length <= 20) {
+    return { summary: file.content, truncated: false };
+  }
+  return { summary: lines.slice(0, 20).join('\n'), truncated: true };
+}
+
+function generateSummaryOutput(files: FileInfo[]): string {
+  let output = '# Codebase Summary Report\n\n';
+  output += `Generated on: ${new Date().toISOString()}\n`;
+  output += `Total files: ${files.length}\n`;
+  output += `Total size: ${formatSize(files.reduce((sum, file) => sum + file.size, 0))}\n\n`;
+  
+  output += '## Files Overview\n\n';
+  files.forEach(file => {
+    output += `- **${file.path}** (${formatSize(file.size)}, ${file.lines} lines)\n`;
+  });
+  
+  output += '\n---\n\n';
+  
+  files.forEach(file => {
+    const { summary, truncated } = summarizeFileContent(file);
+    const truncateLabel = truncated ? ' *(truncated)*' : '';
+    
+    output += `## ${file.path}${truncateLabel}\n\n`;
+    output += `**Size:** ${formatSize(file.size)} | **Lines:** ${file.lines}\n\n`;
+    output += '```\n';
+    output += summary;
+    output += '\n```\n\n';
+  });
+  
+  return output;
+}
+
 // ---- Interactive CLI ------------------------------------------------------
 
 async function getInteractiveOptions(): Promise<AggregateOptions> {
@@ -411,8 +550,9 @@ async function getInteractiveOptions(): Promise<AggregateOptions> {
       name: 'contentLevel',
       message: 'What content level do you want?',
       choices: [
-        { name: 'Compact (summary with file stats)', value: 'compact' },
-        { name: 'Verbose (dump everything - complete AI context)', value: 'verbose' },
+        { name: 'Compact (file stats only)', value: 'compact' },
+        { name: 'Summary (signatures/excerpts with metadata)', value: 'summary' },
+        { name: 'Verbose (complete file contents - full AI context)', value: 'verbose' },
       ],
       default: 'verbose',
     },
@@ -471,12 +611,14 @@ function showHelp() {
 Usage:
   pnpm ag                    # Interactive mode (default)
   pnpm ag --compact          # Quick compact mode
+  pnpm ag --summary          # Summary mode with excerpts
   pnpm ag --verbose          # Full verbose mode
   pnpm ag --categories all,web,api  # Specific categories (comma-separated)
   pnpm ag --help             # Show this help
 
 Content Levels:
   compact    - One line per file with size and line count
+  summary    - File excerpts/signatures (JSONL: first 10 lines, TS/JS: signatures, etc.)
   verbose    - Full file contents (perfect for AI context)
 
 File Categories:
@@ -508,14 +650,15 @@ The script automatically detects relevant code and config files:
 
 Examples:
   pnpm ag                                    # Interactive selection
-  pnpm ag --verbose --categories web         # Web app only
+  pnpm ag --verbose --categories web         # Web app only (full)
+  pnpm ag --summary --categories web         # Web app only (signatures)
   pnpm ag --compact --categories api         # API code summary
   pnpm ag --verbose --categories all         # Everything
+  pnpm ag --summary --categories ontology_core # Ontology metadata summaries
   pnpm ag --verbose --categories web,api     # Web app + API
   pnpm ag --verbose --categories ui_routes   # Router configuration and routes only
   pnpm ag --verbose --categories ontology_taxa # Taxonomic data only
-  pnpm ag --verbose --categories ontology_core # Core ontology data only
-  pnpm ag --verbose --categories ontology_taxa,ontology_core # All ontology data
+  pnpm ag --summary --categories ontology_taxa,ontology_core # All ontology data (excerpts)
   pnpm ag --verbose --categories scripts,docs # Scripts and documentation
 `);
 }
@@ -542,6 +685,8 @@ async function main() {
     let contentLevel: ContentLevel = 'verbose';
     if (args.includes('--compact')) {
       contentLevel = 'compact';
+    } else if (args.includes('--summary')) {
+      contentLevel = 'summary';
     }
 
     // Parse categories
@@ -567,9 +712,14 @@ async function main() {
   console.log(`📁 Found ${files.length} files in categories: ${options.categories.join(', ')}`);
 
   console.log('📝 Generating output...');
-  const output = options.contentLevel === 'verbose' 
-    ? generateVerboseOutput(files)
-    : generateCompactOutput(files);
+  let output: string;
+  if (options.contentLevel === 'verbose') {
+    output = generateVerboseOutput(files);
+  } else if (options.contentLevel === 'summary') {
+    output = generateSummaryOutput(files);
+  } else {
+    output = generateCompactOutput(files);
+  }
 
   // Output to file if specified
   if (options.outputFile && (options.outputDestination === 'file' || options.outputDestination === 'both')) {

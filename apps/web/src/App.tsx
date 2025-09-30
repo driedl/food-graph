@@ -14,6 +14,7 @@ import LeftRail from './components/layout/LeftRail'
 import NodeHeader from './components/NodeHeader'
 import StructureExplorer from './components/StructureExplorer'
 import { fsToPath, pathToFs, pathToNodeId } from './lib/fs-url'
+import { RANK_COLOR } from './lib/constants'
 
 /** Shared types matching API rows */
 interface TaxonNode {
@@ -25,27 +26,11 @@ interface TaxonNode {
 }
 
 
-/** Compact rank → style map (fallback default if unknown) */
-const rankColor: Record<string, string> = {
-  root: 'bg-slate-100 text-slate-700 border-slate-200',
-  domain: 'bg-zinc-100 text-zinc-700 border-zinc-200',
-  kingdom: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-  phylum: 'bg-teal-100 text-teal-700 border-teal-200',
-  class: 'bg-cyan-100 text-cyan-700 border-cyan-200',
-  order: 'bg-sky-100 text-sky-700 border-sky-200',
-  family: 'bg-teal-100 text-teal-700 border-teal-200',
-  genus: 'bg-cyan-100 text-cyan-700 border-cyan-200',
-  species: 'bg-blue-100 text-blue-700 border-blue-200',
-  cultivar: 'bg-violet-100 text-violet-700 border-violet-200',
-  variety: 'bg-violet-100 text-violet-700 border-violet-200',
-  breed: 'bg-violet-100 text-violet-700 border-violet-200',
-  product: 'bg-amber-100 text-amber-700 border-amber-200',
-  form: 'bg-amber-100 text-amber-700 border-amber-200',
-}
+const rankColor = RANK_COLOR
 
 export default function App() {
   const router = useRouter()
-  const onFsRoute = router.state.location.pathname.startsWith('/workbench/fs/')
+  const lastFsRef = useRef<string>('') // idempotence for FS derivation
   const normalizePartId = (id: string) => id.replace(/^part:/, '')
   
   // API health + root bootstrap
@@ -208,25 +193,21 @@ export default function App() {
     { enabled: false }
   )
 
-  // FoodState parser
-  const handleParse = async (fs: string) => {
-    console.log('[Parser] Starting parse of:', fs)
+  // tRPC-powered FS parse (typed)
+  const [fsToParse, setFsToParse] = useState<string | null>(null)
+  const parseQ = trpc.foodstate.parse.useQuery(
+    { fs: fsToParse || '' },
+    { enabled: !!fsToParse, retry: 0 }
+  )
+  useEffect(() => {
+    const parsed: any = parseQ.data
+    if (!fsToParse || !parsed) return
+    console.log('[Parser] Parse response:', parsed)
     try {
-      // Use direct tRPC HTTP query: /trpc/route?input=...
-      const res = await fetch(`/trpc/foodstate.parse?input=${encodeURIComponent(JSON.stringify({ fs }))}`)
-      const json = await res.json()
-      console.log('[Parser] Parse response:', json)
-      const parsed = json?.result?.data
-
       if (parsed.taxonPath && parsed.taxonPath.length > 0) {
-        // parsed.taxonPath is an array of slugs like ['life', 'eukaryota', 'plantae', 'rosaceae', 'malus', 'domestica']
-        // Taxon IDs follow the pattern: tx:kingdom:family:genus:species
-        // We need to find where the kingdom starts and build from there
         const kingdoms = ['plantae', 'animalia', 'fungi']
         const kingdomIndex = parsed.taxonPath.findIndex((slug: string) => kingdoms.includes(slug))
-        
         if (kingdomIndex >= 0) {
-          // Build the taxon ID from the kingdom onwards
           const taxonomicPath = parsed.taxonPath.slice(kingdomIndex)
           const taxonId = 'tx:' + taxonomicPath.join(':')
           console.log('[Parser] Constructed taxon ID:', taxonId, 'from path:', taxonomicPath)
@@ -236,24 +217,26 @@ export default function App() {
         }
       }
       if (parsed.partId) {
-        // Store normalized (no prefix)
         const partId = normalizePartId(parsed.partId)
         console.log('[Parser] Setting selectedPartId to:', partId)
         setSelectedPartId(partId)
       }
       if (parsed.transforms && parsed.transforms.length) {
-        // Stage; will be filtered to identity transforms that exist once query resolves
         pendingFromParse.current = parsed.transforms.map((t: any) => ({
-          id: t.id.replace(/^tx:/, ''), // Remove tx: prefix if present
+          id: t.id.replace(/^tx:/, ''),
           params: t.params ?? {},
         }))
       } else {
         pendingFromParse.current = null
       }
+    } finally {
       console.log('[Parser] Parse complete')
-    } catch (error) {
-      console.error('[Parser] Failed to parse FoodState:', error)
+      setFsToParse(null)
     }
+  }, [parseQ.data, fsToParse])
+  const handleParse = async (fs: string) => {
+    console.log('[Parser] Starting parse of:', fs)
+    setFsToParse(fs)
   }
 
   // --- State → URL (push new history entries when state changes) ------------
@@ -263,10 +246,9 @@ export default function App() {
   useEffect(() => {
     console.log('[State→URL] currentId:', currentId, 'isApplying:', isApplyingFromUrl.current, 'selectedPartId:', selectedPartId, 'lastPath:', lastPathRef.current)
     if (!currentId || isApplyingFromUrl.current) return
-    // If we're already on an FS route but state hasn't re-hydrated part/tx yet,
-    // skip downgrading the URL back to /node/:id. This prevents the flash/revert.
-    if (onFsRoute && !selectedPartId && !chosen.length) {
-      console.log('[State→URL] On FS route with no part/tx yet — holding position')
+    // Hold only while we are actively applying from URL (not just because we are on an FS route)
+    if (isParsingUrl.current && !selectedPartId && !chosen.length) {
+      console.log('[State→URL] During URL parse, no part/tx yet — holding position')
       return
     }
     const fs = fsPreview
@@ -284,6 +266,15 @@ export default function App() {
         : `/workbench/node/${currentId}`
 
     console.log('[State→URL] targetPath:', targetPath, 'lastPath:', lastPathRef.current)
+
+    // Idempotence: avoid churn if FS string hasn't meaningfully changed
+    if (fs) {
+      if (fs !== lastFsRef.current) {
+        lastFsRef.current = fs
+      } else if (targetPath === lastPathRef.current) {
+        return
+      }
+    }
 
     if (targetPath && targetPath !== lastPathRef.current) {
       const isFirstWrite = !lastPathRef.current

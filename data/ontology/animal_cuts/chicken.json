@@ -1,9 +1,23 @@
 {
-  "taxa": ["tx:animalia"],
+  "taxa": [
+    "tx:animalia:chordata:aves:galliformes:phasianidae:gallus:gallus_domesticus"
+  ],
   "parts": [
-    { "id":"part:cut:breast", "name":"Breast" },
-    { "id":"part:cut:thigh", "name":"Thigh" },
-    { "id":"part:cut:wing", "name":"Wing" },
-    { "id":"part:cut:drumstick", "name":"Drumstick" }
+    {
+      "id": "part:cut:breast",
+      "name": "Breast"
+    },
+    {
+      "id": "part:cut:thigh",
+      "name": "Thigh"
+    },
+    {
+      "id": "part:cut:wing",
+      "name": "Wing"
+    },
+    {
+      "id": "part:cut:drumstick",
+      "name": "Drumstick"
+    }
   ]
 }

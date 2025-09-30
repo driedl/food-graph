@@ -1,5 +1,6 @@
 import argparse, os, sqlite3, json, glob, re, sys, time
 from datetime import datetime
+from typing import Set, Tuple, Optional
 
 def print_step(step, message):
     """Print a formatted step message."""
@@ -131,6 +132,14 @@ CREATE TABLE IF NOT EXISTS transform_applicability (
   transform_id TEXT NOT NULL REFERENCES transform_def(id) ON DELETE RESTRICT,
   PRIMARY KEY (taxon_id, part_id, transform_id)
 );
+
+-- Add helpful indexes for performance
+CREATE INDEX IF NOT EXISTS idx_has_part_taxon ON has_part(taxon_id);
+CREATE INDEX IF NOT EXISTS idx_has_part_part  ON has_part(part_id);
+CREATE INDEX IF NOT EXISTS idx_tfapp_taxon_part ON transform_applicability(taxon_id, part_id);
+CREATE INDEX IF NOT EXISTS idx_part_synonym_part ON part_synonym(part_id);
+CREATE INDEX IF NOT EXISTS idx_tpn_taxon ON taxon_part_nodes(taxon_id);
+CREATE INDEX IF NOT EXISTS idx_tpn_part  ON taxon_part_nodes(part_id);
 """)
 
 print_info("Clearing existing data...")
@@ -382,6 +391,37 @@ tp_syn_rules = _read_jsonl(os.path.join(args.in_dir, "rules", "taxon_part_synony
 print_success(f"Loaded implied_parts={len(implied_parts_rules)}, "
               f"name_overrides={len(name_overrides_rules)}, tp_synonyms={len(tp_syn_rules)}")
 
+# also ingest part_aliases into part_synonym (for FTS reachability)
+part_aliases = _read_jsonl(os.path.join(args.in_dir, "rules", "part_aliases.jsonl"))
+ali_inserted = 0
+ali_skipped = 0
+for r in part_aliases:
+    pid = r.get("part_id")
+    for a in (r.get("aliases") or []):
+        syn = a.strip().lower()
+        if pid and syn:
+            # Check if the part_id exists before inserting
+            exists = cur.execute("SELECT 1 FROM part_def WHERE id = ?", (pid,)).fetchone()
+            if exists:
+                cur.execute("INSERT OR IGNORE INTO part_synonym(part_id, synonym) VALUES (?,?)", (pid, syn))
+                ali_inserted += 1
+            else:
+                ali_skipped += 1
+                if args.verbose:
+                    print(f"  ⚠️  Skipping alias '{syn}' for unknown part '{pid}'")
+if ali_skipped > 0:
+    print_info(f"Skipped {ali_skipped} aliases for unknown parts")
+print_success(f"Ingested {ali_inserted} part aliases into part_synonym")
+
+# Load taxon_part_policy.json for TP materialization control
+tp_policy_path = os.path.join(args.in_dir, "rules", "taxon_part_policy.json")
+tp_policy = {}
+if os.path.exists(tp_policy_path):
+    with open(tp_policy_path, "r", encoding="utf-8") as f:
+        tp_policy = json.load(f)
+else:
+    print_info("No taxon_part_policy.json found; using built-in leaf heuristics.")
+
 # Insert nodes in parent-first order using topological sort
 print_step("4/5", "Sorting taxa by hierarchy depth...")
 def depth(tx_id: str) -> int:
@@ -523,6 +563,10 @@ for r in parts_rules:
     p = r["part"]
     if p not in known_parts:
         print_error(f"Unknown part in parts_applicability: {p}")
+    # Check for empty taxon prefix matches
+    matched = [tid for tid in all_taxa if any(tid.startswith(p) for p in r.get("applies_to", []))]
+    if not matched:
+        print_error(f"No taxa matched for part rule: {r['part']} {r.get('applies_to')}")
 
 rows = set()
 for rule in tx_rules:
@@ -584,7 +628,7 @@ def _is_implied(taxon_id: str, part_id: str) -> bool:
                     return True
     return False
 
-def _override_name(taxon_id: str, part_id: str) -> str | None:
+def _override_name(taxon_id: str, part_id: str) -> Optional[Tuple[str, str]]:
     # choose most-specific rule (longest matching taxon_id)
     best = None
     best_len = -1
@@ -592,13 +636,14 @@ def _override_name(taxon_id: str, part_id: str) -> str | None:
         tid = r.get("taxon_id")
         pid = r.get("part_id")
         nm = r.get("name")
+        dn = r.get("display_name") or nm
         if not (tid and pid and nm):
             continue
         if pid == part_id and _is_prefix(tid, taxon_id) and len(tid) > best_len:
-            best, best_len = nm, len(tid)
+            best, best_len = (nm, dn), len(tid)
     return best
 
-def _tp_extra_synonyms(taxon_id: str, part_id: str) -> list[str]:
+def _tp_extra_synonyms(taxon_id: str, part_id: str):
     acc = []
     for r in tp_syn_rules:
         tid = r.get("taxon_id")
@@ -614,7 +659,7 @@ for nid, pid in cur.execute("SELECT id, parent_id FROM nodes"):
     if pid:
         children.setdefault(pid, []).append(nid)
 
-def _descendants_with_part(start_id: str, wanted_part: str, hp_set: set[tuple[str,str]]) -> bool:
+def _descendants_with_part(start_id: str, wanted_part: str, hp_set: Set[Tuple[str,str]]) -> bool:
     stack = children.get(start_id, [])[:]
     while stack:
         cur_id = stack.pop()
@@ -629,9 +674,31 @@ hp_set = set(hp_pairs)
 
 # Rank/kingdom lookup
 node_info = { row[0]: (row[1], row[2]) for row in cur.execute("SELECT id, name, rank FROM nodes") } # id -> (name, rank)
-def _kingdom(tid: str) -> str | None:
+def _kingdom(tid: str):
     parts = tid.split(":")
     return parts[1] if len(parts) > 2 and parts[0] == "tx" else None
+
+def _tp_policy_allowed(taxon_id: str, part_id: str, tax_rank: str) -> bool:
+    if not tp_policy:
+        return True  # fall back to old behavior (handled by leaf filter below)
+
+    kg = _kingdom(taxon_id)
+    default_ranks = set((tp_policy.get("default") or {}).get(kg, []))
+    allowlist = tp_policy.get("allowlist") or []
+    blocklist = tp_policy.get("blocklist") or []
+
+    # blocklist wins
+    for b in blocklist:
+        if taxon_id.startswith(b.get("taxon_id","")) and part_id in (b.get("parts") or []):
+            return False
+
+    # explicit allow
+    for a in allowlist:
+        if taxon_id.startswith(a.get("taxon_id","")) and part_id in (a.get("parts") or []):
+            return True
+
+    # default by kingdom/rank
+    return (tax_rank in default_ranks) if default_ranks else True
 
 # part info & synonyms
 part_info = { row[0]: (row[1], row[2]) for row in cur.execute("SELECT id, name, COALESCE(kind,'') FROM part_def") } # id -> (name, kind)
@@ -650,21 +717,24 @@ for taxon_id, part_id in hp_pairs:
     if not p_name:
         continue
 
-    # Filter: prefer leaf-for-this-part; also allow species-level under animalia even if descendants exist
+    # existing descendant-based leaf pruning
     skip = False
     if _descendants_with_part(taxon_id, part_id, hp_set):
-        # keep if animalia at (sub)species to allow "Beef" + "Wagyu" side-by-side
         kg = _kingdom(taxon_id)
-        keep_non_leaf = (kg == "animalia" and tax_rank in ("species", "subspecies"))
+        keep_non_leaf = (kg == "animalia" and tax_rank in ("species","subspecies"))
         skip = not keep_non_leaf
+
+    # NEW: apply policy (can both allow non-leaf and block leafs by rank)
+    if not _tp_policy_allowed(taxon_id, part_id, tax_rank):
+        skip = True
+
     if skip:
         continue
 
     # 1) name override (most specific wins)
     ov = _override_name(taxon_id, part_id)
     if ov:
-        name = ov
-        display_name = ov
+        name, display_name = ov
     else:
         # 2) implied part collapse
         if _is_implied(taxon_id, part_id):
@@ -729,22 +799,34 @@ if docs_rows:
 # Create and populate FTS table for search functionality
 print_step("6/6", "Creating full-text search index...")
 
-# Create FTS table (now unified: taxa + taxon_part)
+# Create contentless FTS table and align rowids with nodes.rowid
 cur.execute("""
     CREATE VIRTUAL TABLE IF NOT EXISTS nodes_fts
-    USING fts5(name, synonyms, taxon_rank, kind);
+    USING fts5(name, synonyms, taxon_rank, kind, content='',
+               tokenize = 'unicode61 remove_diacritics 2');
 """)
 
-# Populate FTS table with TAXA first
+cur.execute("DELETE FROM nodes_fts")
+
+# TAXA → ensure rowid parity with nodes.rowid
 cur.execute("""
-    INSERT INTO nodes_fts(name,synonyms,taxon_rank,kind)
-    SELECT n.name, COALESCE(GROUP_CONCAT(s.synonym,' '), ''), n.rank, NULL
-    FROM nodes n
-    LEFT JOIN synonyms s ON s.node_id = n.id
-    GROUP BY n.id;
+    INSERT INTO nodes_fts(rowid, name, synonyms, taxon_rank, kind)
+    SELECT n.rowid,
+           n.name,
+           (
+             SELECT TRIM(COALESCE(GROUP_CONCAT(syn,' '), '')) FROM (
+               SELECT DISTINCT s2.synonym AS syn
+               FROM synonyms s2
+               WHERE s2.node_id = n.id
+               ORDER BY syn COLLATE NOCASE
+             )
+           ),
+           n.rank,
+           NULL
+    FROM nodes n;
 """)
 
-# Populate FTS with TAXON+PART rows (names + merged synonyms)
+# TP rows (no stable rowid to mirror; they don't get triggers anyway)
 if fts_tp_rows:
     cur.executemany(
         "INSERT INTO nodes_fts(name, synonyms, taxon_rank, kind) VALUES (?,?,?,?)",
@@ -754,45 +836,61 @@ if fts_tp_rows:
 fts_count = cur.execute("SELECT COUNT(*) FROM nodes_fts").fetchone()[0]
 print_success(f"Created FTS index with {fts_count} entries")
 
-# Create triggers to keep FTS in sync
+# Create triggers to keep FTS in sync with proper rowid alignment
 cur.execute("""
+    -- INSERT: keep rowid parity and precompute synonyms
     CREATE TRIGGER IF NOT EXISTS trg_nodes_ai AFTER INSERT ON nodes BEGIN
-      INSERT INTO nodes_fts(name,synonyms,taxon_rank,kind)
-      VALUES (NEW.name, '', NEW.rank, NULL);
-    END;
-""")
-
-cur.execute("""
-    CREATE TRIGGER IF NOT EXISTS trg_nodes_ad AFTER DELETE ON nodes BEGIN
-      DELETE FROM nodes_fts WHERE name = OLD.name AND taxon_rank = OLD.rank AND kind IS NULL;
-    END;
-""")
-
-cur.execute("""
-    CREATE TRIGGER IF NOT EXISTS trg_nodes_au AFTER UPDATE OF name,rank ON nodes BEGIN
-      UPDATE nodes_fts SET name = NEW.name, taxon_rank = NEW.rank
-      WHERE name = OLD.name AND taxon_rank = OLD.rank AND kind IS NULL;
-    END;
-""")
-
-cur.execute("""
-    CREATE TRIGGER IF NOT EXISTS trg_synonyms_ai AFTER INSERT ON synonyms BEGIN
-      UPDATE nodes_fts SET synonyms = TRIM(
-        COALESCE(synonyms,'') || ' ' || NEW.synonym
-      ) WHERE rowid = (
-        SELECT n.rowid FROM nodes n WHERE n.id = NEW.node_id
+      INSERT INTO nodes_fts(rowid, name, synonyms, taxon_rank, kind)
+      VALUES (
+        NEW.rowid,
+        NEW.name,
+        (
+          SELECT TRIM(COALESCE(GROUP_CONCAT(s.synonym,' '), ''))
+          FROM synonyms s WHERE s.node_id = NEW.id
+        ),
+        NEW.rank,
+        NULL
       );
     END;
 """)
 
 cur.execute("""
+    -- DELETE: remove exact mirror row
+    CREATE TRIGGER IF NOT EXISTS trg_nodes_ad AFTER DELETE ON nodes BEGIN
+      DELETE FROM nodes_fts WHERE rowid = OLD.rowid;
+    END;
+""")
+
+cur.execute("""
+    -- UPDATE: mutate the mirrored row
+    CREATE TRIGGER IF NOT EXISTS trg_nodes_au AFTER UPDATE OF name,rank ON nodes BEGIN
+      UPDATE nodes_fts
+      SET name = NEW.name, taxon_rank = NEW.rank
+      WHERE rowid = OLD.rowid;
+    END;
+""")
+
+cur.execute("""
+    -- SYN INSERT: recompute synonyms string for that node rowid
+    CREATE TRIGGER IF NOT EXISTS trg_synonyms_ai AFTER INSERT ON synonyms BEGIN
+      UPDATE nodes_fts
+      SET synonyms = (
+        SELECT TRIM(COALESCE(GROUP_CONCAT(s2.synonym,' '), ''))
+        FROM synonyms s2 WHERE s2.node_id = NEW.node_id
+      )
+      WHERE rowid = (SELECT n.rowid FROM nodes n WHERE n.id = NEW.node_id);
+    END;
+""")
+
+cur.execute("""
+    -- SYN DELETE: recompute too
     CREATE TRIGGER IF NOT EXISTS trg_synonyms_ad AFTER DELETE ON synonyms BEGIN
-      UPDATE nodes_fts SET synonyms = (
+      UPDATE nodes_fts
+      SET synonyms = (
         SELECT TRIM(COALESCE(GROUP_CONCAT(s2.synonym,' '), ''))
         FROM synonyms s2 WHERE s2.node_id = OLD.node_id
-      ) WHERE rowid = (
-        SELECT n.rowid FROM nodes n WHERE n.id = OLD.node_id
-      );
+      )
+      WHERE rowid = (SELECT n.rowid FROM nodes n WHERE n.id = OLD.node_id);
     END;
 """)
 

@@ -1,7 +1,19 @@
 {
-  "taxa": ["tx:animalia"],
+  "taxa": [
+    "tx:animalia:chordata:mammalia:artiodactyla:suidae:sus:scrofa_domesticus"
+  ],
   "parts": [
-    { "id":"part:cut:belly", "name":"Belly", "aliases":["pork belly","side pork"] },
-    { "id":"part:cut:loin", "name":"Loin" }
+    {
+      "id": "part:cut:belly",
+      "name": "Belly",
+      "aliases": [
+        "pork belly",
+        "side pork"
+      ]
+    },
+    {
+      "id": "part:cut:loin",
+      "name": "Loin"
+    }
   ]
 }
