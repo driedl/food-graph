@@ -37,6 +37,8 @@
 {"transform":"tf:strain","applies_to":[{"taxon_prefix":"tx:animalia:chordata:mammalia:artiodactyla:bovidae","parts":["part:curd","part:whey"]}]}
 {"transform":"tf:cook_curd","applies_to":[{"taxon_prefix":"tx:animalia:chordata:mammalia:artiodactyla:bovidae","parts":["part:curd"]}]}
 {"transform":"tf:press","applies_to":[{"taxon_prefix":"tx:animalia:chordata:mammalia:artiodactyla:bovidae","parts":["part:curd"]}]}
+{"transform":"tf:coagulate","applies_to":[{"taxon_prefix":"tx:plantae:fabaceae:glycine:max","parts":["part:plant_milk"]}]}
+{"transform":"tf:press","applies_to":[{"taxon_prefix":"tx:plantae:fabaceae:glycine:max","parts":["part:curd"]}]}
 {"transform":"tf:stretch","applies_to":[{"taxon_prefix":"tx:animalia:chordata:mammalia:artiodactyla:bovidae","parts":["part:curd"]}]}
 {"transform":"tf:salt","applies_to":[{"taxon_prefix":"tx:animalia:chordata:mammalia:artiodactyla:bovidae","parts":["part:curd"]}]}
 {"transform":"tf:age","applies_to":[{"taxon_prefix":"tx:animalia:chordata:mammalia:artiodactyla:bovidae","parts":["part:curd"]}]}

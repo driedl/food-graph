@@ -106,6 +106,22 @@ const FILE_CATEGORIES: Record<string, FileCategory> = {
     ],
     description: 'Python scripts, TypeScript ETL pipeline, and shared utilities',
   },
+  etl2: {
+    name: 'ETL2 Processing',
+    pattern: [
+      'etl2/**/*.py',
+      'etl2/**/*.md',
+      'etl2/**/*.toml',
+      'etl2/**/*.txt',
+    ],
+    ignore: [
+      'etl2/build/**',  // Exclude build folder
+      'etl2/**/__pycache__/**',  // Exclude Python cache
+      'etl2/**/*.pyc',  // Exclude compiled Python files
+      'etl2/**/*.egg-info/**',  // Exclude Python package info
+    ],
+    description: 'ETL2 Python pipeline with Mise framework and documentation',
+  },
   ontology_taxa: {
     name: 'Ontology - Taxa',
     pattern: [
@@ -627,6 +643,7 @@ File Categories:
   web        - React frontend application with tRPC client and API contracts
   api        - tRPC server with SQLite database and API contracts
   etl        - Python scripts and shared utilities
+  etl2       - ETL2 Python pipeline with Mise framework and documentation
   ontology_taxa - Taxonomic classification data (animals, plants, fungi, etc.)
   ontology_core - Core ontology data (attributes, nutrients, parts, rules, transforms) - excludes taxa
   ui_routes  - TanStack Router configuration, route definitions, and related utilities

@@ -172,6 +172,17 @@ At repo root:
 - `pnpm db:open` — open the current DB in `sqlite3`
 - `pnpm lint` / `pnpm typecheck` — standard hygiene
 
+### ETL2 (Python)
+
+The new Python-based ETL pipeline (eventually replacing the legacy `etl/`):
+
+- `pnpm etl2:install` — install Python dependencies
+- `pnpm etl2:plan` — show pipeline stages and cache status
+- `pnpm etl2:run` — run Stage A (load + lint + normalize)
+- `pnpm etl2:clean` — clean build artifacts
+
+> ETL2 outputs to `etl2/build/database/graph.dev.sqlite`. Set `GRAPH_DB_PATH=etl2/build/database/graph.dev.sqlite` to use with the API.
+
 > If you prefer not to use Turbo, you can run `pnpm -C apps/api dev` and `pnpm -C apps/web dev` in separate terminals.
 
 ---

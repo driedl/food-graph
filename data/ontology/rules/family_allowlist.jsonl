@@ -1,0 +1,14 @@
+{"family":"CULTURED_DAIRY","taxon_prefix":"tx:animalia:chordata:mammalia:artiodactyla:bovidae","parts":["part:milk","part:cream"]}
+{"family":"DRY_CURED_MEAT","taxon_prefix":"tx:animalia:chordata:mammalia:artiodactyla:suidae","parts":["part:cut:belly","part:cut:leg"]}
+{"family":"SMOKED_MEAT_FISH","taxon_prefix":"tx:animalia:chordata:actinopterygii","parts":["part:cut:fillet"]}
+{"family":"SMOKED_MEAT_FISH","taxon_prefix":"tx:animalia:chordata:mammalia","parts":["part:cut:belly","part:cut:shoulder"]}
+{"family":"BRINED_FERMENT_VEG","taxon_prefix":"tx:plantae:brassicaceae","parts":["part:leaf"]}
+{"family":"BRINED_FERMENT_VEG","taxon_prefix":"tx:plantae:cucurbitaceae:cucumis:sativus","parts":["part:fruit"]}
+{"family":"VIRGIN_OIL","taxon_prefix":"tx:plantae:oleaceae:olea:europaea","parts":["part:expressed_oil","part:fruit"]}
+{"family":"REFINED_OIL","taxon_prefix":"tx:plantae:oleaceae:olea:europaea","parts":["part:expressed_oil"]}
+{"family":"BUTTER_DERIVATIVES","taxon_prefix":"tx:animalia:chordata:mammalia","parts":["part:butter"]}
+{"family":"FLOURS_MEALS","taxon_prefix":"tx:plantae:poaceae:triticum","parts":["part:grain"]}
+{"family":"FLOURS_MEALS","taxon_prefix":"tx:plantae:poaceae:avena:sativa","parts":["part:grain"]}
+{"family":"FLOURS_MEALS","taxon_prefix":"tx:plantae:poaceae:oryza:sativa","parts":["part:grain"]}
+{"family":"FLOURS_MEALS","taxon_prefix":"tx:plantae:rosaceae:prunus:dulcis","parts":["part:seed"]}
+{"family":"FLOURS_MEALS","taxon_prefix":"tx:plantae:fabaceae:glycine:max","parts":["part:seed"]}

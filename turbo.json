@@ -30,6 +30,15 @@
     },
     "etl:clean": {
       "outputs": []
+    },
+    "etl2:run": {
+      "inputs": [
+        "etl2/**",
+        "data/ontology/**"
+      ],
+      "outputs": [
+        "etl2/build/**"
+      ]
     }
   },
   "globalDependencies": [

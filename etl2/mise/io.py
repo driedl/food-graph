@@ -3,6 +3,9 @@ import json, hashlib, glob
 from pathlib import Path
 from typing import Iterable, Any, Dict, List
 
+def ensure_dir(path: Path) -> None:
+    path.mkdir(parents=True, exist_ok=True)
+
 def read_json(p: Path) -> Any:
     return json.loads(Path(p).read_text(encoding="utf-8"))
 

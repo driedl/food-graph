@@ -1,0 +1,8 @@
+{"flag_type":"safety","emit":"smoked","when":{"allOf":[{"has_transform":"tf:smoke"}]}}
+{"flag_type":"safety","emit":"nitrite_present","when":{"allOf":[{"has_transform":"tf:cure"},{"param":"tf:cure.nitrite_ppm","op":"gt","value":0}]}}
+{"flag_type":"safety","emit":"nitrite_free","when":{"allOf":[{"has_transform":"tf:cure"},{"param":"tf:cure.nitrite_ppm","op":"eq","value":0}]}}
+{"flag_type":"safety","emit":"pasteurized","when":{"allOf":[{"has_transform":"tf:pasteurize"}]}}
+{"flag_type":"safety","emit":"fermented","when":{"allOf":[{"has_transform":"tf:ferment"}]}}
+{"flag_type":"safety","emit":"raw_dairy","when":{"allOf":[{"has_part":"part:milk"}],"noneOf":[{"has_transform":"tf:pasteurize"}]}}
+{"flag_type":"dietary","emit":"vegetarian","when":{"allOf":[{"has_part":"part:milk"}]}}
+{"flag_type":"dietary","emit":"vegan","when":{"allOf":[{"has_part":"part:plant_milk"}],"noneOf":[{"has_part":"part:milk"},{"has_part":"part:egg"}]}}

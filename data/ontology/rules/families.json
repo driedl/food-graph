@@ -1,0 +1,290 @@
+[
+    {
+        "id": "CULTURED_DAIRY",
+        "identity_transforms": [
+            "tf:ferment",
+            "tf:strain?"
+        ],
+        "identity_params": [
+            "starter",
+            "strain_level?"
+        ],
+        "naming": {
+            "template": "{baseName}",
+            "variants": [
+                {
+                    "when": {
+                        "strain_level": ">=7%"
+                    },
+                    "name": "Greek Yogurt"
+                },
+                {
+                    "when": {
+                        "strain_level": ">=20%"
+                    },
+                    "name": "Labneh"
+                }
+            ]
+        },
+        "defaults": {
+            "cuisines": [
+                "Global"
+            ]
+        },
+        "param_buckets": {
+            "strain_level": [
+                {
+                    "to": 4,
+                    "as": "light"
+                },
+                {
+                    "to": 10,
+                    "as": "greek"
+                },
+                {
+                    "to": 100,
+                    "as": "labneh"
+                }
+            ]
+        }
+    },
+    {
+        "id": "DRY_CURED_MEAT",
+        "identity_transforms": [
+            "tf:cure",
+            "tf:age",
+            "tf:smoke?"
+        ],
+        "identity_params": [
+            "style",
+            "nitrite_ppm",
+            "age.time_d"
+        ],
+        "naming": {
+            "template": "{baseName}",
+            "variants": [
+                {
+                    "when": {
+                        "style": "dry",
+                        "nitrite_ppm": ">0"
+                    },
+                    "name": "Dry Cured"
+                },
+                {
+                    "when": {
+                        "style": "wet",
+                        "nitrite_ppm": ">0"
+                    },
+                    "name": "Wet Cured"
+                }
+            ]
+        },
+        "defaults": {
+            "cuisines": [
+                "Italian",
+                "Spanish",
+                "French"
+            ]
+        },
+        "param_buckets": {
+            "age.time_d": [
+                {
+                    "to": 30,
+                    "as": "fresh"
+                },
+                {
+                    "to": 180,
+                    "as": "short"
+                },
+                {
+                    "to": 9999,
+                    "as": "long"
+                }
+            ]
+        }
+    },
+    {
+        "id": "SMOKED_MEAT_FISH",
+        "identity_transforms": [
+            "tf:smoke"
+        ],
+        "identity_params": [
+            "mode"
+        ],
+        "naming": {
+            "template": "Smoked {baseName}",
+            "variants": [
+                {
+                    "when": {
+                        "mode": "cold"
+                    },
+                    "name": "Cold Smoked"
+                },
+                {
+                    "when": {
+                        "mode": "hot"
+                    },
+                    "name": "Hot Smoked"
+                }
+            ]
+        },
+        "defaults": {
+            "cuisines": [
+                "Global"
+            ]
+        },
+        "param_buckets": {
+            "smoke.temp_C": [
+                {
+                    "to": 40,
+                    "as": "cold"
+                },
+                {
+                    "to": 999,
+                    "as": "hot"
+                }
+            ]
+        }
+    },
+    {
+        "id": "BRINED_FERMENT_VEG",
+        "identity_transforms": [
+            "tf:salt",
+            "tf:ferment"
+        ],
+        "identity_params": [
+            "salt_pct",
+            "time_h"
+        ],
+        "naming": {
+            "template": "Fermented {baseName}",
+            "variants": [
+                {
+                    "when": {
+                        "salt_pct": ">=2.0"
+                    },
+                    "name": "Sauerkraut"
+                },
+                {
+                    "when": {
+                        "salt_pct": "<2.0"
+                    },
+                    "name": "Kimchi"
+                }
+            ]
+        },
+        "defaults": {
+            "cuisines": [
+                "Korean",
+                "German",
+                "Eastern European"
+            ]
+        },
+        "param_buckets": {
+            "salt_pct": [
+                {
+                    "to": 1.5,
+                    "as": "light"
+                },
+                {
+                    "to": 2.5,
+                    "as": "medium"
+                },
+                {
+                    "to": 100,
+                    "as": "heavy"
+                }
+            ]
+        }
+    },
+    {
+        "id": "VIRGIN_OIL",
+        "identity_transforms": [
+            "tf:press"
+        ],
+        "identity_params": [],
+        "naming": {
+            "template": "Extra Virgin {baseName} Oil",
+            "variants": []
+        },
+        "defaults": {
+            "cuisines": [
+                "Mediterranean",
+                "Global"
+            ]
+        },
+        "param_buckets": {}
+    },
+    {
+        "id": "REFINED_OIL",
+        "identity_transforms": [
+            "tf:press",
+            "tf:refine_oil"
+        ],
+        "identity_params": [
+            "steps"
+        ],
+        "naming": {
+            "template": "Refined {baseName} Oil",
+            "variants": []
+        },
+        "defaults": {
+            "cuisines": [
+                "Global"
+            ]
+        },
+        "param_buckets": {}
+    },
+    {
+        "id": "FLOURS_MEALS",
+        "identity_transforms": [
+            "tf:mill"
+        ],
+        "identity_params": [
+            "target"
+        ],
+        "naming": {
+            "template": "{baseName} {target}",
+            "variants": []
+        },
+        "defaults": {
+            "cuisines": [
+                "Global"
+            ]
+        },
+        "param_buckets": {}
+    },
+    {
+        "id": "BUTTER_DERIVATIVES",
+        "identity_transforms": [
+            "tf:clarify?"
+        ],
+        "identity_params": [],
+        "naming": {
+            "template": "{baseName}",
+            "variants": [
+                {
+                    "when": {
+                        "has_transform": "tf:clarify"
+                    },
+                    "name": "Ghee"
+                },
+                {
+                    "when": {
+                        "has_transform": "tf:clarify",
+                        "temp_C": ">100"
+                    },
+                    "name": "Brown Butter"
+                }
+            ]
+        },
+        "defaults": {
+            "cuisines": [
+                "Indian",
+                "French",
+                "Global"
+            ]
+        },
+        "param_buckets": {}
+    }
+]

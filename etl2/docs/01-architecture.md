@@ -12,6 +12,7 @@ mise (runner)
   └─ stages/       # Stage modules
 
 build/ (artifacts)
+  ├─ compiled/     # persistent ontology compilation (taxa, assets, docs)
   ├─ tmp/          # intermediate, diffable
   ├─ out/          # API-ready payloads (search docs, families catalog, tpt meta)
   ├─ graph/        # edges/substrates

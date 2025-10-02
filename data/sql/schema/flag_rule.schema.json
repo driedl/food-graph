@@ -1,0 +1,130 @@
+{
+    "$id": "flag_rule.schema.json",
+    "title": "Guarded Flag Rule",
+    "type": "object",
+    "required": [
+        "flag_type",
+        "emit",
+        "when"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "type": "string",
+            "description": "Optional stable id for diffs"
+        },
+        "flag_type": {
+            "type": "string",
+            "enum": [
+                "safety",
+                "dietary"
+            ]
+        },
+        "emit": {
+            "type": "string",
+            "description": "Flag token to emit (e.g., smoked, pasteurized, nitrite_present, vegetarian)"
+        },
+        "when": {
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": false,
+            "properties": {
+                "allOf": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/cond"
+                    }
+                },
+                "anyOf": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/cond"
+                    }
+                },
+                "noneOf": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/cond"
+                    }
+                }
+            }
+        },
+        "notes": {
+            "type": "string"
+        }
+    },
+    "$defs": {
+        "cond": {
+            "oneOf": [
+                {
+                    "$ref": "#/$defs/has_transform"
+                },
+                {
+                    "$ref": "#/$defs/has_part"
+                },
+                {
+                    "$ref": "#/$defs/param_cmp"
+                }
+            ]
+        },
+        "has_transform": {
+            "type": "object",
+            "required": [
+                "has_transform"
+            ],
+            "properties": {
+                "has_transform": {
+                    "type": "string",
+                    "pattern": "^tf:"
+                }
+            }
+        },
+        "has_part": {
+            "type": "object",
+            "required": [
+                "has_part"
+            ],
+            "properties": {
+                "has_part": {
+                    "type": "string",
+                    "pattern": "^part:"
+                }
+            }
+        },
+        "param_cmp": {
+            "type": "object",
+            "required": [
+                "param",
+                "op",
+                "value"
+            ],
+            "properties": {
+                "param": {
+                    "type": "string",
+                    "pattern": "^tf:[^.]+\\.\\w+$"
+                },
+                "op": {
+                    "type": "string",
+                    "enum": [
+                        "eq",
+                        "ne",
+                        "gt",
+                        "gte",
+                        "lt",
+                        "lte"
+                    ]
+                },
+                "value": {
+                    "oneOf": [
+                        {
+                            "type": "number"
+                        },
+                        {
+                            "type": "string"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

@@ -210,3 +210,8 @@
 {"part":"part:seed","applies_to":["tx:plantae:anacardiaceae:anacardium:occidentale:"],"exclude":[]}
 {"part":"part:seed","applies_to":["tx:plantae:anacardiaceae:pistacia:vera:"],"exclude":[]}
 {"part":"part:seed","applies_to":["tx:plantae:fabaceae:arachis:hypogaea:"],"exclude":[]}
+
+{"part":"part:plant_milk","applies_to":["tx:plantae:fabaceae:glycine:max:","tx:plantae:rosaceae:prunus:dulcis:","tx:plantae:poaceae:avena:sativa:","tx:plantae:poaceae:oryza:sativa:"],"exclude":[]}
+{"part":"part:tofu","applies_to":["tx:plantae:fabaceae:glycine:max:"],"exclude":[]}
+{"part":"part:okara","applies_to":["tx:plantae:fabaceae:glycine:max:","tx:plantae:rosaceae:prunus:dulcis:","tx:plantae:poaceae:avena:sativa:"],"exclude":[]}
+{"part":"part:tofu_serum","applies_to":["tx:plantae:fabaceae:glycine:max:"],"exclude":[]}

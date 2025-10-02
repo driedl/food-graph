@@ -1,0 +1,54 @@
+{
+    "age.time_d": [
+        {
+            "to": 30,
+            "as": "fresh"
+        },
+        {
+            "to": 180,
+            "as": "short"
+        },
+        {
+            "to": 9999,
+            "as": "long"
+        }
+    ],
+    "smoke.temp_C": [
+        {
+            "to": 40,
+            "as": "cold"
+        },
+        {
+            "to": 999,
+            "as": "hot"
+        }
+    ],
+    "strain_level": [
+        {
+            "to": 4,
+            "as": "light"
+        },
+        {
+            "to": 10,
+            "as": "greek"
+        },
+        {
+            "to": 100,
+            "as": "labneh"
+        }
+    ],
+    "salt_pct": [
+        {
+            "to": 1.5,
+            "as": "light"
+        },
+        {
+            "to": 2.5,
+            "as": "medium"
+        },
+        {
+            "to": 100,
+            "as": "heavy"
+        }
+    ]
+}

@@ -18,6 +18,10 @@
       "type": "string",
       "description": "plant|animal|fungus|any"
     },
+    "parent_id": {
+      "type": "string",
+      "description": "Optional: hierarchical parent part id"
+    },
     "applies_to": {
       "type": "array",
       "items": {

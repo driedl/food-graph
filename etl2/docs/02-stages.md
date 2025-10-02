@@ -1,9 +1,10 @@
-# Stage Catalog (A→K)
+# Stage Catalog (0→K)
 
 This is the authoritative stage blueprint. We will bring these online incrementally; file names are indicative.
 
 | ID | Name | Module | Inputs | Outputs | Notes |
 |---:|------|--------|--------|---------|------|
+| 0 | Ontology Compile | `stages/stage_0/` | taxa/, ontology assets | `compiled/taxa.jsonl`, `compiled/*.json`, `compiled/rules/`, `compiled/docs.jsonl` | Compile taxa shards; copy assets; compile docs |
 | A | Load + Lint | `stages/a_load_lint.py` | ontology, rules | `report/lint.json`, `tmp/transforms_canon.json`, `tmp/flags.rules.validated.json` | Schema + xref validation; transform normalization; rules normalization |
 | B | Substrate Graph (T×P) | `stages/b_substrates.py` | parts, implied parts, animal cuts, policy | `graph/substrates.jsonl` | Materialize allowed (taxon, part) pairs; apply promoted parts proto‑paths |
 | C | Curated TPT Seed | `stages/c_tpt_seed.py` | derived_foods.jsonl, substrates | `tmp/tpt_seed.jsonl` | Validate seeds; strip non‑identity steps; family assignment (explicit/pattern) |

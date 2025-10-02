@@ -49,6 +49,10 @@
             "items": {
               "type": "string"
             }
+          },
+          "identity_param": {
+            "type": "boolean",
+            "description": "True if this parameter affects identity (used in hashing)"
           }
         }
       }

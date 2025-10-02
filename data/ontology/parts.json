@@ -293,5 +293,26 @@
     "id": "part:buttermilk",
     "name": "Buttermilk",
     "kind": "animal"
+  },
+  {
+    "id": "part:plant_milk",
+    "name": "Plant Milk",
+    "kind": "plant",
+    "applies_to": [],
+    "notes": "Generic plant milk from aqueous extraction"
+  },
+  {
+    "id": "part:okara",
+    "name": "Okara",
+    "kind": "plant",
+    "applies_to": [],
+    "notes": "Plant fiber pulp from milling/straining"
+  },
+  {
+    "id": "part:tofu_serum",
+    "name": "Tofu Serum",
+    "kind": "plant",
+    "applies_to": [],
+    "notes": "Whey-like tofu serum from coagulation"
   }
 ]
