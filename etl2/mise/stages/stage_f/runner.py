@@ -25,7 +25,10 @@ def preflight(in_dir: Path, build_dir: Path) -> None:
 def run(in_dir: Path, build_dir: Path, verbose: bool = False) -> int:
     ensure_dir(build_dir / "database")
     try:
-        db_path = build_dir / "database" / "graph.sqlite"
+        # Use the configured database path (defaults to graph.dev.sqlite)
+        from mise.config import BuildConfig
+        config = BuildConfig.from_env()
+        db_path = config.db_path
         # Fresh DB each run so schema/FTS updates apply deterministically
         if db_path.exists():
             db_path.unlink()

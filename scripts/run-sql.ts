@@ -4,13 +4,24 @@ import { env } from '@nutrition/config'
 import Database from 'better-sqlite3'
 import { argv, exit, stdin } from 'node:process'
 
-const db = new Database(env.DB_PATH)
+// Determine the correct DB_PATH based on FOOD_DB_SOURCE (same logic as apps/api/src/db.ts)
+const getDbPath = () => {
+  const src = env.FOOD_DB_SOURCE
+  const path = src === 'mise' ? env.FOOD_DB_PATH_MISE : env.FOOD_DB_PATH_ETL
+  if (!path) throw new Error(`No DB path for source ${src}`)
+  return path
+}
+
+const db = new Database(getDbPath())
 db.pragma('journal_mode = WAL')
 
 const help = `Usage:
   pnpm sql "SELECT * FROM nodes LIMIT 3"
   pnpm sql --repl
   echo 'SELECT count(*) c FROM nodes;' | pnpm sql --stdin
+
+Database: ${getDbPath()}
+Source: ${env.FOOD_DB_SOURCE}
 `
 
 async function main() {
