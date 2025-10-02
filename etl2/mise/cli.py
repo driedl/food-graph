@@ -9,6 +9,8 @@ from mise.stages.stage_0.runner import run as run_0
 from mise.stages.stage_a.runner import run as run_A
 from mise.stages.stage_b.runner import run as run_B, preflight as pre_B
 from mise.stages.stage_c.runner import run as run_C, preflight as pre_C
+from mise.stages.stage_d.runner import run as run_D, preflight as pre_D
+from mise.stages.stage_e.runner import run as run_E, preflight as pre_E
 from mise.contracts.engine import verify
 
 console = Console()
@@ -103,14 +105,14 @@ def main():
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     run = sub.add_parser("run", help="Run a stage")
-    run.add_argument("stage", choices=["0", "A", "B", "C", "0A", "0AB", "0ABC", "build"], help="Stage(s) to run")
+    run.add_argument("stage", choices=["0", "A", "B", "C", "D", "E", "0A", "0AB", "0ABC", "0ABCDE", "build"], help="Stage(s) to run")
     run.add_argument("--in", dest="in_dir", default="data/ontology")
     run.add_argument("--build", dest="build_dir", default="etl2/build")
     run.add_argument("--verbose", action="store_true")
     run.add_argument("--with-tests", action="store_true", help="Run contract verification after each stage")
     
     test = sub.add_parser("test", help="Test a stage's contract")
-    test.add_argument("stage", choices=["0", "A", "B", "C"], help="Stage to test")
+    test.add_argument("stage", choices=["0", "A", "B", "C", "D", "E"], help="Stage to test")
     test.add_argument("--in", dest="in_dir", default="data/ontology")
     test.add_argument("--build", dest="build_dir", default="etl2/build")
     test.add_argument("--verbose", action="store_true")
@@ -143,7 +145,23 @@ def main():
                 sys.exit(2)
             rc, _ = run_stage_with_tests(run_C, "C", "Ingesting curated seed", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
             sys.exit(rc)
-        if args.stage in ("0ABC", "build"):
+        if args.stage == "D":
+            try: 
+                pre_D(in_dir, build_dir)
+            except Exception as e: 
+                print_error(f"Preflight D: {e}")
+                sys.exit(2)
+            rc, _ = run_stage_with_tests(run_D, "D", "Family expansions", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
+            sys.exit(rc)
+        if args.stage == "E":
+            try: 
+                pre_E(in_dir, build_dir)
+            except Exception as e: 
+                print_error(f"Preflight E: {e}")
+                sys.exit(2)
+            rc, _ = run_stage_with_tests(run_E, "E", "Canonicalization & IDs", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
+            sys.exit(rc)
+        if args.stage in ("0ABC", "0ABCDE", "build"):
             # Run all stages with timing and optional tests
             rc, _ = run_stage_with_tests(run_0, "0", "Compiling taxa and docs", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, False, args.verbose)
             if rc != 0: sys.exit(rc)
@@ -165,6 +183,22 @@ def main():
                 print_error(f"Preflight C: {e}")
                 sys.exit(2)
             rc, _ = run_stage_with_tests(run_C, "C", "Ingesting curated seed", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
+            if rc != 0: sys.exit(rc)
+            
+            try: 
+                pre_D(in_dir, build_dir)
+            except Exception as e: 
+                print_error(f"Preflight D: {e}")
+                sys.exit(2)
+            rc, _ = run_stage_with_tests(run_D, "D", "Family expansions", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
+            if rc != 0: sys.exit(rc)
+            
+            try: 
+                pre_E(in_dir, build_dir)
+            except Exception as e: 
+                print_error(f"Preflight E: {e}")
+                sys.exit(2)
+            rc, _ = run_stage_with_tests(run_E, "E", "Canonicalization & IDs", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
             
             total_duration = (time.time() - total_start) * 1000
             if rc == 0:

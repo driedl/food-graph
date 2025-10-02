@@ -21,9 +21,46 @@ def temp_ontology_dir():
         
         # Create minimal taxa index
         taxa_index = ontology_dir / "taxa" / "index.jsonl"
-        taxa_index.write_text("""{"id": "tx:life", "rank": "kingdom", "display_name": "Life", "latin_name": "Life"}
-{"id": "tx:plantae", "parent": "tx:life", "rank": "kingdom", "display_name": "Plants", "latin_name": "Plantae"}
-""")
+        taxa_index.write_text(
+            '{"id":"tx:life","rank":"kingdom","display_name":"Life","latin_name":"Life"}\n'
+            '{"id":"tx:eukaryota","parent":"tx:life","rank":"kingdom","display_name":"Eukaryotes","latin_name":"Eukaryota"}\n'
+            '{"id":"tx:plantae","parent":"tx:eukaryota","rank":"kingdom","display_name":"Plants","latin_name":"Plantae"}\n'
+        )
+        # minimal transforms so Stage A can run cleanly
+        (ontology_dir / "transforms.json").write_text('''[
+  {
+    "id": "tf:cook",
+    "name": "Cook",
+    "identity": true,
+    "order": 90,
+    "params": [
+      {
+        "key": "method",
+        "kind": "enum",
+        "enum": ["raw", "boil", "steam", "bake", "roast", "fry", "broil"]
+      },
+      {
+        "key": "fat_added",
+        "kind": "boolean"
+      }
+    ],
+    "notes": "Thermal processing"
+  },
+  {
+    "id": "tf:brine",
+    "name": "Brine/Can (Salt)",
+    "identity": true,
+    "order": 30,
+    "params": [
+      {
+        "key": "salt_level",
+        "kind": "enum",
+        "enum": ["none", "light", "medium", "heavy"]
+      }
+    ],
+    "notes": "Salt preservation"
+  }
+]''')
         
         # Create minimal parts
         parts_file = ontology_dir / "parts.json"

@@ -9,8 +9,4 @@
 | `GRAPH_BUILD_PROFILE` | `dev` | Name of the profile (file‑names and reports may include it) |
 | `GRAPH_SOURCES_ROOT` | `.` | Repo root for data/ontology paths |
 
-Paths are echoed with:
-
-```bash
-python -m mise print-paths
-```
+Paths are configured via environment variables or command line arguments.

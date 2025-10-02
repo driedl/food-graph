@@ -4,7 +4,6 @@ mise/__init__.py
 mise/__main__.py
 mise/cli.py
 mise/config.py
-mise/dag.py
 mise/db.py
 mise/io.py
 mise/logging.py
@@ -18,7 +17,6 @@ mise/contracts/__init__.py
 mise/contracts/engine.py
 mise/contracts/validators.py
 mise/stages/__init__.py
-mise/stages/hello.py
 mise/stages/stage_0/__init__.py
 mise/stages/stage_0/docs_compile.py
 mise/stages/stage_0/runner.py
@@ -33,5 +31,10 @@ mise/stages/stage_b/runner.py
 mise/stages/stage_b/substrates.py
 mise/stages/stage_c/curated_seed.py
 mise/stages/stage_c/runner.py
+mise/stages/stage_d/family_expand.py
+mise/stages/stage_d/runner.py
+mise/stages/stage_e/canon_ids.py
+mise/stages/stage_e/runner.py
 tests/test_end_to_end.py
 tests/test_smoke.py
+tests/test_stage_e_determinism.py

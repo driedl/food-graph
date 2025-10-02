@@ -1,0 +1,18 @@
+artifacts:
+  - path: tmp/tpt_canon.jsonl
+    type: jsonl
+    validators:
+      - kind: field_presence
+        fields: ["id", "taxon_id", "part_id", "identity_hash", "path", "identity"]
+      - kind: unique
+        field: id
+      - kind: composite_unique
+        fields: ["taxon_id", "part_id", "identity_hash"]
+      - kind: crossref_jsonl
+        this_field: taxon_id
+        other_path: compiled/taxa.jsonl
+        other_field: id
+      - kind: crossref_json
+        this_field: part_id
+        other_path: compiled/parts.json
+        other_field: id

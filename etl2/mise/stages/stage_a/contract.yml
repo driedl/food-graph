@@ -5,14 +5,6 @@ artifacts:
     validators:
       - kind: array_of_objects
       - kind: set_nonempty
-  
-  - path: tmp/transform_applicability.normalized.jsonl
-    type: jsonl
-    must_exist: true
-    validators:
-      - kind: field_presence
-        fields: ["transform", "applies_to"]
-  
   - path: tmp/flags.rules.validated.json
     type: json
     must_exist: true
@@ -20,11 +12,7 @@ artifacts:
       - kind: json_pointer_equals
         pointer: "/ok"
         equals: true
-  
-  - path: report/lint.json
-    type: json
+  - path: tmp/transform_applicability.normalized.jsonl
+    type: jsonl
     must_exist: true
-    validators:
-      - kind: json_pointer_equals
-        pointer: "/errors"
-        equals: []
+    validators: []

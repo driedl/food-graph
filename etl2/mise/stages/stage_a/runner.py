@@ -36,8 +36,9 @@ def run(in_dir: Path, build_dir: Path, verbose: bool = False) -> int:
         if not src.exists():
             lint["warnings"].append(f"APPLICABILITY: missing {src}")
             norm_rows, n_stats = [], {"input": 0, "output": 0}
+            write_jsonl(tmp_dir / "transform_applicability.normalized.jsonl", norm_rows)
             if verbose:
-                console.print(f"  ⚠️ Missing {src}", style="yellow")
+                console.print(f"  ⚠️ Missing {src} → wrote empty transform_applicability.normalized.jsonl", style="yellow")
         else:
             rows = read_jsonl(src)
             norm_rows, n_stats = normalize_transform_applicability(rows)

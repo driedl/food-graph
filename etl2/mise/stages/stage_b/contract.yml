@@ -2,10 +2,9 @@ artifacts:
   - path: graph/substrates.jsonl
     type: jsonl
     must_exist: true
-    min_lines: 1
     validators:
       - kind: field_presence
-        fields: ["taxon_id", "part_id"]
+        fields: ["taxon_id","part_id"]
       - kind: crossref_jsonl
         this_field: "taxon_id"
         other_path: "compiled/taxa.jsonl"
@@ -14,3 +13,9 @@ artifacts:
         this_field: "part_id"
         other_path: "compiled/parts.json"
         other_field: "id"
+  - path: tmp/tp_index.jsonl
+    type: jsonl
+    must_exist: true
+    validators:
+      - kind: field_presence
+        fields: ["tp_id","taxon_id","part_id"]

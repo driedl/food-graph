@@ -1,1 +1,1 @@
-# stage modules live here and are loaded by StageRegistry
+# stage modules live here and are called directly by CLI

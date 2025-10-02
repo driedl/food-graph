@@ -1,0 +1,4 @@
+{
+  "tf:cure.nitrite_ppm": { "cuts": [0, 120], "labels": ["none", "low", "high"] },
+  "tf:smoke.time_h":     { "cuts": [0, 2, 12], "labels": ["none", "short", "long"] }
+}

@@ -1,2 +1,2 @@
 [console_scripts]
-mise = mise.cli:app
+mise = mise.cli:main

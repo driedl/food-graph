@@ -191,6 +191,8 @@ def _validate_transform_ids_in(path: Path, lines: List[dict], validator: Dict[st
         transforms_data = json.loads(transforms_path.read_text(encoding="utf-8"))
         if isinstance(transforms_data, dict):
             transform_ids = set(transforms_data.keys())
+        elif isinstance(transforms_data, list):
+            transform_ids = {t.get("id") for t in transforms_data if isinstance(t, dict) and "id" in t}
         else:
             transform_ids = set()
     except (json.JSONDecodeError, KeyError):

@@ -113,12 +113,16 @@ const FILE_CATEGORIES: Record<string, FileCategory> = {
       'etl2/**/*.md',
       'etl2/**/*.toml',
       'etl2/**/*.txt',
+      'etl2/**/*.yml',
+      'etl2/**/*.yaml',
     ],
     ignore: [
       'etl2/build/**',  // Exclude build folder
       'etl2/**/__pycache__/**',  // Exclude Python cache
       'etl2/**/*.pyc',  // Exclude compiled Python files
       'etl2/**/*.egg-info/**',  // Exclude Python package info
+      'etl2/**/__init__.py',  // Exclude __init__.py files
+      'etl2/docs/adr/**',  // Exclude ADR files
     ],
     description: 'ETL2 Python pipeline with Mise framework and documentation',
   },

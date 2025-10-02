@@ -5,8 +5,7 @@ sources/ (repo)
   └─ data/ontology/{taxa,parts,transforms,rules,...}
 
 mise (runner)
-  ├─ dag.py        # Stage, Dag, DagRunner, caching (hash(inputs + code))
-  ├─ cli.py        # Typer commands: plan, run, clean, print-paths
+  ├─ cli.py        # CLI commands: run, test
   ├─ io.py         # JSON/JSONL IO, atomic writes, hashing, glob helpers
   ├─ config.py     # Path resolution from envs
   └─ stages/       # Stage modules
@@ -20,16 +19,12 @@ build/ (artifacts)
   └─ report/       # lint.json, stage_reports/*.json, timings
 ```
 
-## DAG & caching
+## Stage execution
 
-- Each stage declares:
-  - **inputs** (files/globs + optional upstream stage outputs)
-  - **outputs** (declared files)
-  - **params** (structured options included in hash)
-  - **code‑fingerprint** (hash of the stage module)
-
-- The runner computes a **fingerprint**; if identical to last run, the stage **skips** (cache hit).
-- Artifacts are written **atomically** via temp‑files + rename.
+- Each stage is a Python module with a `run()` function
+- Stages are executed sequentially via CLI commands
+- Artifacts are written **atomically** via temp‑files + rename
+- Contract verification ensures stage outputs meet specifications
 
 ## Error handling
 

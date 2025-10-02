@@ -7,7 +7,7 @@
 Legacy ETL mixed Python (compiler) with a TS runner. We are expanding from 5 to 11+ stages and require deterministic caching and a richer validation layer.
 
 ## Decision
-Adopt a **Python-only** runner (Typer CLI + small DAG engine). Keep the legacy TS runner intact under `etl/` until parity.
+Adopt a **Python-only** runner (CLI + direct stage execution). Keep the legacy TS runner intact under `etl/` until parity.
 
 ## Consequences
 - One language surface for build logic and tests.
