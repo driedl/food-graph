@@ -6,6 +6,7 @@ data/ontology/compiled
 etl/dist
 generated
 reports
+apps/api/database/*
 
 # Build outputs
 dist/

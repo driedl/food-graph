@@ -93,7 +93,7 @@ const FILE_CATEGORIES: Record<string, FileCategory> = {
     name: 'ETL Processing',
     pattern: [
       'etl/**/*.py',
-      'etl/**/*.md',
+      // 'etl/**/*.md',
       'etl/src/**/*.ts',
       'etl/src/**/*.js',
       'packages/shared/**/*.ts',
@@ -102,6 +102,7 @@ const FILE_CATEGORIES: Record<string, FileCategory> = {
     ],
     ignore: [
       'etl/node_modules/**',  // Exclude dependencies
+      'etl/src/pipeline/steps/doc-reporter.ts',
     ],
     description: 'Python scripts, TypeScript ETL pipeline, and shared utilities',
   },
@@ -187,13 +188,13 @@ const FILE_CATEGORIES: Record<string, FileCategory> = {
 function isCodeOrConfigFile(filePath: string): boolean {
   const ext = extname(filePath).toLowerCase();
   const fileName = basename(filePath).toLowerCase();
-  
+
   // Code files
   const codeExtensions = ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.py', '.sql'];
   if (codeExtensions.includes(ext)) {
     return true;
   }
-  
+
   // Configuration files
   const configFiles = [
     'package.json',
@@ -209,11 +210,11 @@ function isCodeOrConfigFile(filePath: string): boolean {
     '.env.example',
     '.env.local.example'
   ];
-  
+
   if (configFiles.includes(fileName)) {
     return true;
   }
-  
+
   // Config extensions (but exclude lock files)
   const configExtensions = ['.json', '.jsonl', '.yaml', '.yml', '.toml', '.env'];
   if (configExtensions.includes(ext)) {
@@ -225,18 +226,18 @@ function isCodeOrConfigFile(filePath: string): boolean {
     ];
     return !excludeConfigFiles.includes(fileName);
   }
-  
+
   // Documentation
   if (ext === '.md' && fileName !== 'CHANGELOG.md') {
     return true;
   }
-  
+
   return false;
 }
 
 function shouldExclude(filePath: string, workspaceRoot: string): boolean {
   const relativePath = relative(workspaceRoot, filePath);
-  
+
   // Always exclude common non-code directories and files
   const excludePatterns = [
     'node_modules',
@@ -290,7 +291,7 @@ function getFileInfo(filePath: string, workspaceRoot: string): FileInfo | null {
 
     const content = readFileSync(filePath, 'utf-8');
     const lines = content.split('\n').length;
-    
+
     return {
       path: relative(workspaceRoot, filePath),
       size: stats.size,
@@ -323,12 +324,12 @@ async function discoverFiles(categories: string[], workspaceRoot: string): Promi
           const defaultIgnore = ['node_modules/**', '.git/**', 'dist/**', 'build/**', '*.log', '*.tmp', '*.cache', '*.db*', '*.sqlite*'];
           const categoryIgnore = category.ignore || [];
           const allIgnore = [...defaultIgnore, ...categoryIgnore];
-          
+
           const matches = await glob(pattern, {
             ignore: allIgnore,
             cwd: workspaceRoot,
           });
-          
+
           for (const match of matches) {
             const fullPath = join(workspaceRoot, match);
             if (isCodeOrConfigFile(fullPath) && !shouldExclude(fullPath, workspaceRoot)) {
@@ -346,7 +347,7 @@ async function discoverFiles(categories: string[], workspaceRoot: string): Promi
   }
 
   // Remove duplicates
-  return [...new Set(files.map(f => f.path))].map(path => 
+  return [...new Set(files.map(f => f.path))].map(path =>
     files.find(f => f.path === path)!
   );
 }
@@ -363,14 +364,14 @@ function generateVerboseOutput(files: FileInfo[]): string {
   output += `Generated on: ${new Date().toISOString()}\n`;
   output += `Total files: ${files.length}\n`;
   output += `Total size: ${formatSize(files.reduce((sum, file) => sum + file.size, 0))}\n\n`;
-  
+
   output += '## Files Overview\n\n';
   files.forEach(file => {
     output += `- **${file.path}** (${formatSize(file.size)}, ${file.lines} lines)\n`;
   });
-  
+
   output += '\n---\n\n';
-  
+
   files.forEach(file => {
     output += `## ${file.path}\n\n`;
     output += `**Size:** ${formatSize(file.size)} | **Lines:** ${file.lines}\n\n`;
@@ -378,7 +379,7 @@ function generateVerboseOutput(files: FileInfo[]): string {
     output += file.content;
     output += '\n```\n\n';
   });
-  
+
   return output;
 }
 
@@ -387,10 +388,10 @@ function generateCompactOutput(files: FileInfo[]): string {
   output += `Generated on: ${new Date().toISOString()}\n`;
   output += `Total files: ${files.length}\n`;
   output += `Total size: ${formatSize(files.reduce((sum, file) => sum + file.size, 0))}\n\n`;
-  
+
   // Find the longest filename for alignment
   const maxPathLength = Math.max(...files.map(f => f.path.length));
-  
+
   output += '## Files\n\n';
   files.forEach(file => {
     const paddedPath = file.path.padEnd(maxPathLength);
@@ -398,14 +399,14 @@ function generateCompactOutput(files: FileInfo[]): string {
     const linesStr = file.lines.toString().padStart(6);
     output += `${paddedPath} ${sizeStr} ${linesStr} lines\n`;
   });
-  
+
   return output;
 }
 
 function summarizeFileContent(file: FileInfo): { summary: string; truncated: boolean } {
   const ext = extname(file.path).toLowerCase();
   const lines = file.content.split('\n');
-  
+
   // JSONL files - first 10 lines
   if (ext === '.jsonl') {
     if (lines.length <= 10) {
@@ -413,16 +414,16 @@ function summarizeFileContent(file: FileInfo): { summary: string; truncated: boo
     }
     return { summary: lines.slice(0, 10).join('\n'), truncated: true };
   }
-  
+
   // TypeScript/JavaScript - extract signatures
   if (['.ts', '.tsx', '.js', '.jsx'].includes(ext)) {
     const signatures: string[] = [];
     const imports: string[] = [];
-    
+
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       const trimmed = line.trim();
-      
+
       // Collect imports
       if (trimmed.startsWith('import ')) {
         imports.push(line);
@@ -443,7 +444,7 @@ function summarizeFileContent(file: FileInfo): { summary: string; truncated: boo
         signatures.push(line);
       }
     }
-    
+
     let result = '';
     if (imports.length > 0) {
       result += '// Imports\n' + imports.slice(0, 5).join('\n');
@@ -453,12 +454,12 @@ function summarizeFileContent(file: FileInfo): { summary: string; truncated: boo
     if (signatures.length > 0) {
       result += '// Signatures\n' + signatures.join('\n');
     }
-    
+
     // If we extracted signatures, it's a summary (truncated)
     const truncated = signatures.length > 0 || imports.length > 0;
     return { summary: result || lines.slice(0, 20).join('\n'), truncated };
   }
-  
+
   // JSON files - full if small, otherwise first 30 lines
   if (ext === '.json') {
     if (lines.length <= 50) {
@@ -466,7 +467,7 @@ function summarizeFileContent(file: FileInfo): { summary: string; truncated: boo
     }
     return { summary: lines.slice(0, 30).join('\n'), truncated: true };
   }
-  
+
   // Markdown - first 50 lines or until section break
   if (ext === '.md') {
     let endLine = Math.min(50, lines.length);
@@ -479,7 +480,7 @@ function summarizeFileContent(file: FileInfo): { summary: string; truncated: boo
     const truncated = endLine < lines.length;
     return { summary: lines.slice(0, endLine).join('\n'), truncated };
   }
-  
+
   // Python - extract function/class signatures
   if (ext === '.py') {
     const signatures: string[] = [];
@@ -497,7 +498,7 @@ function summarizeFileContent(file: FileInfo): { summary: string; truncated: boo
     const truncated = signatures.length > 0;
     return { summary: signatures.join('\n') || lines.slice(0, 20).join('\n'), truncated };
   }
-  
+
   // SQL - first 20 lines
   if (ext === '.sql') {
     if (lines.length <= 20) {
@@ -505,7 +506,7 @@ function summarizeFileContent(file: FileInfo): { summary: string; truncated: boo
     }
     return { summary: lines.slice(0, 20).join('\n'), truncated: true };
   }
-  
+
   // Default fallback - first 20 lines
   if (lines.length <= 20) {
     return { summary: file.content, truncated: false };
@@ -518,25 +519,25 @@ function generateSummaryOutput(files: FileInfo[]): string {
   output += `Generated on: ${new Date().toISOString()}\n`;
   output += `Total files: ${files.length}\n`;
   output += `Total size: ${formatSize(files.reduce((sum, file) => sum + file.size, 0))}\n\n`;
-  
+
   output += '## Files Overview\n\n';
   files.forEach(file => {
     output += `- **${file.path}** (${formatSize(file.size)}, ${file.lines} lines)\n`;
   });
-  
+
   output += '\n---\n\n';
-  
+
   files.forEach(file => {
     const { summary, truncated } = summarizeFileContent(file);
     const truncateLabel = truncated ? ' *(truncated)*' : '';
-    
+
     output += `## ${file.path}${truncateLabel}\n\n`;
     output += `**Size:** ${formatSize(file.size)} | **Lines:** ${file.lines}\n\n`;
     output += '```\n';
     output += summary;
     output += '\n```\n\n';
   });
-  
+
   return output;
 }
 
@@ -596,8 +597,8 @@ async function getInteractiveOptions(): Promise<AggregateOptions> {
     contentLevel: contentLevelAnswer.contentLevel,
     categories: categoriesAnswer.categories,
     outputDestination: outputAnswer.outputDestination,
-    outputFile: outputAnswer.outputDestination === 'file' || outputAnswer.outputDestination === 'both' 
-      ? 'generated/code.md' 
+    outputFile: outputAnswer.outputDestination === 'file' || outputAnswer.outputDestination === 'both'
+      ? 'generated/code.md'
       : undefined
   };
 }

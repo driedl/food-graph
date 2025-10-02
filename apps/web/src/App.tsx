@@ -27,13 +27,11 @@ interface TaxonNode {
 
 
 const rankColor = RANK_COLOR
-const stripPart = (id: string) => id.replace(/^part:/, '')
 
 export default function App() {
   const router = useRouter()
   const lastFsRef = useRef<string>('') // idempotence for FS derivation
-  const normalizePartId = (id: string) => id.replace(/^part:/, '')
-  
+
   // API health + root bootstrap
   const health = trpc.health.useQuery()
   const root = trpc.taxonomy.getRoot.useQuery(undefined, { refetchOnWindowFocus: false })
@@ -44,7 +42,7 @@ export default function App() {
   // Queries scoped to current node - using new neighborhood API
   const [childLimit, setChildLimit] = useState(50)
   const neighborhood = trpc.taxonomy.neighborhood.useQuery(
-    { id: currentId!, childLimit, orderBy: 'name' }, 
+    { id: currentId!, childLimit, orderBy: 'name' },
     { enabled: !!currentId, keepPreviousData: true }
   )
   const docs = trpc.docs.getByTaxon.useQuery({ taxonId: currentId! }, { enabled: !!currentId })
@@ -77,18 +75,18 @@ export default function App() {
     const applyFromLocation = async () => {
       const { pathname } = router.state.location
       const currentPath = lastPathRef.current
-      
-      
+
+
       // Skip if this is the path we just wrote (prevents loops)
       if (pathname === currentPath && currentPath !== '') {
         return
       }
-      
+
       // Set flags and update lastPathRef BEFORE setting any state to prevent State→URL from interfering
       isApplyingFromUrl.current = true
       isParsingUrl.current = true // Prevent auto-clear of selectedPartId
       lastPathRef.current = pathname // Update BEFORE state changes to prevent State→URL from overwriting
-      
+
       const fs = pathToFs(pathname)
       const nodeId = pathToNodeId(pathname)
 
@@ -99,7 +97,7 @@ export default function App() {
         setSelectedPartId('')
         setChosen([])
       }
-      
+
       isApplyingFromUrl.current = false
       isParsingUrl.current = false
     }
@@ -115,15 +113,15 @@ export default function App() {
   // Always store WITHOUT the `part:` prefix internally
   const [selectedPartId, setSelectedPartId] = useState<string>('')
   const isParsingUrl = useRef(false) // Track when parsing URL to prevent auto-clear
-  useEffect(() => { 
+  useEffect(() => {
     // Don't auto-clear part when we're syncing from URL
     if (!isParsingUrl.current) {
-      setSelectedPartId('') 
+      setSelectedPartId('')
     }
   }, [currentId])
   const transforms = trpc.taxonomy.getTransformsFor.useQuery(
     { taxonId: currentId || '', partId: selectedPartId || '', identityOnly: false },
-    { enabled: !!currentId && !!selectedPartId }
+    { enabled: !!currentId && !!selectedPartId && selectedPartId.startsWith('part:') }
   )
 
   type ChosenTx = { id: string; params: Record<string, any> }
@@ -186,7 +184,7 @@ export default function App() {
   // Optional server validation using existing foodstate.compose (query)
   const compose = trpc.foodstate.compose.useQuery(
     { taxonId: currentId || '', partId: selectedPartId || '', transforms: chosen },
-    { enabled: false }
+    { enabled: false && !!currentId && !!selectedPartId && selectedPartId.startsWith('part:') }
   )
 
   // tRPC-powered FS parse (typed)
@@ -211,8 +209,8 @@ export default function App() {
         }
       }
       if (parsed.partId) {
-        const partId = normalizePartId(parsed.partId)
-        setSelectedPartId(partId)
+        // parsed.partId already includes the part: prefix from the API
+        setSelectedPartId(parsed.partId)
       }
       if (parsed.transforms && parsed.transforms.length) {
         pendingFromParse.current = parsed.transforms.map((t: any) => ({
@@ -233,7 +231,7 @@ export default function App() {
   // --- State → URL (push new history entries when state changes) ------------
   const lastPathRef = useRef<string>('')
   const isApplyingFromUrl = useRef(false) // Track when we're syncing FROM url to prevent loops
-  
+
   useEffect(() => {
     if (!currentId || isApplyingFromUrl.current) return
     // Hold only while we are actively applying from URL (not just because we are on an FS route)
@@ -304,7 +302,8 @@ export default function App() {
           }}
           onPickTP={(taxonId, partId) => {
             setCurrentId(taxonId)
-            setSelectedPartId(stripPart(partId))
+            // partId from search results already includes the part: prefix
+            setSelectedPartId(partId)
             setChosen([])
             setTab('pt')
           }}
@@ -391,7 +390,7 @@ export default function App() {
                       <PartsPanel
                         parts={parts.data as any}
                         selectedPartId={selectedPartId}
-                        onSelect={(id) => setSelectedPartId(normalizePartId(id))}
+                        onSelect={(id) => setSelectedPartId(id)}
                       />
                     </div>
                     <div className="min-h-0 overflow-auto">

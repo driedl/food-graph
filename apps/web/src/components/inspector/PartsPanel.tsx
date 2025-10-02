@@ -5,10 +5,10 @@ export const PartsPanel = memo(function PartsPanel({
   selectedPartId,
   onSelect,
 }: {
-  parts?: Array<{ 
-    id: string; 
-    name: string; 
-    kind?: string; 
+  parts?: Array<{
+    id: string;
+    name: string;
+    kind?: string;
     parentId?: string | null;
     applicable: boolean;
     identityCount: number;
@@ -19,7 +19,6 @@ export const PartsPanel = memo(function PartsPanel({
   onSelect: (id: string) => void
 }) {
   if (!parts) return <div className="text-sm text-muted-foreground">No parts available</div>
-  const normalize = (id: string) => id.replace(/^part:/, '')
 
   const groups = (parts || []).reduce((acc: Record<string, Array<any>>, p) => {
     const k = p.kind || 'other'
@@ -40,8 +39,8 @@ export const PartsPanel = memo(function PartsPanel({
             {groups[k].map((p) => (
               <button
                 key={p.id}
-                className={`px-3 py-2 rounded border text-left hover:bg-muted/40 ${selectedPartId === normalize(p.id) ? 'bg-muted/50 border-blue-300' : ''} ${!p.applicable ? 'opacity-50' : ''}`}
-                onClick={() => onSelect(normalize(p.id))}
+                className={`px-3 py-2 rounded border text-left hover:bg-muted/40 ${selectedPartId === p.id ? 'bg-muted/50 border-blue-300' : ''} ${!p.applicable ? 'opacity-50' : ''}`}
+                onClick={() => onSelect(p.id)}
                 disabled={!p.applicable}
               >
                 <div className="flex items-center justify-between">

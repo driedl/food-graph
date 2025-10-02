@@ -138,7 +138,6 @@ Culinary notes, nutrition patterns, variability...
 ### Documentation Tables
 
 - **`taxon_doc`** — Markdown docs per taxon (summary, description_md, updated_at, checksum)
-- **`taxon_doc_fts`** — FTS5 index for doc search (virtual table)
 
 ### Parts & Transforms
 
@@ -150,7 +149,8 @@ Culinary notes, nutrition patterns, variability...
 
 ### Search
 
-- **`nodes_fts`** — FTS5 virtual table for taxa (name, synonyms, taxon_rank)
+- **`taxa_fts`** — FTS5 virtual table for taxa (name, synonyms, taxon_rank)
+- **`tp_fts`** — FTS5 virtual table for taxon+part nodes (name, synonyms, taxon_rank, kind)
 
 ### Key Indexes
 
@@ -301,10 +301,18 @@ SELECT * FROM nodes WHERE parent_id = 'tx:plantae' ORDER BY name;
 ### Search Using FTS5
 
 ```sql
+-- Search taxa
 SELECT n.* FROM nodes n
-JOIN nodes_fts fts ON n.name = fts.name AND n.rank = fts.taxon_rank
-WHERE nodes_fts MATCH 'apple'
-ORDER BY bm25(nodes_fts) ASC
+JOIN taxa_fts fts ON taxa_fts.rowid = n.rowid
+WHERE taxa_fts MATCH 'apple'
+ORDER BY bm25(taxa_fts) ASC
+LIMIT 10;
+
+-- Search taxon+part combinations
+SELECT tp.* FROM taxon_part_nodes tp
+JOIN tp_fts fts ON tp_fts.rowid = tp.rowid
+WHERE tp_fts MATCH 'milk'
+ORDER BY bm25(tp_fts) ASC
 LIMIT 10;
 ```
 
@@ -338,10 +346,11 @@ ORDER BY p.kind, p.name;
 ### Search Documentation
 
 ```sql
-SELECT d.taxon_id, d.display_name, d.summary, bm25(taxon_doc_fts) AS score
-FROM taxon_doc_fts d
-WHERE taxon_doc_fts MATCH 'fermented OR cultured'
-ORDER BY score ASC
+-- Documentation is not currently searchable via FTS
+-- Use LIKE queries for basic text search in taxon_doc table
+SELECT taxon_id, display_name, summary
+FROM taxon_doc
+WHERE summary LIKE '%fermented%' OR description_md LIKE '%cultured%'
 LIMIT 10;
 ```
 
@@ -414,11 +423,13 @@ ls -lh etl/dist/database/graph.dev.sqlite
 ### FTS Search Not Working
 
 ```bash
-# Verify FTS table exists
-pnpm sql "SELECT COUNT(*) FROM nodes_fts;"
+# Verify FTS tables exist
+pnpm sql "SELECT COUNT(*) FROM taxa_fts;"
+pnpm sql "SELECT COUNT(*) FROM tp_fts;"
 
 # Test search
-pnpm sql "SELECT * FROM nodes_fts WHERE nodes_fts MATCH 'apple' LIMIT 1;"
+pnpm sql "SELECT * FROM taxa_fts WHERE taxa_fts MATCH 'apple' LIMIT 1;"
+pnpm sql "SELECT * FROM tp_fts WHERE tp_fts MATCH 'milk' LIMIT 1;"
 ```
 
 ### API Returns 404

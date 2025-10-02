@@ -42,10 +42,10 @@ pnpm etl:build
 **Current tables:**
 
 - **Taxonomy**: `nodes`, `synonyms`, `node_attributes`, `attr_def`, `attr_enum`
-- **Documentation**: `taxon_doc` (with `taxon_doc_fts` for search)
+- **Documentation**: `taxon_doc` (markdown docs per taxon)
 - **Parts**: `part_def`, `part_synonym`, `has_part`
 - **Transforms**: `transform_def`, `transform_applicability`
-- **Search**: `nodes_fts` (FTS5 index for taxa + synonyms)
+- **Search**: `taxa_fts` (FTS5 index for taxa), `tp_fts` (FTS5 index for taxon+part)
 
 **Future compiles will add:**
 

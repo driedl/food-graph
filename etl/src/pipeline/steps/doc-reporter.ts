@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 import { writeFileSync, mkdirSync, existsSync } from 'fs'
-import { join, dirname, resolve } from 'path'
+import path, { join, dirname, resolve } from 'path'
 import Database from 'better-sqlite3'
 
 interface TaxonNode {
