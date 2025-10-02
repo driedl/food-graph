@@ -4,11 +4,15 @@ from typing import Dict, List, Tuple, Iterable, Set, Any
 import json
 
 from ...io import read_json, read_jsonl, write_jsonl, ensure_dir
+from ...shared.normalize import normalize_applies_to
 
 # --- helpers -----------------------------------------------------------------
 
 def _strip_colon(s: str) -> str:
     return s[:-1] if s.endswith(":") else s
+
+def _as_part_id(p: str) -> str:
+    return p if p.startswith("part:") else f"part:{p}"
 
 def _load_taxa_index(taxa_jsonl: Path) -> Dict[str, Dict[str, Any]]:
     """Light index: id -> {parent, rank}"""
@@ -34,22 +38,8 @@ def _descendants_have_part(start: str, part_id: str, has_part_pairs: Set[Tuple[s
         stack.extend(children.get(cur, []))
     return False
 
-# normalize rules that can be string or object with parts list
 def _normalize_applies_to(rows: Iterable[Any]) -> List[Dict[str, Any]]:
-    out: List[Dict[str, Any]] = []
-    for r in rows:
-        if isinstance(r, str):
-            out.append({"taxon_prefix": _strip_colon(r), "parts": []})
-        elif isinstance(r, dict):
-            tp = _strip_colon(r.get("taxon_prefix", ""))
-            parts = [p if p.startswith("part:") else f"part:{p}" for p in (r.get("parts") or [])]
-            out.append({"taxon_prefix": tp, "parts": sorted(set(parts))})
-    # dedupe
-    uniq: Dict[Tuple[str, Tuple[str, ...]], Dict[str, Any]] = {}
-    for rec in out:
-        key = (rec["taxon_prefix"], tuple(rec["parts"]))
-        uniq[key] = rec
-    return list(uniq.values())
+    return normalize_applies_to(rows)
 
 # --- main --------------------------------------------------------------------
 
@@ -63,7 +53,8 @@ def build_substrates(
 
     # Inputs
     taxa_jsonl = graph_dir.parent / "compiled" / "taxa.jsonl"
-    parts_json = in_dir / "parts.json"
+    # Use compiled snapshot for hermetic builds
+    parts_json = graph_dir.parent / "compiled" / "parts.json"
     rules_dir  = in_dir / "rules"
     parts_rules_path   = rules_dir / "parts_applicability.jsonl"
     implied_parts_path = rules_dir / "implied_parts.jsonl"
@@ -84,6 +75,8 @@ def build_substrates(
     parts_rules = read_jsonl(parts_rules_path) if parts_rules_path.exists() else []
     for r in parts_rules:
         r["applies_to"] = _normalize_applies_to(r.get("applies_to", []))
+        if r.get("exclude"):
+            r["exclude"] = _normalize_applies_to(r.get("exclude", []))
 
     implied_rules = read_jsonl(implied_parts_path) if implied_parts_path.exists() else []
     tp_policy = read_json(tp_policy_path) if tp_policy_path.exists() else {}
@@ -93,12 +86,30 @@ def build_substrates(
     # Expand applies_to → (taxon_id, part_id)
     all_taxa_ids = set(taxa.keys())
 
+    def _exclude_set(excl) -> set[str]:
+        """
+        Normalize exclude entries into exact 'tx:...:part:...' strings.
+        Supports:
+          - "tx:plantae:rosaceae:prunus:domestica:part:fruit"
+          - {"taxon_id": "tx:plantae:rosaceae:prunus:domestica", "parts": ["part:fruit","leaf"]}
+          - {"taxon_prefix": "...", "parts": [...]}  (treated as exacts)
+        """
+        out: set[str] = set()
+        for e in (excl or []):
+            if isinstance(e, str):
+                out.add(_strip_colon(e))
+            elif isinstance(e, dict):
+                tid = _strip_colon(e.get("taxon_id") or e.get("taxon_prefix") or "")
+                for p in (e.get("parts") or []):
+                    out.add(f"{tid}:{_as_part_id(p)}")
+        return out
+
     def expand_rule(rule: Dict[str, Any]) -> Iterable[Tuple[str, str]]:
         p = rule.get("part")
         if not p:
             return []
         applies = rule.get("applies_to", [])
-        exclude = set(rule.get("exclude", []))
+        exclude = _exclude_set(rule.get("exclude"))
         for ap in applies:
             pref = ap.get("taxon_prefix", "")
             # match all taxa under prefix
@@ -106,7 +117,8 @@ def build_substrates(
             tgt_parts = ap.get("parts", []) or [p]
             for tid in matched:
                 for pid in tgt_parts:
-                    if pid == p and f"{tid}:{pid}" in exclude:
+                    # exclude exact (taxon, part) matches
+                    if f"{tid}:{pid}" in exclude:
                         continue
                     yield (tid, p if pid == p else pid)
 

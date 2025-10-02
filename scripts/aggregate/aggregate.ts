@@ -4,7 +4,8 @@
  * filename: scripts/aggregate.ts
  *
  * Usage:
- *   pnpm ag                           # Interactive mode
+ *   pnpm ag                           # Interactive mode (default config)
+ *   pnpm ag --config etl2             # Use ETL2 config
  *   pnpm ag --compact                 # Quick compact mode
  *   pnpm ag --summary                 # Summary mode (excerpts/signatures)
  *   pnpm ag --verbose                 # Full verbose mode
@@ -27,9 +28,36 @@ type OutputDestination = 'console' | 'file' | 'both';
 
 interface FileCategory {
   name: string;
-  pattern: string[];
   description: string;
+  patterns: string[];
   ignore?: string[];
+  includeExtensions?: string[];
+  excludeExtensions?: string[];
+  maxFileSize?: number;
+  maxLines?: number;
+}
+
+interface AggregateConfig {
+  name: string;
+  description: string;
+  categories: {
+    [key: string]: FileCategory;
+  };
+  defaults: {
+    contentLevel: ContentLevel;
+    outputDestination: OutputDestination;
+    outputFile?: string;
+  };
+  ui: {
+    skipCategorySelection?: boolean;
+    skipVerbositySelection?: boolean;
+    customPrompts?: {
+      [key: string]: string;
+    };
+  };
+  processing: {
+    maxAggregateFileSize: number;
+  };
 }
 
 interface AggregateOptions {
@@ -37,6 +65,9 @@ interface AggregateOptions {
   outputDestination: OutputDestination;
   outputFile?: string;
   categories: string[];
+  config: AggregateConfig;
+  maxAggregateFileSize: number;
+  summaryTruncationLines?: number;
 }
 
 interface FileInfo {
@@ -46,169 +77,56 @@ interface FileInfo {
   content: string;
 }
 
-// ---- File Categories ------------------------------------------------------
+// ---- Config Loading ------------------------------------------------------
 
-const FILE_CATEGORIES: Record<string, FileCategory> = {
-  web: {
-    name: 'Web App',
-    pattern: [
-      'apps/web/**/*.ts',
-      'apps/web/**/*.tsx',
-      'apps/web/**/*.js',
-      'apps/web/**/*.jsx',
-      'apps/web/**/*.json',
-      'apps/web/**/*.html',
-      'apps/web/**/*.css',
-      'apps/web/**/*.config.*',
-      'packages/api-contract/**/*.ts',
-      'packages/api-contract/**/*.tsx',
-      'packages/api-contract/**/*.js',
-      'packages/api-contract/**/*.jsx',
-      'packages/api-contract/**/*.json',
-    ],
-    ignore: [
-      'apps/web/dist/**', // Exclude dist directory from web category
-    ],
-    description: 'React frontend with tRPC client and API contracts',
-  },
-  api: {
-    name: 'API Server',
-    pattern: [
-      'apps/api/src/**/*.ts',
-      'apps/api/migrations/**/*.sql',
-      'apps/api/package.json',
-      'apps/api/tsconfig.json',
-      'packages/api-contract/src/**/*.ts',
-      'packages/api-contract/src/**/*.tsx',
-      'packages/api-contract/package.json',
-      'packages/api-contract/tsconfig.json',
-    ],
-    ignore: [
-      'apps/api/node_modules/**',   // Exclude dependencies
-      'packages/api-contract/node_modules/**', // Exclude dependencies
-    ],
-    description: 'tRPC server with SQLite, migrations, and API contracts',
-  },
-  etl: {
-    name: 'ETL Processing',
-    pattern: [
-      'etl/**/*.py',
-      // 'etl/**/*.md',
-      'etl/src/**/*.ts',
-      'etl/src/**/*.js',
-      'packages/shared/**/*.ts',
-      'packages/shared/**/*.js',
-      'packages/shared/**/*.json',
-    ],
-    ignore: [
-      'etl/node_modules/**',  // Exclude dependencies
-      'etl/src/pipeline/steps/doc-reporter.ts',
-    ],
-    description: 'Python scripts, TypeScript ETL pipeline, and shared utilities',
-  },
-  etl2: {
-    name: 'ETL2 Processing',
-    pattern: [
-      'etl2/**/*.py',
-      'etl2/**/*.md',
-      'etl2/**/*.toml',
-      'etl2/**/*.txt',
-      'etl2/**/*.yml',
-      'etl2/**/*.yaml',
-    ],
-    ignore: [
-      'etl2/build/**',  // Exclude build folder
-      'etl2/**/__pycache__/**',  // Exclude Python cache
-      'etl2/**/*.pyc',  // Exclude compiled Python files
-      'etl2/**/*.egg-info/**',  // Exclude Python package info
-      'etl2/**/__init__.py',  // Exclude __init__.py files
-      'etl2/docs/adr/**',  // Exclude ADR files
-    ],
-    description: 'ETL2 Python pipeline with Mise framework and documentation',
-  },
-  ontology_taxa: {
-    name: 'Ontology - Taxa',
-    pattern: [
-      'data/ontology/taxa/**/*.json',
-      'data/ontology/taxa/**/*.jsonl',
-      'data/ontology/taxa/**/*.md',
-    ],
-    ignore: [
-      'data/ontology/taxa/**/*.tx.md', // Exclude taxonomic markdown files
-    ],
-    description: 'Taxonomic classification data (animals, plants, fungi, etc.)',
-  },
-  ontology_core: {
-    name: 'Ontology - Core',
-    pattern: [
-      'data/ontology/**/*.json',
-      'data/ontology/**/*.jsonl',
-      'data/sql/**/*.json',
-      'etl/dist/database/*.json', // Include metadata JSON files from builds
-    ],
-    ignore: [
-      'data/ontology/compiled/**', // Exclude all compiled files (redundant with source files)
-      'data/ontology/taxa/**', // Exclude taxa folder (handled by ontology_taxa category)
-    ],
-    description: 'Core ontology data (attributes, nutrients, parts, rules, transforms) - excludes taxa',
-  },
-  scripts: {
-    name: 'Project Scripts',
-    pattern: [
-      'scripts/**/*.ts',
-      'scripts/**/*.js',
-      'scripts/**/*.py',
-      'scripts/**/*.md',
-    ],
-    description: 'Build and utility scripts',
-  },
-  docs: {
-    name: 'Documentation',
-    pattern: [
-      'docs/**/*.md',
-      'README.md',
-      'CONTRIBUTING.md',
-    ],
-    description: 'Project documentation',
-  },
-  ui_routes: {
-    name: 'UI Route Logic',
-    pattern: [
-      'apps/web/src/routes/**/*.tsx',
-      'apps/web/src/routes/**/*.ts',
-      'apps/web/src/routeTree.gen.ts',
-      'apps/web/src/lib/fs-url.ts',
-      'apps/web/vite.config.ts',
-    ],
-    description: 'TanStack Router configuration, route definitions, and related utilities',
-  },
-  config: {
-    name: 'Configuration',
-    pattern: [
-      'package.json',
-      'pnpm-workspace.yaml',
-      'turbo.json',
-      'tsconfig.base.json',
-      '.gitignore',
-      'README.md',
-      'apps/*/package.json',
-      'apps/*/tsconfig.json',
-      'apps/*/vite.config.ts',
-      'apps/*/tailwind.config.ts',
-      'apps/*/postcss.config.js',
-      'packages/*/package.json',
-      'packages/*/tsconfig.json',
-    ],
-    description: 'Project config and package files',
-  },
-};
+function loadConfig(configName: string = 'default'): AggregateConfig {
+  const configPath = resolve(process.cwd(), `scripts/aggregate/${configName}.json`);
+
+  if (!existsSync(configPath)) {
+    throw new Error(`Config file not found: ${configPath}`);
+  }
+
+  try {
+    const configContent = readFileSync(configPath, 'utf-8');
+    const config = JSON.parse(configContent) as AggregateConfig;
+
+    // Validate required fields
+    if (!config.name || !config.categories || !config.defaults || !config.processing) {
+      throw new Error('Invalid config: missing required fields');
+    }
+
+    return config;
+  } catch (error) {
+    throw new Error(`Failed to load config ${configName}: ${error}`);
+  }
+}
+
+function listAvailableConfigs(): string[] {
+  const aggregateDir = resolve(process.cwd(), 'scripts/aggregate');
+  const files = readdirSync(aggregateDir);
+
+  return files
+    .filter(file => file.endsWith('.json') && file !== 'default.json')
+    .map(file => file.replace('.json', ''));
+}
 
 // ---- File Detection -------------------------------------------------------
 
-function isCodeOrConfigFile(filePath: string): boolean {
+function isCodeOrConfigFile(filePath: string, category: FileCategory): boolean {
   const ext = extname(filePath).toLowerCase();
   const fileName = basename(filePath).toLowerCase();
 
+  // Check category-specific exclusions first
+  if (category.excludeExtensions && category.excludeExtensions.includes(ext)) {
+    return false;
+  }
+
+  // Check category-specific inclusions
+  if (category.includeExtensions && category.includeExtensions.length > 0) {
+    return category.includeExtensions.includes(ext);
+  }
+
+  // Default file type detection
   // Code files
   const codeExtensions = ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.py', '.sql'];
   if (codeExtensions.includes(ext)) {
@@ -326,20 +244,20 @@ function getFileInfo(filePath: string, workspaceRoot: string): FileInfo | null {
 
 // ---- File Discovery -------------------------------------------------------
 
-async function discoverFiles(categories: string[], workspaceRoot: string): Promise<FileInfo[]> {
+async function discoverFiles(categories: string[], workspaceRoot: string, config: AggregateConfig): Promise<FileInfo[]> {
   const files: FileInfo[] = [];
 
   // Handle "all" category by selecting all other categories
   let categoriesToProcess = categories;
   if (categories.includes('all')) {
-    categoriesToProcess = Object.keys(FILE_CATEGORIES).filter(cat => cat !== 'all');
+    categoriesToProcess = Object.keys(config.categories).filter(cat => cat !== 'all');
   }
 
   // Collect all files from included categories
   for (const categoryName of categoriesToProcess) {
-    const category = FILE_CATEGORIES[categoryName];
+    const category = config.categories[categoryName];
     if (category) {
-      for (const pattern of category.pattern) {
+      for (const pattern of category.patterns) {
         try {
           const defaultIgnore = ['node_modules/**', '.git/**', 'dist/**', 'build/**', '*.log', '*.tmp', '*.cache', '*.db*', '*.sqlite*'];
           const categoryIgnore = category.ignore || [];
@@ -352,9 +270,13 @@ async function discoverFiles(categories: string[], workspaceRoot: string): Promi
 
           for (const match of matches) {
             const fullPath = join(workspaceRoot, match);
-            if (isCodeOrConfigFile(fullPath) && !shouldExclude(fullPath, workspaceRoot)) {
+            if (isCodeOrConfigFile(fullPath, category) && !shouldExclude(fullPath, workspaceRoot)) {
               const fileInfo = getFileInfo(fullPath, workspaceRoot);
               if (fileInfo) {
+                // Apply category-specific file size limits
+                if (category.maxFileSize && fileInfo.size > category.maxFileSize) {
+                  continue;
+                }
                 files.push(fileInfo);
               }
             }
@@ -370,6 +292,44 @@ async function discoverFiles(categories: string[], workspaceRoot: string): Promi
   return [...new Set(files.map(f => f.path))].map(path =>
     files.find(f => f.path === path)!
   );
+}
+
+// ---- File Size Validation -------------------------------------------------
+
+function validateAggregateSize(files: FileInfo[], maxSize: number): { valid: boolean; totalSize: number; message?: string } {
+  const totalSize = files.reduce((sum, file) => sum + file.size, 0);
+
+  if (totalSize <= maxSize) {
+    return { valid: true, totalSize };
+  }
+
+  const sizeKB = (totalSize / 1024).toFixed(1);
+  const maxKB = (maxSize / 1024).toFixed(1);
+
+  return {
+    valid: false,
+    totalSize,
+    message: `Aggregate size ${sizeKB}KB exceeds limit of ${maxKB}KB. Consider using summary mode or reducing file selection.`
+  };
+}
+
+async function getSummaryTruncationLines(): Promise<number> {
+  const answer = await inquirer.prompt([
+    {
+      type: 'number',
+      name: 'lines',
+      message: 'How many lines should be shown per file in summary mode?',
+      default: 20,
+      validate: (input: number) => {
+        if (input < 1 || input > 1000) {
+          return 'Please enter a number between 1 and 1000';
+        }
+        return true;
+      }
+    }
+  ]);
+
+  return answer.lines;
 }
 
 // ---- Output Generation -----------------------------------------------------
@@ -423,7 +383,7 @@ function generateCompactOutput(files: FileInfo[]): string {
   return output;
 }
 
-function summarizeFileContent(file: FileInfo): { summary: string; truncated: boolean } {
+function summarizeFileContent(file: FileInfo, maxLines: number = 20): { summary: string; truncated: boolean } {
   const ext = extname(file.path).toLowerCase();
   const lines = file.content.split('\n');
 
@@ -534,25 +494,36 @@ function summarizeFileContent(file: FileInfo): { summary: string; truncated: boo
   return { summary: lines.slice(0, 20).join('\n'), truncated: true };
 }
 
-function generateSummaryOutput(files: FileInfo[]): string {
+function generateSummaryOutput(files: FileInfo[], maxLines: number = 20): string {
   let output = '# Codebase Summary Report\n\n';
   output += `Generated on: ${new Date().toISOString()}\n`;
   output += `Total files: ${files.length}\n`;
-  output += `Total size: ${formatSize(files.reduce((sum, file) => sum + file.size, 0))}\n\n`;
+
+  // Calculate actual total size including truncation
+  let actualTotalSize = 0;
+  const fileSummaries = files.map(file => {
+    const { summary, truncated } = summarizeFileContent(file, maxLines);
+    const actualSize = Buffer.byteLength(summary, 'utf8');
+    actualTotalSize += actualSize;
+    return { file, summary, truncated, actualSize };
+  });
+
+  output += `Total size: ${formatSize(actualTotalSize)}\n`;
+  output += `Summary truncation: ${maxLines} lines per file\n\n`;
 
   output += '## Files Overview\n\n';
-  files.forEach(file => {
-    output += `- **${file.path}** (${formatSize(file.size)}, ${file.lines} lines)\n`;
+  fileSummaries.forEach(({ file, actualSize, truncated }) => {
+    const sizeLabel = truncated ? `${formatSize(actualSize)} (truncated from ${formatSize(file.size)})` : formatSize(file.size);
+    output += `- **${file.path}** (${sizeLabel}, ${file.lines} lines)\n`;
   });
 
   output += '\n---\n\n';
 
-  files.forEach(file => {
-    const { summary, truncated } = summarizeFileContent(file);
+  fileSummaries.forEach(({ file, summary, truncated, actualSize }) => {
     const truncateLabel = truncated ? ' *(truncated)*' : '';
 
     output += `## ${file.path}${truncateLabel}\n\n`;
-    output += `**Size:** ${formatSize(file.size)} | **Lines:** ${file.lines}\n\n`;
+    output += `**Size:** ${formatSize(actualSize)} | **Lines:** ${file.lines}\n\n`;
     output += '```\n';
     output += summary;
     output += '\n```\n\n';
@@ -563,63 +534,92 @@ function generateSummaryOutput(files: FileInfo[]): string {
 
 // ---- Interactive CLI ------------------------------------------------------
 
-async function getInteractiveOptions(): Promise<AggregateOptions> {
-  // Step 1: Content level
-  const contentLevelAnswer = await inquirer.prompt([
-    {
-      type: 'list',
-      name: 'contentLevel',
-      message: 'What content level do you want?',
-      choices: [
-        { name: 'Compact (file stats only)', value: 'compact' },
-        { name: 'Summary (signatures/excerpts with metadata)', value: 'summary' },
-        { name: 'Verbose (complete file contents - full AI context)', value: 'verbose' },
-      ],
-      default: 'verbose',
-    },
-  ]);
+async function getInteractiveOptions(config: AggregateConfig): Promise<AggregateOptions> {
+  let contentLevel = config.defaults.contentLevel;
+  let categories = ['all'];
+  let outputDestination = config.defaults.outputDestination;
+  let outputFile = config.defaults.outputFile;
 
-  // Step 2: Category selection
-  const categoryChoices = [
-    { name: 'All Project Files - Select all categories', value: 'all' },
-    ...Object.entries(FILE_CATEGORIES).map(([key, cat]) => ({
-      name: `${cat.name} - ${cat.description}`,
-      value: key,
-    }))
-  ];
+  // Step 1: Content level (skip if configured)
+  if (config.ui.skipVerbositySelection === true) {
+    // Skip verbosity selection - use default
+  } else {
+    const contentLevelAnswer = await inquirer.prompt([
+      {
+        type: 'list',
+        name: 'contentLevel',
+        message: 'What content level do you want?',
+        choices: [
+          { name: 'Compact (file stats only)', value: 'compact' },
+          { name: 'Summary (signatures/excerpts with metadata)', value: 'summary' },
+          { name: 'Verbose (complete file contents - full AI context)', value: 'verbose' },
+        ],
+        default: config.defaults.contentLevel,
+      },
+    ]);
+    contentLevel = contentLevelAnswer.contentLevel;
+  }
 
-  const categoriesAnswer = await inquirer.prompt([
-    {
-      type: 'checkbox',
-      name: 'categories',
-      message: 'Which categories to include?',
-      choices: categoryChoices,
-      default: ['all'], // Default to all files
-    },
-  ]);
+  // Step 1.5: Get truncation lines if summary mode
+  let summaryTruncationLines: number | undefined;
+  if (contentLevel === 'summary') {
+    summaryTruncationLines = await getSummaryTruncationLines();
+  }
 
-  // Step 4: Output destination
+  // Step 2: Category selection (skip if configured)
+  if (config.ui.skipCategorySelection === true) {
+    // Skip category selection - use all categories
+    categories = Object.keys(config.categories);
+  } else {
+    const categoryChoices = [
+      { name: 'All Project Files - Select all categories', value: 'all' },
+      ...Object.entries(config.categories).map(([key, cat]) => ({
+        name: `${cat.name} - ${cat.description}`,
+        value: key,
+      }))
+    ];
+
+    const categoriesAnswer = await inquirer.prompt([
+      {
+        type: 'checkbox',
+        name: 'categories',
+        message: 'Which categories to include?',
+        choices: categoryChoices,
+        default: ['all'], // Default to all files
+      },
+    ]);
+    categories = categoriesAnswer.categories;
+  }
+
+  // Step 3: Output destination
+  const outputMessage = config.ui.customPrompts?.outputDestination || 'Output destination?';
   const outputAnswer = await inquirer.prompt([
     {
       type: 'list',
       name: 'outputDestination',
-      message: 'Output destination?',
+      message: outputMessage,
       choices: [
         { name: 'Console only', value: 'console' },
-        { name: 'File only (generated/code.md)', value: 'file' },
+        { name: `File only (${config.defaults.outputFile || 'generated/code.md'})`, value: 'file' },
         { name: 'Both console and file', value: 'both' },
       ],
-      default: 'file',
+      default: config.defaults.outputDestination,
     },
   ]);
 
+  outputDestination = outputAnswer.outputDestination;
+  outputFile = outputAnswer.outputDestination === 'file' || outputAnswer.outputDestination === 'both'
+    ? (config.defaults.outputFile || 'generated/code.md')
+    : undefined;
+
   return {
-    contentLevel: contentLevelAnswer.contentLevel,
-    categories: categoriesAnswer.categories,
-    outputDestination: outputAnswer.outputDestination,
-    outputFile: outputAnswer.outputDestination === 'file' || outputAnswer.outputDestination === 'both'
-      ? 'generated/code.md'
-      : undefined
+    contentLevel,
+    categories,
+    outputDestination,
+    outputFile,
+    config,
+    maxAggregateFileSize: config.processing.maxAggregateFileSize,
+    summaryTruncationLines
   };
 }
 
@@ -630,11 +630,13 @@ function showHelp() {
 📁 Food Graph Codebase Aggregator
 
 Usage:
-  pnpm ag                    # Interactive mode (default)
+  pnpm ag                    # Interactive mode (default config)
+  pnpm ag --config etl2      # Use ETL2 config
   pnpm ag --compact          # Quick compact mode
   pnpm ag --summary          # Summary mode with excerpts
   pnpm ag --verbose          # Full verbose mode
   pnpm ag --categories all,web,api  # Specific categories (comma-separated)
+  pnpm ag --list-configs     # List available configs
   pnpm ag --help             # Show this help
 
 Content Levels:
@@ -642,22 +644,18 @@ Content Levels:
   summary    - File excerpts/signatures (JSONL: first 10 lines, TS/JS: signatures, etc.)
   verbose    - Full file contents (perfect for AI context)
 
-File Categories:
-  all        - All project files (selects all other categories)
-  web        - React frontend application with tRPC client and API contracts
-  api        - tRPC server with SQLite database and API contracts
-  etl        - Python scripts and shared utilities
-  etl2       - ETL2 Python pipeline with Mise framework and documentation
-  ontology_taxa - Taxonomic classification data (animals, plants, fungi, etc.)
-  ontology_core - Core ontology data (attributes, nutrients, parts, rules, transforms) - excludes taxa
-  ui_routes  - TanStack Router configuration, route definitions, and related utilities
-  scripts    - Build and utility scripts
-  docs       - Project documentation
-  config     - Project configuration, package management, and documentation
+Config System:
+  --config <name>    - Use specific config (e.g., etl2)
+  --list-configs     - Show available configurations
+  Configs define categories, UI behavior, and processing limits
+
+File Size Limits:
+  Each config has a maxAggregateFileSize limit to prevent oversized outputs
+  If exceeded, you'll be prompted to use summary mode or reduce file selection
 
 Output Destinations:
   console    - Output directly to terminal
-  file       - Save to generated/code.md
+  file       - Save to configured output file
   both       - Output to both terminal and file
 
 The script automatically detects relevant code and config files:
@@ -671,17 +669,13 @@ The script automatically detects relevant code and config files:
   ❌ Shadcn UI components (apps/web/src/components/ui/)
 
 Examples:
-  pnpm ag                                    # Interactive selection
+  pnpm ag                                    # Interactive selection (default config)
+  pnpm ag --config etl2                      # ETL2 analysis (simplified flow)
   pnpm ag --verbose --categories web         # Web app only (full)
   pnpm ag --summary --categories web         # Web app only (signatures)
   pnpm ag --compact --categories api         # API code summary
   pnpm ag --verbose --categories all         # Everything
-  pnpm ag --summary --categories ontology_core # Ontology metadata summaries
-  pnpm ag --verbose --categories web,api     # Web app + API
-  pnpm ag --verbose --categories ui_routes   # Router configuration and routes only
-  pnpm ag --verbose --categories ontology_taxa # Taxonomic data only
-  pnpm ag --summary --categories ontology_taxa,ontology_core # All ontology data (excerpts)
-  pnpm ag --verbose --categories scripts,docs # Scripts and documentation
+  pnpm ag --list-configs                     # Show available configs
 `);
 }
 
@@ -696,19 +690,51 @@ async function main() {
     return;
   }
 
+  // List configs if requested
+  if (args.includes('--list-configs')) {
+    const configs = listAvailableConfigs();
+    console.log('Available configurations:');
+    configs.forEach(config => console.log(`  - ${config}`));
+    console.log('  - default (built-in)');
+    return;
+  }
+
   const workspaceRoot = process.cwd();
   let options: AggregateOptions;
 
+  // Parse config name
+  let configName = 'default';
+  const configIndex = args.indexOf('--config');
+  if (configIndex !== -1 && configIndex + 1 < args.length) {
+    const configArg = args[configIndex + 1];
+    if (configArg && !configArg.startsWith('--')) {
+      configName = configArg;
+    }
+  }
+
+  // Load config
+  let config: AggregateConfig;
+  try {
+    config = loadConfig(configName);
+  } catch (error) {
+    console.error(`❌ Error loading config '${configName}':`, error);
+    return;
+  }
+
+  console.log(`📋 Using config: ${config.name} - ${config.description}`);
+
   // Parse command line arguments
   if (args.includes('--interactive') || args.length === 0) {
-    options = await getInteractiveOptions();
+    options = await getInteractiveOptions(config);
   } else {
     // Parse content level
-    let contentLevel: ContentLevel = 'verbose';
+    let contentLevel: ContentLevel = config.defaults.contentLevel;
     if (args.includes('--compact')) {
       contentLevel = 'compact';
     } else if (args.includes('--summary')) {
       contentLevel = 'summary';
+    } else if (args.includes('--verbose')) {
+      contentLevel = 'verbose';
     }
 
     // Parse categories
@@ -724,21 +750,60 @@ async function main() {
     options = {
       contentLevel,
       categories,
-      outputDestination: 'file',
-      outputFile: 'generated/code.md'
+      outputDestination: config.defaults.outputDestination,
+      outputFile: config.defaults.outputFile,
+      config,
+      maxAggregateFileSize: config.processing.maxAggregateFileSize
     };
   }
 
   console.log('🔍 Discovering files...');
-  const files = await discoverFiles(options.categories, workspaceRoot);
+  const files = await discoverFiles(options.categories, workspaceRoot, config);
   console.log(`📁 Found ${files.length} files in categories: ${options.categories.join(', ')}`);
+
+  // Validate aggregate file size
+  const sizeValidation = validateAggregateSize(files, options.maxAggregateFileSize);
+  if (!sizeValidation.valid) {
+    console.warn(`⚠️  ${sizeValidation.message}`);
+
+    if (options.contentLevel === 'verbose') {
+      console.log('💡 Try using summary mode to reduce file size:');
+      console.log('   pnpm ag --summary --config ' + (configName === 'default' ? '' : configName));
+
+      const answer = await inquirer.prompt([
+        {
+          type: 'confirm',
+          name: 'useSummary',
+          message: 'Switch to summary mode with custom truncation?',
+          default: true
+        }
+      ]);
+
+      if (answer.useSummary) {
+        options.contentLevel = 'summary';
+        options.summaryTruncationLines = await getSummaryTruncationLines();
+        console.log('✅ Switched to summary mode');
+      } else {
+        console.warn('⚠️  Proceeding with verbose mode - output may be large');
+      }
+    } else {
+      console.warn('⚠️  Proceeding despite file size limit - output may be large');
+    }
+  }
 
   console.log('📝 Generating output...');
   let output: string;
+  let actualTotalSize = sizeValidation.totalSize;
+
   if (options.contentLevel === 'verbose') {
     output = generateVerboseOutput(files);
   } else if (options.contentLevel === 'summary') {
-    output = generateSummaryOutput(files);
+    output = generateSummaryOutput(files, options.summaryTruncationLines || 20);
+    // Recalculate actual size for summary mode
+    actualTotalSize = files.reduce((sum, file) => {
+      const { summary } = summarizeFileContent(file, options.summaryTruncationLines || 20);
+      return sum + Buffer.byteLength(summary, 'utf8');
+    }, 0);
   } else {
     output = generateCompactOutput(files);
   }
@@ -759,7 +824,7 @@ async function main() {
     console.log(output);
   }
 
-  console.log(`📊 Summary: ${files.length} files processed`);
+  console.log(`📊 Summary: ${files.length} files processed (${formatSize(actualTotalSize)})`);
 }
 
 // ---- Run ------------------------------------------------------------------

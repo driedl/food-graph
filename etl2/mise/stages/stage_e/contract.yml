@@ -2,6 +2,9 @@ artifacts:
   - path: tmp/tpt_canon.jsonl
     type: jsonl
     validators:
+      - kind: transform_ids_in_objects
+        transforms_path: tmp/transforms_canon.json
+        field: identity
       - kind: field_presence
         fields: ["id", "taxon_id", "part_id", "identity_hash", "path", "identity"]
       - kind: unique

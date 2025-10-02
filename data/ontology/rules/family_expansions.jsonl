@@ -1,0 +1,1 @@
+{"family":"DRY_CURED_MEAT","applies_to":[{"taxon_prefix":"tx:animalia","parts":["part:meat"]}],"path":[{"id":"tf:cure","params":{"style":"dry"}}]}

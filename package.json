@@ -25,7 +25,8 @@
     "sql:repl": "tsx scripts/run-sql.ts --repl",
     "sync-db": "tsx scripts/sync-db.ts",
     "api:routes": "tsx scripts/print-trpc-routes.ts",
-    "ag": "tsx scripts/aggregate.ts",
+    "ag": "tsx scripts/aggregate/aggregate.ts",
+    "ag:etl2": "tsx scripts/aggregate/aggregate.ts --config etl2 --categories etl2_core",
     "stop": "./scripts/stop-all.sh",
     "stop:force": "./scripts/stop-all.sh --force",
     "check": "pnpm typecheck && pnpm lint && pnpm etl:build"

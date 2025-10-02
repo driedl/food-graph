@@ -1,0 +1,73 @@
+{
+    "name": "ETL2 Analysis",
+    "description": "Complete ETL2 package for external LLM analysis",
+    "categories": {
+        "etl2_full": {
+            "name": "ETL2 Complete Package",
+            "description": "All ETL2 code, configs, and docs (no markdown, no build files)",
+            "patterns": [
+                "etl2/**/*.py",
+                "etl2/**/*.toml",
+                "etl2/**/*.yml",
+                "etl2/**/*.yaml",
+                "etl2/**/*.json"
+            ],
+            "ignore": [
+                "etl2/build/**",
+                "etl2/**/__pycache__/**",
+                "etl2/**/*.pyc",
+                "etl2/**/*.egg-info/**",
+                "etl2/**/__init__.py",
+                "etl2/docs/**/*.md",
+                "etl2/**/*.md"
+            ],
+            "excludeExtensions": [
+                ".md"
+            ]
+        },
+        "etl2_core": {
+            "name": "ETL2 Core Logic",
+            "description": "Core ETL2 implementation files only (no tests, contracts, metadata)",
+            "patterns": [
+                "etl2/**/*.py"
+            ],
+            "ignore": [
+                "etl2/build/**",
+                "etl2/**/__pycache__/**",
+                "etl2/**/*.pyc",
+                "etl2/**/*.egg-info/**",
+                "etl2/**/__init__.py",
+                "etl2/docs/**/*.md",
+                "etl2/**/*.md",
+                "etl2/tests/**",
+                "etl2/**/contract.yml",
+                "etl2/**/*.toml",
+                "etl2/**/*.yml",
+                "etl2/**/*.yaml",
+                "etl2/**/*.json"
+            ],
+            "excludeExtensions": [
+                ".md",
+                ".yml",
+                ".yaml",
+                ".toml",
+                ".json"
+            ]
+        }
+    },
+    "defaults": {
+        "contentLevel": "verbose",
+        "outputDestination": "file",
+        "outputFile": "generated/etl2-analysis.md"
+    },
+    "ui": {
+        "skipCategorySelection": false,
+        "skipVerbositySelection": false,
+        "customPrompts": {
+            "outputDestination": "Where should the ETL2 analysis be saved?"
+        }
+    },
+    "processing": {
+        "maxAggregateFileSize": 120000
+    }
+}

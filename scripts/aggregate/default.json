@@ -1,0 +1,169 @@
+{
+    "name": "Food Graph Default",
+    "description": "Complete food-graph project aggregation",
+    "categories": {
+        "web": {
+            "name": "Web App",
+            "description": "React frontend with tRPC client and API contracts",
+            "patterns": [
+                "apps/web/**/*.ts",
+                "apps/web/**/*.tsx",
+                "apps/web/**/*.js",
+                "apps/web/**/*.jsx",
+                "apps/web/**/*.json",
+                "apps/web/**/*.html",
+                "apps/web/**/*.css",
+                "apps/web/**/*.config.*",
+                "packages/api-contract/**/*.ts",
+                "packages/api-contract/**/*.tsx",
+                "packages/api-contract/**/*.js",
+                "packages/api-contract/**/*.jsx",
+                "packages/api-contract/**/*.json"
+            ],
+            "ignore": [
+                "apps/web/dist/**"
+            ]
+        },
+        "api": {
+            "name": "API Server",
+            "description": "tRPC server with SQLite, migrations, and API contracts",
+            "patterns": [
+                "apps/api/src/**/*.ts",
+                "apps/api/migrations/**/*.sql",
+                "apps/api/package.json",
+                "apps/api/tsconfig.json",
+                "packages/api-contract/src/**/*.ts",
+                "packages/api-contract/src/**/*.tsx",
+                "packages/api-contract/package.json",
+                "packages/api-contract/tsconfig.json"
+            ],
+            "ignore": [
+                "apps/api/node_modules/**",
+                "packages/api-contract/node_modules/**"
+            ]
+        },
+        "etl": {
+            "name": "ETL Processing",
+            "description": "Python scripts, TypeScript ETL pipeline, and shared utilities",
+            "patterns": [
+                "etl/**/*.py",
+                "etl/src/**/*.ts",
+                "etl/src/**/*.js",
+                "packages/shared/**/*.ts",
+                "packages/shared/**/*.js",
+                "packages/shared/**/*.json"
+            ],
+            "ignore": [
+                "etl/node_modules/**",
+                "etl/src/pipeline/steps/doc-reporter.ts"
+            ]
+        },
+        "etl2": {
+            "name": "ETL2 Processing",
+            "description": "ETL2 Python pipeline with Mise framework and documentation",
+            "patterns": [
+                "etl2/**/*.py",
+                "etl2/**/*.md",
+                "etl2/**/*.toml",
+                "etl2/**/*.txt",
+                "etl2/**/*.yml",
+                "etl2/**/*.yaml"
+            ],
+            "ignore": [
+                "etl2/build/**",
+                "etl2/**/__pycache__/**",
+                "etl2/**/*.pyc",
+                "etl2/**/*.egg-info/**",
+                "etl2/**/__init__.py",
+                "etl2/docs/adr/**"
+            ]
+        },
+        "ontology_taxa": {
+            "name": "Ontology - Taxa",
+            "description": "Taxonomic classification data (animals, plants, fungi, etc.)",
+            "patterns": [
+                "data/ontology/taxa/**/*.json",
+                "data/ontology/taxa/**/*.jsonl",
+                "data/ontology/taxa/**/*.md"
+            ],
+            "ignore": [
+                "data/ontology/taxa/**/*.tx.md"
+            ]
+        },
+        "ontology_core": {
+            "name": "Ontology - Core",
+            "description": "Core ontology data (attributes, nutrients, parts, rules, transforms) - excludes taxa",
+            "patterns": [
+                "data/ontology/**/*.json",
+                "data/ontology/**/*.jsonl",
+                "data/sql/**/*.json",
+                "etl/dist/database/*.json"
+            ],
+            "ignore": [
+                "data/ontology/compiled/**",
+                "data/ontology/taxa/**"
+            ]
+        },
+        "scripts": {
+            "name": "Project Scripts",
+            "description": "Build and utility scripts",
+            "patterns": [
+                "scripts/**/*.ts",
+                "scripts/**/*.js",
+                "scripts/**/*.py",
+                "scripts/**/*.md"
+            ]
+        },
+        "docs": {
+            "name": "Documentation",
+            "description": "Project documentation",
+            "patterns": [
+                "docs/**/*.md",
+                "README.md",
+                "CONTRIBUTING.md"
+            ]
+        },
+        "ui_routes": {
+            "name": "UI Route Logic",
+            "description": "TanStack Router configuration, route definitions, and related utilities",
+            "patterns": [
+                "apps/web/src/routes/**/*.tsx",
+                "apps/web/src/routes/**/*.ts",
+                "apps/web/src/routeTree.gen.ts",
+                "apps/web/src/lib/fs-url.ts",
+                "apps/web/vite.config.ts"
+            ]
+        },
+        "config": {
+            "name": "Configuration",
+            "description": "Project config and package files",
+            "patterns": [
+                "package.json",
+                "pnpm-workspace.yaml",
+                "turbo.json",
+                "tsconfig.base.json",
+                ".gitignore",
+                "README.md",
+                "apps/*/package.json",
+                "apps/*/tsconfig.json",
+                "apps/*/vite.config.ts",
+                "apps/*/tailwind.config.ts",
+                "apps/*/postcss.config.js",
+                "packages/*/package.json",
+                "packages/*/tsconfig.json"
+            ]
+        }
+    },
+    "defaults": {
+        "contentLevel": "verbose",
+        "outputDestination": "file",
+        "outputFile": "generated/code.md"
+    },
+    "ui": {
+        "skipCategorySelection": false,
+        "skipVerbositySelection": false
+    },
+    "processing": {
+        "maxAggregateFileSize": 2000000
+    }
+}

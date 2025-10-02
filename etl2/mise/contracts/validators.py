@@ -57,6 +57,10 @@ def _apply_jsonl_validators(path: Path, lines: List[dict], validators: List[Dict
             errs.extend(_validate_crossref_json(path, lines, validator, build_dir))
         elif kind == "transform_ids_in":
             errs.extend(_validate_transform_ids_in(path, lines, validator, build_dir))
+        elif kind == "transform_ids_in_objects":
+            errs.extend(_validate_transform_ids_in_objects(path, lines, validator, build_dir))
+        elif kind == "path_transform_ids_in":
+            errs.extend(_validate_path_transform_ids_in(path, lines, validator, build_dir))
         else:
             errs.append(f"{path}: unknown validator kind: {kind}")
     return errs
@@ -204,6 +208,69 @@ def _validate_transform_ids_in(path: Path, lines: List[dict], validator: Dict[st
             for transform_id in transforms:
                 if transform_id not in transform_ids:
                     errs.append(f"{path}:{i}: transform ID '{transform_id}' not found in {transforms_path}")
+    return errs
+
+def _validate_transform_ids_in_objects(path: Path, lines: List[dict], validator: Dict[str, Any], build_dir: Path) -> List[str]:
+    """
+    Validate that a field is an array of objects each with 'id' that exists in transforms_canon.json
+    validator:
+      { kind: "transform_ids_in_objects", transforms_path: "tmp/transforms_canon.json", field: "identity" }
+    """
+    errs: List[str] = []
+    transforms_path = build_dir / validator.get("transforms_path", "tmp/transforms_canon.json")
+    field = validator.get("field", "identity")
+    if not transforms_path.exists():
+        return errs
+    try:
+        transforms_data = json.loads(transforms_path.read_text(encoding="utf-8"))
+        if isinstance(transforms_data, dict):
+            transform_ids = set(transforms_data.keys())
+        elif isinstance(transforms_data, list):
+            transform_ids = {t.get("id") for t in transforms_data if isinstance(t, dict) and "id" in t}
+        else:
+            transform_ids = set()
+    except (json.JSONDecodeError, KeyError):
+        return errs
+    for i, line in enumerate(lines, 1):
+        arr = line.get(field, [])
+        if isinstance(arr, list):
+            for obj in arr:
+                if not isinstance(obj, dict): 
+                    errs.append(f"{path}:{i}: {field} must be array of objects")
+                    break
+                tid = obj.get("id")
+                if tid not in transform_ids:
+                    errs.append(f"{path}:{i}: transform id '{tid}' not found in {transforms_path}")
+    return errs
+
+def _validate_path_transform_ids_in(path: Path, lines: List[dict], validator: Dict[str, Any], build_dir: Path) -> List[str]:
+    """
+    Validate that each step in a 'path' array has an id present in transforms_canon.json.
+    Expects objects like: {"path":[{"id":"tf:...","params":{...}}, ...]}
+    """
+    errs: List[str] = []
+    transforms_path = build_dir / validator.get("transforms_path", "tmp/transforms_canon.json")
+    field = validator.get("field", "path")
+    if not transforms_path.exists():
+        return errs
+    try:
+        transforms_data = json.loads(transforms_path.read_text(encoding="utf-8"))
+        if isinstance(transforms_data, dict):
+            transform_ids = set(transforms_data.keys())
+        elif isinstance(transforms_data, list):
+            transform_ids = {t.get("id") for t in transforms_data if isinstance(t, dict) and "id" in t}
+        else:
+            transform_ids = set()
+    except (json.JSONDecodeError, KeyError):
+        return errs
+    for i, line in enumerate(lines, 1):
+        steps = line.get(field, [])
+        if not isinstance(steps, list):
+            continue
+        for step in steps:
+            tid = isinstance(step, dict) and step.get("id")
+            if tid and tid not in transform_ids:
+                errs.append(f"{path}:{i}: transform ID '{tid}' not found in {transforms_path}")
     return errs
 
 def _validate_array_of_objects(path: Path, obj: Any, validator: Dict[str, Any]) -> List[str]:

@@ -1,0 +1,39 @@
+{
+    "DRY_CURED_MEAT": {
+        "applies_to": [
+            {
+                "taxon_prefix": "tx:animalia",
+                "parts": [
+                    "part:meat"
+                ]
+            }
+        ],
+        "identity_path": [
+            {
+                "id": "tf:cure",
+                "params": {
+                    "nitrite_ppm": 110
+                }
+            }
+        ]
+    },
+    "BRINED_VEG": {
+        "applies_to": [
+            {
+                "taxon_prefix": "tx:plantae",
+                "parts": [
+                    "part:fruit",
+                    "part:leaf"
+                ]
+            }
+        ],
+        "identity_path": [
+            {
+                "id": "tf:salt",
+                "params": {
+                    "salt_pct": 3.0
+                }
+            }
+        ]
+    }
+}

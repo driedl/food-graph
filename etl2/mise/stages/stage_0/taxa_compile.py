@@ -27,17 +27,21 @@ def _collect_taxa(root: Path) -> List[Tuple[Path, int, dict]]:
 
 def _kingdom_key(id_: str) -> str:
     parts = id_.split(":")
-    if len(parts) >= 3 and parts[0] == "tx": return parts[1]
+    if len(parts) >= 2 and parts[0] == "tx": 
+        if parts[1] in {"plantae", "fungi", "animalia"}:
+            return parts[1]
     if id_ in {"tx:life", "tx:eukaryota"}: return "00_index"
     return "zz_other"
 
 def _sort_key(obj: dict) -> tuple:
     id_ = obj["id"]
-    if id_ == "tx:life": return (0, 0, "")
-    if id_ == "tx:eukaryota": return (0, 1, "")
+    if id_ == "tx:life": return (0, 0, 0, "")
+    if id_ == "tx:eukaryota": return (0, 1, 0, "")
     group = _kingdom_key(id_)
     order = {"00_index": 0, "plantae": 1, "fungi": 2, "animalia": 3}.get(group, 9)
-    return (1, order, id_)
+    # Add hierarchical depth (number of colons) to ensure parents come before children
+    depth = len(id_.split(":")) - 1  # -1 because "tx:life" should be depth 0
+    return (1, order, depth, id_)
 
 def _normalize(obj: dict) -> dict:
     obj = dict(obj)
