@@ -29,7 +29,7 @@ python -m mise plan
 python -m mise print-paths
 
 # run the pipeline (will expand as stages are added)
-python -m mise run
+python -m mise run build
 ```
 
 ### Switch API to use mise outputs

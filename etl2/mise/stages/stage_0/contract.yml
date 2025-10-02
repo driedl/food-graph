@@ -1,0 +1,48 @@
+artifacts:
+  - path: compiled/taxa.jsonl
+    type: jsonl
+    must_exist: true
+    min_lines: 10
+    validators:
+      - kind: field_presence
+        fields: ["id", "rank", "display_name", "latin_name"]
+      - kind: unique
+        field: "id"
+      - kind: parent_exists
+        id_field: "id"
+        parent_field: "parent"
+  
+  - path: compiled/docs.jsonl
+    type: jsonl
+    must_exist: true
+    min_lines: 1
+    validators:
+      - kind: field_presence
+        fields: ["taxon_id", "lang", "summary", "description_md", "checksum"]
+      - kind: composite_unique
+        fields: ["taxon_id", "lang"]
+      - kind: crossref_jsonl
+        this_field: "taxon_id"
+        other_path: "compiled/taxa.jsonl"
+        other_field: "id"
+  
+  - path: compiled/attributes.json
+    type: json
+    must_exist: true
+    validators:
+      - kind: array_of_objects
+      - kind: set_nonempty
+  
+  - path: compiled/nutrients.json
+    type: json
+    must_exist: true
+    validators:
+      - kind: array_of_objects
+      - kind: set_nonempty
+  
+  - path: compiled/parts.json
+    type: json
+    must_exist: true
+    validators:
+      - kind: array_of_objects
+      - kind: set_nonempty

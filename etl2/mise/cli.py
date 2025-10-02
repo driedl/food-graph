@@ -9,6 +9,7 @@ from mise.stages.stage_0.runner import run as run_0
 from mise.stages.stage_a.runner import run as run_A
 from mise.stages.stage_b.runner import run as run_B, preflight as pre_B
 from mise.stages.stage_c.runner import run as run_C, preflight as pre_C
+from mise.contracts.engine import verify
 
 console = Console()
 
@@ -65,6 +66,38 @@ def run_stage_with_timing(stage_func, stage_id: str, description: str, *args, **
         print_error(f"Stage {stage_id} failed: {e}")
         return 1, duration_ms
 
+def run_stage_with_tests(stage_func, stage_id: str, description: str, in_dir: Path, build_dir: Path, verbose: bool, with_tests: bool, *args, **kwargs):
+    """Run a stage function with timing, colored output, and optional contract verification"""
+    print_stage_header(stage_id, description)
+    start_time = time.time()
+    
+    try:
+        rc = stage_func(*args, **kwargs)
+        duration_ms = (time.time() - start_time) * 1000
+        
+        if rc == 0:
+            print_stage_complete(stage_id, duration_ms)
+            
+            # Run contract verification if requested
+            if with_tests:
+                verify_start = time.time()
+                verify_rc = verify(f"stage_{stage_id.lower()}", in_dir, build_dir, verbose)
+                verify_duration = (time.time() - verify_start) * 1000
+                
+                if verify_rc == 0:
+                    console.print(f"  ✓ Contract verification passed in {verify_duration:.0f}ms", style="green")
+                else:
+                    console.print(f"  ❌ Contract verification failed in {verify_duration:.0f}ms", style="red")
+                    return 1, duration_ms
+        else:
+            print_error(f"Stage {stage_id} failed with exit code {rc}")
+        
+        return rc, duration_ms
+    except Exception as e:
+        duration_ms = (time.time() - start_time) * 1000
+        print_error(f"Stage {stage_id} failed: {e}")
+        return 1, duration_ms
+
 def main():
     ap = argparse.ArgumentParser(prog="mise", description="Next-gen ETL (Stage runner)")
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -74,6 +107,14 @@ def main():
     run.add_argument("--in", dest="in_dir", default="data/ontology")
     run.add_argument("--build", dest="build_dir", default="etl2/build")
     run.add_argument("--verbose", action="store_true")
+    run.add_argument("--with-tests", action="store_true", help="Run contract verification after each stage")
+    
+    test = sub.add_parser("test", help="Test a stage's contract")
+    test.add_argument("stage", choices=["0", "A", "B", "C"], help="Stage to test")
+    test.add_argument("--in", dest="in_dir", default="data/ontology")
+    test.add_argument("--build", dest="build_dir", default="etl2/build")
+    test.add_argument("--verbose", action="store_true")
+    
     args = ap.parse_args()
 
     if args.cmd == "run":
@@ -81,10 +122,10 @@ def main():
         total_start = time.time()
         
         if args.stage == "0":
-            rc, _ = run_stage_with_timing(run_0, "0", "Compiling taxa and docs", in_dir, build_dir, False, args.verbose)
+            rc, _ = run_stage_with_tests(run_0, "0", "Compiling taxa and docs", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, False, args.verbose)
             sys.exit(rc)
         if args.stage == "A":
-            rc, _ = run_stage_with_timing(run_A, "A", "Normalizing transforms and rules", in_dir, build_dir, args.verbose)
+            rc, _ = run_stage_with_tests(run_A, "A", "Normalizing transforms and rules", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
             sys.exit(rc)
         if args.stage == "B":
             try: 
@@ -92,7 +133,7 @@ def main():
             except Exception as e: 
                 print_error(f"Preflight B: {e}")
                 sys.exit(2)
-            rc, _ = run_stage_with_timing(run_B, "B", "Building substrates", in_dir, build_dir, args.verbose)
+            rc, _ = run_stage_with_tests(run_B, "B", "Building substrates", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
             sys.exit(rc)
         if args.stage == "C":
             try: 
@@ -100,14 +141,14 @@ def main():
             except Exception as e: 
                 print_error(f"Preflight C: {e}")
                 sys.exit(2)
-            rc, _ = run_stage_with_timing(run_C, "C", "Ingesting curated seed", in_dir, build_dir, args.verbose)
+            rc, _ = run_stage_with_tests(run_C, "C", "Ingesting curated seed", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
             sys.exit(rc)
         if args.stage in ("0ABC", "build"):
-            # Run all stages with timing
-            rc, _ = run_stage_with_timing(run_0, "0", "Compiling taxa and docs", in_dir, build_dir, False, args.verbose)
+            # Run all stages with timing and optional tests
+            rc, _ = run_stage_with_tests(run_0, "0", "Compiling taxa and docs", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, False, args.verbose)
             if rc != 0: sys.exit(rc)
             
-            rc, _ = run_stage_with_timing(run_A, "A", "Normalizing transforms and rules", in_dir, build_dir, args.verbose)
+            rc, _ = run_stage_with_tests(run_A, "A", "Normalizing transforms and rules", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
             if rc != 0: sys.exit(rc)
             
             try: 
@@ -115,7 +156,7 @@ def main():
             except Exception as e: 
                 print_error(f"Preflight B: {e}")
                 sys.exit(2)
-            rc, _ = run_stage_with_timing(run_B, "B", "Building substrates", in_dir, build_dir, args.verbose)
+            rc, _ = run_stage_with_tests(run_B, "B", "Building substrates", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
             if rc != 0: sys.exit(rc)
             
             try: 
@@ -123,7 +164,7 @@ def main():
             except Exception as e: 
                 print_error(f"Preflight C: {e}")
                 sys.exit(2)
-            rc, _ = run_stage_with_timing(run_C, "C", "Ingesting curated seed", in_dir, build_dir, args.verbose)
+            rc, _ = run_stage_with_tests(run_C, "C", "Ingesting curated seed", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
             
             total_duration = (time.time() - total_start) * 1000
             if rc == 0:
@@ -131,16 +172,16 @@ def main():
             sys.exit(rc)
             
         if args.stage == "0A":
-            rc, _ = run_stage_with_timing(run_0, "0", "Compiling taxa and docs", in_dir, build_dir, False, args.verbose)
+            rc, _ = run_stage_with_tests(run_0, "0", "Compiling taxa and docs", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, False, args.verbose)
             if rc != 0: sys.exit(rc)
-            rc, _ = run_stage_with_timing(run_A, "A", "Normalizing transforms and rules", in_dir, build_dir, args.verbose)
+            rc, _ = run_stage_with_tests(run_A, "A", "Normalizing transforms and rules", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
             sys.exit(rc)
             
         if args.stage == "0AB":
-            rc, _ = run_stage_with_timing(run_0, "0", "Compiling taxa and docs", in_dir, build_dir, False, args.verbose)
+            rc, _ = run_stage_with_tests(run_0, "0", "Compiling taxa and docs", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, False, args.verbose)
             if rc != 0: sys.exit(rc)
             
-            rc, _ = run_stage_with_timing(run_A, "A", "Normalizing transforms and rules", in_dir, build_dir, args.verbose)
+            rc, _ = run_stage_with_tests(run_A, "A", "Normalizing transforms and rules", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
             if rc != 0: sys.exit(rc)
             
             try: 
@@ -148,8 +189,17 @@ def main():
             except Exception as e: 
                 print_error(f"Preflight B: {e}")
                 sys.exit(2)
-            rc, _ = run_stage_with_timing(run_B, "B", "Building substrates", in_dir, build_dir, args.verbose)
+            rc, _ = run_stage_with_tests(run_B, "B", "Building substrates", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
             sys.exit(rc)
+    
+    elif args.cmd == "test":
+        in_dir = Path(args.in_dir); build_dir = Path(args.build_dir)
+        stage_map = {"0": "stage_0", "A": "stage_a", "B": "stage_b", "C": "stage_c"}
+        stage_name = stage_map[args.stage]
+        
+        print_stage_header(f"Test {args.stage}", f"Contract verification")
+        rc = verify(stage_name, in_dir, build_dir, args.verbose)
+        sys.exit(rc)
 
 if __name__ == "__main__":
     main()
