@@ -11,7 +11,7 @@ const findWorkspaceRoot = (startDir: string): string => {
     if (existsSync(pnpmWorkspacePath)) {
       return current
     }
-    
+
     // Check for package.json with workspaces
     const packageJsonPath = path.join(current, 'package.json')
     if (existsSync(packageJsonPath)) {
@@ -24,7 +24,7 @@ const findWorkspaceRoot = (startDir: string): string => {
         // Continue searching
       }
     }
-    
+
     const parent = path.dirname(current)
     if (parent === current) break // Reached root
     current = parent
@@ -41,23 +41,25 @@ export const PATHS = {
   // Database paths
   database: 'etl/dist/database/graph.dev.sqlite',
   databaseAbsolute: path.join(workspaceRoot, 'etl/dist/database/graph.dev.sqlite'),
-  
+  miseDatabase: 'etl2/build/database/graph.dev.sqlite',
+  miseDatabaseAbsolute: path.join(workspaceRoot, 'etl2/build/database/graph.dev.sqlite'),
+
   // ETL paths
   etlRoot: 'etl',
   etlDist: 'etl/dist',
   etlCompiled: 'etl/dist/compiled',
   etlReports: 'etl/reports',
-  
+
   // Data paths
   dataRoot: 'data',
   ontologyRoot: 'data/ontology',
   taxaRoot: 'data/ontology/taxa',
-  
+
   // App paths
   appsRoot: 'apps',
   apiRoot: 'apps/api',
   webRoot: 'apps/web',
-  
+
   // Package paths
   packagesRoot: 'packages',
   sharedRoot: 'packages/shared',

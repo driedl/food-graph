@@ -234,34 +234,40 @@ A culturally recognized product whose identity **depends on a transform path** (
 
 # The boundary rules (decision checklist)
 
-1. **Can you obtain it by simple separation without changing composition?**
-   → **Part.** (milk ⇄ cream; fruit → expressed_juice; seeds → expressed_oil)
+## Promote to Part when the thing is:
 
-2. **Is it a widely traded intermediate used as a starting point for many distinct identities?**
-   → **Promote to Part (kind: "derived").**
-   Examples: butter (→ clarified/brown/ghee), flour (→ enriched/leavened/pasta), tofu (→ smoked/fried/fermented).
-   Counter-examples (keep as TPT): yogurt, bacon, sauerkraut (used as ingredient, but not a major substrate for many identity-bearing families).
+1. **Produced mainly by fractionation/part-changing transforms** (separate, press, mill, churn, split, dehull)
+2. **An upstream commodity** used broadly to make other things
+3. **Parameter-stable** (small variations don't change its identity name)
 
-3. **Does its name encode the process/style (i.e., identity lives in the path)?**
-   → **TPT.** (pancetta vs bacon; prosciutto; Greek yogurt; cold-smoked salmon)
+## Keep as TPT when the thing is:
 
-4. **Would treating it as a Part explode combinatorics or blur categories?**
-   → Keep as **TPT.** (e.g., “kimchi” as a part would make little sense)
+1. **Defined by identity-bearing transforms** (ferment, cure, smoke, age, stretch, refine, dry-as-identity)
+2. **Sold/recognized as a finished product** with cultural identity
+3. **Has identity parameters** (e.g., starter type, cure style, smoke mode) that change naming or family membership
 
-5. **Do downstream transforms primarily tune **flavor/texture** without minting new product families?**
-   → Keep upstream as **TPT**, model tweaks as **TPT variants** (same substrate & path family, different parameters).
+## Examples (apply the rules):
+
+* **Butter** → **Part** (promoted derived part). Source path (proto): separate(milk→cream) → churn; byproduct: buttermilk
+* **Ghee / Brown butter** → **TPTs** derived from **part:butter** via `clarify_butter(stage=ghee|brown_butter)`
+* **Plant milks (soy/oat/almond, etc.)** → **Parts** (promoted; upstream substrates for yogurts, tofu, ice creams)
+* **Tofu** → **Part** (promoted; enables smoked/fermented/aged tofu TPTs)
+* **EVOO / Virgin oils** → base **part:expressed_oil** remains a Part; **EVOO/virgin** are **TPTs** constrained by path (press-only, no refine)
+* **Bacon/pancetta/prosciutto, yogurt/Greek/labneh, kimchi/sauerkraut/pickles** → **TPTs**
 
 ---
 
 # Transform taxonomy (how transforms interact with parts)
 
-* **Part-changing transforms** (create new substrates): separate, press, churn, coagulate, split, dehull.
-  *These justify parts (or promoted derived parts) on the output side.*
+## Transform Classes (to keep boundaries crisp)
 
-* **Identity-bearing state transforms** (mint product identity; usually TPT): ferment, cure, smoke, age, stretch, cook_curd, refine_oil, dry (when used to define a product, e.g., milk powder).
+* **Part-changing** (may yield/promote Parts): separate, press, mill, churn, split, dehull, polish
+  *These justify parts (or promoted derived parts) on the output side*
 
-* **Non-identity/finishing transforms** (don’t usually mint new identities): cook (table prep), blanch, soak, pasteurize, homogenize, standardize_fat.
-  *These are usually covariates/attributes, not identity.*
+* **Identity-bearing** (define TPT names/families): ferment, cure, smoke, age, stretch, refine_oil, salt (when intrinsic), dry (when intrinsic), evaporate (when intrinsic)
+
+* **Finishing/non-identity** (metadata only): cook, blanch, soak, pasteurize, homogenize, standardize_fat, strain, press (when purely dewatering inside an existing identity)
+  *These are usually covariates/attributes, not identity*
 
 ---
 
@@ -337,37 +343,111 @@ If promoted, capture:
 
 ---
 
-# Data modeling guidance (light changes)
+# Data modeling guidance (phase-1 scope)
 
-**Parts**
+## Minimal fields
 
-* Add optional fields (non-breaking):
+**Taxon (T)**
+* `id`, `display_name`, `rank`
 
-  * `parent_id`: lineage (e.g., butter ← cream ← milk)
-  * `kind`: `"anatomical" | "secreted" | "fraction" | "derived"`
-  * `proto_path`: minimal transforms to obtain this part (list of `{id, params?}`)
-  * `byproducts`: list of `{part_id, notes}`
+**Part (P)**
+* `id`, `name`, `kind: "anatomical"|"secreted"|"fraction"|"derived"`
+* optional `parent_id`
+* optional **`proto_path[]`** (for **promoted derived parts** only; transforms must be part-changing)
+* optional **`byproducts[]`** (ids of Parts/TPTs)
+* (optional) `cuisines[]`, `regions[]` (light metadata)
 
-**Transforms**
+**Transform (TF)**
+* `id`, `name`, `class: "part_changing"|"identity"|"finishing"`
+* `params[]` (typed)
+* `applies_to` matrix remains as you have it
 
-* Add optional `yields_hint` for part-changing transforms (doc only, used by ETL validation).
-  Example: `tf:churn` → yields `part:butter` (+ byproduct `part:buttermilk`) when substrate is `part:cream`.
+**TPT (derived food)**
+* `id`, `name`
+* `taxon_id`, `part_id` (or promoted part id)
+* `family_id` (see family archetypes below)
+* **`path[]`** (ordered identity-bearing transforms with params)
+* **`identity_params[]`** (subset of path params the name/family cares about)
+* `synonyms[]`
+* **`cuisines[]`, `regions[]`** (phase-1 on)
+* **`dietary_compat[]`** (e.g., vegan/vegetarian/pescetarian/kosher?/halal? when determinable)
+* **`safety_flags[]`** (simple booleans/labels derived from path: `pasteurized`, `nitrite_present`, `retorted`, `fermented`, `smoked`)
 
-**Derived foods (TPT)**
+## Family archetypes (initial set)
 
-* Keep `out_part_id` optional for cases where the end state is best thought of as a named product **still grounded on a substrate** (usually not needed; butter/ghee handled by part + TPT above).
+(Drives grouping, facets, and consistent UI)
 
-**Identity discipline**
+* **CULTURED_DAIRY** (yogurt, kefir, labneh): identity params → `starter`, `strain_level`
+* **FRESH_CHEESE** (paneer, queso fresco, ricotta): `coagulate.agent`, `cook_curd?`
+* **PASTA_FILATA** (mozzarella): `stretch.temp_C` bucket
+* **PRESSED_COOKED_CHEESE** (cheddar/comté archetype): `age.time_d` bucket
+* **DRY_CURED_MEAT** (prosciutto, pancetta): `cure.style`, `age.time_d` bucket, `nitrite`
+* **SMOKED_MEAT_FISH** (hot/cold): `smoke.mode` (hot|cold)
+* **BRINED_FERMENT_VEG** (kimchi, sauerkraut): `salt_pct` bucket, `time_h/d` bucket
+* **PICKLED_VEG** (non-ferment acidified)
+* **VIRGIN_OIL** (press only, no refine)
+* **REFINED_OIL** (refine_oil steps)
+* **FLOURS_MEALS** (promoted parts: flour, semolina, meal)
+* **BUTTER_DERIVATIVES** (TPTs from butter: ghee, brown butter)
+
+Each family defines which params are **identity** vs **variant** so names/facets stay stable.
+
+## Identity discipline
 
 * Only **identity-bearing params** contribute to the TPT identity hash (e.g., starter culture, presence of nitrite, hot vs cold smoke). Process minutiae (time/temp ranges) are covariates.
 
 ---
 
-# Consistency rules & lint checks
+# Consistency rules & lint checks (phase-1)
 
-* A **promoted derived part** must have a `proto_path` that consists only of **part-changing** steps (or separations).
-* **TPT** must start from a **part** (including derived parts).
-* If a TPT is extremely common as a substrate for ≥3 other TPT families, **consider promotion** (e.g., tofu).
-* Avoid cyclic promotions (don’t promote “Greek yogurt” to part; it’s too style-defined).
-* Keep **part:** prefix everywhere; UI never parses—always uses IDs.
+## Invariants / lint (phase-1)
+
+* No TPT without a valid `(taxon_id, part_id)` substrate
+* Promoted Parts must have `proto_path` composed **only** of part-changing transforms
+* All TFs used in `proto_path` or `path` must be allowed for the `(taxon, part)` by rules
+* `identity_params ⊆ path.params`
+* Family must declare ≥1 identity param
+* Safety/diet flags are **derived** from `path`, not hand-edited
+
+## What's in / out (explicit)
+
+**In (phase-1)**
+* Promoted Parts (butter, flours, plant milks, tofu) with `proto_path` + `byproducts`
+* TPTs with `family_id`, `path[]`, `identity_params[]`
+* `cuisines[]`, `regions[]`
+* Derived **safety/diet flags** on TPTs
+
+**Out (phase-2+)**
+* Protected designations (PDO/PGI), deep safety/process semantics (F0, pH), localization/i18n, brand/compliance metadata
+
+---
+
+# UX implications (kept lean, driven by the trimmed ontology)
+
+## Core pivots
+
+1. **By Base** (Taxon→Part): start from salmon fillet / cow milk / soy milk / wheat flour
+2. **By Family**: explore CULTURED_DAIRY, DRY_CURED_MEAT, VIRGIN_OIL, etc.
+3. **By Product (TPT)**: direct lookup of "bacon", "Greek yogurt", "ghee"
+
+## Card anatomy (Part vs TPT)
+
+**Part card**
+* Label + breadcrumb: `Taxon ▶ Part` (for promoted parts, show a tiny "made by: separate→churn" hint)
+* "Common derived foods" rail → top TPTs from this substrate
+* Light tags: `cuisines`, `regions` if present
+
+**TPT card**
+* Label + breadcrumb: `Taxon ▶ Part ▶ TPT`
+* **Path chips** (identity steps only): e.g., `cure (dry, nitrite) → smoke (cold)`
+* **Badges** from safety/diet flags: `fermented`, `smoked`, `nitrite-free`, `pasteurized`, `vegan`
+* Metadata chips: `family_id`, `cuisines`, `regions`
+* "How it's made" expand → humanized path from `path[]`
+* "From this" & "Related" rails: upstream Part; sibling TPTs in same family
+
+## Placement & impact
+
+* **Base Part pages** (e.g., cow milk, soy milk, pork belly): surface **top family groupings** (CULTURED_DAIRY, CHEESE families; DRY_CURED_MEAT, SMOKED_MEAT_FISH)
+* **Family pages**: shared facet blocks for identity params (e.g., smoke mode, starter, strain level)
+* **Search result grouping**: cluster TPTs by **family**, then by **taxon/part**; Parts appear in a separate section with "popular derived foods" previews
 

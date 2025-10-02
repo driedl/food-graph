@@ -1,0 +1,2 @@
+[console_scripts]
+mise = mise.cli:app

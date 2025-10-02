@@ -1,0 +1,41 @@
+# mise — the new ETL for the Food Graph
+
+**mise** (as in *mise en place*) is a Python-first, deterministic build system for the Food Graph.
+It replaces ad‑hoc, monolithic scripts with **small, testable stages**, a **content‑hash cache**, and **clear artifacts**.
+It coexists with the legacy `etl/` so you can switch the API to either build via envs.
+
+- Runner: Python 3.11+ (Typer CLI)
+- Caching: content hash of *inputs + stage code*
+- Artifacts: `etl2/build/{tmp,out,graph,database,report}`
+- Status: bootstrapped; stages will be layered in along the TPT plan
+
+## Quickstart
+
+```bash
+# install (editable)
+python -m pip install -e ./etl2
+
+# explore the plan and paths
+python -m mise plan
+python -m mise print-paths
+
+# run the pipeline (will expand as stages are added)
+python -m mise run
+```
+
+### Switch API to use mise outputs
+
+Expose the DB (or other artifacts) to the API via envs:
+
+```
+GRAPH_DB_PATH=etl2/build/database/graph.dev.sqlite
+GRAPH_BUILD_ROOT=etl2/build
+```
+
+The API can toggle between legacy and mise builds by switching paths.
+
+## Why a new package?
+
+- The legacy ETL is a single ~1k‑loc Python file plus a TS runner; hard to extend to 11+ stages.
+- The TPT system needs **many intermediate artifacts** with **strong validation** and **golden tests**.
+- We want **determinism and caching** across stages to speed iteration.
