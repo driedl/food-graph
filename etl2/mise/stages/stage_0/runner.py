@@ -1,9 +1,12 @@
 from __future__ import annotations
 from pathlib import Path
+from rich.console import Console
 
 from ...io import ensure_dir
 from .taxa_compile import compile_taxa_into
 from .docs_compile import compile_docs_into
+
+console = Console()
 
 def run(in_dir: Path, build_dir: Path, skip_validate: bool = False, verbose: bool = False) -> int:
     compiled_dir = build_dir / "compiled"
@@ -20,7 +23,8 @@ def run(in_dir: Path, build_dir: Path, skip_validate: bool = False, verbose: boo
         verbose=verbose,
     )
     if rc != 0:
-        print("✗ Stage 0 (taxa) failed")
+        if verbose:
+            console.print("  ❌ Taxa compilation failed", style="red")
         return rc
 
     # 2) Compile docs (uses compiled taxa we just wrote)
@@ -32,11 +36,15 @@ def run(in_dir: Path, build_dir: Path, skip_validate: bool = False, verbose: boo
         verbose=verbose,
     )
     if rc != 0:
-        print("✗ Stage 0 (docs) failed")
+        if verbose:
+            console.print("  ❌ Docs compilation failed", style="red")
         return rc
 
     if verbose:
-        print(f"✓ Stage 0 wrote: {out_taxa}")
-        print(f"✓ Stage 0 wrote: {out_docs}")
-    print("✓ Stage 0 completed cleanly")
+        # Count entries in output files for better feedback
+        taxa_count = sum(1 for _ in out_taxa.open()) if out_taxa.exists() else 0
+        docs_count = sum(1 for _ in out_docs.open()) if out_docs.exists() else 0
+        console.print(f"  ✓ Compiled taxa ({taxa_count:,} entries)", style="green")
+        console.print(f"  ✓ Compiled docs ({docs_count:,} entries)", style="green")
+    
     return 0

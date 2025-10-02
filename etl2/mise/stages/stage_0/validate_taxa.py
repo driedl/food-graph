@@ -322,9 +322,9 @@ def main():
 
     rc = validate(root)
     if rc == 0:
-        print("✓ Validation passed.")
+        print("✓ Taxa validation passed (structure, IDs, ranks, file alignment, product detection)")
     else:
-        print("✗ Validation failed.", file=sys.stderr)
+        print("✗ Taxa validation failed.", file=sys.stderr)
     sys.exit(rc)
 
 
