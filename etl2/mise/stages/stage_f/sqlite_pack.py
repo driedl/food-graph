@@ -71,13 +71,33 @@ CREATE TABLE IF NOT EXISTS tpt_nodes (
   path_json TEXT NOT NULL  -- identity-only
 );
 
--- Keep a lightweight 'id' field in FTS so results can be resolved by callers.
-CREATE VIRTUAL TABLE IF NOT EXISTS taxa_fts USING fts5(id, name, synonyms, taxon_rank, content='',
-             tokenize='unicode61 remove_diacritics 2');
-CREATE VIRTUAL TABLE IF NOT EXISTS tp_fts USING fts5(id, name, tp_rank, content='',
-             tokenize='unicode61 remove_diacritics 2');
-CREATE VIRTUAL TABLE IF NOT EXISTS tpt_fts USING fts5(id, name, family, content='',
-             tokenize='unicode61 remove_diacritics 2');
+-- Unified search backing table (external content for FTS)
+CREATE TABLE IF NOT EXISTS search_content (
+  rowid INTEGER PRIMARY KEY,             -- stable handle used by FTS
+  ref_type TEXT NOT NULL,                -- 'taxon' | 'tp' | 'tpt'
+  ref_id   TEXT NOT NULL,                -- nodes.id | taxon_part_nodes.id | tpt_nodes.id
+  taxon_id TEXT,                         -- for filtering/join
+  part_id  TEXT,
+  family   TEXT,
+  entity_rank TEXT,                      -- renamed from 'rank' (reserved keyword)
+  name     TEXT NOT NULL,                -- primary display name
+  synonyms TEXT,                         -- plain text bag (space-joined)
+  display_name TEXT,                     -- optional UI override
+  slug     TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_search_ref ON search_content(ref_type, ref_id);
+CREATE INDEX IF NOT EXISTS idx_search_taxon ON search_content(taxon_id);
+
+-- One FTS index across all entity types
+CREATE VIRTUAL TABLE IF NOT EXISTS search_fts USING fts5(
+  name,          -- col 0: highest weight
+  synonyms,      -- col 1
+  entity_rank,   -- col 2 (renamed from 'rank' - reserved keyword)
+  family,        -- col 3
+  content='search_content', content_rowid='rowid',
+  tokenize='unicode61 remove_diacritics 2'
+);
 
 CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, val TEXT NOT NULL);
 """
@@ -251,24 +271,69 @@ def build_sqlite(*, in_dir: Path, build_dir: Path, db_path: Path, verbose: bool 
             print(f"Part exists: {part_exists}")
             raise
 
-    # Build/populate FTS (contentless FTS5)
-    # taxa_fts(id,name,synonyms,taxon_rank)
+    # ----- Unified search materialization ------------------------------------
+    def _syn_str(items) -> str:
+        if not items:
+            return ""
+        bag = []
+        for s in items:
+            if isinstance(s, str):
+                s = s.strip().lower()
+                if s:
+                    bag.append(s)
+        # space-joined bag-of-words for FTS
+        return " ".join(sorted(set(bag)))
+
+    # Rebuild the external content table deterministically
+    cur.execute("DELETE FROM search_content")
+
+    # 1) Taxa → search_content
     for row in taxa:
         tid = row["id"]
         nm = row.get("display_name") or row.get("latin_name") or _last(tid)
-        r  = row.get("rank", "unknown")
-        syn_text = " ".join(_syn_by_node.get(tid, []))
-        cur.execute("INSERT INTO taxa_fts(id, name, synonyms, taxon_rank) VALUES (?, ?, ?, ?)", (tid, nm, syn_text, r))
-    # tp_fts(id,name,tp_rank)
+        slug = _last(tid)
+        rank = row.get("rank", "unknown")
+        syns = _syn_str(row.get("synonyms", []))
+        cur.execute("""
+          INSERT INTO search_content
+            (ref_type, ref_id, taxon_id, part_id, family, entity_rank, name, synonyms, display_name, slug)
+          VALUES
+            ('taxon', ?, ?, NULL, NULL, ?, ?, ?, ?, ?)
+        """, (tid, tid, rank, nm, syns, nm, slug))
+
+    # 2) TP nodes → search_content
+    #    Use display_name/name from tp_index insert above; synonyms come from rules if present later
     for row in tp_index:
-        tp_id = f"{row['taxon_id']}:{row['part_id']}"
-        nm = row.get("display_name") or row.get("name") or tp_id
-        cur.execute("INSERT INTO tp_fts(id, name, tp_rank) VALUES (?, ?, ?)", (tp_id, nm, "taxon_part"))
-    # tpt_fts(id,name,family)
+        tid = row["taxon_id"]; pid = row["part_id"]
+        tp_id = f"{tid}:{pid}"
+        # name/display_name computed during TP insert
+        name = row.get("name", f"{_last(tid)} {parts_index.get(pid, {}).get('name', _last(pid))}")
+        display_name = row.get("display_name", name)
+        slug = f"{_last(tid)}-{_last(pid)}"
+        rank = "taxon_part"
+        cur.execute("""
+          INSERT INTO search_content
+            (ref_type, ref_id, taxon_id, part_id, family, entity_rank, name, synonyms, display_name, slug)
+          VALUES
+            ('tp', ?, ?, ?, NULL, ?, ?, '', ?, ?)
+        """, (tp_id, tid, pid, rank, name, display_name, slug))
+
+    # 3) TPT nodes → search_content
     for row in tpt:
-        nm = row.get("name") or ""
-        fam = row.get("family", "")
-        cur.execute("INSERT INTO tpt_fts(id, name, family) VALUES (?, ?, ?)", (row["id"], nm, fam))
+        ref_id = row["id"]
+        tid = row["taxon_id"]; pid = row["part_id"]
+        fam = row.get("family", "unknown")
+        name = row.get("name") or ""
+        syns = _syn_str(row.get("synonyms", []))
+        cur.execute("""
+          INSERT INTO search_content
+            (ref_type, ref_id, taxon_id, part_id, family, entity_rank, name, synonyms, display_name, slug)
+          VALUES
+            ('tpt', ?, ?, ?, ?, 'tpt', ?, ?, NULL, NULL)
+        """, (ref_id, tid, pid, fam, name, syns))
+
+    # (Re)build unified FTS from external content
+    cur.execute("INSERT INTO search_fts(search_fts) VALUES('rebuild')")
 
     # Insert metadata
     cur.execute("INSERT OR REPLACE INTO meta (key, val) VALUES (?, ?)", ("build_time", datetime.now(timezone.utc).isoformat()))
