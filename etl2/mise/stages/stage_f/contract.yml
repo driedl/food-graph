@@ -1,9 +1,9 @@
 artifacts:
-  - path: database/graph.sqlite
+  - path: database/graph.dev.sqlite
     type: sqlite
     validators:
       - kind: field_presence
-        fields: ["nodes", "part_def", "has_part", "taxon_part_nodes", "tpt_nodes", "meta"]
+        fields: ["nodes", "part_def", "has_part", "taxon_part_nodes", "tpt_nodes", "meta", "transform_def", "tpt_identity_steps", "taxon_ancestors"]
       - kind: min_rows
         table: nodes
         min_rows: 1
@@ -12,4 +12,10 @@ artifacts:
         min_rows: 1
       - kind: min_rows
         table: has_part
+        min_rows: 1
+      - kind: min_rows
+        table: transform_def
+        min_rows: 1
+      - kind: min_rows
+        table: tpt_identity_steps
         min_rows: 1

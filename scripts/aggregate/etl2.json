@@ -44,7 +44,8 @@
                 "etl2/**/*.toml",
                 "etl2/**/*.yml",
                 "etl2/**/*.yaml",
-                "etl2/**/*.json"
+                "etl2/**/*.json",
+                "etl2/mise/stages/stage_0/validate_taxa.py"
             ],
             "excludeExtensions": [
                 ".md",
@@ -52,6 +53,23 @@
                 ".yaml",
                 ".toml",
                 ".json"
+            ]
+        },
+        "schemas": {
+            "name": "ETL2 Schemas",
+            "description": "All schema definitions for ETL2 data structures, validation, and database schema",
+            "patterns": [
+                "data/sql/schema/*.schema.json",
+                "etl2/mise/stages/stage_f/sqlite_pack.py",
+                "etl2/mise/stages/stage_a/flags_validate.py",
+                "etl2/mise/contracts/validators.py",
+                "etl2/docs/04-schemas.md"
+            ],
+            "ignore": [],
+            "includeExtensions": [
+                ".json",
+                ".py",
+                ".md"
             ]
         }
     },

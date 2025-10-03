@@ -1,0 +1,6 @@
+{"match":{"taxon_prefix":"tx:plantae:oleaceae:olea:europaea"},"cuisines":["mediterranean","middle_eastern","spanish","italian"]}
+{"match":{"taxon_prefix":"tx:plantae:brassicaceae:brassica:oleracea:capitata","parts":["part:leaf"]},"cuisines":["german","eastern_european","korean"]}
+{"match":{"taxon_prefix":"tx:plantae:cucurbitaceae:cucumis:sativus","parts":["part:fruit"]},"cuisines":["eastern_european","american","korean","japanese"]}
+{"match":{"taxon_prefix":"tx:animalia:chordata:mammalia:artiodactyla:suidae","parts":["part:cut:belly"]},"cuisines":["american","british","italian","chinese"]}
+{"match":{"taxon_prefix":"tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae:salmo:salar","parts":["part:cut:fillet"]},"cuisines":["nordic","japanese","russian"]}
+{"match":{"taxon_prefix":"tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus","parts":["part:milk","part:cream"]},"cuisines":["mediterranean","french","indian","middle_eastern"]}

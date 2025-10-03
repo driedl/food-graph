@@ -724,7 +724,11 @@ async function main() {
   console.log(`📋 Using config: ${config.name} - ${config.description}`);
 
   // Parse command line arguments
-  if (args.includes('--interactive') || args.length === 0) {
+  // Only go non-interactive if there are actual content/category arguments
+  const hasContentArgs = args.includes('--compact') || args.includes('--summary') || args.includes('--verbose');
+  const hasCategoryArgs = args.includes('--categories');
+
+  if (args.includes('--interactive') || (!hasContentArgs && !hasCategoryArgs)) {
     options = await getInteractiveOptions(config);
   } else {
     // Parse content level
@@ -745,6 +749,9 @@ async function main() {
       if (categoriesArg && !categoriesArg.startsWith('--')) {
         categories = categoriesArg.split(',').map(c => c.trim());
       }
+    } else if (config.ui.skipCategorySelection) {
+      // Use all categories if skipCategorySelection is true
+      categories = Object.keys(config.categories);
     }
 
     options = {

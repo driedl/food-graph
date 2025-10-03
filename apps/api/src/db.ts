@@ -4,15 +4,8 @@ import fs from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { env } from '@nutrition/config'
 
-// Determine the correct DB_PATH based on FOOD_DB_SOURCE
-const getDbPath = () => {
-  const src = env.FOOD_DB_SOURCE
-  const path = src === 'mise' ? env.FOOD_DB_PATH_MISE : env.FOOD_DB_PATH_ETL
-  if (!path) throw new Error(`No DB path for source ${src}`)
-  return path
-}
-
-const DB_PATH = getDbPath()
+// API's own database location (where we copy the ETL2 database to)
+const DB_PATH = env.DB_PATH
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const DATA_DIR = path.dirname(DB_PATH)
 const DB_FILE = DB_PATH
@@ -20,18 +13,21 @@ const DB_FILE = DB_PATH
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true })
 
 console.log('[api] Connecting to database:', DB_FILE)
-export const db = new Database(DB_FILE)
+let db = new Database(DB_FILE)
 db.pragma('journal_mode = WAL')
 
+// Export a getter that returns the current database instance
+export { db }
+
 function copyETLArtifact() {
-  const src = env.ETL_DB_PATH
-  const dst = DB_PATH
+  const src = env.ETL2_DB_PATH  // ETL2 source database
+  const dst = DB_PATH           // API's own database location
 
   if (!fs.existsSync(src)) {
-    throw new Error(`[api] ETL artifact not found at ${src}. Run ETL compile first.`)
+    throw new Error(`[api] ETL2 artifact not found at ${src}. Run ETL2 compile first.`)
   }
 
-  console.log(`[api] Auto-copying ETL artifact: ${src} -> ${dst}`)
+  console.log(`[api] Auto-copying ETL2 artifact: ${src} -> ${dst}`)
 
   // Ensure destination directory exists
   fs.mkdirSync(path.dirname(dst), { recursive: true })
@@ -48,7 +44,7 @@ function copyETLArtifact() {
   if (fs.existsSync(walSrc)) fs.copyFileSync(walSrc, walDst)
   if (fs.existsSync(shmSrc)) fs.copyFileSync(shmSrc, shmDst)
 
-  console.log('[api] ETL artifact copied successfully')
+  console.log(`[api] ETL2 artifact copied successfully`)
 }
 
 function tableExists(name: string): boolean {
@@ -56,25 +52,11 @@ function tableExists(name: string): boolean {
   return !!row
 }
 
-function getMetaVersion(): number | null {
-  try {
-    if (!tableExists('meta')) return null
-    const row = db.prepare("SELECT val FROM meta WHERE key='schema_version'").get() as { val?: string } | undefined
-    return row?.val ? Number(row.val) : null
-  } catch { return null }
-}
-
-function getUserVersion(): number | null {
-  try {
-    const row = db.prepare('PRAGMA user_version').get() as { user_version?: number }
-    return typeof row?.user_version === 'number' ? row.user_version : null
-  } catch { return null }
-}
 
 function getArtifactAge(): number | null {
   try {
     if (!tableExists('meta')) return null
-    const row = db.prepare("SELECT val FROM meta WHERE key='built_at'").get() as { val?: string } | undefined
+    const row = db.prepare("SELECT val FROM meta WHERE key='build_time'").get() as { val?: string } | undefined
     if (!row?.val) return null
 
     const builtAt = new Date(row.val).getTime()
@@ -85,76 +67,57 @@ function getArtifactAge(): number | null {
 
 export function verifyGraphArtifact() {
   // Basic presence checks
-  const requiredTables = ['nodes', 'taxa_fts', 'tp_fts', 'part_def', 'has_part', 'taxon_part_nodes']
+  const requiredTables = [
+    'nodes',
+    'part_def',
+    'has_part',
+    'taxon_doc',
+    'taxon_part_nodes',
+    'tpt_nodes',
+    'search_content',
+    'search_fts',
+    'meta',
+    'transform_def',
+    'tpt_identity_steps',
+    'taxon_ancestors'
+  ]
   const missing = requiredTables.filter(t => !tableExists(t))
   if (missing.length) {
     if (env.AUTO_COPY_ETL_DB === 'true') {
-      console.log(`[api] Graph DB missing required tables: ${missing.join(', ')}. Auto-copying from ETL...`)
+      console.log(`[api] Graph DB missing required tables: ${missing.join(', ')}. Auto-copying from ETL2...`)
       copyETLArtifact()
       // Reconnect to the copied database
       db.close()
-      const newDb = new Database(DB_PATH)
-      Object.assign(db, newDb)
+      db = new Database(DB_PATH)
       db.pragma('journal_mode = WAL')
-      // Re-run verification on the copied database
-      return verifyGraphArtifact()
+      // Re-run verification on the copied database (but don't recurse)
+      const missingAfterCopy = requiredTables.filter(t => !tableExists(t))
+      if (missingAfterCopy.length) {
+        throw new Error(
+          `[api] Graph DB still missing required tables after copy: ${missingAfterCopy.join(', ')}. ` +
+          `Source database may be incomplete.`
+        )
+      }
     } else {
       throw new Error(
         `[api] Graph DB is missing required tables: ${missing.join(', ')}. ` +
-        `Rebuild via ETL and copy the artifact to ${DB_PATH}.`
+        `Rebuild via ETL2 and copy the artifact to ${DB_PATH}.`
       )
     }
   }
 
-  // Version checks
-  const metaVer = getMetaVersion()
-  const pragmaVer = getUserVersion()
-  const ver = metaVer ?? pragmaVer
-  if (ver == null) {
-    if (env.AUTO_COPY_ETL_DB === 'true') {
-      console.log('[api] Graph DB has no schema version. Auto-copying from ETL...')
-      copyETLArtifact()
-      // Reconnect and re-verify
-      db.close()
-      const newDb = new Database(DB_PATH)
-      Object.assign(db, newDb)
-      db.pragma('journal_mode = WAL')
-      return verifyGraphArtifact()
-    } else {
-      throw new Error(
-        `[api] Graph DB has no schema version (meta.schema_version or PRAGMA user_version). ` +
-        `Rebuild via ETL >= v${env.MIN_GRAPH_SCHEMA_VERSION} and copy the artifact.`
-      )
-    }
-  }
-  if (ver < env.MIN_GRAPH_SCHEMA_VERSION) {
-    if (env.AUTO_COPY_ETL_DB === 'true') {
-      console.log(`[api] Graph DB schema_version=${ver} is below API requirement=${env.MIN_GRAPH_SCHEMA_VERSION}. Auto-copying from ETL...`)
-      copyETLArtifact()
-      // Reconnect and re-verify
-      db.close()
-      const newDb = new Database(DB_PATH)
-      Object.assign(db, newDb)
-      db.pragma('journal_mode = WAL')
-      return verifyGraphArtifact()
-    } else {
-      throw new Error(
-        `[api] Graph DB schema_version=${ver} is below API requirement=${env.MIN_GRAPH_SCHEMA_VERSION}. ` +
-        `Rebuild via ETL and copy the new artifact.`
-      )
-    }
-  }
+  // No hard schema-version enforcement for Stage-F artifacts.
 
   const builtAt = tableExists('meta')
-    ? (db.prepare("SELECT val FROM meta WHERE key='built_at'").get() as { val?: string } | undefined)?.val
+    ? (db.prepare("SELECT val FROM meta WHERE key='build_time'").get() as { val?: string } | undefined)?.val
     : undefined
   const age = getArtifactAge()
   const ageWarning = age && age > 7 ? ` (⚠️ ${age} days old)` : ''
 
-  console.log(`[api] Graph DB verified (schema_version=${ver}${builtAt ? `, built_at=${builtAt}` : ''}${ageWarning})`)
+  console.log(`[api] Graph DB verified${builtAt ? ` (build_time=${builtAt})` : ''}${ageWarning}`)
 
   // Warning for old artifacts in development
   if (env.NODE_ENV === 'development' && age && age > 7) {
-    console.warn(`[api] Graph artifact is ${age} days old. Consider rebuilding with ETL for latest changes.`)
+    console.warn(`[api] Graph artifact is ${age} days old. Consider rebuilding with ETL2 for latest changes.`)
   }
 }

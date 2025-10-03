@@ -100,3 +100,5 @@
 {"taxon_id":"tx:animalia:chordata:actinopterygii:polyodontiformes:polyodontidae:polyodon:spathula","part_id":"part:roe","name":"Caviar","display_name":"Caviar (Paddlefish)"}
 {"taxon_id":"tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae:salmo:salar","part_id":"part:roe","name":"Salmon Roe","display_name":"Salmon Roe"}
 {"taxon_id":"tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae:oncorhynchus:keta","part_id":"part:roe","name":"Salmon Roe","display_name":"Salmon Roe"}
+{"taxon_id":"tx:plantae:oleaceae:olea:europaea","part_id":"part:expressed_oil","name":"Olive Oil","display_name":"Olive Oil"}
+{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:suidae:sus:scrofa_domesticus","part_id":"part:cut:belly","name":"Pork Belly","display_name":"Pork Belly"}

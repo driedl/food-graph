@@ -1,0 +1,10 @@
+{
+  "DRY_CURED_MEAT":  { "label": "Dry-cured meat",   "icon": "i-bacon",  "color": "#C96A3D", "blurb": "Salt-cured meats; often smoked." },
+  "SMOKED_MEAT_FISH":{ "label": "Smoked",           "icon": "i-smoke",  "color": "#6B7280", "blurb": "Cold or hot smoked foods." },
+  "BRINED_FERMENT_VEG": { "label": "Brined ferment", "icon": "i-jar",    "color": "#2D6A4F", "blurb": "Salted, naturally fermented vegetables." },
+  "CULTURED_DAIRY":  { "label": "Cultured dairy",   "icon": "i-yogurt", "color": "#2563EB", "blurb": "Fermented milk and cream." },
+  "VIRGIN_OIL":      { "label": "Virgin oil",       "icon": "i-olive",  "color": "#065F46", "blurb": "Unrefined, first-press oils." },
+  "REFINED_OIL":     { "label": "Refined oil",      "icon": "i-drop",   "color": "#4B5563", "blurb": "Further processed oils." },
+  "BUTTER_DERIVATIVES": { "label": "Butter derivatives", "icon": "i-butter", "color": "#F59E0B", "blurb": "Ghee, brown butter, etc." },
+  "FLOURS_MEALS":    { "label": "Flours & meals",   "icon": "i-flour",  "color": "#9CA3AF", "blurb": "Milled grain and seed products." }
+}

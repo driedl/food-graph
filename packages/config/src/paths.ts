@@ -38,17 +38,15 @@ const workspaceRoot = findWorkspaceRoot(__dirname)
 
 export const PATHS = {
   workspaceRoot,
-  // Database paths
-  database: 'etl/dist/database/graph.dev.sqlite',
-  databaseAbsolute: path.join(workspaceRoot, 'etl/dist/database/graph.dev.sqlite'),
-  miseDatabase: 'etl2/build/database/graph.dev.sqlite',
-  miseDatabaseAbsolute: path.join(workspaceRoot, 'etl2/build/database/graph.dev.sqlite'),
+  // Database paths (ETL2 only)
+  database: 'etl2/build/database/graph.dev.sqlite',
+  databaseAbsolute: path.join(workspaceRoot, 'etl2/build/database/graph.dev.sqlite'),
 
-  // ETL paths
-  etlRoot: 'etl',
-  etlDist: 'etl/dist',
-  etlCompiled: 'etl/dist/compiled',
-  etlReports: 'etl/reports',
+  // ETL2 paths
+  etl2Root: 'etl2',
+  etl2Build: 'etl2/build',
+  etl2Database: 'etl2/build/database',
+  etl2Reports: 'etl2/build/report',
 
   // Data paths
   dataRoot: 'data',
@@ -75,7 +73,7 @@ export const resolvePath = (relativePath: string): string => {
 // Helper function to get absolute paths for common locations
 export const getAbsolutePaths = () => ({
   database: path.join(workspaceRoot, PATHS.database),
-  etlReports: path.join(workspaceRoot, PATHS.etlReports),
-  etlCompiled: path.join(workspaceRoot, PATHS.etlCompiled),
+  etl2Reports: path.join(workspaceRoot, PATHS.etl2Reports),
+  etl2Build: path.join(workspaceRoot, PATHS.etl2Build),
   taxaRoot: path.join(workspaceRoot, PATHS.taxaRoot),
 })
