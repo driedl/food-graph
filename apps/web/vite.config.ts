@@ -23,10 +23,9 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          react: ['react','react-dom'],
+          react: ['react', 'react-dom'],
           query: ['@tanstack/react-query'],
-          trpc: ['@trpc/client','@trpc/react-query','zod'],
-          flow: ['reactflow']
+          trpc: ['@trpc/client', '@trpc/react-query', 'zod'],
         },
         chunkFileNames: 'assets/[name]-[hash].js',
         entryFileNames: 'assets/[name]-[hash].js',

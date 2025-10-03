@@ -4,6 +4,7 @@ export const PartsPanel = memo(function PartsPanel({
   parts,
   selectedPartId,
   onSelect,
+  readOnly = false,
 }: {
   parts?: Array<{
     id: string;
@@ -17,6 +18,7 @@ export const PartsPanel = memo(function PartsPanel({
   }>
   selectedPartId: string
   onSelect: (id: string) => void
+  readOnly?: boolean
 }) {
   if (!parts) return <div className="text-sm text-muted-foreground">No parts available</div>
 
@@ -31,7 +33,7 @@ export const PartsPanel = memo(function PartsPanel({
 
   return (
     <div className="space-y-3 text-sm">
-      <div className="text-xs text-muted-foreground">Select a part to see transforms.</div>
+      {!readOnly && <div className="text-xs text-muted-foreground">Select a part to see transforms.</div>}
       {kinds.map((k) => (
         <div key={k} className="space-y-2">
           <div className="text-[11px] uppercase tracking-wide text-muted-foreground">{k}</div>
@@ -39,7 +41,7 @@ export const PartsPanel = memo(function PartsPanel({
             {groups[k].map((p) => (
               <button
                 key={p.id}
-                className={`px-3 py-2 rounded border text-left hover:bg-muted/40 ${selectedPartId === p.id ? 'bg-muted/50 border-blue-300' : ''} ${!p.applicable ? 'opacity-50' : ''}`}
+                className={`px-3 py-2 rounded border text-left ${readOnly ? 'cursor-pointer hover:bg-muted/40' : 'hover:bg-muted/40'} ${selectedPartId === p.id ? 'bg-muted/50 border-blue-300' : ''} ${!p.applicable ? 'opacity-50' : ''}`}
                 onClick={() => onSelect(p.id)}
                 disabled={!p.applicable}
               >

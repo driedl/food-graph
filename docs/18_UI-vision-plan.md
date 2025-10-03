@@ -44,9 +44,9 @@ This document outlines the transformation of the workbench from a "nice demo" in
 
 * `tab`
 
-  * Taxon: `overview|graph|lists` (default `overview`)
+  * Taxon: `overview|lists` (default `overview`)
   * TP: `overview|transforms|compare` (default `overview`)
-  * TPT: `overview|explain|graph` (default `overview`)
+  * TPT: `overview|explain` (default `overview`)
 * `limit` (int, default **50**, min 10, max 500), `offset` (int, default **0**, ≥ 0)
 * `overlay` (string): comma list of tokens. tokens:
   `parts,identity,families,cuisines,flags,docs,tf:<transformId>`
@@ -175,7 +175,7 @@ type SearchRow = {
 
 ### Phase 2: Taxon Page
 - [ ] Implement Taxon Overview tab with docs, parts coverage, families
-- [ ] Add Graph and Lists tabs
+- [ ] Add Lists tab
 - [ ] Wire up neighborhood queries and navigation
 
 ### Phase 3: TP Page (Taxon+Part)
@@ -187,7 +187,6 @@ type SearchRow = {
 ### Phase 4: TPT Page
 - [ ] Create TPT Overview with identity steps and related entities
 - [ ] Add Explain tab with human-friendly summaries
-- [ ] Build Graph tab with lineage and relationships
 - [ ] Implement Suggestions in inspector
 
 ### Phase 5: QA Browsers
@@ -293,9 +292,9 @@ export function useGlobalHotkeys() {
 }
 
 function getTabsForPage(pathname: string): string[] {
-  if (pathname.includes('/workbench/taxon/')) return ['overview', 'graph', 'lists']
+  if (pathname.includes('/workbench/taxon/')) return ['overview', 'lists']
   if (pathname.includes('/workbench/tp/')) return ['overview', 'transforms', 'compare']
-  if (pathname.includes('/workbench/tpt/')) return ['overview', 'explain', 'graph']
+  if (pathname.includes('/workbench/tpt/')) return ['overview', 'explain']
   return []
 }
 ```
@@ -304,7 +303,7 @@ function getTabsForPage(pathname: string): string[] {
 
 ### Global Layout (Stays Familiar)
 - **Left rail**: Search + quick filters + outline
-- **Center canvas**: The thing you're actually studying (graph, lists, tables)
+- **Center canvas**: The thing you're actually studying (lists, tables)
 - **Right rail (Inspector)**: Changes with entity type; shows raw details, utilities, and actions
 
 ## Pages — Center Content + Right Inspector
@@ -342,8 +341,6 @@ Array<{ family: string; count: number }>
     - Read-only `PartsPanel` variant (no selection)
     - Row click → `/workbench/tp/${taxonId}/${partId}`
 
-- **Graph**:
-  - `GraphView` centered on current node; children fanout
   - **Overlays bar** (chips reflecting `overlay=`):
     - `tptCount`: badge on child node (see overlays §6)
     - `familyDiversity`: badge count
@@ -450,8 +447,6 @@ available via `tpt.get({ id })` or new lightweight `tpt.identity({ id })`
   - Friendly chain text from `tpt.explain`
   - Toggle to show raw `identity` JSON
 
-- **Graph**:
-  - Mini graph: lineage above (taxon path), same-family siblings below, variants lateral
 
 **Inspector (Right) — TPT:**
 - Copy buttons: `id`, `taxonId`, `partId`, `identityHash`
@@ -599,7 +594,7 @@ available via `tpt.get({ id })` or new lightweight `tpt.identity({ id })`
 - `/workbench/node/$id` → **redirect** (replace) to `/workbench/taxon/$id`
 
 ### Query Params (Uniform Across Pages)
-- `tab`: one of `overview|graph|lists|transforms|compare|explain`
+- `tab`: one of `overview|lists|transforms|compare|explain`
 - `limit`: int (default 50), `offset`: int (default 0)
 - `family`: string (family id) — TP & Search pages
 - `cuisines`: comma list — Search/Cuisines pages
@@ -629,7 +624,6 @@ available via `tpt.get({ id })` or new lightweight `tpt.identity({ id })`
 ### Implementation Strategy
 - **URL-first state**: `overlay=parts,identity,tf:tx:milling`
 - **Badge rendering**: Small pills on nodes/rows showing metrics
-- **GraphView integration**: Optional `renderNodeOverlay` prop for node chips
 - **Table integration**: Badge column using `badgesForTaxon(row, overlayState)`
 
 ### Data Sources (Phase 6+)
@@ -753,14 +747,14 @@ apps/web/src/lib/
 - PartsPanel (taxon inspector)
 - TransformsPanel (read-only in TP)
 - FoodStatePanel (TP inspector)
-- ErrorBoundary, GraphView
+- ErrorBoundary
 
 ### New Components
 - **Route shells**: `TaxonPage`, `TPPage`, `TPTPage`, `FamiliesPage`, `CuisinesPage`, `FlagsPage`, `SearchQAPage`, `MetaPage`
 - **Inspectors**: `InspectorTaxon`, `InspectorTP`, `InspectorTPT`
 - **Tools**: `TPTComparePanel`, `FamilyDrawer`, `OverlaysBar`, `EntityList`, `FacetChips`
 - **TP Components**: `TPOverview`, `TPTransforms`, `TPCompare`
-- **TPT Components**: `TPTOverview`, `TPTExplain`, `TPTGraph`
+- **TPT Components**: `TPTOverview`, `TPTExplain`
 
 ## Key Flows
 
@@ -779,7 +773,7 @@ apps/web/src/lib/
 ## Performance & DX
 
 - React Query options: `{ staleTime: 30_000, keepPreviousData: true, refetchOnWindowFocus: false }`
-- Lazy-load heavy comps: `GraphView`, drawer internals
+- Lazy-load heavy comps: drawer internals
 - Lists under 1k → no virtualization; beyond that, cap `limit` to 200 and require filters (guardrail in UI)
 
 ## Compare/Diff Rules (TP/TPT)
@@ -804,7 +798,7 @@ apps/web/src/lib/
 
 **Phase 2 DoD:**
 - Taxon Overview shows docs, children list, families chips, read-only parts coverage
-- Graph tab renders; overlay bar visible (chips toggle but may be no-op until Phase 6)
+- Lists tab renders; overlay bar visible (chips toggle but may be no-op until Phase 6)
 - Lists tab paginates
 
 **Phase 3 DoD:**
@@ -816,7 +810,6 @@ apps/web/src/lib/
 **Phase 4 DoD:**
 - TPT Overview shows identity steps, flags, cuisines, related
 - Explain tab renders friendly chain + raw JSON toggle
-- Graph tab shows lineage + center TPT + variants with clickable navigation
 - Inspector suggestions list navigates
 
 **Phase 5 DoD:**
@@ -1596,7 +1589,7 @@ export function badgesForTaxon(row: TaxonLike, ov: OverlayState) {
   return out.length ? <div className="flex flex-wrap gap-1">{out}</div> : null
 }
 
-/** Same badges but for ReactFlow node data payloads. */
+/** Same badges but for node data payloads. */
 export function badgesForNodeData(data: any, ov: OverlayState) {
   const row: TaxonLike = {
     id: data?.id,
@@ -1643,114 +1636,6 @@ export function OverlayLegend() {
 export default OverlayLegend
 ```
 
-#### E) GraphView Enhancement (Additive Change)
-
-**Patch** `apps/web/src/components/GraphView.tsx`:
-
-```diff
-@@
--export interface GraphViewProps {
-+export interface GraphViewProps {
-   nodes: Node[]
-   edges: Edge[]
-   onNodeClick?: (id: string) => void
-   /** optional layout, defaults to 'radial' */
-   layout?: 'radial' | 'tree'
-+  /** optional overlay renderer for node data (chips/badges) */
-+  renderNodeOverlay?: (data: any) => React.ReactNode
- }
-@@
--  const TaxonNode: React.FC<NodeProps> = ({ data, selected }) => {
-+  const TaxonNode: React.FC<NodeProps> = ({ data, selected }) => {
-     return (
-       <div className={`rounded-lg border bg-white px-3 py-2 shadow-sm ${selected ? 'ring-2 ring-blue-300' : ''}`}>
-         <div className="flex items-center justify-between gap-3">
-           <div className="min-w-0">
-             <div className="text-sm font-medium truncate">{data?.name ?? data?.label}</div>
-             {data?.slug && <div className="text-[11px] text-zinc-500 truncate">/{data.slug}</div>}
-           </div>
-           <div className="flex items-center gap-2">
-             <RankPill rank={data?.rank} />
-             {typeof data?.childCount === 'number' && (
-               <span className="text:[10px] text-zinc-500">{data.childCount}</span>
-             )}
-+            {/* optional overlay chips injected via data.__overlay */}
-+            {data?.__overlay ? <div className="ml-1">{data.__overlay}</div> : null}
-           </div>
-         </div>
-       </div>
-     )
-   }
-@@
--  const Cmp = ({ nodes, edges, onNodeClick, layout = 'radial' }: GraphViewProps) => {
-+  const Cmp = ({ nodes, edges, onNodeClick, layout = 'radial', renderNodeOverlay }: GraphViewProps) => {
-@@
--    const laidOut = useMemo(() => {
-+    const laidOut = useMemo(() => {
-       if (!nodes.length) return { nodes, edges }
-       const children = edges.filter((e) => e.source === centerId).map((e) => e.target)
-       const arranged = nodes.map((n) => ({ ...n }))
-@@
-       return { nodes: arranged, edges }
-     }, [nodes, edges, centerId, layout])
- 
-+    // Attach overlay JSX to node data if a renderer is provided (no-op otherwise)
-+    const withOverlay = useMemo(() => {
-+      if (!renderNodeOverlay) return laidOut
-+      return {
-+        nodes: laidOut.nodes.map((n) => ({
-+          ...n,
-+          data: { ...n.data, __overlay: renderNodeOverlay((n as any).data) },
-+        })),
-+        edges: laidOut.edges,
-+      }
-+    }, [laidOut, renderNodeOverlay])
-+
-     const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null)
-@@
-     return (
-       <ReactFlow
--        nodes={laidOut.nodes}
--        edges={laidOut.edges}
-+        nodes={withOverlay.nodes}
-+        edges={withOverlay.edges}
-         nodeTypes={nodeTypes}
-         defaultEdgeOptions={defaultEdgeOptions}
-         onNodeClick={(_, n) => onNodeClick?.(n.id)}
-         nodesDraggable={false}
-         panOnDrag
-         zoomOnScroll
-         fitView
-         proOptions={{ hideAttribution: true }}
-         onInit={(inst) => setRfInstance(inst)}
-       >
-```
-
-#### F) Example Integration Usage
-
-```tsx
-import OverlaysBar from '@/components/overlays/OverlaysBar'
-import { parseOverlayParam, serializeOverlayParam } from '@/lib/overlays'
-import { badgesForNodeData } from '@/components/overlays/OverlayBadges'
-import GraphView from '@/components/GraphView'
-
-// inside a page component:
-const search = Route.useSearch() as { overlay?: string }
-const router = Route.useRouter()
-const ov = parseOverlayParam(search.overlay as string | undefined)
-
-<OverlaysBar
-  value={ov}
-  onChange={(next) => router.navigate({ search: (s:any) => ({ ...s, overlay: serializeOverlayParam(next) }) })}
-/>
-
-<GraphView
-  nodes={nodes}
-  edges={edges}
-  layout="tree"
-  renderNodeOverlay={(data) => badgesForNodeData(data, ov)}
-/>
-```
 
 **Phase 7 DoD:**
 - [ ] Meta page shows build info and age warning
@@ -2118,7 +2003,7 @@ function TabButton({ active, onClick, children }: { active: boolean; onClick: ()
 
 function TaxonPage() {
   const { id } = Route.useParams()
-  const search = Route.useSearch<{ tab?: 'overview' | 'graph' | 'lists' }>()
+  const search = Route.useSearch<{ tab?: 'overview' | 'lists' }>()
   const tab = search.tab ?? 'overview'
   const router = Route.useRouter()
 
@@ -2136,7 +2021,6 @@ function TaxonPage() {
           </div>
           <div className="flex gap-1">
             <TabButton active={tab === 'overview'} onClick={() => setTab('overview')}>Overview</TabButton>
-            <TabButton active={tab === 'graph'} onClick={() => setTab('graph')}>Graph</TabButton>
             <TabButton active={tab === 'lists'} onClick={() => setTab('lists')}>Lists</TabButton>
           </div>
         </div>
@@ -2144,7 +2028,6 @@ function TaxonPage() {
 
       <div className="mt-3 flex-1 min-h-0 rounded-md border p-3 text-sm text-muted-foreground">
         {tab === 'overview' && <div>Overview stub — docs, parts coverage, families chips (Phase 2)</div>}
-        {tab === 'graph' && <div>Graph stub — overlays bar (Phase 2/6)</div>}
         {tab === 'lists' && <div>Lists stub — paged children (Phase 2)</div>}
       </div>
     </div>
@@ -2209,7 +2092,7 @@ export const Route = createFileRoute('/workbench/tpt/$id')({
 
 function TPTPage() {
   const { id } = Route.useParams()
-  const search = Route.useSearch<{ tab?: 'overview' | 'explain' | 'graph' }>()
+  const search = Route.useSearch<{ tab?: 'overview' | 'explain' }>()
   const tab = search.tab ?? 'overview'
   const router = Route.useRouter()
   const setTab = (t: typeof tab) => router.navigate({ to: '/workbench/tpt/$id', params: { id }, search: (s: any) => ({ ...s, tab: t }) })
@@ -2225,7 +2108,6 @@ function TPTPage() {
           <div className="flex gap-1">
             <button className={`text-xs px-2 py-1 rounded border ${tab==='overview'?'bg-muted/60':'bg-background'}`} onClick={() => setTab('overview')}>Overview</button>
             <button className={`text-xs px-2 py-1 rounded border ${tab==='explain'?'bg-muted/60':'bg-background'}`} onClick={() => setTab('explain')}>Explain</button>
-            <button className={`text-xs px-2 py-1 rounded border ${tab==='graph'?'bg-muted/60':'bg-background'}`} onClick={() => setTab('graph')}>Graph</button>
           </div>
         </div>
       </div>
@@ -2233,7 +2115,6 @@ function TPTPage() {
       <div className="mt-3 flex-1 min-h-0 rounded-md border p-3 text-sm text-muted-foreground">
         {tab === 'overview' && <div>Overview stub — identity, flags, cuisines, related (Phase 4)</div>}
         {tab === 'explain' && <div>Explain stub — friendly chain + raw JSON toggle (Phase 4)</div>}
-        {tab === 'graph' && <div>Graph stub — lineage & siblings (Phase 4)</div>}
       </div>
     </div>
   )
@@ -2950,7 +2831,6 @@ export default function LeftRail({
 
 1. **Create new components**
    - `apps/web/src/components/taxon/TaxonOverview.tsx`
-   - `apps/web/src/components/taxon/TaxonGraph.tsx`
    - `apps/web/src/components/taxon/TaxonLists.tsx`
    - `apps/web/src/components/OverlaysBar.tsx`
    - `apps/web/src/types.ts`
@@ -2967,9 +2847,8 @@ export default function LeftRail({
 
 - `/workbench/taxon/:id`:
   - **Overview**: docs summary stub, parts coverage grouped by kind, families chips (if API available), derived sampler (if API available)
-  - **Graph**: center node + children graph using `GraphView`; overlay chips toggle and reflect in URL (`overlay=`)
   - **Lists**: paged children table; "Show more" increases `limit` in URL and re-queries `neighborhood`
-- URL state: `tab=overview|graph|lists`, `overlay=parts,identity,...`, `limit=50` (increases by 50 with "Show more")
+- URL state: `tab=overview|lists`, `overlay=parts,identity,...`, `limit=50` (increases by 50 with "Show more")
 
 ## Phase 3 — TP Page Implementation Package
 
@@ -3014,25 +2893,22 @@ export default function LeftRail({
 2. **Create new TPT components**
    - `apps/web/src/components/tpt/TPTOverview.tsx`
    - `apps/web/src/components/tpt/TPTExplain.tsx`
-   - `apps/web/src/components/tpt/TPTGraph.tsx`
 
 3. **Update the TPT route to use these components**
    - Replace `apps/web/src/routes/workbench.tpt.$id.tsx` with the full implementation
 
 **Notes:**
 - All API calls use `(trpc as any)` casts to avoid type-blockers during scaffold
-- URL state includes `tab` parameter for switching between Overview, Explain, and Graph
+- URL state includes `tab` parameter for switching between Overview and Explain
 - Inspector integrates suggestions list and FoodStatePanel with FS preview and paste-to-navigate
-- Graph tab provides lineage visualization with clickable navigation to related entities
 
 ### Expected Results After Phase 4
 
 - `/workbench/tpt/:id`:
   - **Overview**: metadata, flags, cuisines, identity steps, and related (siblings/variants) navigation
   - **Explain**: human-readable text from `tpt.explain` + raw JSON toggle
-  - **Graph**: lineage above → center TPT → variants below; clickable to navigate
   - **Inspector**: suggestions list (dev) + FoodState tools (paste FS to jump)
-- URL state: `tab=overview|explain|graph`
+- URL state: `tab=overview|explain`
 
 ### Phase 2 — Exact File Contents
 
@@ -3324,67 +3200,6 @@ export function TaxonOverview({
 }
 ```
 
-#### D) `apps/web/src/components/taxon/TaxonGraph.tsx`
-
-```tsx
-import { useMemo } from 'react'
-import GraphView from '@/components/GraphView'
-import { OverlaysBar } from '@/components/OverlaysBar'
-import type { OverlayKey, TaxonNode } from '@/types'
-import type { Edge, Node } from 'reactflow'
-import { Badge } from '@ui/badge'
-
-export function TaxonGraph({
-  node,
-  children,
-  overlays,
-  onToggleOverlay,
-}: {
-  node?: TaxonNode
-  children: TaxonNode[]
-  overlays: OverlayKey[]
-  onToggleOverlay: (k: OverlayKey) => void
-}) {
-  const { nodes, edges } = useMemo(() => {
-    if (!node) return { nodes: [] as Node[], edges: [] as Edge[] }
-    const ns: Node[] = [
-      {
-        id: node.id,
-        type: 'taxon',
-        position: { x: 0, y: 0 },
-        data: { ...node, isCenter: true, childCount: children.length },
-      },
-    ]
-    const es: Edge[] = []
-    children.forEach((c, i) => {
-      ns.push({
-        id: c.id,
-        type: 'taxon',
-        position: { x: (i - (children.length - 1) / 2) * 220, y: 160 },
-        data: { ...c, isCenter: false },
-      })
-      es.push({ id: `${node.id}->${c.id}`, source: node.id, target: c.id, type: 'smoothstep' } as Edge)
-    })
-    return { nodes: ns, edges: es }
-  }, [node, children])
-
-  return (
-    <div className="space-y-3">
-      <OverlaysBar active={overlays} onToggle={onToggleOverlay} />
-      <GraphView nodes={nodes} edges={edges} layout="tree" />
-      {overlays.length > 0 && (
-        <div className="text-xs text-muted-foreground">
-          {/* Placeholder legend to prove overlay state plumbs through */}
-          Active overlays:{' '}
-          {overlays.map((k) => (
-            <Badge key={k} variant="secondary" className="text-[10px] uppercase mr-1">{k}</Badge>
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
-```
 
 #### E) `apps/web/src/components/taxon/TaxonLists.tsx`
 
@@ -3468,13 +3283,12 @@ import { createFileRoute } from '@tanstack/react-router'
 import React from 'react'
 import { trpc } from '@/lib/trpc'
 import { TaxonOverview } from '@/components/taxon/TaxonOverview'
-import { TaxonGraph } from '@/components/taxon/TaxonGraph'
 import { TaxonLists } from '@/components/taxon/TaxonLists'
 import type { OverlayKey, TaxonNode } from '@/types'
 
 export const Route = createFileRoute('/workbench/taxon/$id')({
   validateSearch: (search: Record<string, unknown>) => {
-    const tab = (['overview','graph','lists'] as const).includes(search.tab as any) ? (search.tab as any) : 'overview'
+    const tab = (['overview','lists'] as const).includes(search.tab as any) ? (search.tab as any) : 'overview'
     const overlayStr = typeof search.overlay === 'string' ? search.overlay : ''
     const overlays = overlayStr
       .split(',')
@@ -3500,7 +3314,7 @@ function TabButton({ active, onClick, children }: { active: boolean; onClick: ()
 function TaxonPage() {
   const { id } = Route.useParams()
   const router = Route.useRouter()
-  const search = Route.useSearch() as { tab: 'overview' | 'graph' | 'lists'; overlays: OverlayKey[]; limit: number }
+  const search = Route.useSearch() as { tab: 'overview' | 'lists'; overlays: OverlayKey[]; limit: number }
 
   // Neighborhood drives most views; keep data when switching tabs
   const neighborhood = trpc.taxonomy.neighborhood.useQuery(
@@ -3541,7 +3355,6 @@ function TaxonPage() {
           </div>
           <div className="flex gap-1">
             <TabButton active={search.tab === 'overview'} onClick={() => setTab('overview')}>Overview</TabButton>
-            <TabButton active={search.tab === 'graph'} onClick={() => setTab('graph')}>Graph</TabButton>
             <TabButton active={search.tab === 'lists'} onClick={() => setTab('lists')}>Lists</TabButton>
           </div>
         </div>
@@ -3550,14 +3363,6 @@ function TaxonPage() {
       <div className="mt-3 flex-1 min-h-0 rounded-md border p-3">
         {search.tab === 'overview' && <TaxonOverview id={id} />}
 
-        {search.tab === 'graph' && (
-          <TaxonGraph
-            node={node}
-            children={children}
-            overlays={search.overlays}
-            onToggleOverlay={toggleOverlay}
-          />
-        )}
 
         {search.tab === 'lists' && (
           <TaxonLists
@@ -4416,98 +4221,6 @@ export function TPTExplain({ id }: { id: string }) {
 }
 ```
 
-#### D) `apps/web/src/components/tpt/TPTGraph.tsx`
-
-```tsx
-import { useMemo } from 'react'
-import { trpc } from '@/lib/trpc'
-import GraphView from '@/components/GraphView'
-import type { Edge, Node } from 'reactflow'
-
-export function TPTGraph({
-  id,
-  onOpenTPT,
-  onOpenTP,
-}: {
-  id: string
-  onOpenTPT: (id: string) => void
-  onOpenTP: (taxonId: string, partId: string) => void
-}) {
-  const metaQ = (trpc as any).tpt?.get?.useQuery({ id })
-  const meta = metaQ?.data
-  const lineageQ = trpc.taxonomy.pathToRoot.useQuery({ id: meta?.taxonId ?? '' }, { enabled: !!meta?.taxonId })
-  const relatedQ = (trpc as any).tpt?.related?.useQuery({ id }, { enabled: !!id })
-
-  const nodesEdges = useMemo(() => {
-    if (!meta) return { nodes: [], edges: [] }
-    const nodes: Node[] = []
-    const edges: Edge[] = []
-
-    // lineage above
-    const lineage: Array<any> = lineageQ.data ?? []
-    lineage.forEach((n: any, idx: number) => {
-      nodes.push({
-        id: n.id,
-        type: 'taxon',
-        position: { x: (idx - (lineage.length - 1) / 2) * 160, y: -120 },
-        data: { ...n, isCenter: false },
-      })
-      if (idx < lineage.length - 1) {
-        const next = lineage[idx + 1]
-        edges.push({ id: `${n.id}->${next.id}`, source: n.id, target: next.id, type: 'smoothstep' })
-      }
-    })
-
-    // center node = TPT
-    nodes.push({
-      id: meta.id,
-      type: 'taxon',
-      position: { x: 0, y: 0 },
-      data: { name: meta.name || meta.id, slug: (meta.family || 'tpt'), rank: 'tpt', isCenter: true },
-    })
-    if (lineage.length) {
-      const lastTaxon = lineage[lineage.length - 1]
-      edges.push({ id: `${lastTaxon.id}->${meta.id}`, source: lastTaxon.id, target: meta.id, type: 'smoothstep' })
-    }
-
-    // variants/siblings below
-    const related = relatedQ?.data ?? { variants: [], siblings: [] }
-    const variants = related.variants ?? []
-    variants.forEach((v: any, i: number) => {
-      nodes.push({
-        id: v.id,
-        type: 'taxon',
-        position: { x: (i - (variants.length - 1) / 2) * 160, y: 140 },
-        data: { name: v.name || v.id, slug: v.family, rank: 'tpt', isCenter: false },
-      })
-      edges.push({ id: `${meta.id}->${v.id}`, source: meta.id, target: v.id, type: 'smoothstep' })
-    })
-
-    return { nodes, edges }
-  }, [meta, lineageQ.data, relatedQ?.data])
-
-  if (metaQ?.isLoading) return <div className="text-sm text-muted-foreground">Loading…</div>
-  if (!meta) return <div className="text-sm text-muted-foreground">Not found.</div>
-
-  return (
-    <div className="space-y-3">
-      <GraphView
-        nodes={nodesEdges.nodes}
-        edges={nodesEdges.edges}
-        layout="radial"
-        onNodeClick={(nid) => {
-          if (nid === meta.id) return
-          if (nid.startsWith('tx:')) onOpenTP(nid, meta.partId)
-          else onOpenTPT(nid)
-        }}
-      />
-      <div className="text-[11px] text-muted-foreground">
-        Tip: Click any node to navigate (taxon nodes open TP with this part).
-      </div>
-    </div>
-  )
-}
-```
 
 #### E) `apps/web/src/routes/workbench.tpt.$id.tsx` (Updated)
 
@@ -4517,14 +4230,13 @@ import React, { useMemo } from 'react'
 import { trpc } from '@/lib/trpc'
 import { TPTOverview } from '@/components/tpt/TPTOverview'
 import { TPTExplain } from '@/components/tpt/TPTExplain'
-import { TPTGraph } from '@/components/tpt/TPTGraph'
 import { Badge } from '@ui/badge'
 import { Button } from '@ui/button'
 import { FoodStatePanel } from '@/components/inspector/FoodStatePanel'
 
 export const Route = createFileRoute('/workbench/tpt/$id')({
   validateSearch: (s: Record<string, unknown>) => {
-    const tab = (['overview','explain','graph'] as const).includes(s.tab as any) ? (s.tab as any) : 'overview'
+    const tab = (['overview','explain'] as const).includes(s.tab as any) ? (s.tab as any) : 'overview'
     return { tab }
   },
   component: TPTPage,
@@ -4544,7 +4256,7 @@ function TabButton({ active, onClick, children }: { active: boolean; onClick: ()
 function TPTPage() {
   const { id } = Route.useParams()
   const router = Route.useRouter()
-  const search = Route.useSearch() as { tab: 'overview' | 'explain' | 'graph' }
+  const search = Route.useSearch() as { tab: 'overview' | 'explain' }
 
   // minimal meta for header + FS
   const metaQ = (trpc as any).tpt?.get?.useQuery({ id })
@@ -4598,7 +4310,6 @@ function TPTPage() {
             <div className="flex gap-1">
               <TabButton active={search.tab === 'overview'} onClick={() => setTab('overview')}>Overview</TabButton>
               <TabButton active={search.tab === 'explain'} onClick={() => setTab('explain')}>Explain</TabButton>
-              <TabButton active={search.tab === 'graph'} onClick={() => setTab('graph')}>Graph</TabButton>
             </div>
           </div>
         </div>
@@ -4609,9 +4320,6 @@ function TPTPage() {
           )}
           {search.tab === 'explain' && (
             <TPTExplain id={id} />
-          )}
-          {search.tab === 'graph' && (
-            <TPTGraph id={id} onOpenTPT={openTPT} onOpenTP={openTP} />
           )}
         </div>
       </div>
@@ -4677,10 +4385,10 @@ function TPTPage() {
 ## Work Breakdown (For Cursor Agent)
 
 1. **Phase 0-1**: Apply the implementation package above (routes, shell, search)
-2. **Phase 2**: Apply the Taxon page implementation package above (Overview, Graph, Lists components)
+2. **Phase 2**: Apply the Taxon page implementation package above (Overview, Lists components)
 3. **Phase 3**: TP Overview TPT list + family filter + read-only Transforms + Compare
-4. **Phase 4**: TPT Overview + Explain + Graph + Suggestions
+4. **Phase 4**: TPT Overview + Explain + Suggestions
 5. **Phase 5**: ✅ QA browsers (Families, Cuisines, Flags, Search QA) - **COMPLETE**
-6. **Phase 6**: ✅ Overlays & Power Tools (overlay system, badges, GraphView integration) - **COMPLETE**
+6. **Phase 6**: ✅ Overlays & Power Tools (overlay system, badges) - **COMPLETE**
 7. **Phase 7**: Meta page & build age badge in shell
 8. **Phase 8**: Polish (keyboard shortcuts, copy buttons, empty states, loading skeletons)

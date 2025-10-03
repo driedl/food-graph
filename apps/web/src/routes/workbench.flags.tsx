@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import React from 'react'
 import { trpc } from '@/lib/trpc'
 import { Button } from '@ui/button'
@@ -18,10 +18,10 @@ export const Route = createFileRoute('/workbench/flags')({
 })
 
 function FlagsPage() {
-    const router = Route.useRouter()
+    const navigate = useNavigate()
     const search = Route.useSearch() as { q: string; type: string; flag: string; limit: number; offset: number }
     const setSearch = (patch: Partial<typeof search>) =>
-        router.navigate({ to: '/workbench/flags', search: (s: any) => ({ ...s, ...patch }) })
+        navigate({ to: '/workbench/flags', search: (s: any) => ({ ...s, ...patch }) })
 
     const flagsQ = (trpc as any).browse?.getFlags?.useQuery({ q: search.q || undefined })
     const groups: Array<{ type: string; items: Array<{ flag: string; count: number }> }> = flagsQ?.data ?? []

@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import React, { useMemo } from 'react'
 import { trpc } from '@/lib/trpc'
 import { Input } from '@ui/input'
@@ -23,12 +23,12 @@ export const Route = createFileRoute('/workbench/search')({
 })
 
 function SearchQAPage() {
-    const router = Route.useRouter()
+    const navigate = useNavigate()
     const search = Route.useSearch() as {
         q: string; type: ResultKind; taxonId: string; partId: string; family: string; limit: number; offset: number
     }
     const setSearch = (patch: Partial<typeof search>) =>
-        router.navigate({ to: '/workbench/search', search: (s: any) => ({ ...s, ...patch }) })
+        navigate({ to: '/workbench/search', search: (s: any) => ({ ...s, ...patch }) })
 
     const queryQ = (trpc as any).search?.query?.useQuery({
         q: search.q || '',
@@ -48,7 +48,7 @@ function SearchQAPage() {
 
     const gotoTaxon = (id: string) => router.navigate({ to: '/workbench/taxon/$id', params: { id } })
     const gotoTP = (taxonId: string, partId: string) =>
-        router.navigate({ to: '/workbench/tp/$taxonId/$partId', params: { taxonId, partId } })
+        navigate({ to: '/workbench/tp/$taxonId/$partId', params: { taxonId, partId } })
     const gotoTPT = (id: string) => router.navigate({ to: '/workbench/tpt/$id', params: { id } })
 
     const kindBadge = (k: string) => {

@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import React from 'react'
 import { trpc } from '@/lib/trpc'
 import { Input } from '@ui/input'
@@ -17,10 +17,10 @@ export const Route = createFileRoute('/workbench/cuisines')({
 })
 
 function CuisinesPage() {
-    const router = Route.useRouter()
+    const navigate = useNavigate()
     const search = Route.useSearch() as { q: string; cuisine: string; limit: number; offset: number }
     const setSearch = (patch: Partial<typeof search>) =>
-        router.navigate({ to: '/workbench/cuisines', search: (s: any) => ({ ...s, ...patch }) })
+        navigate({ to: '/workbench/cuisines', search: (s: any) => ({ ...s, ...patch }) })
 
     const cuisQ = (trpc as any).browse?.getCuisines?.useQuery({
         q: search.q || undefined,
@@ -45,9 +45,9 @@ function CuisinesPage() {
     const entsTotal: number = entsQ?.data?.total ?? ents.length
 
     const gotoTPT = (id: string) =>
-        router.navigate({ to: '/workbench/tpt/$id', params: { id } })
+        navigate({ to: '/workbench/tpt/$id', params: { id } })
     const gotoTP = (taxonId: string, partId: string) =>
-        router.navigate({ to: '/workbench/tp/$taxonId/$partId', params: { taxonId, partId } })
+        navigate({ to: '/workbench/tp/$taxonId/$partId', params: { taxonId, partId }, search: { tab: 'overview', family: '', limit: 50, offset: 0, compare: '' } })
 
     return (
         <div className="p-4 space-y-3">
