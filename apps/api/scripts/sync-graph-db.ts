@@ -6,11 +6,11 @@ import { env } from '@nutrition/config'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-const src = env.ETL_DB_PATH
+const src = env.ETL2_DB_PATH
 const dst = env.DB_PATH
 
 if (!src || !dst) {
-  console.error('ETL_DB_PATH and DB_PATH must be set in config')
+  console.error('ETL2_DB_PATH and DB_PATH must be set in config')
   process.exit(1)
 }
 

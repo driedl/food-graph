@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 import React from 'react'
-import App from '@/App'
+import AppShell from '@/components/layout/AppShell'
 
 // Layout for /workbench and its children
 export const Route = createFileRoute('/workbench')({
-  component: () => <App />,
+  component: () => <AppShell />,
 })

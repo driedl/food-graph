@@ -11,10 +11,11 @@ export const docsRouter = t.router({
         }))
         .query(({ input }) => {
             const stmt = db.prepare(`
-        SELECT taxon_id, lang, summary, description_md, updated_at, 
-               rank, latin_name, display_name, tags
-        FROM taxon_doc 
-        WHERE taxon_id = ? AND lang = ?
+        SELECT td.taxon_id, td.lang, td.summary, td.description_md, td.updated_at,
+               n.name, n.slug, n.rank
+        FROM taxon_doc td
+        JOIN nodes n ON td.taxon_id = n.id
+        WHERE td.taxon_id = ? AND td.lang = ?
       `)
             return stmt.get(input.taxonId, input.lang) ?? null
         }),
@@ -23,8 +24,11 @@ export const docsRouter = t.router({
         .input(z.object({ taxonId: z.string(), childLimit: z.number().default(25) }))
         .query(({ input }) => {
             const doc = db.prepare(`
-        SELECT taxon_id, summary, description_md, updated_at, rank, latin_name, display_name, tags
-        FROM taxon_doc WHERE taxon_id = ? AND lang = 'en'
+        SELECT td.taxon_id, td.summary, td.description_md, td.updated_at,
+               n.name, n.slug, n.rank
+        FROM taxon_doc td
+        JOIN nodes n ON td.taxon_id = n.id
+        WHERE td.taxon_id = ? AND td.lang = 'en'
       `).get(input.taxonId) || null
 
             const lineage = db.prepare(`

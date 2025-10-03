@@ -14,7 +14,19 @@ class BuildConfig:
 
     @staticmethod
     def from_env() -> "BuildConfig":
-        root = Path(os.environ.get("GRAPH_BUILD_ROOT", DEFAULT_BUILD_ROOT))
+        # If GRAPH_BUILD_ROOT is not set, use absolute path from current working directory
+        if "GRAPH_BUILD_ROOT" in os.environ:
+            root = Path(os.environ["GRAPH_BUILD_ROOT"])
+        else:
+            # Find the project root by looking for pnpm-workspace.yaml
+            current_dir = Path.cwd()
+            project_root = current_dir
+            while project_root != project_root.parent:
+                if (project_root / "pnpm-workspace.yaml").exists():
+                    break
+                project_root = project_root.parent
+            root = project_root / DEFAULT_BUILD_ROOT
+        
         db = Path(os.environ.get("GRAPH_DB_PATH", str(root / "database" / "graph.dev.sqlite")))
         profile = os.environ.get("GRAPH_BUILD_PROFILE", "local")
         cfg = BuildConfig(build_root=root, db_path=db, profile=profile)

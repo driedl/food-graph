@@ -1,9 +1,7 @@
 .turbo
 node_modules
 .env
-etl/dist/database/graph.dev.sqlite
 data/ontology/compiled
-etl/dist
 etl2/build
 generated
 reports

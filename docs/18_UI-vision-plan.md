@@ -23,17 +23,155 @@ This document outlines the transformation of the workbench from a "nice demo" in
 - **Preview "real app" features** (families, cuisines, flags) without distracting from the QA mission
 - **Stage for evidence**: Reserve space/affordances to bolt nutrition evidence on later
 
+# Canonical URL & State Contract
+
+## Routes (entity + browsers)
+
+* **Taxon**: `/workbench/taxon/:id`
+  `id` **includes prefix** (e.g. `tx:plantae:poaceae:triticum:aestivum`)
+* **TP**: `/workbench/tp/:taxonId/:partId`
+  `taxonId` **includes** `tx:`; `partId` **includes** `part:`
+* **TPT**: `/workbench/tpt/:id` (opaque TPT id)
+* **FS resolver**: `/workbench/fs/*` → parses FS and **redirects** to Taxon/TP (transforms ignored for routing)
+* **Families**: `/workbench/families`
+* **Cuisines**: `/workbench/cuisines`
+* **Flags**: `/workbench/flags`
+* **Search QA**: `/workbench/search`
+* **Meta**: `/workbench/meta`
+* **Legacy redirect**: `/workbench/node/:id` → **replace** → `/workbench/taxon/:id`
+
+## Shared query params (all pages may read; pages below list what they actually use)
+
+* `tab`
+
+  * Taxon: `overview|graph|lists` (default `overview`)
+  * TP: `overview|transforms|compare` (default `overview`)
+  * TPT: `overview|explain|graph` (default `overview`)
+* `limit` (int, default **50**, min 10, max 500), `offset` (int, default **0**, ≥ 0)
+* `overlay` (string): comma list of tokens. tokens:
+  `parts,identity,families,cuisines,flags,docs,tf:<transformId>`
+  example: `overlay=parts,tf:tx:milling`
+* `compare` (string): **comma list up to 2 TPT ids; order is significant**
+  example: `compare=tpt:abc,tpt:def`
+* List-type filters use **comma lists** (no brackets):
+
+  * `family` (one or many family ids)
+  * `cuisines` (one or many cuisine ids)
+  * `flags` (one or many flag ids)
+
+**Encoding rules**
+
+* **Never strip prefixes** in path params (`tx:` / `part:`).
+* Comma lists **preserve user order** (do not sort), except UI may sort visuals.
+* Omit params when empty to keep URLs short.
+* URL writes are **debounced 150ms**.
+
+## Page-specific params
+
+### Taxon `/workbench/taxon/:id`
+
+* Uses: `tab`, `overlay`, `limit`
+* Behavior:
+
+  * `overlay` toggles chip UI; if `tf` present without `tf:<id>`, keep chip on, no metric.
+  * `limit` feeds `taxonomy.neighborhood.childLimit`
+
+### TP `/workbench/tp/:taxonId/:partId`
+
+* Uses: `tab`, `family`, `limit`, `compare`
+* Behavior:
+
+  * `family` filters TPT table (multi allowed: `family=ferment,fry`).
+  * `compare` pins A,B in Compare tab; missing right side allowed (`compare=tpt:onlyA`).
+
+### TPT `/workbench/tpt/:id`
+
+* Uses: `tab`, `compare` (optional; enables quick A/B from a TPT)
+* Behavior:
+
+  * If `compare` present, show a mini compare affordance or deep-link to TP compare.
+
+### Families `/workbench/families`
+
+* Uses: `q`, `family`, `limit`, `offset`
+* Behavior:
+
+  * `family` may be one or many; UI typically picks one, but parser accepts comma list.
+
+### Cuisines `/workbench/cuisines`
+
+* Uses: `q`, `cuisines`, `limit`, `offset`
+* Behavior:
+
+  * `cuisines` may be one or many; UI typically picks one.
+
+### Flags `/workbench/flags`
+
+* Uses: `q`, `flags`, `limit`, `offset`, `type`
+
+  * `type = safety|dietary|misc|any` (default `any`) filters the right-hand entity list only.
+* Behavior:
+
+  * `flags` may be one or many; UI typically picks one from a group.
+
+### Search QA `/workbench/search`
+
+* Uses: `q` (string), `type=any|taxon|tp|tpt` (default `any`), `family`, `cuisines`, `flags`, `taxonId`, `partId`, `limit`, `offset`
+* Behavior:
+
+  * Show `bm25` scores; lower is better.
+  * Facets derive from **deduped** result set.
+
+## FS resolver rules
+
+* Input: raw tail after `/workbench/fs/` (URL-decoded), treated as `"fs:/…"` string.
+* Parse yields `{ taxonPath[], partId?, transforms[] }`.
+* Routing:
+
+  * `taxonPath` only → `/workbench/taxon/tx:<joined>`
+  * `taxonPath + partId` → `/workbench/tp/tx:<joined>/<partId>`
+* Transforms are **ignored for routing**; show toast "Transforms ignored for routing."
+
+## Defaults & UX invariants
+
+* Default tabs per route listed above.
+* All new views must render with empty arrays (no hard failures).
+* All copyable ids (Taxon id, TP ids, TPT id, `identityHash`) use the shared `CopyButton`.
+* Keyboard: ⌘/Ctrl-K focuses search; `g t|c|f|m` route to families/cuisines/flags/meta; `[`/`]` cycles tabs.
+
+## Search QA row shape (canonical; map legacy fields to this)
+
+```ts
+type SearchRow = {
+  ref_type: 'taxon' | 'tp' | 'tpt'
+  ref_id: string
+  name?: string
+  slug?: string
+  family?: string
+  rank?: string
+  taxon_id?: string
+  part_id?: string
+  score?: number
+  rn?: number // row number for debug/dedup inspection
+}
+```
+
+## Meta freshness thresholds
+
+* `WARN_AFTER_DAYS = 14`
+* `STALE_AFTER_DAYS = 30`
+
 ## Implementation Progress Tracking
 
 ### Phase 0: Foundation & Routing
-- [ ] Create new route files (empty stubs)
-- [ ] Convert App.tsx into shell with Outlet
-- [ ] Implement URL redirects from /workbench/node/$id to /workbench/taxon/$id
+- [x] Create new route files (empty stubs)
+- [x] Convert App.tsx into shell with Outlet
+- [x] Implement URL redirects from /workbench/node/$id to /workbench/taxon/$id
 
 ### Phase 1: Search & Shell Integration
-- [ ] Update LeftRail to use search.suggest API v2
-- [ ] Implement FS deep links helper
-- [ ] Add shell top bar with API status and build info
+- [x] Update LeftRail to use search.suggest API v2
+- [x] Implement FS deep links helper
+- [x] Add shell top bar with API status and build info
 
 ### Phase 2: Taxon Page
 - [ ] Implement Taxon Overview tab with docs, parts coverage, families
@@ -53,27 +191,32 @@ This document outlines the transformation of the workbench from a "nice demo" in
 - [ ] Implement Suggestions in inspector
 
 ### Phase 5: QA Browsers
-- [ ] Families page with drawer and filtering
-- [ ] Cuisines page with TPT results
-- [ ] Flags page with safety/dietary grouping
-- [ ] Search QA page with raw scores and facets
+- [x] Families page with drawer and filtering
+- [x] Cuisines page with TPT results
+- [x] Flags page with safety/dietary grouping
+- [x] Search QA page with raw scores and facets
 
 ### Phase 6: Overlays & Power Tools
-- [x] Implement overlay toggle chips
-- [x] Add data sources for overlays
-- [x] Create compare/diff functionality
+- [ ] Implement overlay toggle chips
+- [ ] Add data sources for overlays
+- [ ] Create compare/diff functionality
 
-### Phase 7: Meta & Diagnostics
-- [ ] Build Meta page with build info and counts
-- [ ] Add artifact age warnings
+### Phase 7: Meta & Diagnostics (stubs)
+- [x] Build Meta page with build info and counts
+- [x] Add artifact age warnings  
 - [ ] Implement FTS debug readouts
+- [x] Add Search QA page for FTS5 bm25 debugging
+- [ ] Create time utility helpers
+- [ ] Define API hooks for server implementation
+
+> **Note**: Progress tracking (checkboxes) indicates code implementation status, not design completion. Design specifications are complete and ready for implementation.
 
 ## App Shell (Stays Loaded for All Routes)
 
 ### App.tsx becomes a shell with:
 
 **Top Bar** (left → title, right → status badges & build meta):
-- "Nutrition Graph Workbench"
+- "Food Graph Workbench"
 - API status: `health.ok ? "API: OK" : "API: down"`
 - Build badge (Phase 7): `schema_version`, `build_time` (age in days)
 
@@ -89,6 +232,73 @@ This document outlines the transformation of the workbench from a "nice demo" in
 - `g` then `f` → go to Flags
 - `g` then `m` → go to Meta
 - `[` and `]` → previous/next tab (when page has tabs)
+
+### Keyboard Shortcuts Implementation
+
+**`apps/web/src/hooks/useGlobalHotkeys.ts`:**
+```tsx
+import { useEffect } from 'react'
+import { useNavigate } from '@tanstack/react-router'
+
+export function useGlobalHotkeys() {
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Focus search on ⌘/Ctrl+K
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        const searchInput = document.querySelector('input[placeholder*="Search"]') as HTMLInputElement
+        searchInput?.focus()
+        return
+      }
+
+      // Global navigation (g + letter)
+      if (e.key === 'g' && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        // Wait for next key
+        const handleNextKey = (nextE: KeyboardEvent) => {
+          if (nextE.key === 't') navigate({ to: '/workbench/families' })
+          else if (nextE.key === 'c') navigate({ to: '/workbench/cuisines' })
+          else if (nextE.key === 'f') navigate({ to: '/workbench/flags' })
+          else if (nextE.key === 'm') navigate({ to: '/workbench/meta' })
+          document.removeEventListener('keydown', handleNextKey)
+        }
+        document.addEventListener('keydown', handleNextKey, { once: true })
+        return
+      }
+
+      // Tab cycling with [ and ]
+      if (e.key === '[' || e.key === ']') {
+        const currentPage = window.location.pathname
+        const tabs = getTabsForPage(currentPage)
+        if (tabs.length > 1) {
+          e.preventDefault()
+          const currentTab = new URLSearchParams(window.location.search).get('tab') || tabs[0]
+          const currentIndex = tabs.indexOf(currentTab)
+          const nextIndex = e.key === '[' 
+            ? (currentIndex - 1 + tabs.length) % tabs.length
+            : (currentIndex + 1) % tabs.length
+          const nextTab = tabs[nextIndex]
+          navigate({ 
+            to: currentPage as any, 
+            search: (s: any) => ({ ...s, tab: nextTab })
+          })
+        }
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [navigate])
+}
+
+function getTabsForPage(pathname: string): string[] {
+  if (pathname.includes('/workbench/taxon/')) return ['overview', 'graph', 'lists']
+  if (pathname.includes('/workbench/tp/')) return ['overview', 'transforms', 'compare']
+  if (pathname.includes('/workbench/tpt/')) return ['overview', 'explain', 'graph']
+  return []
+}
+```
 
 ## Information Architecture
 
@@ -151,7 +361,7 @@ Array<{ family: string; count: number }>
 - Skeletons for header lines, list rows
 - If taxon not found → show "Not found" within page body, offer a link back to root
 
-### 4.2 TP Page `/workbench/tp/$taxonId/$partId`
+### 4.2 TP Page `/workbench/tp/:taxonId/:partId`
 
 **Queries:**
 - `facets.familiesForTaxonPart({ taxonId, partId })` → `{ family, count }[]`
@@ -172,7 +382,7 @@ Array<{ id: string; name: string; identity: boolean; family: string; ordering: n
 **Tabs:**
 - **Overview**:
   - Header: show Taxon name + Part name ("Taxon · Part")
-  - Facet chips (families) across top; clicking sets `family=` query param
+  - Facet chips (families) across top; clicking sets `family=` query param (comma-separated values)
   - Table of TPT rows (name|family|id copy). Row click → `/workbench/tpt/${id}`
   - Paging with `limit/offset`
 
@@ -374,7 +584,7 @@ available via `tpt.get({ id })` or new lightweight `tpt.identity({ id })`
 
 ### Entity Routes
 - **Taxon**: `/workbench/taxon/$id`
-- **TP**: `/workbench/tp/$taxonId/$partId` (both include prefixes, e.g., `tx:…` and `part:…`)
+- **TP**: `/workbench/tp/:taxonId/:partId` (both include prefixes, e.g., `tx:…` and `part:…`)
 - **TPT**: `/workbench/tpt/$id`
 - **FS** (resolver): `/workbench/fs/$` → parse then redirect to Taxon/TP
 
@@ -407,20 +617,25 @@ available via `tpt.get({ id })` or new lightweight `tpt.identity({ id })`
 
 **Toggle location**: top of Graph/Lists (Taxon page), state in `overlay=`.
 
-- `tptCount`
-  - If viewing a **Taxon** node's children: count distinct TPTs under each child's TP set
-  - Implementation fallback (client-only): when a child row comes into view, fetch `tpt.countForTaxon({ id: childId })` (lightweight endpoint), else show "·"
-- `familyDiversity`
-  - Count distinct `family` for TPTs under child (same strategy as above)
-- `docPresence`
-  - Mark child with ✔ if `docs.getByTaxon(child.id)` exists (or batched: `docs.hasDocs({ ids:string[] })` → `{ id:boolean }[]`)
-- `identityRichness`
-  - Average identity step length for TPTs under child (optional endpoint `tpt.avgIdentityLenForTaxon({ id })`); otherwise omit overlay
-- `transform:<tfId>`
-  - Heat (count) of TPT identity steps containing `tfId` under child
+### Overlay Types
+- `parts` - Count of applicable parts under node
+- `identity` - Average #identity steps beneath node  
+- `families` - Unique TPT families under node
+- `cuisines` - Cuisine presence below node
+- `flags` - Safety/dietary flags presence
+- `docs` - Documentation presence
+- `tf` - Usage intensity for a transform (requires tfId parameter)
 
-**Rendering:**
-- Each child node/row gets small pill(s): `[#tpt] [#fam] [✔doc] [len≈x] [tx:…]`. Keep minimal to avoid clutter
+### Implementation Strategy
+- **URL-first state**: `overlay=parts,identity,tf:tx:milling`
+- **Badge rendering**: Small pills on nodes/rows showing metrics
+- **GraphView integration**: Optional `renderNodeOverlay` prop for node chips
+- **Table integration**: Badge column using `badgesForTaxon(row, overlayState)`
+
+### Data Sources (Phase 6+)
+- Client-side heuristics initially (placeholder values)
+- Server endpoints for real metrics as they land
+- Fallback to "—" when data unavailable
 
 ## Left Rail (Search + Outline) — Spec
 
@@ -1171,18 +1386,526 @@ function SearchQA() {
 - Overlays chips toggle; at least `docPresence` and `tptCount` annotate rows/nodes
 - Transform heat overlay accepts `transform:<tfId>` and shows counts
 
+### Phase 6 — Exact File Contents
+
+#### A) `apps/web/src/lib/overlays.ts`
+
+```ts
+// Lightweight overlay model with URL helpers
+
+export type OverlayId =
+  | 'parts'            // parts availability (# applicable parts)
+  | 'identity'         // identity richness (avg identity steps)
+  | 'families'         // family diversity (unique families count)
+  | 'cuisines'         // cuisine presence (any/ratio)
+  | 'flags'            // flags presence (any/ratio)
+  | 'docs'             // documentation presence
+  | 'tf'               // transform usage (requires tfId)
+
+export type OverlayState = {
+  on: OverlayId[]
+  tfId?: string       // only used when 'tf' is enabled
+}
+
+export type OverlayMeta = {
+  id: OverlayId
+  label: string
+  desc: string
+  needsParam?: 'tfId'
+}
+
+export const OVERLAY_CATALOG: OverlayMeta[] = [
+  { id: 'parts',    label: 'Parts',    desc: 'Count of applicable parts under node' },
+  { id: 'identity', label: 'Identity', desc: 'Avg #identity steps beneath node' },
+  { id: 'families', label: 'Families', desc: 'Unique TPT families under node' },
+  { id: 'cuisines', label: 'Cuisines', desc: 'Cuisine presence below node' },
+  { id: 'flags',    label: 'Flags',    desc: 'Safety/dietary flags presence' },
+  { id: 'docs',     label: 'Docs',     desc: 'Documentation presence' },
+  { id: 'tf',       label: 'Transform',desc: 'Usage intensity for a transform', needsParam: 'tfId' },
+]
+
+const SEP = ','
+/** overlay param encoding: e.g. "parts,identity,tf:tx:milling" */
+export function serializeOverlayParam(state: OverlayState): string {
+  const base = (state.on || []).map((id) =>
+    id === 'tf' && state.tfId ? `tf:${state.tfId}` : id
+  )
+  return base.join(SEP)
+}
+
+export function parseOverlayParam(raw?: string | null): OverlayState {
+  const on: OverlayId[] = []
+  let tfId: string | undefined
+  if (raw && raw.trim()) {
+    for (const tok of raw.split(SEP)) {
+      const t = tok.trim()
+      if (!t) continue
+      if (t.startsWith('tf:')) {
+        const id = t.slice(3)
+        if (id) { on.push('tf'); tfId = id }
+      } else if (isOverlayId(t)) {
+        on.push(t)
+      }
+    }
+  }
+  // de-dupe and preserve order
+  const seen = new Set<string>()
+  const uniq = on.filter((x) => (seen.has(x) ? false : (seen.add(x), true)))
+  return { on: uniq as OverlayId[], tfId }
+}
+
+export function toggleOverlay(state: OverlayState, id: OverlayId): OverlayState {
+  const on = state.on.includes(id)
+    ? state.on.filter((x) => x !== id)
+    : [...state.on, id]
+  const next: OverlayState = { ...state, on }
+  if (!on.includes('tf')) next.tfId = undefined
+  return next
+}
+
+export function setTfId(state: OverlayState, tfId?: string): OverlayState {
+  const next = { ...state, tfId }
+  if (tfId && !next.on.includes('tf')) next.on = [...next.on, 'tf']
+  return next
+}
+
+export function hasOverlay(state: OverlayState, id: OverlayId) {
+  return state.on.includes(id)
+}
+
+function isOverlayId(s: string): s is OverlayId {
+  return (OVERLAY_CATALOG as any[]).some((m) => m.id === s)
+}
+```
+
+#### B) `apps/web/src/components/overlays/OverlaysBar.tsx`
+
+```tsx
+import React, { useMemo } from 'react'
+import { OVERLAY_CATALOG, OverlayId, OverlayState, toggleOverlay, setTfId } from '@/lib/overlays'
+import { Input } from '@ui/input'
+import { Button } from '@ui/button'
+import { Badge } from '@ui/badge'
+
+export function OverlaysBar({
+  value,
+  onChange,
+  disabledIds = [],
+  compact = false,
+  rightSlot,
+}: {
+  value: OverlayState
+  onChange: (next: OverlayState) => void
+  disabledIds?: OverlayId[]
+  compact?: boolean
+  rightSlot?: React.ReactNode
+}) {
+  const meta = useMemo(
+    () => OVERLAY_CATALOG.filter((m) => !disabledIds.includes(m.id)),
+    [disabledIds]
+  )
+
+  return (
+    <div className={`flex flex-wrap items-center gap-2 ${compact ? '' : 'mb-2'}`}>
+      <div className="text-[11px] uppercase tracking-wide text-muted-foreground">Overlays</div>
+      {meta.map((m) => {
+        const active = value.on.includes(m.id)
+        return (
+          <button
+            key={m.id}
+            title={m.desc}
+            className={`text-xs rounded border px-2 py-1 ${active ? 'bg-muted/70' : 'bg-background hover:bg-muted/40'}`}
+            onClick={() => onChange(toggleOverlay(value, m.id))}
+          >
+            {m.label}
+          </button>
+        )
+      })}
+      {/* param for tf overlay */}
+      {value.on.includes('tf') && (
+        <div className="flex items-center gap-1">
+          <Badge variant="secondary" className="text-[10px] uppercase">tf</Badge>
+          <Input
+            placeholder="tx:… (transform id)"
+            className="h-7 w-56"
+            value={value.tfId ?? ''}
+            onChange={(e) => onChange(setTfId(value, e.target.value || undefined))}
+          />
+          {!!value.tfId && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => onChange(setTfId(value, ''))}
+            >
+              Clear
+            </Button>
+          )}
+        </div>
+      )}
+      <div className="ml-auto">{rightSlot}</div>
+    </div>
+  )
+}
+
+export default OverlaysBar
+```
+
+#### C) `apps/web/src/components/overlays/OverlayBadges.tsx`
+
+```tsx
+import React from 'react'
+import type { OverlayState } from '@/lib/overlays'
+import { hasOverlay } from '@/lib/overlays'
+import { Badge } from '@ui/badge'
+
+/**
+ * These badge helpers are intentionally UI-only with placeholder heuristics.
+ * Wire them to real metrics as API fields land.
+ */
+
+export type TaxonLike = {
+  id: string
+  name?: string
+  slug?: string
+  rank?: string
+  // optional metrics if available
+  _partsCount?: number
+  _identityAvg?: number
+  _familiesCount?: number
+  _cuisinesCount?: number
+  _flagsCount?: number
+  _docs?: boolean
+  _tfHits?: number
+}
+
+/** Tiny badge pill */
+function Pill({ children }: { children: React.ReactNode }) {
+  return <Badge variant="secondary" className="text-[10px]">{children}</Badge>
+}
+
+/** Render a set of badges for a taxon row given overlay state. */
+export function badgesForTaxon(row: TaxonLike, ov: OverlayState) {
+  const out: React.ReactNode[] = []
+  if (hasOverlay(ov, 'parts'))     out.push(<Pill key="parts">{row._partsCount ?? '—'} parts</Pill>)
+  if (hasOverlay(ov, 'identity'))  out.push(<Pill key="ident">{fmt(row._identityAvg, 1)} id</Pill>)
+  if (hasOverlay(ov, 'families'))  out.push(<Pill key="fams">{row._familiesCount ?? '—'} fam</Pill>)
+  if (hasOverlay(ov, 'cuisines'))  out.push(<Pill key="cuis">{row._cuisinesCount ?? '—'} cui</Pill>)
+  if (hasOverlay(ov, 'flags'))     out.push(<Pill key="flags">{row._flagsCount ?? '—'} flags</Pill>)
+  if (hasOverlay(ov, 'docs'))      out.push(<Pill key="docs">{row._docs ? 'docs' : '—'}</Pill>)
+  if (hasOverlay(ov, 'tf'))        out.push(<Pill key="tf">{row._tfHits ?? '—'} × tf</Pill>)
+  return out.length ? <div className="flex flex-wrap gap-1">{out}</div> : null
+}
+
+/** Same badges but for ReactFlow node data payloads. */
+export function badgesForNodeData(data: any, ov: OverlayState) {
+  const row: TaxonLike = {
+    id: data?.id,
+    name: data?.name,
+    slug: data?.slug,
+    rank: data?.rank,
+    _partsCount: data?._partsCount,
+    _identityAvg: data?._identityAvg,
+    _familiesCount: data?._familiesCount,
+    _cuisinesCount: data?._cuisinesCount,
+    _flagsCount: data?._flagsCount,
+    _docs: data?._docs,
+    _tfHits: data?._tfHits,
+  }
+  return badgesForTaxon(row, ov)
+}
+
+function fmt(v: any, d = 0) {
+  return typeof v === 'number' ? v.toFixed(d) : '—'
+}
+```
+
+#### D) `apps/web/src/components/overlays/OverlayLegend.tsx`
+
+```tsx
+import React from 'react'
+import { OVERLAY_CATALOG } from '@/lib/overlays'
+
+export function OverlayLegend() {
+  return (
+    <div className="rounded border p-2 text-xs">
+      <div className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Legend</div>
+      <ul className="space-y-1">
+        {OVERLAY_CATALOG.map((m) => (
+          <li key={m.id} className="flex items-start gap-2">
+            <span className="font-medium w-24">{m.label}</span>
+            <span className="text-muted-foreground">{m.desc}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+export default OverlayLegend
+```
+
+#### E) GraphView Enhancement (Additive Change)
+
+**Patch** `apps/web/src/components/GraphView.tsx`:
+
+```diff
+@@
+-export interface GraphViewProps {
++export interface GraphViewProps {
+   nodes: Node[]
+   edges: Edge[]
+   onNodeClick?: (id: string) => void
+   /** optional layout, defaults to 'radial' */
+   layout?: 'radial' | 'tree'
++  /** optional overlay renderer for node data (chips/badges) */
++  renderNodeOverlay?: (data: any) => React.ReactNode
+ }
+@@
+-  const TaxonNode: React.FC<NodeProps> = ({ data, selected }) => {
++  const TaxonNode: React.FC<NodeProps> = ({ data, selected }) => {
+     return (
+       <div className={`rounded-lg border bg-white px-3 py-2 shadow-sm ${selected ? 'ring-2 ring-blue-300' : ''}`}>
+         <div className="flex items-center justify-between gap-3">
+           <div className="min-w-0">
+             <div className="text-sm font-medium truncate">{data?.name ?? data?.label}</div>
+             {data?.slug && <div className="text-[11px] text-zinc-500 truncate">/{data.slug}</div>}
+           </div>
+           <div className="flex items-center gap-2">
+             <RankPill rank={data?.rank} />
+             {typeof data?.childCount === 'number' && (
+               <span className="text:[10px] text-zinc-500">{data.childCount}</span>
+             )}
++            {/* optional overlay chips injected via data.__overlay */}
++            {data?.__overlay ? <div className="ml-1">{data.__overlay}</div> : null}
+           </div>
+         </div>
+       </div>
+     )
+   }
+@@
+-  const Cmp = ({ nodes, edges, onNodeClick, layout = 'radial' }: GraphViewProps) => {
++  const Cmp = ({ nodes, edges, onNodeClick, layout = 'radial', renderNodeOverlay }: GraphViewProps) => {
+@@
+-    const laidOut = useMemo(() => {
++    const laidOut = useMemo(() => {
+       if (!nodes.length) return { nodes, edges }
+       const children = edges.filter((e) => e.source === centerId).map((e) => e.target)
+       const arranged = nodes.map((n) => ({ ...n }))
+@@
+       return { nodes: arranged, edges }
+     }, [nodes, edges, centerId, layout])
+ 
++    // Attach overlay JSX to node data if a renderer is provided (no-op otherwise)
++    const withOverlay = useMemo(() => {
++      if (!renderNodeOverlay) return laidOut
++      return {
++        nodes: laidOut.nodes.map((n) => ({
++          ...n,
++          data: { ...n.data, __overlay: renderNodeOverlay((n as any).data) },
++        })),
++        edges: laidOut.edges,
++      }
++    }, [laidOut, renderNodeOverlay])
++
+     const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null)
+@@
+     return (
+       <ReactFlow
+-        nodes={laidOut.nodes}
+-        edges={laidOut.edges}
++        nodes={withOverlay.nodes}
++        edges={withOverlay.edges}
+         nodeTypes={nodeTypes}
+         defaultEdgeOptions={defaultEdgeOptions}
+         onNodeClick={(_, n) => onNodeClick?.(n.id)}
+         nodesDraggable={false}
+         panOnDrag
+         zoomOnScroll
+         fitView
+         proOptions={{ hideAttribution: true }}
+         onInit={(inst) => setRfInstance(inst)}
+       >
+```
+
+#### F) Example Integration Usage
+
+```tsx
+import OverlaysBar from '@/components/overlays/OverlaysBar'
+import { parseOverlayParam, serializeOverlayParam } from '@/lib/overlays'
+import { badgesForNodeData } from '@/components/overlays/OverlayBadges'
+import GraphView from '@/components/GraphView'
+
+// inside a page component:
+const search = Route.useSearch() as { overlay?: string }
+const router = Route.useRouter()
+const ov = parseOverlayParam(search.overlay as string | undefined)
+
+<OverlaysBar
+  value={ov}
+  onChange={(next) => router.navigate({ search: (s:any) => ({ ...s, overlay: serializeOverlayParam(next) }) })}
+/>
+
+<GraphView
+  nodes={nodes}
+  edges={edges}
+  layout="tree"
+  renderNodeOverlay={(data) => badgesForNodeData(data, ov)}
+/>
+```
+
 **Phase 7 DoD:**
-- Meta page shows build info and age warning
-- FTS debug note present on Search QA
+- [ ] Meta page shows build info and age warning
+- [ ] FTS debug note present on Search QA
+- [ ] Complete MetaPage component with BuildInfoCard, CountsCard, ArtifactAgeNotice
+- [ ] Complete SearchQAPage component with FTS5 bm25 debugging and dedup inspection
+- [ ] Time utility library with timeAgo and isOlderThan functions
+- [ ] API hooks defined for server implementation (meta.getInfo, meta.getCounts, meta.getArtifactAges, search.debug)
+
+## Accessibility & Polish
+
+### Accessibility Quick Wins
+- [ ] Tab buttons use `aria-selected` attribute
+- [ ] Table headers use `<th scope="col">` 
+- [ ] Visible focus rings on interactive elements
+- [ ] `aria-busy` on loading regions
+- [ ] Screen reader friendly error messages
+
+### Copy Button Component
+**`apps/web/src/components/ui/CopyButton.tsx`:**
+```tsx
+import { useState } from 'react'
+import { Button } from '@ui/button'
+import { Check, Copy } from 'lucide-react'
+
+export function CopyButton({ text, className }: { text: string; className?: string }) {
+  const [copied, setCopied] = useState(false)
+  
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(text)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <Button
+      size="sm"
+      variant="ghost"
+      onClick={handleCopy}
+      className={className}
+      aria-label={`Copy ${text}`}
+    >
+      {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+    </Button>
+  )
+}
+```
+
+**Mandatory Copy Button Locations:**
+- Taxon id in Taxon inspector
+- TP (taxonId/partId/composed) in TP inspector  
+- TPT id in TPT inspector
+- `identityHash` in TPT explain
+
+### Loading Policy
+**`apps/web/src/lib/queryClient.ts`:**
+```tsx
+import { QueryClient } from '@tanstack/react-query'
+
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      keepPreviousData: true,
+      refetchOnWindowFocus: false,
+    },
+  },
+})
+```
+
+### Type Consolidation
+**`apps/web/src/lib/types.ts`:**
+```tsx
+export type SearchRow = {
+  ref_type: 'taxon' | 'tp' | 'tpt'
+  ref_id: string
+  name?: string
+  slug?: string
+  family?: string
+  rank?: string
+  taxon_id?: string
+  part_id?: string
+  score?: number
+  rn?: number
+}
+```
+
+### Test Seeds
+**Canonical test IDs for development:**
+- **Taxon**: `tx:plantae:angiosperms:monocots:poales:poaceae:triticum` (wheat)
+- **TP**: `tx:plantae:angiosperms:monocots:poales:poaceae:triticum` + `part:seed`
+- **TPT**: `tpt:12345` (use actual TPT ID from your test data)
+
+### Feature Flags
+**`apps/web/src/lib/features.ts`:**
+```tsx
+export const features = {
+  meta: true,
+  searchDebug: true,
+  overlays: true,
+  compare: true,
+} as const
+```
 
 ## Open Edges (Already Decided)
 
 - **No server mutation** in this pass. Everything read-only
 - **Part selection in Taxon inspector** navigates to TP page (not an in-place builder)
 - **FS composing** stays inside `FoodStatePanel` and is informational; don't write FS URLs
+- **FS resolver edge cases**: When FS has transforms, route to Taxon/TP only; show toast "Transforms ignored for routing"
 - **Pins** for compare are **URL-only** (`compare=`). No local storage
 - **Flags/Cuisines** display only when present on the returned row; do not fetch them separately if not included
-- **Families labels**: prefer `family_meta.label`; fallback to raw id
+- **Families labels**: prefer `family_meta.label`; fallback to raw id; `browse.getFamilies` returns `{ id, label?, count }`
+- **Search dedup**: bm25 lower scores are better; dedup by `ref_id` is stable across result kinds
+
+## Review Integration Summary
+
+**Fixed Inconsistencies:**
+- ✅ **Route notation**: Standardized on `/workbench/tp/:taxonId/:partId` (TanStack maps to file route)
+- ✅ **Compare parameters**: Unified on `compare=abc,def` format (removed tpta/tptb)
+- ✅ **Family filters**: Standardized on `family=ferment,fry` (comma-separated single param)
+- ✅ **Page titles**: Unified on "Food Graph Workbench" throughout
+- ✅ **Meta freshness**: Aligned code (14d warn, 30d stale) with doc specification
+- ✅ **Search API shape**: Canonical field names (`ref_type`, `ref_id`, `entity_rank`)
+
+**Added Polish & Specifications:**
+- ✅ **Preflight checklist**: Database requirements, API contracts, error handling
+- ✅ **Keyboard shortcuts**: Complete `useGlobalHotkeys` implementation
+- ✅ **Accessibility**: ARIA attributes, focus management, screen reader support
+- ✅ **Copy buttons**: Mandatory ID copying with visual feedback
+- ✅ **Loading policy**: Centralized React Query configuration
+- ✅ **Type consolidation**: `SearchRow` union type for strict typing
+- ✅ **Test seeds**: Canonical development IDs for each entity type
+- ✅ **Feature flags**: Graceful degradation for incomplete endpoints
+
+**Ready for Implementation:**
+The plan is now complete and consistent enough for a Cursor agent to implement end-to-end without guessing. All naming conflicts resolved, API contracts defined, and edge cases documented.
+
+## Preflight Checklist (Before Implementation)
+
+**Database Requirements:**
+- [ ] SQLite version supports window functions (for `ROW_NUMBER()`)
+- [ ] SQLite version supports FTS5 bm25
+- [ ] `search_content`/`search_fts` schemas match stated fields (`ref_type`, `ref_id`, etc.)
+- [ ] `taxonomy.getTransformsFor` returns `family` and `ordering` as specified
+
+**API Contracts:**
+- [ ] Confirm canonical URL/state decisions (compare=abc,def, family=ferment,fry, cuisines=, flags=)
+- [ ] Confirm part ID prefixes in routes (`/workbench/tp/tx:…/part:…`)
+- [ ] Confirm final title string: "Food Graph Workbench"
+- [ ] Confirm meta freshness thresholds: warn=14d, stale=30d
+
+**Error Handling:**
+- [ ] Define uniform error payload: `{ code: string, message: string }` from tRPC
+- [ ] Ensure ErrorBoundary can show actionable text + Retry
 
 ## QA Checklist (Manual Smoke)
 
@@ -1258,7 +1981,7 @@ export default function App() {
     <div className="p-4">
       {/* Top status bar */}
       <div className="mb-3 flex items-center justify-between">
-        <div className="text-lg font-semibold tracking-tight">Nutrition Graph Workbench</div>
+        <div className="text-lg font-semibold tracking-tight">Food Graph Workbench</div>
         <div className="flex items-center gap-2 text-xs">
           <div className="hidden lg:flex text-xs text-muted-foreground px-2 py-1 rounded-md border bg-muted/30">
             Press <kbd className="mx-1 rounded border bg-background px-1">⌘</kbd><span>K</span> to search
@@ -1562,42 +2285,474 @@ export const Route = createFileRoute('/workbench/flags')({
 ```tsx
 import { createFileRoute } from '@tanstack/react-router'
 import React from 'react'
+import SearchQAPage from '@/components/searchqa/SearchQAPage'
 
 export const Route = createFileRoute('/workbench/search')({
-  validateSearch: (search: Record<string, unknown>) => {
-    return {
-      q: typeof search.q === 'string' ? search.q : '',
-      type: (['any','taxon','tp','tpt'] as const).includes(search.type as any) ? (search.type as any) : 'any',
-    }
-  },
-  component: SearchQA,
+  component: () => <SearchQAPage />,
 })
-
-function SearchQA() {
-  const search = Route.useSearch() as { q: string; type: 'any'|'taxon'|'tp'|'tpt' }
-  return (
-    <div className="rounded-md border p-3">
-      <div className="text-sm font-medium">Search QA</div>
-      <div className="text-xs text-muted-foreground">q=<code>{search.q || '∅'}</code> · type=<code>{search.type}</code></div>
-      <div className="mt-3 text-sm text-muted-foreground">Results/facets/score table stub (Phase 5)</div>
-    </div>
-  )
-}
 ```
 
 **`apps/web/src/routes/workbench.meta.tsx`:**
 ```tsx
 import { createFileRoute } from '@tanstack/react-router'
+import React from 'react'
+import MetaPage from '@/components/meta/MetaPage'
 
 export const Route = createFileRoute('/workbench/meta')({
-  component: () => (
-    <div className="rounded-md border p-3 text-sm">
-      <div className="font-medium">Meta</div>
-      <div className="text-xs text-muted-foreground">Build info & counts stub (Phase 7)</div>
-    </div>
-  ),
+  component: () => <MetaPage />,
 })
 ```
+
+## Phase 7: Meta & Diagnostics Components
+
+### Meta Page Components
+
+**`apps/web/src/components/meta/MetaPage.tsx`:**
+```tsx
+import { Card, CardHeader, CardTitle, CardContent } from '@ui/card'
+import { Separator } from '@ui/separator'
+import { Badge } from '@ui/badge'
+import { Skeleton } from '@ui/skeleton'
+import { trpc } from '@/lib/trpc'
+import BuildInfoCard from './parts/BuildInfoCard'
+import CountsCard from './parts/CountsCard'
+import ArtifactAgeNotice from './parts/ArtifactAgeNotice'
+
+export default function MetaPage() {
+  const info = trpc.meta?.getInfo?.useQuery?.() // optional chaining to avoid crash pre-API
+  const counts = trpc.meta?.getCounts?.useQuery?.()
+  const ages = trpc.meta?.getArtifactAges?.useQuery?.()
+
+  return (
+    <div className="p-4 space-y-3">
+      <div className="flex items-center justify-between">
+        <div className="text-lg font-semibold tracking-tight">Meta & Diagnostics</div>
+        <Badge variant="secondary" className="text-[10px] uppercase">Dev tools</Badge>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm">Build</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {info?.isLoading ? <Skeleton className="h-24" /> : <BuildInfoCard info={info?.data as any} />}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm">Counts</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {counts?.isLoading ? <Skeleton className="h-24" /> : <CountsCard counts={counts?.data as any} />}
+          </CardContent>
+        </Card>
+
+        <Card className="md:col-span-2">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm">Artifact freshness</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {ages?.isLoading ? (
+              <Skeleton className="h-24" />
+            ) : (
+              <ArtifactAgeNotice ages={(ages?.data as any) ?? []} />
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="md:col-span-2">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm">FTS diagnostics</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-sm text-muted-foreground">
+              Use <code className="px-1 rounded bg-muted/40">/workbench/search</code> for raw results, scores, and
+              de-duplication inspection.
+            </div>
+            <Separator className="my-3" />
+            <ul className="text-xs leading-6">
+              <li>• Confirms FTS index health (row counts, rebuild times)</li>
+              <li>• Surfaces bm25 scores and row-number deduplication (CTE-free)</li>
+              <li>• Shows facets computed from the final set</li>
+            </ul>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  )
+}
+```
+
+**`apps/web/src/components/meta/parts/BuildInfoCard.tsx`:**
+```tsx
+import { Badge } from '@ui/badge'
+import { Separator } from '@ui/separator'
+import { timeAgo } from '@/lib/time'
+
+type Info = {
+  build_time?: string
+  schema_version?: string | number
+  profile?: string
+  database?: string
+  git?: { commit?: string; branch?: string } | null
+}
+
+export default function BuildInfoCard({ info }: { info?: Info | null }) {
+  if (!info) return <div className="text-sm text-muted-foreground">No build info.</div>
+  const bt = info.build_time ? new Date(info.build_time) : null
+
+  return (
+    <div className="text-sm space-y-2">
+      <div className="flex flex-wrap items-center gap-2">
+        <div><span className="text-muted-foreground">Schema:</span> <strong>{String(info.schema_version ?? '—')}</strong></div>
+        <Separator orientation="vertical" className="h-4" />
+        <div><span className="text-muted-foreground">Profile:</span> <strong>{info.profile ?? 'local'}</strong></div>
+        {info.git?.branch && (
+          <>
+            <Separator orientation="vertical" className="h-4" />
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary" className="text-[10px] uppercase">{info.git.branch}</Badge>
+              <code className="text-xs">{info.git.commit?.slice(0, 8) ?? ''}</code>
+            </div>
+          </>
+        )}
+      </div>
+      <div className="text-xs text-muted-foreground">
+        {info.database ? <>DB: <code className="mr-2">{info.database}</code></> : null}
+        {bt ? <>Built {timeAgo(bt)} ({bt.toISOString()})</> : 'Build time unknown'}
+      </div>
+    </div>
+  )
+}
+```
+
+**`apps/web/src/components/meta/parts/CountsCard.tsx`:**
+```tsx
+type Counts = Record<string, number | string>
+
+export default function CountsCard({ counts }: { counts?: Counts | null }) {
+  if (!counts) return <div className="text-sm text-muted-foreground">No counts available.</div>
+  const entries = Object.entries(counts)
+
+  return (
+    <div className="grid grid-cols-2 gap-2 text-sm">
+      {entries.length === 0
+        ? <div className="text-muted-foreground">No data.</div>
+        : entries.map(([k, v]) => (
+            <div key={k} className="rounded border p-2 flex items-center justify-between">
+              <div className="text-xs text-muted-foreground">{k}</div>
+              <div className="font-medium">{String(v)}</div>
+            </div>
+          ))}
+    </div>
+  )
+}
+```
+
+**`apps/web/src/components/meta/parts/ArtifactAgeNotice.tsx`:**
+```tsx
+import { Badge } from '@ui/badge'
+import { timeAgo, isOlderThan } from '@/lib/time'
+
+type AgeRow = {
+  name: string           // e.g. 'taxa', 'tpt', 'fts_index'
+  updated_at?: string    // ISO
+  count?: number
+}
+
+const WARN_DAYS = 14
+const STALE_DAYS = 30
+
+export default function ArtifactAgeNotice({ ages }: { ages: AgeRow[] }) {
+  if (!ages || ages.length === 0) return <div className="text-sm text-muted-foreground">No artifact timings.</div>
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+      {ages.map((a) => {
+        const dt = a.updated_at ? new Date(a.updated_at) : null
+        const stale = dt ? isOlderThan(dt, STALE_DAYS) : true
+        const warn = dt ? isOlderThan(dt, WARN_DAYS) : true
+        return (
+          <div key={a.name} className={`rounded border p-2 text-sm ${stale ? 'border-red-300 bg-red-50' : warn ? 'border-amber-300 bg-amber-50' : ''}`}>
+            <div className="flex items-center justify-between">
+              <div className="font-medium">{a.name}</div>
+              {typeof a.count === 'number' && (
+                <Badge variant="secondary" className="text-[10px]">{a.count}</Badge>
+              )}
+            </div>
+            <div className="text-xs text-muted-foreground">
+              {dt ? <>Updated {timeAgo(dt)} ({dt.toISOString()})</> : 'No timestamp'}
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+```
+
+### Search QA Components
+
+**`apps/web/src/components/searchqa/SearchQAPage.tsx`:**
+```tsx
+import { useMemo, useState } from 'react'
+import { createSearchValidator, useNavigate, useSearch } from '@tanstack/react-router'
+import { z } from 'zod'
+import { trpc } from '@/lib/trpc'
+import { Card, CardHeader, CardTitle, CardContent } from '@ui/card'
+import { Input } from '@ui/input'
+import { Button } from '@ui/button'
+import { Badge } from '@ui/badge'
+import { Separator } from '@ui/separator'
+import { Skeleton } from '@ui/skeleton'
+
+const SearchSchema = z.object({
+  q: z.string().default(''),
+  type: z.enum(['any','taxon','tp','tpt']).default('any'),
+  taxonId: z.string().optional(),
+  partId: z.string().optional(),
+  family: z.string().optional(),
+  limit: z.coerce.number().min(1).max(200).default(50),
+  offset: z.coerce.number().min(0).default(0),
+})
+export type SearchQAParams = z.infer<typeof SearchSchema>
+export const searchValidator = createSearchValidator(SearchSchema)
+
+export default function SearchQAPage() {
+  const nav = useNavigate()
+  const search = useSearch({ from: '/workbench/search', strict: false, validateSearch: searchValidator })
+  const [localQ, setLocalQ] = useState(search.q ?? '')
+
+  // Prefer a dedicated debug endpoint if available; otherwise fall back to search.query
+  const dbg = (trpc.search as any)?.debug?.useQuery?.({
+    q: search.q ?? '',
+    type: search.type ?? 'any',
+    taxonId: search.taxonId || undefined,
+    partId: search.partId || undefined,
+    family: search.family || undefined,
+    limit: search.limit ?? 50,
+    offset: search.offset ?? 0,
+  }, { enabled: !!(search.q && (trpc.search as any)?.debug?.useQuery) })
+
+  const normal = trpc.search?.query?.useQuery?.({
+    q: search.q ?? '',
+    type: search.type ?? 'any',
+    taxonId: search.taxonId || undefined,
+    partId: search.partId || undefined,
+    family: search.family || undefined,
+    limit: search.limit ?? 50,
+    offset: search.offset ?? 0,
+    debug: true, // if server supports it, return scores/rowids
+  }, { enabled: !!(search.q && trpc.search?.query?.useQuery && !(trpc.search as any)?.debug?.useQuery) })
+
+  const data = dbg?.data ?? normal?.data
+  const isLoading = dbg?.isLoading ?? normal?.isLoading
+  const rows = Array.isArray(data?.rows) ? data.rows : (Array.isArray(data) ? data : [])
+
+  // Optional: group by ref_id for dedup inspection if the API didn't do it
+  const grouped = useMemo(() => {
+    const map = new Map<string, any[]>()
+    for (const r of rows) {
+      const key = String((r as any).ref_id ?? (r as any).id ?? Math.random())
+      const arr = map.get(key) ?? []
+      arr.push(r)
+      map.set(key, arr)
+    }
+    return Array.from(map.entries()).map(([key, group]) => ({
+      key,
+      best: [...group].sort((a: any, b: any) => (a.score ?? 0) - (b.score ?? 0))[0],
+      count: group.length,
+      group,
+    }))
+  }, [rows])
+
+  const setSearch = (patch: Partial<SearchQAParams>) =>
+    nav({
+      to: '/workbench/search',
+      search: (s: any) => ({ ...s, ...patch }),
+      replace: true,
+    })
+
+  return (
+    <div className="p-4 space-y-3">
+      <div className="flex items-center justify-between">
+        <div className="text-lg font-semibold tracking-tight">Search QA</div>
+        <Badge variant="secondary" className="text-[10px] uppercase">FTS5 bm25 · dedup</Badge>
+      </div>
+
+      <Card>
+        <CardContent className="pt-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <Input
+              className="w-72"
+              placeholder="query…"
+              value={localQ}
+              onChange={(e) => setLocalQ(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') setSearch({ q: localQ, offset: 0 }) }}
+            />
+            <Button size="sm" onClick={() => setSearch({ q: localQ, offset: 0 })}>Search</Button>
+
+            <Separator orientation="vertical" className="h-6" />
+
+            <select
+              className="border rounded px-2 py-1 text-sm bg-background"
+              value={search.type ?? 'any'}
+              onChange={(e) => setSearch({ type: e.target.value as any, offset: 0 })}
+            >
+              <option value="any">any</option>
+              <option value="taxon">taxon</option>
+              <option value="tp">tp</option>
+              <option value="tpt">tpt</option>
+            </select>
+
+            <Input className="h-8 w-56" placeholder="taxonId (optional)" value={search.taxonId ?? ''} onChange={(e) => setSearch({ taxonId: e.target.value || undefined, offset: 0 })} />
+            <Input className="h-8 w-48" placeholder="partId (optional)" value={search.partId ?? ''} onChange={(e) => setSearch({ partId: e.target.value || undefined, offset: 0 })} />
+            <Input className="h-8 w-40" placeholder="family (optional)" value={search.family ?? ''} onChange={(e) => setSearch({ family: e.target.value || undefined, offset: 0 })} />
+
+            <Separator orientation="vertical" className="h-6" />
+
+            <Input className="h-8 w-20" type="number" min={1} max={200} value={search.limit ?? 50} onChange={(e) => setSearch({ limit: Number(e.target.value) || 50 })} />
+            <Input className="h-8 w-20" type="number" min={0} value={search.offset ?? 0} onChange={(e) => setSearch({ offset: Math.max(0, Number(e.target.value) || 0) })} />
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm">Results</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <div className="space-y-2">
+              {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-6" />)}
+            </div>
+          ) : !rows.length ? (
+            <div className="text-sm text-muted-foreground">No results.</div>
+          ) : (
+            <>
+              <div className="text-xs text-muted-foreground mb-2">
+                {rows.length} rows (grouped {grouped.length} by <code>ref_id</code>)
+              </div>
+              <div className="overflow-auto rounded border">
+                <table className="w-full text-sm">
+                  <thead className="text-xs text-muted-foreground bg-muted/40 sticky top-0">
+                    <tr>
+                      <th className="text-left px-2 py-1">score</th>
+                      <th className="text-left px-2 py-1">kind</th>
+                      <th className="text-left px-2 py-1">ref_id</th>
+                      <th className="text-left px-2 py-1">name</th>
+                      <th className="text-left px-2 py-1">slug</th>
+                      <th className="text-left px-2 py-1">family</th>
+                      <th className="text-left px-2 py-1">rank</th>
+                      <th className="text-left px-2 py-1">taxon_id</th>
+                      <th className="text-left px-2 py-1">part_id</th>
+                      <th className="text-left px-2 py-1">rn</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.map((r: any, i: number) => (
+                      <tr key={i} className="border-t hover:bg-muted/30">
+                        <td className="px-2 py-1 text-xs">{fmt(r.score)}</td>
+                        <td className="px-2 py-1 text-xs">{r.ref_type ?? r.kind}</td>
+                        <td className="px-2 py-1 text-xs font-mono break-all">{r.ref_id ?? r.id}</td>
+                        <td className="px-2 py-1 text-xs">{r.name}</td>
+                        <td className="px-2 py-1 text-[11px] text-muted-foreground">/{r.slug ?? ''}</td>
+                        <td className="px-2 py-1 text-xs">{r.family ?? ''}</td>
+                        <td className="px-2 py-1 text-xs">{r.entity_rank ?? r.rank ?? ''}</td>
+                        <td className="px-2 py-1 text-[11px] font-mono break-all">{r.taxon_id ?? ''}</td>
+                        <td className="px-2 py-1 text-[11px] font-mono break-all">{r.part_id ?? ''}</td>
+                        <td className="px-2 py-1 text-xs">{r.rn ?? ''}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Grouped roll-up for dedup verification */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm">Dedup groups (by ref_id)</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {!grouped.length ? (
+            <div className="text-sm text-muted-foreground">Nothing to show.</div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              {grouped.map((g) => (
+                <div key={g.key} className="rounded border p-2 text-sm">
+                  <div className="flex items-center justify-between">
+                    <div className="font-medium truncate">{g.best?.name ?? '—'}</div>
+                    <div className="text-xs text-muted-foreground">{g.count} hits</div>
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    score: {fmt(g.best?.score)} · kind: {g.best?.ref_type ?? g.best?.kind ?? '—'}
+                  </div>
+                  <div className="text-[11px] font-mono break-all mt-1">{g.key}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
+function fmt(n: any) {
+  if (typeof n === 'number') return n.toFixed(3)
+  return n ?? ''
+}
+```
+
+### Utility Libraries
+
+**`apps/web/src/lib/time.ts`:**
+```ts
+export function timeAgo(d: Date) {
+  const s = Math.floor((Date.now() - d.getTime()) / 1000)
+  if (s < 60) return `${s}s ago`
+  const m = Math.floor(s / 60)
+  if (m < 60) return `${m}m ago`
+  const h = Math.floor(m / 60)
+  if (h < 24) return `${h}h ago`
+  const days = Math.floor(h / 24)
+  if (days < 30) return `${days}d ago`
+  const mo = Math.floor(days / 30)
+  if (mo < 12) return `${mo}mo ago`
+  const y = Math.floor(mo / 12)
+  return `${y}y ago`
+}
+
+export function isOlderThan(d: Date, days: number) {
+  const ms = days * 24 * 60 * 60 * 1000
+  return Date.now() - d.getTime() > ms
+}
+```
+
+## Expected API Hooks (Server to Implement)
+
+Keep the names consistent so Cursor can wire quickly:
+
+* `trpc.meta.getInfo()` → `{ build_time, schema_version, profile, database, git?: { commit, branch } }`
+* `trpc.meta.getCounts()` → `{ taxa_count, parts_count, substrates_count, tpt_count, ... }`
+* `trpc.meta.getArtifactAges()` → `Array<{ name: string, updated_at: string, count?: number }>`
+* `trpc.search.debug({ q, type, taxonId?, partId?, family?, limit, offset })`
+  returns `{ rows: Array<{ score:number, ref_type:'taxon'|'tp'|'tpt', ref_id:string, name:string, slug?:string, entity_rank?:string, family?:string, taxon_id?:string, part_id?:string, rn?:number }> }`
+
+  * If you don't want a new endpoint, make `search.query(..., debug:true)` return the same shape; the page already falls back to that.
+
+## What you'll see after adding files
+
+* Visit `/workbench/meta` → build info, counts, artifact age cards (with skeletons until API)
+* Visit `/workbench/search` → a full FTS QA console (query input + filters + raw rows table + dedup roll-up)
+
+No other pages are impacted. No breaking imports.
 
 #### H) `apps/web/src/components/layout/LeftRail.tsx` (Phase-1 Search.Suggest Wiring)
 
@@ -1836,7 +2991,7 @@ export default function LeftRail({
 
 **Notes:**
 - All API calls use `(trpc as any)` casts to avoid type-blockers during scaffold
-- URL state includes `tab`, `families` (comma-separated), `limit`, `tpta`, `tptb` for compare pins
+- URL state includes `tab`, `families` (comma-separated), `limit`, `compare` for compare pins
 - Inspector integrates `FoodStatePanel` with FS preview and paste-to-navigate functionality
 - Compare tab provides side-by-side identity step viewing with pinboard functionality
 
@@ -1845,9 +3000,9 @@ export default function LeftRail({
 - `/workbench/tp/:taxonId/:partId`:
   - **Overview**: Families facet chips (URL-backed), TPT list with paging and click-through
   - **Transforms**: Read-only explorer by family + "Resolve best TPT" (navigates)
-  - **Compare**: Pin two TPTs via query params (`tpta`, `tptb`) and see side-by-side identity steps
-  - **Inspector**: FoodState composer prefilled with `fs:/…/part:<id>` and FS paste-to-jump
-- URL state: `tab=overview|transforms|compare`, `family=fermented,fried`, `limit=50`, `tpta=`, `tptb=`
+- **Compare**: Pin two TPTs via query param (`compare=abc,def`) and see side-by-side identity steps
+- **Inspector**: FoodState composer prefilled with `fs:/…/part:<id>` and FS paste-to-jump
+- URL state: `tab=overview|transforms|compare`, `family=fermented,fried`, `limit=50`, `compare=`
 
 ## Phase 4 — TPT Page Implementation Package
 
@@ -2747,18 +3902,15 @@ function Steps({
 }
 
 export function TPCompare({
-  tpta,
-  tptb,
-  onSetA,
-  onSetB,
+  compare,
+  onSetCompare,
 }: {
-  tpta?: string
-  tptb?: string
-  onSetA: (id: string) => void
-  onSetB: (id: string) => void
+  compare?: string
+  onSetCompare: (ids: string[]) => void
 }) {
-  const aVal = useMemo(() => tpta ?? '', [tpta])
-  const bVal = useMemo(() => tptb ?? '', [tptb])
+  const [a, b] = compare ? compare.split(',') : ['', '']
+  const aVal = useMemo(() => a ?? '', [a])
+  const bVal = useMemo(() => b ?? '', [b])
 
   return (
     <div className="grid grid-cols-2 gap-3">
@@ -2829,9 +3981,8 @@ export const Route = createFileRoute('/workbench/tp/$taxonId.$partId')({
       ? (search.family as string).split(',').map((s) => s.trim()).filter(Boolean)
       : []
     const limit = Number.isFinite(Number(search.limit)) ? Math.max(10, Math.min(500, Number(search.limit))) : 50
-    const tpta = typeof search.tpta === 'string' ? (search.tpta as string) : undefined
-    const tptb = typeof search.tptb === 'string' ? (search.tptb as string) : undefined
-    return { tab, families, limit, tpta, tptb }
+    const compare = typeof search.compare === 'string' ? (search.compare as string) : undefined
+    return { tab, families, limit, compare }
   },
   component: TPPage,
 })
@@ -2854,8 +4005,7 @@ function TPPage() {
     tab: 'overview' | 'transforms' | 'compare'
     families: string[]
     limit: number
-    tpta?: string
-    tptb?: string
+    compare?: string
   }
 
   // fetch minimal node info for header / FS
@@ -2886,11 +4036,13 @@ function TPPage() {
   const openTPT = (id: string) => {
     router.navigate({ to: '/workbench/tpt/$id', params: { id } })
   }
-  const setA = (id: string) => {
-    router.navigate({ to: '/workbench/tp/$taxonId.$partId', params: { taxonId, partId }, search: (s: any) => ({ ...s, tpta: id }) })
-  }
-  const setB = (id: string) => {
-    router.navigate({ to: '/workbench/tp/$taxonId.$partId', params: { taxonId, partId }, search: (s: any) => ({ ...s, tptb: id }) })
+  const setCompare = (ids: string[]) => {
+    const compareValue = ids.filter(Boolean).join(',')
+    router.navigate({ 
+      to: '/workbench/tp/$taxonId.$partId', 
+      params: { taxonId, partId }, 
+      search: (s: any) => ({ ...s, compare: compareValue || undefined }) 
+    })
   }
 
   return (
@@ -2934,10 +4086,8 @@ function TPPage() {
 
           {search.tab === 'compare' && (
             <TPCompare
-              tpta={search.tpta}
-              tptb={search.tptb}
-              onSetA={setA}
-              onSetB={setB}
+              compare={search.compare}
+              onSetCompare={setCompare}
             />
           )}
         </div>
@@ -3531,6 +4681,6 @@ function TPTPage() {
 3. **Phase 3**: TP Overview TPT list + family filter + read-only Transforms + Compare
 4. **Phase 4**: TPT Overview + Explain + Graph + Suggestions
 5. **Phase 5**: ✅ QA browsers (Families, Cuisines, Flags, Search QA) - **COMPLETE**
-6. **Phase 6**: Wire overlays data sources
+6. **Phase 6**: ✅ Overlays & Power Tools (overlay system, badges, GraphView integration) - **COMPLETE**
 7. **Phase 7**: Meta page & build age badge in shell
 8. **Phase 8**: Polish (keyboard shortcuts, copy buttons, empty states, loading skeletons)

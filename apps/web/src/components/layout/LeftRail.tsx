@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { trpc } from '../../lib/trpc'
 import { Card, CardContent, CardHeader, CardTitle } from '@ui/card'
 import { Input } from '@ui/input'
@@ -7,7 +8,7 @@ import { Badge } from '@ui/badge'
 import { Separator } from '@ui/separator'
 import { Skeleton } from '@ui/skeleton'
 
-const RANKS = ['domain','kingdom','phylum','class','order','family','genus','species','product','form','cultivar','variety','breed'] as const
+const RANKS = ['domain', 'kingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species', 'product', 'form', 'cultivar', 'variety', 'breed'] as const
 
 export default function LeftRail({
   rankColor,
@@ -23,12 +24,13 @@ export default function LeftRail({
   /** Navigate directly to a FoodState context by setting taxon + part. */
   onPickTP: (taxonId: string, partId: string) => void
 }) {
+  const navigate = useNavigate()
   // Search + filters
   const [qInput, setQInput] = useState('')
   const [q, setQ] = useState('')
   const [rankFilter, setRankFilter] = useState<string[]>([])
-  // Combined search returns taxa + taxon_part; rankFilter applied client-side to taxa only
-  const search = trpc.search.combined.useQuery({ q, limit: 25 }, { enabled: q.length > 0 })
+  // Use new search.suggest API v2
+  const search = (trpc as any).search?.suggest?.useQuery({ q, type: 'any', limit: 20 }, { enabled: q.length > 0 })
   useEffect(() => {
     const t = setTimeout(() => setQ(qInput.trim()), 220)
     return () => clearTimeout(t)
@@ -45,21 +47,36 @@ export default function LeftRail({
   )
 
   const rawResults = (search.data as any[] | undefined) ?? []
-  // Apply rank filter to *taxon* rows only; keep taxon_part rows so foods still show up.
+  // Apply rank filter to *taxon* rows only; keep tp/tpt rows so foods still show up.
   const results = useMemo(() => {
     if (!rankFilter.length) return rawResults
     return rawResults.filter((r: any) => {
-      if (r.kind === 'taxon_part') return true
-      // taxon row: keep only if rank included
-      return rankFilter.includes(r.rank)
+      if (r.kind === 'tp' || r.kind === 'tpt') return true
+      // taxon row: keep only if rank included (using 'sub' field for rank)
+      return rankFilter.includes(r.sub)
     })
   }, [rawResults, rankFilter])
 
   const clickResult = (row: any) => {
-    const nav = row.nav
-    if (!nav) return
-    if (nav.target === 'taxon') onPick(nav.taxonId)
-    else if (nav.target === 'taxon_part') onPickTP(nav.taxonId, nav.partId)
+    if (row.kind === 'taxon') {
+      onPick(row.id)
+    } else if (row.kind === 'tp') {
+      // For TP results, we need to parse the ref_id to get taxonId and partId
+      // The ref_id format should be like "tx:plantae:poaceae:triticum:aestivum:part:seed"
+      const parts = row.id.split(':part:')
+      if (parts.length === 2) {
+        const taxonId = parts[0]
+        const partId = `part:${parts[1]}`
+        onPickTP(taxonId, partId)
+      } else {
+        console.warn('Unexpected TP ref_id format:', row.id)
+      }
+    } else if (row.kind === 'tpt') {
+      // For TPT results, we need to get the taxonId and partId from the database
+      // For now, just navigate to the TPT page directly
+      // TODO: Implement proper TP navigation for TPT results
+      console.log('TPT clicked:', row.id)
+    }
   }
 
   return (
@@ -96,8 +113,18 @@ export default function LeftRail({
         {/* Results */}
         {q ? (
           <div className="flex-1 min-h-0 overflow-auto rounded-md border">
-            <div className="bg-muted/50 border-b px-3 py-2 text-xs">
-              {search.isLoading ? 'Searching…' : `Results (${results.length})`}
+            <div className="bg-muted/50 border-b px-3 py-2 text-xs flex items-center justify-between">
+              <span>{search.isLoading ? 'Searching…' : `Results (${results.length})`}</span>
+              {q && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-6 px-2 text-xs"
+                  onClick={() => navigate({ to: '/workbench/search', search: { q } })}
+                >
+                  See all
+                </Button>
+              )}
             </div>
             {search.isLoading ? (
               <div className="p-3 space-y-2">
@@ -119,18 +146,24 @@ export default function LeftRail({
                     onClick={() => clickResult(n)}
                   >
                     <div className="min-w-0">
-                      <div className="truncate">{n.name}</div>
-                      <div className="text-xs text-muted-foreground truncate">/{n.slug}</div>
+                      <div className="truncate">{n.label}</div>
+                      <div className="text-xs text-muted-foreground truncate">
+                        {n.kind === 'taxon' ? `/${n.sub}` : n.kind === 'tp' ? `TP: ${n.id}` : `TPT: ${n.sub}`}
+                      </div>
                     </div>
-                    {n.kind === 'taxon_part' ? (
+                    {n.kind === 'tp' ? (
                       <span className="inline-flex items-center rounded border px-2 py-0.5 text-[10px] uppercase bg-amber-100 text-amber-700 border-amber-200">
                         Food
                       </span>
+                    ) : n.kind === 'tpt' ? (
+                      <span className="inline-flex items-center rounded border px-2 py-0.5 text-[10px] uppercase bg-blue-100 text-blue-700 border-blue-200">
+                        TPT
+                      </span>
                     ) : (
                       <span
-                        className={`inline-flex items-center rounded border px-2 py-0.5 text-[10px] uppercase ${rankColor[n.rank] || 'bg-zinc-100 text-zinc-700 border-zinc-200'}`}
+                        className={`inline-flex items-center rounded border px-2 py-0.5 text-[10px] uppercase ${rankColor[n.sub] || 'bg-zinc-100 text-zinc-700 border-zinc-200'}`}
                       >
-                        {n.rank}
+                        {n.sub}
                       </span>
                     )}
                   </li>

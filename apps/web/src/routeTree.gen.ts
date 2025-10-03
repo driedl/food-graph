@@ -13,8 +13,16 @@ import { Route as WorkbenchRouteImport } from './routes/workbench'
 import { Route as SplatRouteImport } from './routes/$'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WorkbenchIndexRouteImport } from './routes/workbench.index'
+import { Route as WorkbenchSearchRouteImport } from './routes/workbench.search'
+import { Route as WorkbenchMetaRouteImport } from './routes/workbench.meta'
+import { Route as WorkbenchFlagsRouteImport } from './routes/workbench.flags'
+import { Route as WorkbenchFamiliesRouteImport } from './routes/workbench.families'
+import { Route as WorkbenchCuisinesRouteImport } from './routes/workbench.cuisines'
+import { Route as WorkbenchTptIdRouteImport } from './routes/workbench.tpt.$id'
+import { Route as WorkbenchTaxonIdRouteImport } from './routes/workbench.taxon.$id'
 import { Route as WorkbenchNodeIdRouteImport } from './routes/workbench.node.$id'
 import { Route as WorkbenchFsSplatRouteImport } from './routes/workbench.fs.$'
+import { Route as WorkbenchTpTaxonIdPartIdRouteImport } from './routes/workbench.tp.$taxonId.$partId'
 
 const WorkbenchRoute = WorkbenchRouteImport.update({
   id: '/workbench',
@@ -36,6 +44,41 @@ const WorkbenchIndexRoute = WorkbenchIndexRouteImport.update({
   path: '/',
   getParentRoute: () => WorkbenchRoute,
 } as any)
+const WorkbenchSearchRoute = WorkbenchSearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => WorkbenchRoute,
+} as any)
+const WorkbenchMetaRoute = WorkbenchMetaRouteImport.update({
+  id: '/meta',
+  path: '/meta',
+  getParentRoute: () => WorkbenchRoute,
+} as any)
+const WorkbenchFlagsRoute = WorkbenchFlagsRouteImport.update({
+  id: '/flags',
+  path: '/flags',
+  getParentRoute: () => WorkbenchRoute,
+} as any)
+const WorkbenchFamiliesRoute = WorkbenchFamiliesRouteImport.update({
+  id: '/families',
+  path: '/families',
+  getParentRoute: () => WorkbenchRoute,
+} as any)
+const WorkbenchCuisinesRoute = WorkbenchCuisinesRouteImport.update({
+  id: '/cuisines',
+  path: '/cuisines',
+  getParentRoute: () => WorkbenchRoute,
+} as any)
+const WorkbenchTptIdRoute = WorkbenchTptIdRouteImport.update({
+  id: '/tpt/$id',
+  path: '/tpt/$id',
+  getParentRoute: () => WorkbenchRoute,
+} as any)
+const WorkbenchTaxonIdRoute = WorkbenchTaxonIdRouteImport.update({
+  id: '/taxon/$id',
+  path: '/taxon/$id',
+  getParentRoute: () => WorkbenchRoute,
+} as any)
 const WorkbenchNodeIdRoute = WorkbenchNodeIdRouteImport.update({
   id: '/node/$id',
   path: '/node/$id',
@@ -46,30 +89,60 @@ const WorkbenchFsSplatRoute = WorkbenchFsSplatRouteImport.update({
   path: '/fs/$',
   getParentRoute: () => WorkbenchRoute,
 } as any)
+const WorkbenchTpTaxonIdPartIdRoute =
+  WorkbenchTpTaxonIdPartIdRouteImport.update({
+    id: '/tp/$taxonId/$partId',
+    path: '/tp/$taxonId/$partId',
+    getParentRoute: () => WorkbenchRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/workbench': typeof WorkbenchRouteWithChildren
+  '/workbench/cuisines': typeof WorkbenchCuisinesRoute
+  '/workbench/families': typeof WorkbenchFamiliesRoute
+  '/workbench/flags': typeof WorkbenchFlagsRoute
+  '/workbench/meta': typeof WorkbenchMetaRoute
+  '/workbench/search': typeof WorkbenchSearchRoute
   '/workbench/': typeof WorkbenchIndexRoute
   '/workbench/fs/$': typeof WorkbenchFsSplatRoute
   '/workbench/node/$id': typeof WorkbenchNodeIdRoute
+  '/workbench/taxon/$id': typeof WorkbenchTaxonIdRoute
+  '/workbench/tpt/$id': typeof WorkbenchTptIdRoute
+  '/workbench/tp/$taxonId/$partId': typeof WorkbenchTpTaxonIdPartIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
+  '/workbench/cuisines': typeof WorkbenchCuisinesRoute
+  '/workbench/families': typeof WorkbenchFamiliesRoute
+  '/workbench/flags': typeof WorkbenchFlagsRoute
+  '/workbench/meta': typeof WorkbenchMetaRoute
+  '/workbench/search': typeof WorkbenchSearchRoute
   '/workbench': typeof WorkbenchIndexRoute
   '/workbench/fs/$': typeof WorkbenchFsSplatRoute
   '/workbench/node/$id': typeof WorkbenchNodeIdRoute
+  '/workbench/taxon/$id': typeof WorkbenchTaxonIdRoute
+  '/workbench/tpt/$id': typeof WorkbenchTptIdRoute
+  '/workbench/tp/$taxonId/$partId': typeof WorkbenchTpTaxonIdPartIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/workbench': typeof WorkbenchRouteWithChildren
+  '/workbench/cuisines': typeof WorkbenchCuisinesRoute
+  '/workbench/families': typeof WorkbenchFamiliesRoute
+  '/workbench/flags': typeof WorkbenchFlagsRoute
+  '/workbench/meta': typeof WorkbenchMetaRoute
+  '/workbench/search': typeof WorkbenchSearchRoute
   '/workbench/': typeof WorkbenchIndexRoute
   '/workbench/fs/$': typeof WorkbenchFsSplatRoute
   '/workbench/node/$id': typeof WorkbenchNodeIdRoute
+  '/workbench/taxon/$id': typeof WorkbenchTaxonIdRoute
+  '/workbench/tpt/$id': typeof WorkbenchTptIdRoute
+  '/workbench/tp/$taxonId/$partId': typeof WorkbenchTpTaxonIdPartIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -77,19 +150,48 @@ export interface FileRouteTypes {
     | '/'
     | '/$'
     | '/workbench'
+    | '/workbench/cuisines'
+    | '/workbench/families'
+    | '/workbench/flags'
+    | '/workbench/meta'
+    | '/workbench/search'
     | '/workbench/'
     | '/workbench/fs/$'
     | '/workbench/node/$id'
+    | '/workbench/taxon/$id'
+    | '/workbench/tpt/$id'
+    | '/workbench/tp/$taxonId/$partId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$' | '/workbench' | '/workbench/fs/$' | '/workbench/node/$id'
+  to:
+    | '/'
+    | '/$'
+    | '/workbench/cuisines'
+    | '/workbench/families'
+    | '/workbench/flags'
+    | '/workbench/meta'
+    | '/workbench/search'
+    | '/workbench'
+    | '/workbench/fs/$'
+    | '/workbench/node/$id'
+    | '/workbench/taxon/$id'
+    | '/workbench/tpt/$id'
+    | '/workbench/tp/$taxonId/$partId'
   id:
     | '__root__'
     | '/'
     | '/$'
     | '/workbench'
+    | '/workbench/cuisines'
+    | '/workbench/families'
+    | '/workbench/flags'
+    | '/workbench/meta'
+    | '/workbench/search'
     | '/workbench/'
     | '/workbench/fs/$'
     | '/workbench/node/$id'
+    | '/workbench/taxon/$id'
+    | '/workbench/tpt/$id'
+    | '/workbench/tp/$taxonId/$partId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -128,6 +230,55 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkbenchIndexRouteImport
       parentRoute: typeof WorkbenchRoute
     }
+    '/workbench/search': {
+      id: '/workbench/search'
+      path: '/search'
+      fullPath: '/workbench/search'
+      preLoaderRoute: typeof WorkbenchSearchRouteImport
+      parentRoute: typeof WorkbenchRoute
+    }
+    '/workbench/meta': {
+      id: '/workbench/meta'
+      path: '/meta'
+      fullPath: '/workbench/meta'
+      preLoaderRoute: typeof WorkbenchMetaRouteImport
+      parentRoute: typeof WorkbenchRoute
+    }
+    '/workbench/flags': {
+      id: '/workbench/flags'
+      path: '/flags'
+      fullPath: '/workbench/flags'
+      preLoaderRoute: typeof WorkbenchFlagsRouteImport
+      parentRoute: typeof WorkbenchRoute
+    }
+    '/workbench/families': {
+      id: '/workbench/families'
+      path: '/families'
+      fullPath: '/workbench/families'
+      preLoaderRoute: typeof WorkbenchFamiliesRouteImport
+      parentRoute: typeof WorkbenchRoute
+    }
+    '/workbench/cuisines': {
+      id: '/workbench/cuisines'
+      path: '/cuisines'
+      fullPath: '/workbench/cuisines'
+      preLoaderRoute: typeof WorkbenchCuisinesRouteImport
+      parentRoute: typeof WorkbenchRoute
+    }
+    '/workbench/tpt/$id': {
+      id: '/workbench/tpt/$id'
+      path: '/tpt/$id'
+      fullPath: '/workbench/tpt/$id'
+      preLoaderRoute: typeof WorkbenchTptIdRouteImport
+      parentRoute: typeof WorkbenchRoute
+    }
+    '/workbench/taxon/$id': {
+      id: '/workbench/taxon/$id'
+      path: '/taxon/$id'
+      fullPath: '/workbench/taxon/$id'
+      preLoaderRoute: typeof WorkbenchTaxonIdRouteImport
+      parentRoute: typeof WorkbenchRoute
+    }
     '/workbench/node/$id': {
       id: '/workbench/node/$id'
       path: '/node/$id'
@@ -142,19 +293,42 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkbenchFsSplatRouteImport
       parentRoute: typeof WorkbenchRoute
     }
+    '/workbench/tp/$taxonId/$partId': {
+      id: '/workbench/tp/$taxonId/$partId'
+      path: '/tp/$taxonId/$partId'
+      fullPath: '/workbench/tp/$taxonId/$partId'
+      preLoaderRoute: typeof WorkbenchTpTaxonIdPartIdRouteImport
+      parentRoute: typeof WorkbenchRoute
+    }
   }
 }
 
 interface WorkbenchRouteChildren {
+  WorkbenchCuisinesRoute: typeof WorkbenchCuisinesRoute
+  WorkbenchFamiliesRoute: typeof WorkbenchFamiliesRoute
+  WorkbenchFlagsRoute: typeof WorkbenchFlagsRoute
+  WorkbenchMetaRoute: typeof WorkbenchMetaRoute
+  WorkbenchSearchRoute: typeof WorkbenchSearchRoute
   WorkbenchIndexRoute: typeof WorkbenchIndexRoute
   WorkbenchFsSplatRoute: typeof WorkbenchFsSplatRoute
   WorkbenchNodeIdRoute: typeof WorkbenchNodeIdRoute
+  WorkbenchTaxonIdRoute: typeof WorkbenchTaxonIdRoute
+  WorkbenchTptIdRoute: typeof WorkbenchTptIdRoute
+  WorkbenchTpTaxonIdPartIdRoute: typeof WorkbenchTpTaxonIdPartIdRoute
 }
 
 const WorkbenchRouteChildren: WorkbenchRouteChildren = {
+  WorkbenchCuisinesRoute: WorkbenchCuisinesRoute,
+  WorkbenchFamiliesRoute: WorkbenchFamiliesRoute,
+  WorkbenchFlagsRoute: WorkbenchFlagsRoute,
+  WorkbenchMetaRoute: WorkbenchMetaRoute,
+  WorkbenchSearchRoute: WorkbenchSearchRoute,
   WorkbenchIndexRoute: WorkbenchIndexRoute,
   WorkbenchFsSplatRoute: WorkbenchFsSplatRoute,
   WorkbenchNodeIdRoute: WorkbenchNodeIdRoute,
+  WorkbenchTaxonIdRoute: WorkbenchTaxonIdRoute,
+  WorkbenchTptIdRoute: WorkbenchTptIdRoute,
+  WorkbenchTpTaxonIdPartIdRoute: WorkbenchTpTaxonIdPartIdRoute,
 }
 
 const WorkbenchRouteWithChildren = WorkbenchRoute._addFileChildren(
