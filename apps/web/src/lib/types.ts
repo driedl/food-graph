@@ -60,6 +60,18 @@ export type TPTExplain = {
     friendlyName?: string
 }
 
+export type TPTDetail = {
+    id: string
+    name?: string
+    taxonId: string
+    partId: string
+    family: string
+    identity?: Array<{ id: string; params?: Record<string, any> }>
+    path?: Array<{ id: string; params?: Record<string, any> }>
+    flags?: string[]                  // may also be exposed via separate endpoint
+    cuisines?: string[]               // same note as flags
+}
+
 export type FSParseResult = {
     taxonPath?: string[]
     partId?: string

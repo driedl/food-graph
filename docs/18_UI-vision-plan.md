@@ -173,23 +173,23 @@ type SearchRow = {
 - [x] Implement FS deep links helper
 - [x] Add shell top bar with API status and build info
 
-### Phase 2: Taxon Page
-- [ ] Implement Taxon Overview tab with docs, parts coverage, families
-- [ ] Add Lists tab
-- [ ] Wire up neighborhood queries and navigation
+### Phase 2: Taxon Page ✅ COMPLETED
+- [x] Implement Taxon Overview tab with docs, parts coverage, families
+- [x] Add Lists tab
+- [x] Wire up neighborhood queries and navigation
 
-### Phase 3: TP Page (Taxon+Part)
-- [ ] Build TP Overview with families filter and TPT list
+### Phase 3: TP Page (Taxon+Part) 🔄 PARTIALLY COMPLETED
+- [x] Build TP Overview with families filter and TPT list
 - [ ] Create Transforms tab (read-only explorer)
 - [ ] Implement Compare tab with pinboard functionality
-- [ ] Update inspector with FoodStatePanel integration
+- [x] Update inspector with FoodStatePanel integration
 
-### Phase 4: TPT Page
+### Phase 4: TPT Page ❌ NOT STARTED
 - [ ] Create TPT Overview with identity steps and related entities
 - [ ] Add Explain tab with human-friendly summaries
 - [ ] Implement Suggestions in inspector
 
-### Phase 5: QA Browsers
+### Phase 5: QA Browsers ✅ COMPLETED
 - [x] Families page with drawer and filtering
 - [x] Cuisines page with TPT results
 - [x] Flags page with safety/dietary grouping
@@ -796,25 +796,25 @@ apps/web/src/lib/
 - `/workbench/fs/...` resolves and navigates
 - Top bar shows API status; (build badge can be a placeholder)
 
-**Phase 2 DoD:**
-- Taxon Overview shows docs, children list, families chips, read-only parts coverage
-- Lists tab renders; overlay bar visible (chips toggle but may be no-op until Phase 6)
-- Lists tab paginates
+**Phase 2 DoD:** ✅ COMPLETED
+- [x] Taxon Overview shows docs, children list, families chips, read-only parts coverage
+- [x] Lists tab renders with pagination
+- [x] Neighborhood queries and navigation working
 
-**Phase 3 DoD:**
-- TP Overview lists TPTs; family filter works; paging works
-- Transforms tab shows grouped transforms (read-only)
-- Compare tab accepts two ids from query and renders side-by-side steps
-- Inspector integrates FoodStatePanel with FS preview and paste-to-navigate
+**Phase 3 DoD:** 🔄 PARTIALLY COMPLETED
+- [x] TP Overview lists TPTs; family filter works; paging works
+- [ ] Transforms tab shows grouped transforms (read-only)
+- [ ] Compare tab accepts two ids from query and renders side-by-side steps
+- [x] Inspector integrates FoodStatePanel with FS preview and paste-to-navigate
 
-**Phase 4 DoD:**
-- TPT Overview shows identity steps, flags, cuisines, related
-- Explain tab renders friendly chain + raw JSON toggle
-- Inspector suggestions list navigates
+**Phase 4 DoD:** ❌ NOT STARTED
+- [ ] TPT Overview shows identity steps, flags, cuisines, related
+- [ ] Explain tab renders friendly chain + raw JSON toggle
+- [ ] Inspector suggestions list navigates
 
-**Phase 5 DoD:**
-- Families/Cuisines/Flags pages show counts and lists; filters/paging round-trip via URL
-- Search QA shows raw scores, facets, and notes strategy
+**Phase 5 DoD:** ✅ COMPLETED
+- [x] Families/Cuisines/Flags pages show counts and lists; filters/paging round-trip via URL
+- [x] Search QA shows raw scores, facets, and notes strategy
 
 ### Phase 5 — Exact File Contents
 
@@ -4384,11 +4384,11 @@ function TPTPage() {
 
 ## Work Breakdown (For Cursor Agent)
 
-1. **Phase 0-1**: Apply the implementation package above (routes, shell, search)
-2. **Phase 2**: Apply the Taxon page implementation package above (Overview, Lists components)
-3. **Phase 3**: TP Overview TPT list + family filter + read-only Transforms + Compare
-4. **Phase 4**: TPT Overview + Explain + Suggestions
-5. **Phase 5**: ✅ QA browsers (Families, Cuisines, Flags, Search QA) - **COMPLETE**
-6. **Phase 6**: ✅ Overlays & Power Tools (overlay system, badges) - **COMPLETE**
-7. **Phase 7**: Meta page & build age badge in shell
+1. **Phase 0-1**: ✅ COMPLETE - Routes, shell, search
+2. **Phase 2**: ✅ COMPLETE - Taxon page with Overview and Lists tabs
+3. **Phase 3**: 🔄 PARTIAL - TP Overview + family filter + TPT list (missing Transforms + Compare tabs)
+4. **Phase 4**: ❌ NOT STARTED - TPT Overview + Explain + Suggestions
+5. **Phase 5**: ✅ COMPLETE - QA browsers (Families, Cuisines, Flags, Search QA)
+6. **Phase 6**: ❌ NOT APPLICABLE - ReactFlow removed, overlays not implemented
+7. **Phase 7**: ✅ COMPLETE - Meta page & build age badge in shell
 8. **Phase 8**: Polish (keyboard shortcuts, copy buttons, empty states, loading skeletons)

@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Input } from '@ui/input'
 import { TransformsPanel } from '@/components/inspector/TransformsPanel'
 import { FoodStatePanel } from '@/components/inspector/FoodStatePanel'
+import { TPCompare } from '@/components/tp/TPCompare'
 import ErrorBoundary from '@/components/ErrorBoundary'
 
 export const Route = createFileRoute('/workbench/tp/$taxonId/$partId')({
@@ -260,9 +261,10 @@ function TPPage() {
                         </TabsContent>
 
                         <TabsContent value="compare" className="flex-1 min-h-0 p-4">
-                            <div className="text-center text-muted-foreground">
-                                Compare functionality coming soon...
-                            </div>
+                            <TPCompare
+                                compare={search.compare}
+                                onSetCompare={(ids) => setSearch({ compare: ids.join(',') })}
+                            />
                         </TabsContent>
                     </Tabs>
                 </CardContent>
