@@ -10,8 +10,6 @@ def preflight(in_dir: Path, build_dir: Path) -> None:
     req = [
         build_dir / "compiled" / "taxa.jsonl",
         build_dir / "compiled" / "parts.json",
-        build_dir / "compiled" / "attributes.json",
-        build_dir / "compiled" / "transforms.json",
         build_dir / "compiled" / "docs.jsonl",
         build_dir / "graph" / "substrates.jsonl",
         build_dir / "tmp" / "tp_index.jsonl",
@@ -36,7 +34,7 @@ def run(in_dir: Path, build_dir: Path, verbose: bool = False) -> int:
         if verbose:
             console.print(f"  ✓ SQLite packed → {db_path}", style="green")
         return 0
-    except Exception as e:
+    except Exception:
         if verbose:
-            console.print(f"  ❌ Stage F failed: {e}", style="red")
+            console.print_exception()
         return 1

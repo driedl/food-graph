@@ -106,7 +106,42 @@ export function verifyGraphArtifact() {
     }
   }
 
-  // No hard schema-version enforcement for Stage-F artifacts.
+  // Check schema version for auto-copy
+  const currentSchemaVersion = tableExists('meta')
+    ? (db.prepare("SELECT val FROM meta WHERE key='schema_version'").get() as { val?: string } | undefined)?.val
+    : undefined
+
+  // Read ETL2 build version
+  let etl2SchemaVersion: string | undefined
+  try {
+    const etl2Db = new Database(env.ETL2_DB_PATH)
+    etl2Db.pragma('journal_mode = WAL')
+    const etl2Meta = etl2Db.prepare("SELECT val FROM meta WHERE key='schema_version'").get() as { val?: string } | undefined
+    etl2SchemaVersion = etl2Meta?.val
+    etl2Db.close()
+  } catch (error) {
+    console.warn(`[api] Could not read ETL2 schema version: ${error}`)
+  }
+
+  // Copy ETL2 database if it's newer or if API database doesn't exist
+  const shouldCopy = !currentSchemaVersion ||
+    (etl2SchemaVersion && parseInt(etl2SchemaVersion) > parseInt(currentSchemaVersion))
+
+  if (shouldCopy) {
+    if (env.AUTO_COPY_ETL_DB === 'true') {
+      console.log(`[api] ${!currentSchemaVersion ? 'No API database found' : `ETL2 version ${etl2SchemaVersion} > API version ${currentSchemaVersion}`}. Auto-copying from ETL2...`)
+      copyETLArtifact()
+      // Reconnect to the copied database
+      db.close()
+      db = new Database(DB_PATH)
+      db.pragma('journal_mode = WAL')
+    } else {
+      throw new Error(
+        `[api] ${!currentSchemaVersion ? 'API database missing' : `ETL2 version ${etl2SchemaVersion} > API version ${currentSchemaVersion}`}. ` +
+        `Rebuild via ETL2 and copy the artifact to ${DB_PATH}.`
+      )
+    }
+  }
 
   const builtAt = tableExists('meta')
     ? (db.prepare("SELECT val FROM meta WHERE key='build_time'").get() as { val?: string } | undefined)?.val

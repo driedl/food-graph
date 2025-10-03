@@ -77,84 +77,92 @@ export const searchRouter = t.router({
                 params.push(...input.families)
             }
 
-            // Cuisines filter (requires JOIN with tpt_cuisines)
-            let cuisineJoin = ''
+            // Cuisines/Flags filters: use EXISTS to avoid fan-out/duplication
             if (needCuisines) {
-                cuisineJoin = 'LEFT JOIN tpt_cuisines tc ON sc.ref_id = tc.tpt_id'
-                whereConditions.push(`tc.cuisine IN (${inClause(input.cuisines!.length)})`)
+                whereConditions.push(`EXISTS (
+                  SELECT 1 FROM tpt_cuisines tc
+                  WHERE tc.tpt_id = sc.ref_id
+                    AND tc.cuisine IN (${inClause(input.cuisines!.length)})
+                )`)
                 params.push(...input.cuisines!)
             }
-
-            // Flags filter (requires JOIN with tpt_flags)
-            let flagsJoin = ''
             if (needFlags) {
-                flagsJoin = 'LEFT JOIN tpt_flags tf ON sc.ref_id = tf.tpt_id'
-                whereConditions.push(`tf.flag IN (${inClause(input.flags!.length)})`)
+                whereConditions.push(`EXISTS (
+                  SELECT 1 FROM tpt_flags tf
+                  WHERE tf.tpt_id = sc.ref_id
+                    AND tf.flag IN (${inClause(input.flags!.length)})
+                )`)
                 params.push(...input.flags!)
             }
 
             const whereClause = whereConditions.join(' AND ')
 
-            const base = `
-        FROM search_fts
-        JOIN search_content sc ON sc.rowid = search_fts.rowid
-        ${cuisineJoin}
-        ${flagsJoin}
-        WHERE ${whereClause}
+            // Dedup by ref_id using ROW_NUMBER() over the scored FTS rows
+            const cte = `
+        WITH scored AS (
+          SELECT
+            sc.ref_type, sc.ref_id, sc.taxon_id, sc.part_id, sc.family,
+            sc.entity_rank, sc.name, sc.synonyms, sc.display_name, sc.slug,
+            bm25(search_fts) AS score
+          FROM search_fts
+          JOIN search_content sc ON sc.rowid = search_fts.rowid
+          WHERE ${whereClause}
+        ),
+        ranked AS (
+          SELECT *,
+                 ROW_NUMBER() OVER (
+                   PARTITION BY ref_id
+                   ORDER BY score ASC, name ASC
+                 ) AS rn
+          FROM scored
+        )
       `
 
             const data = db.prepare(`
-        SELECT sc.ref_type, sc.ref_id, sc.taxon_id, sc.part_id, sc.family,
-               sc.entity_rank, sc.name, sc.synonyms, sc.display_name, sc.slug,
-               bm25(search_fts) AS score
-        ${base}
-        ORDER BY score ASC, sc.name ASC
+        ${cte}
+        SELECT ref_type, ref_id, taxon_id, part_id, family,
+               entity_rank, name, synonyms, display_name, slug,
+               score
+        FROM ranked
+        WHERE rn = 1
+        ORDER BY score ASC, name ASC
         LIMIT ? OFFSET ?
       `).all(...params, input.limit, input.offset) as any[]
 
             // Get actual total count (not just page length)
-            const total = db.prepare(`SELECT COUNT(1) AS c ${base}`).get(...params) as { c: number }
+            const total = db.prepare(`
+        ${cte}
+        SELECT COUNT(1) AS c
+        FROM ranked
+        WHERE rn = 1
+      `).get(...params) as { c: number }
 
-            // Get facets for the same query (without LIMIT/OFFSET)
-            let facetRows: any[] = []
-            try {
-                const facetStmt = db.prepare(`
-          SELECT 
-            sc.family,
-            ${cuisineJoin ? 'tc.cuisine' : 'NULL as cuisine'},
-            ${flagsJoin ? 'tf.flag' : 'NULL as flag'},
-            COUNT(*) as count
-          ${base}
-          GROUP BY sc.family, ${cuisineJoin ? 'tc.cuisine' : 'NULL'}, ${flagsJoin ? 'tf.flag' : 'NULL'}
-        `)
-                facetRows = facetStmt.all(...params) as any[]
-            } catch (error) {
-                // If tables don't exist, just get family facets
-                try {
-                    const simpleFacetStmt = db.prepare(`
-            SELECT 
-              sc.family,
-              COUNT(*) as count
-            ${base}
-            GROUP BY sc.family
-          `)
-                    facetRows = simpleFacetStmt.all(...params) as any[]
-                } catch {
-                    // If even that fails, return empty facets
-                    facetRows = []
-                }
-            }
+            // Facets over the same de-duplicated rowset (rn = 1)
+            const familiesFacet = db.prepare(`
+        ${cte}
+        SELECT family, COUNT(*) AS count
+        FROM ranked
+        WHERE rn = 1 AND family IS NOT NULL
+        GROUP BY family
+      `).all(...params) as Array<{ family: string; count: number }>
 
-            // Process facets
-            const families = new Map<string, number>()
-            const cuisines = new Map<string, number>()
-            const flags = new Map<string, number>()
+            const cuisinesFacet = hasTable('tpt_cuisines') ? (db.prepare(`
+        ${cte}
+        SELECT tc.cuisine AS id, COUNT(*) AS count
+        FROM ranked r
+        JOIN tpt_cuisines tc ON tc.tpt_id = r.ref_id
+        WHERE r.rn = 1
+        GROUP BY tc.cuisine
+      `).all(...params) as Array<{ id: string; count: number }>) : []
 
-            facetRows.forEach(row => {
-                if (row.family) families.set(row.family, (families.get(row.family) || 0) + row.count)
-                if (row.cuisine) cuisines.set(row.cuisine, (cuisines.get(row.cuisine) || 0) + row.count)
-                if (row.flag) flags.set(row.flag, (flags.get(row.flag) || 0) + row.count)
-            })
+            const flagsFacet = hasTable('tpt_flags') ? (db.prepare(`
+        ${cte}
+        SELECT tf.flag AS id, COUNT(*) AS count
+        FROM ranked r
+        JOIN tpt_flags tf ON tf.tpt_id = r.ref_id
+        WHERE r.rn = 1
+        GROUP BY tf.flag
+      `).all(...params) as Array<{ id: string; count: number }>) : []
 
             return {
                 results: data.map(r => ({
@@ -169,9 +177,9 @@ export const searchRouter = t.router({
                     family: r.family ?? null
                 })),
                 facets: {
-                    families: Array.from(families.entries()).map(([id, count]) => ({ id, count })),
-                    cuisines: Array.from(cuisines.entries()).map(([id, count]) => ({ id, count })),
-                    flags: Array.from(flags.entries()).map(([id, count]) => ({ id, count }))
+                    families: familiesFacet.map(r => ({ id: r.family, count: r.count })),
+                    cuisines: cuisinesFacet.map(r => ({ id: r.id, count: r.count })),
+                    flags: flagsFacet.map(r => ({ id: r.id, count: r.count })),
                 },
                 total: total.c,
                 limit: input.limit,

@@ -103,17 +103,17 @@ export const tptAdvancedRouter = t.router({
         .query(({ input }) => {
             const { taxonId, partId, transforms } = input
 
-            // FIXED: Check applicability with proper status detection
+            // Check applicability with proper status detection
             const status = db.prepare(`
         SELECT
           CASE WHEN n.id IS NULL THEN 'taxon_missing'
                WHEN p.id IS NULL THEN 'part_missing'
                WHEN hp.taxon_id IS NULL THEN 'part_not_applicable'
                ELSE 'ok' END AS status
-        FROM (SELECT ? id) n
-        LEFT JOIN nodes       ON nodes.id = n.id
-        LEFT JOIN part_def p  ON p.id = ?
-        LEFT JOIN has_part hp ON hp.part_id = p.id AND hp.taxon_id = n.id
+        FROM (SELECT ? AS id) input
+        LEFT JOIN nodes n      ON n.id = input.id
+        LEFT JOIN part_def p   ON p.id = ?
+        LEFT JOIN has_part hp  ON hp.part_id = p.id AND hp.taxon_id = input.id
       `).get(taxonId, partId) as { status: string }
 
             if (status.status !== 'ok') {

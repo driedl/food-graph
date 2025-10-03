@@ -27,8 +27,10 @@ CREATE TABLE IF NOT EXISTS synonyms (
 );
 
 CREATE TABLE IF NOT EXISTS part_def (
-  id   TEXT PRIMARY KEY,
-  name TEXT NOT NULL
+  id        TEXT PRIMARY KEY,
+  name      TEXT NOT NULL,
+  kind      TEXT,                -- optional grouping (e.g., organ, product)
+  parent_id TEXT REFERENCES part_def(id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS has_part (
@@ -149,6 +151,12 @@ CREATE INDEX IF NOT EXISTS idx_steps_tf    ON tpt_identity_steps(tf_id);
 CREATE INDEX IF NOT EXISTS idx_steps_tp    ON tpt_identity_steps(taxon_id, part_id);
 CREATE INDEX IF NOT EXISTS idx_steps_taxon ON tpt_identity_steps(taxon_id);
 
+-- Additional performance indexes (created after data population)
+CREATE INDEX IF NOT EXISTS idx_sc_family ON search_content(family);
+CREATE INDEX IF NOT EXISTS idx_sc_taxon_part ON search_content(taxon_id, part_id);
+CREATE INDEX IF NOT EXISTS idx_tc ON tpt_cuisines(tpt_id, cuisine);
+CREATE INDEX IF NOT EXISTS idx_tf ON tpt_flags(tpt_id, flag);
+
 -- 3) Part synonyms for UI surfacing
 CREATE TABLE IF NOT EXISTS part_synonym (
   part_id TEXT NOT NULL REFERENCES part_def(id) ON DELETE CASCADE,
@@ -177,12 +185,11 @@ CREATE TABLE IF NOT EXISTS tp_tf_counts (
 def _last(seg: str) -> str:
     return seg.split(":")[-1].lower()
 
-def _load_rules(in_dir: Path) -> Tuple[List[Dict[str,Any]], List[Dict[str,Any]], List[Dict[str,Any]]]:
+def _load_rules(in_dir: Path) -> Tuple[List[Dict[str,Any]], List[Dict[str,Any]]]:
     rules_dir = in_dir / "rules"
-    implied = read_jsonl(rules_dir / "implied_parts.jsonl") if (rules_dir / "implied_parts.jsonl").exists() else []
     overrides = read_jsonl(rules_dir / "name_overrides.jsonl") if (rules_dir / "name_overrides.jsonl").exists() else []
     tp_syn = read_jsonl(rules_dir / "taxon_part_synonyms.jsonl") if (rules_dir / "taxon_part_synonyms.jsonl").exists() else []
-    return implied, overrides, tp_syn
+    return overrides, tp_syn
 
 def _load_part_aliases(in_dir: Path) -> Dict[str, List[str]]:
     """rules/part_aliases.jsonl → {part_id: [aliases...]}"""
@@ -225,6 +232,13 @@ def _param_get(obj: Dict[str, Any], dotted: str):
         cur = cur[seg]
     return cur
 
+def _num(x):
+    """Convert to float if possible, return None otherwise"""
+    try: 
+        return float(x)
+    except (TypeError, ValueError): 
+        return None
+
 def _build_identity_index(identity_steps: List[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
     """{ transform_id: params_dict } for quick lookup; if multiple, last one wins."""
     idx: Dict[str, Dict[str, Any]] = {}
@@ -252,12 +266,15 @@ def _eval_condition(cond: Dict[str, Any], id_idx: Dict[str, Dict[str, Any]], par
         if op == "eq":   return val == cmpv
         if op == "ne":   return val != cmpv
         try:
-            # numeric-safe compares (leave as-is if not numbers)
+            # numeric-safe compares
             if op in ("gt","gte","lt","lte"):
-                return ((val > cmpv) if op=="gt" else
-                        (val >= cmpv) if op=="gte" else
-                        (val < cmpv) if op=="lt" else
-                        (val <= cmpv))
+                av, bv = _num(val), _num(cmpv)
+                if av is None or bv is None: 
+                    return False
+                return ((av >  bv) if op=="gt"  else
+                        (av >= bv) if op=="gte" else
+                        (av <  bv) if op=="lt"  else
+                        (av <= bv))
             if op == "in":
                 arr = cmpv if isinstance(cmpv, list) else [cmpv]
                 return val in arr
@@ -286,18 +303,6 @@ def _eval_when(when: Dict[str, Any], id_idx: Dict[str, Dict[str, Any]], part_id:
 def _is_prefix(pfx: str, s: str) -> bool:
     return s.startswith(pfx)
 
-def _is_implied(taxon_id: str, part_id: str, implied_rules: List[Dict[str,Any]]) -> bool:
-    for r in implied_rules:
-        if r.get("part") != part_id: 
-            continue
-        exclude = set(r.get("exclude", []))
-        if taxon_id in exclude:
-            continue
-        for pref in r.get("applies_to", []):
-            tp = pref["taxon_prefix"] if isinstance(pref, dict) else str(pref)
-            if _is_prefix(tp.rstrip(":"), taxon_id):
-                return True
-    return False
 
 def _override_name(taxon_id: str, part_id: str, overrides: List[Dict[str,Any]]) -> Tuple[str,str] | None:
     best = None; best_len = -1
@@ -324,6 +329,13 @@ def _tp_extra_synonyms(taxon_id: str, part_id: str, tp_syn_rules: List[Dict[str,
 
 def build_sqlite(*, in_dir: Path, build_dir: Path, db_path: Path, verbose: bool = False) -> None:
     ensure_dir(db_path.parent)
+    
+    # Remove stale WAL/SHM files before building
+    for ext in ("", "-wal", "-shm"):
+        p = Path(str(db_path) + ext)
+        if p.exists():
+            p.unlink()
+    
     con = sqlite3.connect(str(db_path))
     con.executescript(DDL)
     cur = con.cursor()
@@ -344,7 +356,7 @@ def build_sqlite(*, in_dir: Path, build_dir: Path, db_path: Path, verbose: bool 
     tpt = read_jsonl(build_dir / "tmp" / "tpt_canon.jsonl")
     tp_index = read_jsonl(build_dir / "tmp" / "tp_index.jsonl")
     # Rules / UI helpers
-    implied_rules, overrides_rules, tp_syn_rules = _load_rules(in_dir)
+    overrides_rules, tp_syn_rules = _load_rules(in_dir)
     part_aliases = _load_part_aliases(in_dir)
     family_meta = _load_family_meta(in_dir)
     flag_rules = _load_flag_rules(in_dir)
@@ -355,12 +367,44 @@ def build_sqlite(*, in_dir: Path, build_dir: Path, db_path: Path, verbose: bool 
     for i, row in enumerate(taxa):
         try:
             tid = row["id"]
-            nm = row.get("display_name") or row.get("latin_name") or _last(tid)
+            nm = (row.get("display_name") or row.get("latin_name") or _last(tid)).strip()
             slug = _last(tid)
             rank = row.get("rank", "unknown")
             parent = row.get("parent")
-            cur.execute("INSERT OR REPLACE INTO nodes (id, name, slug, rank, parent_id) VALUES (?, ?, ?, ?, ?)",
-                       (tid, nm, slug, rank, parent))
+            try:
+                cur.execute("""
+                  INSERT INTO nodes (id, name, slug, rank, parent_id)
+                  VALUES (?, ?, ?, ?, ?)
+                  ON CONFLICT(id) DO UPDATE SET
+                    name=excluded.name,
+                    slug=excluded.slug,
+                    rank=excluded.rank,
+                    parent_id=excluded.parent_id
+                """, (tid, nm, row.get("slug") or slug, rank, parent))
+            except sqlite3.IntegrityError as e:
+                # Handle UNIQUE(slug,parent_id) collisions without deleting other rows
+                if "UNIQUE constraint failed: nodes.slug, nodes.parent_id" not in str(e):
+                    raise
+                base = row.get("slug") or slug
+                k = 2
+                while True:
+                    alt = f"{base}-{k}"
+                    try:
+                        cur.execute("""
+                          INSERT INTO nodes (id, name, slug, rank, parent_id)
+                          VALUES (?, ?, ?, ?, ?)
+                          ON CONFLICT(id) DO UPDATE SET
+                            name=excluded.name,
+                            slug=excluded.slug,
+                            rank=excluded.rank,
+                            parent_id=excluded.parent_id
+                        """, (tid, nm, alt, rank, parent))
+                        break
+                    except sqlite3.IntegrityError as e2:
+                        if "UNIQUE constraint failed: nodes.slug, nodes.parent_id" in str(e2):
+                            k += 1
+                            continue
+                        raise
             # synonyms
             node_syns: List[str] = []
             for syn in row.get("synonyms", []):
@@ -375,9 +419,21 @@ def build_sqlite(*, in_dir: Path, build_dir: Path, db_path: Path, verbose: bool 
             raise
 
     for pid, pdata in parts_index.items():
-        name = pdata.get("name") if isinstance(pdata, dict) else None
+        pdata = pdata or {}
+        name = pdata.get("name")
         if name:
-            cur.execute("INSERT OR REPLACE INTO part_def (id, name) VALUES (?, ?)", (pid, name))
+            name = name.strip()
+        kind = pdata.get("kind")
+        parent_id = pdata.get("parent_id")
+        if name:
+            cur.execute("""
+              INSERT INTO part_def (id, name, kind, parent_id)
+              VALUES (?, ?, ?, ?)
+              ON CONFLICT(id) DO UPDATE SET
+                name=excluded.name,
+                kind=COALESCE(excluded.kind, part_def.kind),
+                parent_id=COALESCE(excluded.parent_id, part_def.parent_id)
+            """, (pid, name, kind, parent_id))
     
     # Commit base data before inserting dependent records
     con.commit()
@@ -414,9 +470,11 @@ def build_sqlite(*, in_dir: Path, build_dir: Path, db_path: Path, verbose: bool 
             ovr = _override_name(tid, pid, overrides_rules)
             if ovr:
                 name, display_name = ovr
+                name = name.strip()
+                display_name = display_name.strip()
             else:
-                name = row.get("name", default_name)
-                display_name = row.get("display_name", name)
+                name = (row.get("name", default_name)).strip()
+                display_name = (row.get("display_name", name)).strip()
             slug = f"{_last(tid)}-{_last(pid)}"
             cur.execute("INSERT OR REPLACE INTO taxon_part_nodes (id, taxon_id, part_id, name, display_name, slug) VALUES (?, ?, ?, ?, ?, ?)",
                        (tp_id, tid, pid, name, display_name, slug))
@@ -624,6 +682,9 @@ def build_sqlite(*, in_dir: Path, build_dir: Path, db_path: Path, verbose: bool 
         )
         SELECT * FROM chain;
     """)
+    
+    # Create index on taxon_ancestors after population
+    cur.execute("CREATE INDEX IF NOT EXISTS idx_taxon_anc_desc_depth ON taxon_ancestors(descendant_id, depth)")
 
     # 5) Populate tp_tf_counts (optional pre-agg)
     cur.execute("DELETE FROM tp_tf_counts")
@@ -640,7 +701,7 @@ def build_sqlite(*, in_dir: Path, build_dir: Path, db_path: Path, verbose: bool 
     cur.execute("INSERT OR REPLACE INTO meta (key, val) VALUES (?, ?)", ("parts_count", str(len(parts_index))))
     cur.execute("INSERT OR REPLACE INTO meta (key, val) VALUES (?, ?)", ("substrates_count", str(len(substrates))))
     cur.execute("INSERT OR REPLACE INTO meta (key, val) VALUES (?, ?)", ("tpt_count", str(len(tpt))))
-    cur.execute("INSERT OR REPLACE INTO meta (key, val) VALUES (?, ?)", ("schema_version", "2"))
+    cur.execute("INSERT OR REPLACE INTO meta (key, val) VALUES (?, ?)", ("schema_version", "3"))
 
     con.commit()
     # Insert/refresh family UI metadata last (doesn't affect FTS)

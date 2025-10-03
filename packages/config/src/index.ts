@@ -7,7 +7,6 @@ const schema = z.object({
   PORT: z.coerce.number().default(3000),
   // API's own database location
   DB_PATH: z.string().default(path.join(PATHS.workspaceRoot, 'apps/api/database/graph.dev.sqlite')),
-  MIN_GRAPH_SCHEMA_VERSION: z.coerce.number().default(5),
   AUTO_COPY_ETL_DB: z.enum(['true', 'false']).default('true'),
   // ETL2 source database location (the database the API should copy from)
   ETL2_DB_PATH: z.string().default(PATHS.databaseAbsolute),

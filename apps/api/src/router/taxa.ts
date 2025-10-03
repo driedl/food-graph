@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { db } from '../db'
 import { t } from './_t'
 import { inClause } from './_util'
+import { hasTable } from './_guards'
 
 export const taxaRouter = t.router({
     // Get parts for a taxon with popularity ranking
@@ -52,6 +53,7 @@ export const taxaRouter = t.router({
             }
 
             if (input.flags && input.flags.length > 0) {
+                if (!hasTable('tpt_flags')) return []
                 where.push(`EXISTS (
           SELECT 1 FROM tpt_flags tf 
           WHERE tf.tpt_id = tpt.id AND tf.flag IN (${inClause(input.flags.length)})

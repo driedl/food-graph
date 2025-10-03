@@ -27,6 +27,7 @@
     "api:routes": "tsx scripts/print-trpc-routes.ts",
     "ag": "tsx scripts/aggregate/aggregate.ts",
     "ag:etl2": "tsx scripts/aggregate/aggregate.ts --config etl2",
+    "ag:api": "tsx scripts/aggregate/aggregate.ts --config api",
     "stop": "./scripts/stop-all.sh",
     "stop:force": "./scripts/stop-all.sh --force",
     "check": "pnpm typecheck && pnpm lint && pnpm etl:build"

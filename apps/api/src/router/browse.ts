@@ -52,16 +52,20 @@ export const browseRouter = t.router({
 
     // New: Get all families with metadata
     getFamilies: t.procedure.query(() => {
-        const stmt = db.prepare(`
-      SELECT 
-        fm.id, fm.label, fm.icon, fm.color, fm.blurb,
-        COUNT(tpt.id) as count
-      FROM family_meta fm
-      LEFT JOIN tpt_nodes tpt ON tpt.family = fm.id
-      GROUP BY fm.id, fm.label, fm.icon, fm.color, fm.blurb
-      ORDER BY count DESC, fm.label ASC
-    `)
-        return stmt.all() as any[]
+        try {
+            const stmt = db.prepare(`
+        SELECT 
+          fm.id, fm.label, fm.icon, fm.color, fm.blurb,
+          COUNT(tpt.id) as count
+        FROM family_meta fm
+        LEFT JOIN tpt_nodes tpt ON tpt.family = fm.id
+        GROUP BY fm.id, fm.label, fm.icon, fm.color, fm.blurb
+        ORDER BY count DESC, fm.label ASC
+      `)
+            return stmt.all() as any[]
+        } catch {
+            return []
+        }
     }),
 
     // New: Get all cuisines with counts

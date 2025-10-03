@@ -120,13 +120,13 @@ export const tptRouter = t.router({
         .query(({ input }) => {
             const { taxonId, partId, transforms, familyHint } = input
             const candRows = db.prepare(`
-        SELECT t.id, t.family, t.identity_hash, t.name, t.synonyms,
+        SELECT t.id, t.family, t.identity_hash, t.name, t.synonyms, t.path_json,
                GROUP_CONCAT(DISTINCT s.tf_id) AS tf_ids
         FROM tpt_nodes t
         JOIN tpt_identity_steps s ON s.tpt_id = t.id
         WHERE t.taxon_id = ? AND t.part_id = ?
           AND (? IS NULL OR t.family = ?)
-        GROUP BY t.id, t.family, t.identity_hash, t.name, t.synonyms
+        GROUP BY t.id, t.family, t.identity_hash, t.name, t.synonyms, t.path_json
       `).all(taxonId, partId, familyHint ?? null, familyHint ?? null) as any[]
             if (!candRows.length) return null
 
@@ -147,6 +147,9 @@ export const tptRouter = t.router({
 
             const scored: Scored[] = candRows.map(r => {
                 const candIds = new Set((r.tf_ids || '').split(',').filter(Boolean))
+                const candPath = safeParseJSON<Array<{ id: string; params?: Record<string, any> }>>(r.path_json, [])
+                const candParamsById = new Map(candPath.map(s => [s.id, s.params ?? {}]))
+
                 const inter = [...candIds].filter(id => inIds.has(id))
                 const missing = [...candIds].filter(id => !inIds.has(id))
                 const extra = [...inIds].filter(id => !candIds.has(id))
@@ -160,7 +163,7 @@ export const tptRouter = t.router({
                 let bonus = 0
                 for (const id of inter) {
                     const a = inParams.get(id) ?? {}
-                    const b = (path.find(s => s.id === id)?.params) ?? {}
+                    const b = candParamsById.get(id) ?? {}
                     for (const [k, av] of Object.entries(a)) {
                         if (k in b && asString(av) === asString(b[k])) bonus += 0.05
                     }

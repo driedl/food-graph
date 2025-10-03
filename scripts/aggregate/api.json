@@ -1,0 +1,77 @@
+{
+    "name": "API Analysis",
+    "description": "Complete API package for external LLM analysis",
+    "categories": {
+        "api_full": {
+            "name": "API Complete Package",
+            "description": "All API code, configs, and dependencies (no build files)",
+            "patterns": [
+                "apps/api/src/**/*.ts",
+                "apps/api/package.json",
+                "apps/api/tsconfig.json",
+                "packages/api-contract/**/*.ts",
+                "packages/api-contract/**/*.json",
+                "packages/shared/**/*.ts",
+                "packages/shared/**/*.json",
+                "packages/config/**/*.ts",
+                "packages/config/**/*.json"
+            ],
+            "ignore": [
+                "apps/api/dist/**",
+                "apps/api/node_modules/**",
+                "packages/api-contract/node_modules/**",
+                "packages/shared/node_modules/**",
+                "packages/config/node_modules/**",
+                "packages/config/dist/**"
+            ],
+            "excludeExtensions": []
+        },
+        "api_core": {
+            "name": "API Core Logic",
+            "description": "Core API implementation files only (no tests, contracts, metadata)",
+            "patterns": [
+                "apps/api/src/**/*.ts"
+            ],
+            "ignore": [
+                "apps/api/dist/**",
+                "apps/api/node_modules/**",
+                "apps/api/src/dev/**"
+            ],
+            "excludeExtensions": []
+        },
+        "api_routes": {
+            "name": "API Routes",
+            "description": "tRPC router definitions and route handlers",
+            "patterns": [
+                "apps/api/src/router/**/*.ts"
+            ],
+            "ignore": [],
+            "excludeExtensions": []
+        },
+        "api_database": {
+            "name": "API Database",
+            "description": "Database connection, verification, and management logic",
+            "patterns": [
+                "apps/api/src/db.ts",
+                "apps/api/scripts/**/*.ts"
+            ],
+            "ignore": [],
+            "excludeExtensions": []
+        }
+    },
+    "defaults": {
+        "contentLevel": "verbose",
+        "outputDestination": "file",
+        "outputFile": "generated/api-analysis.md"
+    },
+    "ui": {
+        "skipCategorySelection": false,
+        "skipVerbositySelection": false,
+        "customPrompts": {
+            "outputDestination": "Where should the API analysis be saved?"
+        }
+    },
+    "processing": {
+        "maxAggregateFileSize": 150000
+    }
+}

@@ -71,6 +71,18 @@
                 ".py",
                 ".md"
             ]
+        },
+        "stage_f": {
+            "name": "Stage F - Database Packer",
+            "description": "Stage F implementation that builds SQLite database from compiled ontology artifacts",
+            "patterns": [
+                "etl2/mise/stages/stage_f/**/*.py",
+                "etl2/mise/stages/stage_f/**/*.yml",
+                "etl2/mise/io.py",
+                "etl2/mise/config.py"
+            ],
+            "ignore": [],
+            "excludeExtensions": []
         }
     },
     "defaults": {
