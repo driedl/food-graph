@@ -46,10 +46,10 @@ function SearchQAPage() {
     const total: number = queryQ?.data?.total ?? rows.length
     const facets = queryQ?.data?.facets ?? {}
 
-    const gotoTaxon = (id: string) => router.navigate({ to: '/workbench/taxon/$id', params: { id } })
+    const gotoTaxon = (id: string) => navigate({ to: '/workbench/taxon/$id', params: { id } })
     const gotoTP = (taxonId: string, partId: string) =>
         navigate({ to: '/workbench/tp/$taxonId/$partId', params: { taxonId, partId } })
-    const gotoTPT = (id: string) => router.navigate({ to: '/workbench/tpt/$id', params: { id } })
+    const gotoTPT = (id: string) => navigate({ to: '/workbench/tpt/$id', params: { id } })
 
     const kindBadge = (k: string) => {
         const label = k === 'tp' ? 'food' : k
@@ -112,6 +112,21 @@ function SearchQAPage() {
                                 {f.id} ({f.count})
                             </Button>
                         ))}
+                    </div>
+                </div>
+            )}
+
+            {/* FTS Debug Info */}
+            {!!search.q && queryQ?.data?.debug && (
+                <div className="rounded border p-3 bg-muted/30">
+                    <div className="text-xs font-medium mb-2">FTS5 Debug Info</div>
+                    <div className="text-xs space-y-1">
+                        <div>Query: <code className="bg-muted px-1 rounded">{queryQ.data.debug.query || search.q}</code></div>
+                        <div>Total matches: {queryQ.data.debug.totalMatches || total}</div>
+                        <div>Deduplication: {queryQ.data.debug.deduped ? 'Yes' : 'No'}</div>
+                        {queryQ.data.debug.ftsVersion && (
+                            <div>FTS Version: {queryQ.data.debug.ftsVersion}</div>
+                        )}
                     </div>
                 </div>
             )}

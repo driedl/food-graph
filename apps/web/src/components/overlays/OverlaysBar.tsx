@@ -45,22 +45,32 @@ export function OverlaysBar({
                     <Input
                         placeholder="Transform ID"
                         value={value.tfId || ''}
-                        onChange={(e) => onChange(setTfId(value, e.target.value.trim() || undefined))}
-                        className="w-32 text-xs"
+                        onChange={(e) => onChange(setTfId(value, e.target.value || undefined))}
+                        className="w-32 h-6 text-xs"
                     />
-                    <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => onChange(setTfId(value, undefined))}
-                    >
-                        Clear
-                    </Button>
                 </div>
             )}
 
-            <div className="ml-auto">{rightSlot}</div>
+            {rightSlot}
         </div>
     )
 }
 
-export default OverlaysBar
+export function OverlayBadge({
+    overlay,
+    value,
+    className = ''
+}: {
+    overlay: OverlayId
+    value: string | number
+    className?: string
+}) {
+    return (
+        <Badge
+            variant="secondary"
+            className={`text-[10px] px-1 py-0 ${className}`}
+        >
+            {value}
+        </Badge>
+    )
+}

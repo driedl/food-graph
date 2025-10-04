@@ -15,16 +15,17 @@
  * Automatically detects relevant code and config files, excludes build artifacts.
  */
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, createWriteStream } from 'node:fs';
 import { dirname, resolve, join, relative, extname, basename } from 'node:path';
 import { readdirSync, statSync } from 'node:fs';
 import { glob } from 'glob';
 import inquirer from 'inquirer';
+import archiver from 'archiver';
 
 // ---- Types ----------------------------------------------------------------
 
 type ContentLevel = 'compact' | 'summary' | 'verbose';
-type OutputDestination = 'console' | 'file' | 'both';
+type OutputDestination = 'console' | 'file' | 'both' | 'zip';
 
 interface FileCategory {
   name: string;
@@ -532,6 +533,38 @@ function generateSummaryOutput(files: FileInfo[], maxLines: number = 20): string
   return output;
 }
 
+function generateZipOutput(files: FileInfo[], outputPath: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const output = createWriteStream(outputPath);
+    const archive = archiver('zip', {
+      zlib: { level: 9 } // Maximum compression
+    });
+
+    output.on('close', () => {
+      console.log(`✅ ZIP archive created: ${archive.pointer()} total bytes`);
+      resolve();
+    });
+
+    archive.on('error', (err) => {
+      reject(err);
+    });
+
+    archive.pipe(output);
+
+    // Add each file to the archive
+    files.forEach(file => {
+      archive.append(file.content, { name: file.path });
+    });
+
+    // Add a summary file
+    const summaryContent = generateCompactOutput(files);
+    archive.append(summaryContent, { name: 'SUMMARY.md' });
+
+    // Finalize the archive
+    archive.finalize();
+  });
+}
+
 // ---- Interactive CLI ------------------------------------------------------
 
 async function getInteractiveOptions(config: AggregateConfig): Promise<AggregateOptions> {
@@ -602,6 +635,7 @@ async function getInteractiveOptions(config: AggregateConfig): Promise<Aggregate
         { name: 'Console only', value: 'console' },
         { name: `File only (${config.defaults.outputFile || 'generated/code.md'})`, value: 'file' },
         { name: 'Both console and file', value: 'both' },
+        { name: 'ZIP archive (all files bundled)', value: 'zip' },
       ],
       default: config.defaults.outputDestination,
     },
@@ -610,7 +644,9 @@ async function getInteractiveOptions(config: AggregateConfig): Promise<Aggregate
   outputDestination = outputAnswer.outputDestination;
   outputFile = outputAnswer.outputDestination === 'file' || outputAnswer.outputDestination === 'both'
     ? (config.defaults.outputFile || 'generated/code.md')
-    : undefined;
+    : outputAnswer.outputDestination === 'zip'
+      ? (config.defaults.outputFile?.replace(/\.md$/, '.zip') || 'generated/code.zip')
+      : undefined;
 
   return {
     contentLevel,
@@ -657,6 +693,7 @@ Output Destinations:
   console    - Output directly to terminal
   file       - Save to configured output file
   both       - Output to both terminal and file
+  zip        - Create ZIP archive with all files bundled
 
 The script automatically detects relevant code and config files:
   ✅ TypeScript/JavaScript files (.ts, .tsx, .js, .jsx)
@@ -675,6 +712,7 @@ Examples:
   pnpm ag --summary --categories web         # Web app only (signatures)
   pnpm ag --compact --categories api         # API code summary
   pnpm ag --verbose --categories all         # Everything
+  pnpm ag --zip --categories all             # Create ZIP archive with all files
   pnpm ag --list-configs                     # Show available configs
 `);
 }
@@ -727,8 +765,9 @@ async function main() {
   // Only go non-interactive if there are actual content/category arguments
   const hasContentArgs = args.includes('--compact') || args.includes('--summary') || args.includes('--verbose');
   const hasCategoryArgs = args.includes('--categories');
+  const hasZipArg = args.includes('--zip');
 
-  if (args.includes('--interactive') || (!hasContentArgs && !hasCategoryArgs)) {
+  if (args.includes('--interactive') || (!hasContentArgs && !hasCategoryArgs && !hasZipArg)) {
     options = await getInteractiveOptions(config);
   } else {
     // Parse content level
@@ -754,11 +793,20 @@ async function main() {
       categories = Object.keys(config.categories);
     }
 
+    // Parse output destination
+    let outputDestination = config.defaults.outputDestination;
+    let outputFile = config.defaults.outputFile;
+
+    if (hasZipArg) {
+      outputDestination = 'zip';
+      outputFile = config.defaults.outputFile?.replace(/\.md$/, '.zip') || 'generated/code.zip';
+    }
+
     options = {
       contentLevel,
       categories,
-      outputDestination: config.defaults.outputDestination,
-      outputFile: config.defaults.outputFile,
+      outputDestination,
+      outputFile,
       config,
       maxAggregateFileSize: config.processing.maxAggregateFileSize
     };
@@ -821,6 +869,15 @@ async function main() {
     mkdirSync(dirname(outFile), { recursive: true });
     writeFileSync(outFile, output);
     console.log(`✅ Output written → ${outFile}`);
+  }
+
+  // Output to ZIP if specified
+  if (options.outputFile && options.outputDestination === 'zip') {
+    const outFile = resolve(options.outputFile);
+    mkdirSync(dirname(outFile), { recursive: true });
+    console.log('📦 Creating ZIP archive...');
+    await generateZipOutput(files, outFile);
+    console.log(`✅ ZIP archive created → ${outFile}`);
   }
 
   // Output to console if specified

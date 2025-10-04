@@ -5,25 +5,27 @@ import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/router-devtools'
 import { routeTree } from './routeTree.gen'
 import { trpc } from './lib/trpc'
-import { httpBatchLink } from '@trpc/client'
+import { httpBatchLink, httpLink } from '@trpc/client'
 import './index.css'
 import './styles/theme.css'
 
 const client = new QueryClient({
-  defaultOptions: { 
-    queries: { 
-      refetchOnWindowFocus: false, 
-      staleTime: 30_000 
-    } 
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      staleTime: 30_000
+    }
   }
 })
 const trpcClient = trpc.createClient({
   links: [
-    httpBatchLink({ url: '/trpc' }),
+    httpLink({
+      url: '/trpc',
+    }),
   ],
 })
 
-const router = createRouter({ 
+const router = createRouter({
   routeTree,
   defaultPreload: 'intent',
   defaultPreloadStaleTime: 0,
@@ -57,9 +59,9 @@ const App = () => {
     <>
       <RouterProvider router={router} />
       {import.meta.env.DEV && (
-        <TanStackRouterDevtools 
+        <TanStackRouterDevtools
           router={router}
-          position="bottom-right" 
+          position="bottom-right"
         />
       )}
     </>

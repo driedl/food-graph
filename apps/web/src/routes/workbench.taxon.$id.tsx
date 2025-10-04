@@ -12,12 +12,15 @@ import StructureExplorer from '@/components/StructureExplorer'
 import NodeHeader from '@/components/NodeHeader'
 import { RANK_COLOR } from '@/lib/constants'
 import ErrorBoundary from '@/components/ErrorBoundary'
+import { OverlaysBar } from '@/components/overlays/OverlaysBar'
+import { badgesForTaxon } from '@/components/overlays/OverlayBadges'
+import { parseOverlayParam, serializeOverlayParam } from '@/lib/overlays'
 
 export const Route = createFileRoute('/workbench/taxon/$id')({
     validateSearch: (s: Record<string, unknown>) => {
         const tab = typeof s.tab === 'string' && ['overview', 'lists'].includes(s.tab) ? s.tab : 'overview'
         const limit = Number.isFinite(Number(s.limit)) ? Math.max(10, Math.min(500, Number(s.limit))) : 50
-        const overlay = typeof s.overlay === 'string' ? s.overlay : ''
+        const overlay = parseOverlayParam(typeof s.overlay === 'string' ? s.overlay : undefined)
         return { tab, limit, overlay }
     },
     component: TaxonPage,
@@ -26,13 +29,17 @@ export const Route = createFileRoute('/workbench/taxon/$id')({
 function TaxonPage() {
     const { id } = Route.useParams()
     const navigate = useNavigate()
-    const search = Route.useSearch() as { tab: string; limit: number; overlay: string }
+    const search = Route.useSearch() as { tab: string; limit: number; overlay: any }
     const setSearch = (patch: Partial<typeof search>) =>
         navigate({
             to: '/workbench/taxon/$id',
             params: { id },
             search: (s: any) => ({ ...s, ...patch })
         })
+
+    const handleOverlayChange = (overlay: any) => {
+        setSearch({ overlay: serializeOverlayParam(overlay) })
+    }
 
     // Queries
     const neighborhood = trpc.taxonomy.neighborhood.useQuery(
@@ -45,6 +52,16 @@ function TaxonPage() {
     const familiesQ = trpc.facets.familiesForTaxon.useQuery(
         { taxonId: id, limit: 20 },
         { enabled: !!id }
+    )
+
+    // Overlay data query
+    const overlayDataQ = trpc.facets.overlayDataForTaxon.useQuery(
+        {
+            taxonId: id,
+            overlayTypes: search.overlay.on,
+            tfId: search.overlay.tfId
+        },
+        { enabled: !!id && search.overlay.on.length > 0 }
     )
 
     // Extract data
@@ -184,11 +201,11 @@ function TaxonPage() {
                                     )}
 
                                     {/* Parts Coverage */}
-                                    <Card>
+                                    <Card className="flex-1 min-h-0 flex flex-col">
                                         <CardHeader className="pb-2">
                                             <CardTitle className="text-sm">Parts Coverage</CardTitle>
                                         </CardHeader>
-                                        <CardContent>
+                                        <CardContent className="flex-1 min-h-0 overflow-auto">
                                             <ErrorBoundary>
                                                 <PartsPanel
                                                     parts={parts.data as any}
@@ -206,6 +223,11 @@ function TaxonPage() {
 
                         <TabsContent value="lists" className="flex-1 min-h-0 p-4">
                             <div className="space-y-4">
+                                <OverlaysBar
+                                    value={search.overlay}
+                                    onChange={handleOverlayChange}
+                                />
+
                                 <div className="flex items-center justify-between">
                                     <div className="text-sm font-medium">
                                         Children ({childCount})
@@ -229,34 +251,44 @@ function TaxonPage() {
                                                 <TableHead>Rank</TableHead>
                                                 <TableHead>Slug</TableHead>
                                                 <TableHead>ID</TableHead>
+                                                {search.overlay.on.length > 0 && <TableHead>Overlays</TableHead>}
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {childrenData.map((child) => (
-                                                <TableRow
-                                                    key={child.id}
-                                                    className="cursor-pointer hover:bg-muted/50"
-                                                    onClick={() => handleJump(child.id)}
-                                                >
-                                                    <TableCell className="font-medium">
-                                                        {child.name}
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <Badge
-                                                            variant="secondary"
-                                                            className="text-xs"
-                                                        >
-                                                            {child.rank}
-                                                        </Badge>
-                                                    </TableCell>
-                                                    <TableCell className="text-sm text-muted-foreground">
-                                                        {child.slug}
-                                                    </TableCell>
-                                                    <TableCell className="text-xs text-muted-foreground font-mono">
-                                                        {child.id}
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
+                                            {childrenData.map((child) => {
+                                                const overlayData = overlayDataQ.data?.[child.id] || {}
+                                                const childWithOverlay = { ...child, ...overlayData }
+                                                return (
+                                                    <TableRow
+                                                        key={child.id}
+                                                        className="cursor-pointer hover:bg-muted/50"
+                                                        onClick={() => handleJump(child.id)}
+                                                    >
+                                                        <TableCell className="font-medium">
+                                                            {child.name}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <Badge
+                                                                variant="secondary"
+                                                                className="text-xs"
+                                                            >
+                                                                {child.rank}
+                                                            </Badge>
+                                                        </TableCell>
+                                                        <TableCell className="text-sm text-muted-foreground">
+                                                            {child.slug}
+                                                        </TableCell>
+                                                        <TableCell className="text-xs text-muted-foreground font-mono">
+                                                            {child.id}
+                                                        </TableCell>
+                                                        {search.overlay.on.length > 0 && (
+                                                            <TableCell>
+                                                                {badgesForTaxon(childWithOverlay as any, search.overlay)}
+                                                            </TableCell>
+                                                        )}
+                                                    </TableRow>
+                                                )
+                                            })}
                                         </TableBody>
                                     </Table>
                                 </div>

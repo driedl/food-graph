@@ -3,6 +3,7 @@ import React from 'react'
 import { trpc } from '@/lib/trpc'
 import { Badge } from '@ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@ui/card'
+import { timeAgo, isOlderThan, formatBuildTime } from '@/lib/time'
 
 export const Route = createFileRoute('/workbench/meta')({
     component: MetaPage,
@@ -14,18 +15,8 @@ function MetaPage() {
     const meta = metaQ?.data
     const isLoading = metaQ?.isLoading
 
-    // Calculate age in days
-    const getAgeInDays = (buildTime?: string) => {
-        if (!buildTime) return null
-        const buildDate = new Date(buildTime)
-        const now = new Date()
-        const diffTime = Math.abs(now.getTime() - buildDate.getTime())
-        return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-    }
-
-    const ageInDays = getAgeInDays(meta?.build_time)
-    const isStale = ageInDays && ageInDays > 14
-    const isVeryStale = ageInDays && ageInDays > 30
+    const isStale = meta?.build_time ? isOlderThan(meta.build_time, 14) : false
+    const isVeryStale = meta?.build_time ? isOlderThan(meta.build_time, 30) : false
 
     return (
         <div className="p-4 space-y-4">
@@ -52,10 +43,10 @@ function MetaPage() {
                                 <div className="flex items-center justify-between">
                                     <span className="text-sm">Build Time:</span>
                                     <div className="text-right">
-                                        <div className="text-sm">{meta?.build_time ? new Date(meta.build_time).toLocaleString() : 'Unknown'}</div>
-                                        {ageInDays && (
+                                        <div className="text-sm">{meta?.build_time ? formatBuildTime(meta.build_time) : 'Unknown'}</div>
+                                        {meta?.build_time && (
                                             <div className="text-xs text-muted-foreground">
-                                                Age: {ageInDays} days
+                                                {timeAgo(meta.build_time)}
                                                 {isVeryStale && <Badge variant="destructive" className="ml-2">STALE</Badge>}
                                                 {isStale && !isVeryStale && <Badge variant="outline" className="ml-2">WARN</Badge>}
                                             </div>

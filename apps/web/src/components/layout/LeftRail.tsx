@@ -8,7 +8,7 @@ import { Badge } from '@ui/badge'
 import { Separator } from '@ui/separator'
 import { Skeleton } from '@ui/skeleton'
 
-const RANKS = ['domain', 'kingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species', 'product', 'form', 'cultivar', 'variety', 'breed'] as const
+const RANKS = ['product', 'form', 'cultivar', 'variety', 'breed'] as const
 
 export default function LeftRail({
   rankColor,
