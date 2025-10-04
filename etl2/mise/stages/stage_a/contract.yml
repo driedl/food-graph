@@ -11,6 +11,11 @@ artifacts:
         transform_file: "tmp/transforms_canon.json"
         family_file: "compiled/families.json"
         param_field: "identity_params"
+      - kind: id_format_consistency
+      - kind: required_fields_present
+        file_type: "transforms"
+      - kind: parameter_types_consistent
+      - kind: no_duplicate_definitions
   - path: tmp/flags.rules.validated.json
     type: json
     must_exist: true
@@ -21,4 +26,5 @@ artifacts:
   - path: tmp/transform_applicability.normalized.jsonl
     type: jsonl
     must_exist: true
-    validators: []
+    validators:
+      - kind: cross_references_exist

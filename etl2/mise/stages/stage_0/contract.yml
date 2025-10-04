@@ -11,6 +11,11 @@ artifacts:
       - kind: parent_exists
         id_field: "id"
         parent_field: "parent"
+      - kind: id_format_consistency
+      - kind: required_fields_present
+        file_type: "taxa"
+      - kind: hierarchy_acyclic
+      - kind: no_duplicate_definitions
   
   - path: compiled/docs.jsonl
     type: jsonl
@@ -31,15 +36,24 @@ artifacts:
       - kind: hierarchy_consistency
         parent_field: "parent_id"
         child_field: "id"
+      - kind: id_format_consistency
+      - kind: required_fields_present
+        file_type: "parts"
+      - kind: hierarchy_acyclic
+      - kind: expected_parents
+      - kind: no_duplicate_definitions
   
   - path: compiled/attributes.json
     type: json
     must_exist: true
     validators:
       - kind: array_of_objects
+      - kind: id_format_consistency
+      - kind: no_duplicate_definitions
   
   - path: compiled/nutrients.json
     type: json
     must_exist: true
     validators:
       - kind: array_of_objects
+      - kind: no_duplicate_definitions
