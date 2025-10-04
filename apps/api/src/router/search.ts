@@ -17,7 +17,8 @@ export const searchRouter = t.router({
             family: z.string().optional(),
             families: z.array(z.string()).optional(),
             cuisines: z.array(z.string()).optional(),
-            flags: z.array(z.string()).optional()
+            flags: z.array(z.string()).optional(),
+            categories: z.array(z.string()).optional()
         }))
         .query(({ input }) => {
             const qfts = makeFtsQuery(input.q)
@@ -25,12 +26,14 @@ export const searchRouter = t.router({
             // Guard optional tables before building main query
             const needCuisines = !!(input.cuisines?.length)
             const needFlags = !!(input.flags?.length)
+            const needCategories = !!(input.categories?.length)
 
             if ((needCuisines && !hasTable('tpt_cuisines')) ||
-                (needFlags && !hasTable('tpt_flags'))) {
+                (needFlags && !hasTable('tpt_flags')) ||
+                (needCategories && !hasTable('categories'))) {
                 return {
                     results: [],
-                    facets: { families: [], cuisines: [], flags: [] },
+                    facets: { families: [], cuisines: [], flags: [], categories: [] },
                     total: 0,
                     limit: input.limit,
                     offset: input.offset
@@ -77,7 +80,7 @@ export const searchRouter = t.router({
                 params.push(...input.families)
             }
 
-            // Cuisines/Flags filters: use EXISTS to avoid fan-out/duplication
+            // Cuisines/Flags/Categories filters: use EXISTS to avoid fan-out/duplication
             if (needCuisines) {
                 whereConditions.push(`EXISTS (
                   SELECT 1 FROM tpt_cuisines tc
@@ -93,6 +96,15 @@ export const searchRouter = t.router({
                     AND tf.flag IN (${inClause(input.flags!.length)})
                 )`)
                 params.push(...input.flags!)
+            }
+            if (needCategories) {
+                whereConditions.push(`EXISTS (
+                  SELECT 1 FROM part_def p
+                  JOIN categories c ON p.category = c.id
+                  WHERE p.id = sc.part_id
+                    AND c.id IN (${inClause(input.categories!.length)})
+                )`)
+                params.push(...input.categories!)
             }
 
             const whereClause = whereConditions.join(' AND ')
@@ -164,6 +176,16 @@ export const searchRouter = t.router({
         GROUP BY tf.flag
       `).all(...params) as Array<{ id: string; count: number }>) : []
 
+            const categoriesFacet = hasTable('categories') ? (db.prepare(`
+        ${cte}
+        SELECT c.id, c.name, COUNT(*) AS count
+        FROM ranked r
+        JOIN part_def p ON p.id = r.part_id
+        JOIN categories c ON c.id = p.category
+        WHERE r.rn = 1 AND r.part_id IS NOT NULL
+        GROUP BY c.id, c.name
+      `).all(...params) as Array<{ id: string; name: string; count: number }>) : []
+
             return {
                 results: data.map(r => ({
                     kind: r.ref_type as 'taxon' | 'tp' | 'tpt',
@@ -180,6 +202,7 @@ export const searchRouter = t.router({
                     families: familiesFacet.map(r => ({ id: r.family, count: r.count })),
                     cuisines: cuisinesFacet.map(r => ({ id: r.id, count: r.count })),
                     flags: flagsFacet.map(r => ({ id: r.id, count: r.count })),
+                    categories: categoriesFacet.map(r => ({ id: r.id, name: r.name, count: r.count })),
                 },
                 total: total.c,
                 limit: input.limit,
@@ -192,27 +215,47 @@ export const searchRouter = t.router({
             q: z.string().min(1),
             type: z.enum(['any', 'taxon', 'tp', 'tpt']).default('any'),
             limit: z.number().min(1).max(20).default(8),
-            taxonPrefix: z.string().optional()
+            taxonPrefix: z.string().optional(),
+            categories: z.array(z.string()).optional()
         }))
         .query(({ input }) => {
             const qfts = makeFtsQuery(input.q)
+
+            // Build WHERE conditions
+            const whereConditions = ['search_fts MATCH ?']
+            const params: any[] = [qfts]
+
+            // Type filter
+            whereConditions.push('(? = \'any\' OR sc.ref_type = ?)')
+            params.push(input.type, input.type)
+
+            // Taxon prefix filter
+            whereConditions.push('(? IS NULL OR sc.taxon_id LIKE (? || \'%\'))')
+            params.push(input.taxonPrefix ?? null, input.taxonPrefix ?? null)
+
+            // Category filter
+            if (input.categories && input.categories.length > 0) {
+                whereConditions.push(`EXISTS (
+                  SELECT 1 FROM part_def p
+                  JOIN categories c ON p.category = c.id
+                  WHERE p.id = sc.part_id
+                    AND c.id IN (${input.categories.map(() => '?').join(',')})
+                )`)
+                params.push(...input.categories)
+            }
+
+            const whereClause = whereConditions.join(' AND ')
+
             const stmt = db.prepare(`
         SELECT sc.ref_type, sc.ref_id, sc.name, sc.display_name, sc.entity_rank, sc.family,
                bm25(search_fts) AS score
         FROM search_fts
         JOIN search_content sc ON sc.rowid = search_fts.rowid
-        WHERE search_fts MATCH ?
-          AND (? = 'any' OR sc.ref_type = ?)
-          AND (? IS NULL OR sc.taxon_id LIKE (? || '%'))
+        WHERE ${whereClause}
         ORDER BY score ASC, sc.name ASC
-          LIMIT ?
+        LIMIT ?
       `)
-            const rows = stmt.all(
-                qfts,
-                input.type, input.type,
-                input.taxonPrefix ?? null, input.taxonPrefix ?? null,
-                input.limit
-            ) as any[]
+            const rows = stmt.all(...params, input.limit) as any[]
             return rows.map(r => ({
                 kind: r.ref_type as 'taxon' | 'tp' | 'tpt',
                 id: r.ref_id as string,

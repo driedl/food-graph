@@ -17,6 +17,7 @@ import StructureExplorer from '../StructureExplorer'
 import { fsToPath, pathToFs, pathToNodeId } from '../../lib/fs-url'
 import { RANK_COLOR } from '../../lib/constants'
 import { useGlobalHotkeys } from '../../hooks/useGlobalHotkeys'
+import { useNavigationHelpers } from '../../lib/nav'
 
 /** Shared types matching API rows */
 interface TaxonNode {
@@ -32,6 +33,7 @@ const rankColor = RANK_COLOR
 export default function AppShell() {
     const router = useRouter()
     const lastFsRef = useRef<string>('') // idempotence for FS derivation
+    const nav = useNavigationHelpers()
 
     // Global hotkeys
     useGlobalHotkeys()
@@ -283,6 +285,25 @@ export default function AppShell() {
                         <Badge className="border-red-600">API: down</Badge>
                     )}
                 </div>
+            </div>
+
+            {/* Navigation bar */}
+            <div className="mb-3 flex items-center gap-1 text-sm">
+                <Button variant="ghost" size="sm" onClick={nav.gotoFamilies}>
+                    Families
+                </Button>
+                <Button variant="ghost" size="sm" onClick={nav.gotoCuisines}>
+                    Cuisines
+                </Button>
+                <Button variant="ghost" size="sm" onClick={nav.gotoFlags}>
+                    Flags
+                </Button>
+                <Button variant="ghost" size="sm" onClick={nav.gotoSearch}>
+                    Search
+                </Button>
+                <Button variant="ghost" size="sm" onClick={nav.gotoMeta}>
+                    Meta
+                </Button>
             </div>
 
             {/* Desktop layout: Left rail / Center canvas / Right rail */}

@@ -3,7 +3,7 @@
 # scripts/stop-all.sh
 # 
 # Stops all processes spawned by the food-graph monorepo
-# Usage: ./scripts/stop-all.sh [--force]
+# Usage: ./scripts/stop-all.sh [--force] [--all-ports]
 
 set -e
 
@@ -15,10 +15,27 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Default to graceful kill, use --force for SIGKILL
+# Use --all-ports to check all port ranges instead of smart defaults
 FORCE=false
-if [[ "$1" == "--force" ]]; then
-    FORCE=true
-fi
+ALL_PORTS=false
+
+for arg in "$@"; do
+    case $arg in
+        --force)
+            FORCE=true
+            ;;
+        --all-ports)
+            ALL_PORTS=true
+            ;;
+        *)
+            echo "Unknown option: $arg"
+            echo "Usage: $0 [--force] [--all-ports]"
+            echo "  --force: Use SIGKILL instead of SIGTERM"
+            echo "  --all-ports: Check all port ranges instead of smart defaults"
+            exit 1
+            ;;
+    esac
+done
 
 echo -e "${BLUE}🛑 Stopping all food-graph monorepo processes...${NC}"
 
@@ -137,17 +154,90 @@ kill_processes "tsc.*watch" "TypeScript watch processes"
 kill_processes "tsc.*apps" "TypeScript compiler processes"
 
 # 6. Free up common ports used by the monorepo
-# API server ports (3000-3005)
-for port in {3000..3005}; do
-    free_port "$port" "API server port $port"
-done
+# Smart port checking: check defaults first, then expand if needed
+check_ports_smart() {
+    local api_default=3000
+    local vite_default=5173
+    local api_plus_one=3001
+    local vite_plus_one=5174
+    
+    echo -e "${YELLOW}🔍 Smart port checking (checking defaults first)...${NC}"
+    
+    # Check if default ports are in use
+    local api_default_in_use=false
+    local vite_default_in_use=false
+    
+    if lsof -ti:$api_default >/dev/null 2>&1; then
+        api_default_in_use=true
+    fi
+    
+    if lsof -ti:$vite_default >/dev/null 2>&1; then
+        vite_default_in_use=true
+    fi
+    
+    # If defaults are free, we're done
+    if [[ "$api_default_in_use" == "false" && "$vite_default_in_use" == "false" ]]; then
+        echo -e "  ${GREEN}✓ Default ports (3000, 5173) are free - no need to check additional ports${NC}"
+        return
+    fi
+    
+    # Check default ports
+    if [[ "$api_default_in_use" == "true" ]]; then
+        free_port "$api_default" "API server port $api_default (default)"
+    fi
+    
+    if [[ "$vite_default_in_use" == "true" ]]; then
+        free_port "$vite_default" "Vite dev server port $vite_default (default)"
+    fi
+    
+    # Check if default+1 ports are in use
+    local api_plus_one_in_use=false
+    local vite_plus_one_in_use=false
+    
+    if lsof -ti:$api_plus_one >/dev/null 2>&1; then
+        api_plus_one_in_use=true
+    fi
+    
+    if lsof -ti:$vite_plus_one >/dev/null 2>&1; then
+        vite_plus_one_in_use=true
+    fi
+    
+    # If default+1 is also in use, check all ports
+    if [[ "$api_plus_one_in_use" == "true" || "$vite_plus_one_in_use" == "true" ]]; then
+        echo -e "  ${YELLOW}⚠️  Default+1 ports are also in use - checking all port ranges${NC}"
+        check_all_ports
+    else
+        # Just check default+1 ports
+        if [[ "$api_plus_one_in_use" == "true" ]]; then
+            free_port "$api_plus_one" "API server port $api_plus_one (default+1)"
+        fi
+        
+        if [[ "$vite_plus_one_in_use" == "true" ]]; then
+            free_port "$vite_plus_one" "Vite dev server port $vite_plus_one (default+1)"
+        fi
+    fi
+}
 
-# Vite dev server ports (5173-5178)
-for port in {5173..5178}; do
-    free_port "$port" "Vite dev server port $port"
-done
+check_all_ports() {
+    echo -e "${YELLOW}🔍 Checking all port ranges...${NC}"
+    
+    # API server ports (3000-3005)
+    for port in {3000..3005}; do
+        free_port "$port" "API server port $port"
+    done
 
-# Note: Only checking API (3000-3005) and Vite (5173-5178) port ranges
+    # Vite dev server ports (5173-5178)
+    for port in {5173..5178}; do
+        free_port "$port" "Vite dev server port $port"
+    done
+}
+
+# Use smart port checking unless --all-ports is specified
+if [[ "$ALL_PORTS" == "true" ]]; then
+    check_all_ports
+else
+    check_ports_smart
+fi
 
 # 7. Kill any remaining processes that might be related to our workspace
 echo -e "${YELLOW}Checking for any remaining workspace-related processes...${NC}"
@@ -200,29 +290,49 @@ echo -e "  • TypeScript compiler processes"
 echo -e "  • Workspace-related processes"
 
 echo -e "\n${YELLOW}Ports checked and freed:${NC}"
-echo -e "  • API ports: 3000-3005"
-echo -e "  • Vite ports: 5173-5178"
+if [[ "$ALL_PORTS" == "true" ]]; then
+    echo -e "  • API ports: 3000-3005 (all ports checked)"
+    echo -e "  • Vite ports: 5173-5178 (all ports checked)"
+else
+    echo -e "  • API ports: 3000-3001 (smart checking - defaults first)"
+    echo -e "  • Vite ports: 5173-5174 (smart checking - defaults first)"
+    echo -e "  • Additional ports checked only if defaults+1 were in use"
+fi
 
 echo -e "\n${BLUE}📊 Port status:${NC}"
-echo -e "${YELLOW}API ports (3000-3005):${NC}"
-for port in {3000..3005}; do
-    if lsof -ti:$port >/dev/null 2>&1; then
-        echo -e "  Port $port: ${RED}IN USE${NC}"
-    else
-        echo -e "  Port $port: ${GREEN}FREE${NC}"
-    fi
-done
+echo -e "${YELLOW}Default API port (3000):${NC}"
+if lsof -ti:3000 >/dev/null 2>&1; then
+    echo -e "  Port 3000: ${RED}IN USE${NC}"
+else
+    echo -e "  Port 3000: ${GREEN}FREE${NC}"
+fi
 
-echo -e "\n${YELLOW}Vite ports (5173-5178):${NC}"
-for port in {5173..5178}; do
-    if lsof -ti:$port >/dev/null 2>&1; then
-        echo -e "  Port $port: ${RED}IN USE${NC}"
-    else
-        echo -e "  Port $port: ${GREEN}FREE${NC}"
-    fi
-done
+echo -e "\n${YELLOW}Default Vite port (5173):${NC}"
+if lsof -ti:5173 >/dev/null 2>&1; then
+    echo -e "  Port 5173: ${RED}IN USE${NC}"
+else
+    echo -e "  Port 5173: ${GREEN}FREE${NC}"
+fi
 
-# Note: Only monitoring API and Vite port ranges
+if [[ "$ALL_PORTS" == "true" ]]; then
+    echo -e "\n${YELLOW}All API ports (3000-3005):${NC}"
+    for port in {3000..3005}; do
+        if lsof -ti:$port >/dev/null 2>&1; then
+            echo -e "  Port $port: ${RED}IN USE${NC}"
+        else
+            echo -e "  Port $port: ${GREEN}FREE${NC}"
+        fi
+    done
+
+    echo -e "\n${YELLOW}All Vite ports (5173-5178):${NC}"
+    for port in {5173..5178}; do
+        if lsof -ti:$port >/dev/null 2>&1; then
+            echo -e "  Port $port: ${RED}IN USE${NC}"
+        else
+            echo -e "  Port $port: ${GREEN}FREE${NC}"
+        fi
+    done
+fi
 
 # Count total processes stopped
 TOTAL_STOPPED=0

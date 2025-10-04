@@ -108,4 +108,38 @@ export const browseRouter = t.router({
       `)
             return stmt.all(input.familyId, input.limit, input.offset) as any[]
         }),
+
+    // New: Get all categories with metadata
+    getCategories: t.procedure.query(() => {
+        try {
+            const stmt = db.prepare(`
+        SELECT id, name, description, kind
+        FROM categories
+        ORDER BY name ASC
+      `)
+            return stmt.all() as any[]
+        } catch {
+            return []
+        }
+    }),
+
+    // New: Get parts filtered by category
+    getPartsByCategory: t.procedure
+        .input(z.object({
+            categoryId: z.string(),
+            limit: z.number().min(1).max(200).default(50),
+            offset: z.number().min(0).default(0)
+        }))
+        .query(({ input }) => {
+            const stmt = db.prepare(`
+        SELECT p.id, p.name, p.kind, p.parent_id as parentId,
+               c.name as category_name, c.description as category_description, c.kind as category_kind
+        FROM part_def p
+        JOIN categories c ON p.category = c.id
+        WHERE c.id = ?
+        ORDER BY p.name ASC
+        LIMIT ? OFFSET ?
+      `)
+            return stmt.all(input.categoryId, input.limit, input.offset) as any[]
+        }),
 })

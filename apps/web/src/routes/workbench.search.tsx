@@ -15,9 +15,12 @@ export const Route = createFileRoute('/workbench/search')({
         const taxonId = typeof s.taxonId === 'string' ? s.taxonId : ''
         const partId = typeof s.partId === 'string' ? s.partId : ''
         const family = typeof s.family === 'string' ? s.family : ''
+        const categories = Array.isArray(s.categories) ? s.categories : []
+        const cuisines = Array.isArray(s.cuisines) ? s.cuisines : []
+        const flags = Array.isArray(s.flags) ? s.flags : []
         const limit = Number.isFinite(Number(s.limit)) ? Math.max(1, Math.min(20, Number(s.limit))) : 20
         const offset = Number.isFinite(Number(s.offset)) ? Math.max(0, Number(s.offset)) : 0
-        return { q, type, taxonId, partId, family, limit, offset }
+        return { q, type, taxonId, partId, family, categories, cuisines, flags, limit, offset }
     },
     component: SearchQAPage,
 })
@@ -25,7 +28,9 @@ export const Route = createFileRoute('/workbench/search')({
 function SearchQAPage() {
     const navigate = useNavigate()
     const search = Route.useSearch() as {
-        q: string; type: ResultKind; taxonId: string; partId: string; family: string; limit: number; offset: number
+        q: string; type: ResultKind; taxonId: string; partId: string; family: string;
+        categories: string[]; cuisines: string[]; flags: string[];
+        limit: number; offset: number
     }
     const setSearch = (patch: Partial<typeof search>) =>
         navigate({ to: '/workbench/search', search: (s: any) => ({ ...s, ...patch }) })
@@ -36,6 +41,9 @@ function SearchQAPage() {
         taxonId: search.taxonId || undefined,
         partId: search.partId || undefined,
         family: search.family || undefined,
+        categories: search.categories || undefined,
+        cuisines: search.cuisines || undefined,
+        flags: search.flags || undefined,
         limit: search.limit,
         offset: search.offset,
         withScores: true,
@@ -90,7 +98,7 @@ function SearchQAPage() {
                 <div className="rounded border p-2">
                     <div className="text-xs font-medium mb-2">Facets</div>
                     <div className="flex flex-wrap gap-2">
-                        {facets.family?.map((f: any) => (
+                        {facets.families?.map((f: any) => (
                             <Button
                                 key={f.id}
                                 size="sm"
@@ -101,13 +109,35 @@ function SearchQAPage() {
                                 {f.id} ({f.count})
                             </Button>
                         ))}
-                        {facets.rank?.map((f: any) => (
+                        {facets.categories?.map((f: any) => (
                             <Button
                                 key={f.id}
                                 size="sm"
                                 variant="outline"
                                 className="text-xs"
-                                onClick={() => setSearch({ taxonId: f.id, offset: 0 })}
+                                onClick={() => setSearch({ categories: [f.id], offset: 0 })}
+                            >
+                                {f.name} ({f.count})
+                            </Button>
+                        ))}
+                        {facets.cuisines?.map((f: any) => (
+                            <Button
+                                key={f.id}
+                                size="sm"
+                                variant="outline"
+                                className="text-xs"
+                                onClick={() => setSearch({ cuisines: [f.id], offset: 0 })}
+                            >
+                                {f.id} ({f.count})
+                            </Button>
+                        ))}
+                        {facets.flags?.map((f: any) => (
+                            <Button
+                                key={f.id}
+                                size="sm"
+                                variant="outline"
+                                className="text-xs"
+                                onClick={() => setSearch({ flags: [f.id], offset: 0 })}
                             >
                                 {f.id} ({f.count})
                             </Button>

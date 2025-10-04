@@ -141,9 +141,11 @@ export const taxonomyRouter = t.router({
           SELECT n.parent_id FROM nodes n JOIN lineage l ON n.id = l.id
           WHERE n.parent_id IS NOT NULL
         )
-        SELECT DISTINCT p.id, p.name, p.kind, p.parent_id AS parentId
+        SELECT DISTINCT p.id, p.name, p.kind, p.parent_id AS parentId, p.category,
+               c.name as category_name, c.description as category_description, c.kind as category_kind
         FROM has_part hp
         JOIN part_def p ON p.id = hp.part_id
+        LEFT JOIN categories c ON p.category = c.id
         WHERE hp.taxon_id IN (SELECT id FROM lineage)
         ORDER BY COALESCE(p.kind,''), p.name
       `).all(input.id)
@@ -189,7 +191,13 @@ export const taxonomyRouter = t.router({
                 applicable: true, // All returned parts are applicable by definition
                 identityCount: countsMap.get(p.id)?.identityCount ?? 0,
                 nonIdentityCount: countsMap.get(p.id)?.nonIdentityCount ?? 0,
-                synonyms: synMap.get(p.id) ?? []
+                synonyms: synMap.get(p.id) ?? [],
+                category: p.category ? {
+                    id: p.category,
+                    name: p.category_name,
+                    description: p.category_description,
+                    kind: p.category_kind
+                } : null
             }))
         }),
 

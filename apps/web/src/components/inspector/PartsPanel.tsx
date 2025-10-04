@@ -1,4 +1,5 @@
 import { memo } from 'react'
+import { Badge } from '@ui/badge'
 
 export const PartsPanel = memo(function PartsPanel({
   parts,
@@ -15,6 +16,12 @@ export const PartsPanel = memo(function PartsPanel({
     identityCount: number;
     nonIdentityCount: number;
     synonyms: string[];
+    category?: {
+      id: string;
+      name: string;
+      description: string;
+      kind: string;
+    } | null;
   }>
   selectedPartId: string
   onSelect: (id: string) => void
@@ -50,14 +57,19 @@ export const PartsPanel = memo(function PartsPanel({
                   {p.applicable && (
                     <div className="flex items-center gap-1">
                       {p.identityCount > 0 && (
-                        <span className="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded">
+                        <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">
                           {p.identityCount}I
-                        </span>
+                        </Badge>
                       )}
                       {p.nonIdentityCount > 0 && (
-                        <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">
+                        <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-700">
                           {p.nonIdentityCount}T
-                        </span>
+                        </Badge>
+                      )}
+                      {p.category && (
+                        <Badge variant="outline" className="text-xs">
+                          {p.category.name}
+                        </Badge>
                       )}
                     </div>
                   )}

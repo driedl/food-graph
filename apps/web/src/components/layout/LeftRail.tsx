@@ -7,8 +7,9 @@ import { Button } from '@ui/button'
 import { Badge } from '@ui/badge'
 import { Separator } from '@ui/separator'
 import { Skeleton } from '@ui/skeleton'
-
-const RANKS = ['product', 'form', 'cultivar', 'variety', 'breed'] as const
+import { Checkbox } from '@/components/ui/checkbox'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useCategories } from '../../hooks/useOntology'
 
 export default function LeftRail({
   rankColor,
@@ -28,17 +29,23 @@ export default function LeftRail({
   // Search + filters
   const [qInput, setQInput] = useState('')
   const [q, setQ] = useState('')
-  const [rankFilter, setRankFilter] = useState<string[]>([])
-  // Use new search.suggest API v2
-  const search = (trpc as any).search?.suggest?.useQuery({ q, type: 'any', limit: 20 }, { enabled: q.length > 0 })
+  const [excludeTaxa, setExcludeTaxa] = useState(false)
+  const [categoryFilter, setCategoryFilter] = useState<string>('all')
+
+  // Get categories for filter dropdown
+  const { data: categories = [] } = useCategories()
+
+  // Use new search.suggest API v2 with category filtering
+  const search = (trpc as any).search?.suggest?.useQuery({
+    q,
+    type: 'any',
+    limit: 20,
+    categories: categoryFilter && categoryFilter !== 'all' ? [categoryFilter] : undefined
+  }, { enabled: q.length > 0 })
   useEffect(() => {
     const t = setTimeout(() => setQ(qInput.trim()), 220)
     return () => clearTimeout(t)
   }, [qInput])
-
-  const toggleRank = (r: string) => {
-    setRankFilter((prev) => (prev.includes(r) ? prev.filter((x) => x !== r) : [...prev, r]))
-  }
 
   // Quick outline: root → kingdoms (lazy)
   const childrenQ = trpc.taxonomy.getChildren.useQuery(
@@ -47,15 +54,17 @@ export default function LeftRail({
   )
 
   const rawResults = (search.data as any[] | undefined) ?? []
-  // Apply rank filter to *taxon* rows only; keep tp/tpt rows so foods still show up.
+  // Apply filters: exclude taxa option (category filtering is now server-side)
   const results = useMemo(() => {
-    if (!rankFilter.length) return rawResults
-    return rawResults.filter((r: any) => {
-      if (r.kind === 'tp' || r.kind === 'tpt') return true
-      // taxon row: keep only if rank included (using 'sub' field for rank)
-      return rankFilter.includes(r.sub)
-    })
-  }, [rawResults, rankFilter])
+    let filtered = rawResults
+
+    // Exclude taxa filter - only show TP and TPT results
+    if (excludeTaxa) {
+      filtered = filtered.filter((r: any) => r.kind === 'tp' || r.kind === 'tpt')
+    }
+
+    return filtered
+  }, [rawResults, excludeTaxa])
 
   const clickResult = (row: any) => {
     if (row.kind === 'taxon') {
@@ -98,16 +107,40 @@ export default function LeftRail({
           )}
         </div>
 
-        <div className="flex flex-wrap gap-1">
-          {RANKS.map((r) => (
-            <button
-              key={r}
-              className={`text-[11px] rounded border px-1.5 py-0.5 ${rankFilter.includes(r) ? 'bg-muted/70' : 'bg-background'}`}
-              onClick={() => toggleRank(r)}
+        {/* Filters */}
+        <div className="space-y-2">
+          {/* Exclude taxa checkbox */}
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="exclude-taxa"
+              checked={excludeTaxa}
+              onCheckedChange={(checked) => setExcludeTaxa(checked as boolean)}
+            />
+            <label
+              htmlFor="exclude-taxa"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              {r}
-            </button>
-          ))}
+              Exclude taxa (TP & TPT only)
+            </label>
+          </div>
+
+          {/* Category filter dropdown */}
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-muted-foreground">Category</label>
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger className="h-8">
+                <SelectValue placeholder="All categories" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All categories</SelectItem>
+                {categories.map((cat) => (
+                  <SelectItem key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         {/* Results */}

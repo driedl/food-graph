@@ -30,6 +30,8 @@
     "ag:api": "tsx scripts/aggregate/aggregate.ts --config api",
     "stop": "./scripts/stop-all.sh",
     "stop:force": "./scripts/stop-all.sh --force",
+    "stop:all-ports": "./scripts/stop-all.sh --all-ports",
+    "stop:force-all-ports": "./scripts/stop-all.sh --force --all-ports",
     "check": "pnpm typecheck && pnpm lint && pnpm etl:build"
   },
   "devDependencies": {
