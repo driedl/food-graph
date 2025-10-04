@@ -265,13 +265,13 @@
             "variants": [
                 {
                     "when": {
-                        "has_transform": "tf:clarify"
+                        "has_transform": "tf:clarify_butter"
                     },
                     "name": "Ghee"
                 },
                 {
                     "when": {
-                        "has_transform": "tf:clarify",
+                        "has_transform": "tf:clarify_butter",
                         "temp_C": ">100"
                     },
                     "name": "Brown Butter"

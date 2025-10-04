@@ -877,11 +877,12 @@ def _validate_hierarchy_acyclic_json(path: Path, obj: Any, validator: Dict[str, 
     return errs
 
 # Small, stable datamap - only add to this rarely
+# Updated to match Ontology Bible hierarchy
 COMMON_MISSING_PARENTS = {
     "part:curd": "part:milk",
     "part:whey": "part:milk", 
-    "part:butter": "part:milk",
-    "part:buttermilk": "part:milk",
+    "part:butter": "part:cream",  # Bible: butter → cream → milk
+    "part:buttermilk": "part:cream",  # Bible: buttermilk → cream → milk
     "part:bran": "part:grain",
     "part:germ": "part:grain", 
     "part:endosperm": "part:grain",

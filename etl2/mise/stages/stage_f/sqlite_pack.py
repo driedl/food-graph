@@ -33,6 +33,14 @@ CREATE TABLE IF NOT EXISTS part_def (
   parent_id TEXT REFERENCES part_def(id) ON DELETE SET NULL
 );
 
+-- Part closure (mirror of taxon_ancestors)
+CREATE TABLE IF NOT EXISTS part_ancestors (
+  descendant_id TEXT NOT NULL REFERENCES part_def(id) ON DELETE CASCADE,
+  ancestor_id   TEXT NOT NULL REFERENCES part_def(id) ON DELETE CASCADE,
+  depth INTEGER NOT NULL,
+  PRIMARY KEY (descendant_id, ancestor_id)
+);
+
 CREATE TABLE IF NOT EXISTS has_part (
   taxon_id TEXT NOT NULL REFERENCES nodes(id) ON DELETE CASCADE,
   part_id  TEXT NOT NULL REFERENCES part_def(id) ON DELETE RESTRICT,
@@ -434,6 +442,25 @@ def build_sqlite(*, in_dir: Path, build_dir: Path, db_path: Path, verbose: bool 
                 kind=COALESCE(excluded.kind, part_def.kind),
                 parent_id=COALESCE(excluded.parent_id, part_def.parent_id)
             """, (pid, name, kind, parent_id))
+    
+    # Populate part_ancestors (transitive closure)
+    cur.execute("DELETE FROM part_ancestors")
+    cur.execute("""
+        INSERT OR REPLACE INTO part_ancestors(descendant_id, ancestor_id, depth)
+        WITH RECURSIVE chain(descendant_id, ancestor_id, depth) AS (
+          SELECT id, id, 0 FROM part_def
+          UNION ALL
+          SELECT chain.descendant_id, part_def.parent_id, chain.depth+1
+          FROM chain JOIN part_def ON part_def.id = chain.ancestor_id
+          WHERE part_def.parent_id IS NOT NULL
+        )
+        SELECT * FROM chain;
+    """)
+    # Depth sanity (warn >5)
+    cur.execute("SELECT COALESCE(MAX(depth),0) FROM part_ancestors")
+    max_depth = (cur.fetchone() or [0])[0]
+    if max_depth > 5:
+        print(f"[WARN] part_ancestors depth exceeds 5 (max: {max_depth})—check for hierarchy smell")
     
     # Commit base data before inserting dependent records
     con.commit()

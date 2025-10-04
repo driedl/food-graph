@@ -20,6 +20,10 @@
       "type": "boolean",
       "description": "True if transform is identity-bearing (affects FoodState identity)"
     },
+    "order": {
+      "type": "integer",
+      "description": "Processing order for transform sequence"
+    },
     "params": {
       "type": "array",
       "items": {

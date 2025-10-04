@@ -94,7 +94,7 @@ def compile_taxa_into(*, taxa_root: Path, ontology_root: Path,
         print(f"✓ Wrote {len(objs)} taxa → {out_taxa_path}")
 
     # Copy assets into etl2/build/compiled
-    assets = ["attributes.json", "parts.json", "nutrients.json", "transforms.json"]
+    assets = ["attributes.json", "nutrients.json", "transforms.json"]
     for asset in assets:
         src = ontology_root / asset
         if src.exists():
@@ -103,6 +103,9 @@ def compile_taxa_into(*, taxa_root: Path, ontology_root: Path,
             if verbose: print(f"  ✓ Copied {asset}")
         else:
             print(f"  ⚠️  Missing asset: {src}")
+    
+    # Merge parts registry (core + derived)
+    _merge_parts_registry(ontology_root, compiled_dir, verbose)
     # rules/ directory
     rules_src = ontology_root / "rules"
     rules_dst = compiled_dir / "rules"
@@ -112,3 +115,60 @@ def compile_taxa_into(*, taxa_root: Path, ontology_root: Path,
         if verbose: print("  ✓ Copied rules/")
 
     return 0
+
+
+def _merge_parts_registry(ontology_root: Path, compiled_dir: Path, verbose: bool) -> None:
+    """Merge parts.core.json and parts.derived.jsonl into parts.registry.json"""
+    import json
+    
+    # Load core parts
+    core_parts = []
+    core_path = ontology_root / "parts.json"
+    if core_path.exists():
+        with core_path.open("r", encoding="utf-8") as f:
+            core_parts = json.load(f)
+        if verbose: print(f"  ✓ Loaded {len(core_parts)} core parts")
+    else:
+        print(f"  ⚠️  Missing core parts: {core_path}")
+    
+    # Load derived parts
+    derived_parts = []
+    derived_path = ontology_root / "parts.derived.jsonl"
+    if derived_path.exists():
+        with derived_path.open("r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("//"):
+                    try:
+                        derived_parts.append(json.loads(line))
+                    except json.JSONDecodeError as e:
+                        print(f"  ⚠️  Invalid JSON in {derived_path}: {e}")
+        if verbose: print(f"  ✓ Loaded {len(derived_parts)} derived parts")
+    else:
+        print(f"  ⚠️  Missing derived parts: {derived_path}")
+    
+    # Merge and validate
+    all_parts = core_parts + derived_parts
+    
+    # Check for duplicate IDs
+    seen_ids = set()
+    for part in all_parts:
+        part_id = part.get("id")
+        if part_id in seen_ids:
+            print(f"  ❌ Duplicate part ID: {part_id}")
+            return
+        seen_ids.add(part_id)
+    
+    # Write merged registry
+    registry_path = compiled_dir / "parts.registry.json"
+    with registry_path.open("w", encoding="utf-8") as f:
+        json.dump(all_parts, f, indent=2, ensure_ascii=False)
+    
+    if verbose: print(f"  ✓ Merged {len(all_parts)} parts → {registry_path}")
+    
+    # Also create parts.json for backward compatibility
+    parts_path = compiled_dir / "parts.json"
+    with parts_path.open("w", encoding="utf-8") as f:
+        json.dump(all_parts, f, indent=2, ensure_ascii=False)
+    
+    if verbose: print(f"  ✓ Created parts.json for backward compatibility")

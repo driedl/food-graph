@@ -34,22 +34,6 @@
     "applies_to": []
   },
   {
-    "id": "part:egg_white",
-    "name": "Egg white (albumen)",
-    "kind": "animal",
-    "applies_to": [
-      "tx:animalia:phasianidae:gallus:gallus_domesticus"
-    ]
-  },
-  {
-    "id": "part:egg_yolk",
-    "name": "Egg yolk",
-    "kind": "animal",
-    "applies_to": [
-      "tx:animalia:phasianidae:gallus:gallus_domesticus"
-    ]
-  },
-  {
     "id": "part:cut:belly",
     "name": "Belly",
     "kind": "animal",
@@ -167,17 +151,20 @@
   {
     "id": "part:bran",
     "name": "Bran",
-    "kind": "plant"
+    "kind": "plant",
+    "parent_id": "part:grain"
   },
   {
     "id": "part:germ",
     "name": "Germ",
-    "kind": "plant"
+    "kind": "plant",
+    "parent_id": "part:grain"
   },
   {
     "id": "part:endosperm",
     "name": "Endosperm",
-    "kind": "plant"
+    "kind": "plant",
+    "parent_id": "part:grain"
   },
   {
     "id": "part:hull",
@@ -229,12 +216,8 @@
   {
     "id": "part:marrow",
     "name": "Marrow",
-    "kind": "animal"
-  },
-  {
-    "id": "part:liver",
-    "name": "Liver",
-    "kind": "animal"
+    "kind": "animal",
+    "parent_id": "part:bone"
   },
   {
     "id": "part:roe",
@@ -242,25 +225,23 @@
     "kind": "animal"
   },
   {
-    "id": "part:fillet",
-    "name": "Fillet",
-    "kind": "animal"
-  },
-  {
     "id": "part:egg",
     "name": "Egg",
-    "kind": "bird"
+    "kind": "animal",
+    "category": "egg"
   },
   {
     "id": "part:egg:white",
     "name": "Egg white",
-    "kind": "bird",
+    "kind": "animal",
+    "category": "egg",
     "parent_id": "part:egg"
   },
   {
     "id": "part:egg:yolk",
     "name": "Egg yolk",
-    "kind": "bird",
+    "kind": "animal",
+    "category": "egg",
     "parent_id": "part:egg"
   },
   {
@@ -277,22 +258,20 @@
   {
     "id": "part:curd",
     "name": "Curd",
-    "kind": "animal"
+    "kind": "animal",
+    "parent_id": "part:milk"
   },
   {
     "id": "part:whey",
     "name": "Whey",
-    "kind": "animal"
-  },
-  {
-    "id": "part:butter",
-    "name": "Butter",
-    "kind": "animal"
+    "kind": "animal",
+    "parent_id": "part:milk"
   },
   {
     "id": "part:buttermilk",
     "name": "Buttermilk",
-    "kind": "animal"
+    "kind": "animal",
+    "parent_id": "part:cream"
   },
   {
     "id": "part:plant_milk",

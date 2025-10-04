@@ -60,7 +60,7 @@ def run(in_dir: Path, build_dir: Path, verbose: bool = False) -> int:
             if verbose:
                 console.print(f"  ⚠️ Missing {rules_path}", style="yellow")
         else:
-            parts = read_json(in_dir / "parts.json")
+            parts = read_json(build_dir / "compiled" / "parts.registry.json")
             part_ids = [p["id"] for p in parts]
             tdefs = read_json(tmp_dir / "transforms_canon.json")
             errors, meta = validate_guarded_flags(rules_path, tdefs, part_ids)
