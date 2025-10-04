@@ -23,6 +23,14 @@ artifacts:
     validators:
       - kind: array_of_objects
       - kind: set_nonempty
+      - kind: no_duplicates
+        field: "id"
+      - kind: schema_enum_compliance
+        field: "kind"
+        allowed_values: ["plant", "animal", "fungus", "derived"]
+      - kind: hierarchy_consistency
+        parent_field: "parent_id"
+        child_field: "id"
   
   - path: compiled/attributes.json
     type: json

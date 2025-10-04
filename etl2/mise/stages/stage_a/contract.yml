@@ -5,6 +5,12 @@ artifacts:
     validators:
       - kind: array_of_objects
       - kind: set_nonempty
+      - kind: no_duplicates
+        field: "id"
+      - kind: parameter_consistency
+        transform_file: "tmp/transforms_canon.json"
+        family_file: "compiled/families.json"
+        param_field: "identity_params"
   - path: tmp/flags.rules.validated.json
     type: json
     must_exist: true
