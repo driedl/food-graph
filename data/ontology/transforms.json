@@ -14,32 +14,6 @@
     "notes": "Standardization of dairy fat percentage"
   },
   {
-    "id": "tf:cook",
-    "name": "Cook",
-    "identity": true,
-    "order": 90,
-    "params": [
-      {
-        "key": "method",
-        "kind": "enum",
-        "enum": [
-          "raw",
-          "boil",
-          "steam",
-          "bake",
-          "roast",
-          "fry",
-          "broil"
-        ]
-      },
-      {
-        "key": "fat_added",
-        "kind": "boolean"
-      }
-    ],
-    "notes": "Thermal processing"
-  },
-  {
     "id": "tf:brine",
     "name": "Brine/Can (Salt)",
     "identity": true,
@@ -103,44 +77,6 @@
     "notes": "Post-mill enrichment of select micronutrients"
   },
   {
-    "id": "tf:cure",
-    "name": "Cure (salt/nitrite)",
-    "identity": true,
-    "order": 40,
-    "params": [
-      {
-        "key": "style",
-        "kind": "enum",
-        "enum": [
-          "dry",
-          "wet"
-        ]
-      },
-      {
-        "key": "nitrite",
-        "kind": "boolean"
-      }
-    ],
-    "notes": "Meat curing (e.g., bacon, pastrami); sodium-bearing and water-binding"
-  },
-  {
-    "id": "tf:smoke",
-    "name": "Smoke",
-    "identity": true,
-    "order": 50,
-    "params": [
-      {
-        "key": "style",
-        "kind": "enum",
-        "enum": [
-          "cold",
-          "hot"
-        ]
-      }
-    ],
-    "notes": "Cold/hot smoking; often combined with cure"
-  },
-  {
     "id": "tf:trim",
     "name": "Trim/Lean standardization",
     "identity": true,
@@ -161,7 +97,7 @@
     "order": 20,
     "params": [
       {
-        "key": "method",
+        "key": "style",
         "kind": "enum",
         "enum": [
           "dry",
@@ -182,26 +118,6 @@
       },
       {
         "key": "time_d",
-        "kind": "number"
-      }
-    ]
-  },
-  {
-    "id": "tf:smoke",
-    "name": "Smoke",
-    "identity": true,
-    "order": 40,
-    "params": [
-      {
-        "key": "mode",
-        "kind": "enum",
-        "enum": [
-          "cold",
-          "hot"
-        ]
-      },
-      {
-        "key": "time_h",
         "kind": "number"
       }
     ]
@@ -700,27 +616,6 @@
     "params": [
       {
         "key": "sugar_pct",
-        "kind": "number"
-      }
-    ]
-  },
-  {
-    "id": "tf:dry",
-    "name": "Dry / Dehydrate",
-    "identity": true,
-    "order": 90,
-    "params": [
-      {
-        "key": "method",
-        "kind": "enum",
-        "enum": [
-          "spray",
-          "drum",
-          "freeze"
-        ]
-      },
-      {
-        "key": "target_moisture_pct",
         "kind": "number"
       }
     ]

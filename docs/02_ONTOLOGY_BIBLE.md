@@ -19,11 +19,11 @@ Everything downstream (search facets, families, cuisine hints, safety flags) is 
 ## 1) IDs & casing
 
 * **Taxa (`tx:*`)**: `tx:segment:segment[: ...]`. A **full ID has no trailing colon**; a **prefix ends with `:`**.
-* **Parts (`part:*`)**: colon-separated hierarchy: `part:{category?}:{specific[:sub...]}`.
+* **Parts (`part:*`)**: anatomical parts use `part:{specific}` with `category` field; hierarchical parts use `part:{parent}:{child}` only when child is truly a component of parent.
 
   * `id`: lower_snake
   * `kind`: `"plant" | "animal" | "fungus" | "derived"`
-  * `category` (optional): clarifies role (e.g., `organ`, `cut`, `egg`, `grain`, `fruit`, `dairy`, `oil`)
+  * `category` (required): clarifies role and enables filtering (e.g., `organ`, `cut`, `egg`, `grain`, `fruit`, `dairy`, `oil`, `muscle`, `fat`, `bone`)
   * `parent_id`: explicit; hierarchy must be acyclic.
 * **Transforms (`tf:*`)**: `tf:[a-z0-9_]+`. One ID → one schema, one `order`, stable params.
 * **Names**: `display_name` Title Case; synonyms are plain strings (no qualifiers like `(salted)`).
@@ -93,6 +93,18 @@ Everything downstream (search facets, families, cuisine hints, safety flags) is 
 
   * `{ id, taxon_id, part_id, path[], identity[], family?, name, synonyms[] }`
   * `identity[]` is the subset of `path[]` used to compute `identity_hash`.
+
+### Category Ontology
+
+* **`categories.json`**: authoritative registry of all part categories with metadata.
+
+  * Required fields: `id`, `name`, `description`, `kind`
+  * `id`: category identifier used in parts (e.g., `"fruit"`, `"cut"`, `"dairy"`)
+  * `name`: display name for UI (e.g., `"Fruit"`, `"Cut"`, `"Dairy"`)
+  * `description`: human-readable description of the category
+  * `kind`: biological kind this category applies to (`"plant"`, `"animal"`, `"fungus"`, `"derived"`)
+  * **Single source of truth** for all category validation and UI display
+  * **Self-validating** - validators read from this file, preventing data drift
 
 ---
 
@@ -187,6 +199,7 @@ Confirm that `part:cream` exists in `parts.core.json` and that the merged regist
 * **No orphan parents**: Every `parent_id` must resolve AFTER the union.
 * **No cycles** across the combined hierarchy.
 * **Kind vocabulary**: `plant|animal|fungus|derived|any` (schema-enforced).
+* **Category required**: every part must have a `category` field for filtering and organization.
 * **Biological ancestry for derived**: every `kind:"derived"` must trace to at least one biological ancestor (`plant|animal|fungus`) via `parent_id` links.
 * **Depth**: hierarchy depth ≤ 5 (configurable).
 * **Core purity**: `parts.core.json` must not contain `kind:"derived"`.
@@ -340,4 +353,42 @@ Confirm that `part:cream` exists in `parts.core.json` and that the merged regist
 * **Eggs**: use `kind:"animal"` + `category:"egg"`; scope to birds/reptiles via applicability, not via `kind`.
 * **Cuts**: are anatomical; use `kind:"animal"` with `category:"cut"` and `parent_id:"part:muscle"`.
 * **Caviar**: is a **TPT** (salted roe), not a part. Keep `part:egg:fish:roe` as the part.
+
+### Part Naming Convention
+
+**Anatomical parts** (most common): Use `part:{specific}` with `category` field
+- `part:shoulder` with `category: "cut"` (not `part:cut:shoulder`)
+- `part:liver` with `category: "organ"` (not `part:organ:liver`)
+- `part:fruit` with `category: "fruit"`
+- `part:muscle` with `category: "muscle"`
+
+**Hierarchical parts** (true parent-child relationships): Use `part:{parent}:{child}`
+- `part:egg:white` (white is a component of egg)
+- `part:egg:yolk` (yolk is a component of egg)
+- `part:fat:leaf` (leaf fat is a type of fat)
+
+**Why categories matter**: Enable filtering and searching by part type
+- "Show all cuts": `WHERE category = "cut"`
+- "Show all organs": `WHERE category = "organ"`
+- "Show all dairy products": `WHERE category = "dairy"`
+
+### Category Rules
+
+**Category Ontology Requirements**:
+- **All parts must have a valid category** from `categories.json`
+- **Categories are immutable** - never hardcode category lists in validators
+- **Single source of truth** - all category validation reads from `categories.json`
+- **Rich metadata** - categories include `id`, `name`, `description`, `kind`
+
+**Category Assignment Rules**:
+- **Biological parts** use categories matching their biological function (`fruit`, `muscle`, `organ`)
+- **Processed parts** use categories matching their product type (`dairy`, `oil`, `byproduct`)
+- **Hierarchical parts** inherit category from parent when appropriate (`part:fat:leaf` → `category: "fat"`)
+- **Consolidation** - group similar concepts (e.g., `pulp` and `serum` → `byproduct`)
+
+**Category Validation**:
+- **Schema compliance** - `part.schema.json` references `categories.json`
+- **Runtime validation** - validators load categories dynamically
+- **UI integration** - categories include display names and descriptions
+- **Database integration** - categories are loaded into database for queries
 

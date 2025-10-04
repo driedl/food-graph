@@ -84,6 +84,14 @@ def _apply_jsonl_validators(path: Path, lines: List[dict], validators: List[Dict
             errs.extend(_validate_parameter_types_consistent(path, lines, validator))
         elif kind == "no_duplicate_definitions":
             errs.extend(_validate_no_duplicate_definitions(path, lines, validator))
+        elif kind == "part_categories":
+            errs.extend(_validate_part_categories(path, lines, validator))
+        elif kind == "part_category_values":
+            errs.extend(_validate_part_category_values(path, lines, validator, build_dir))
+        elif kind == "part_naming_convention":
+            errs.extend(_validate_part_naming_convention(path, lines, validator))
+        elif kind == "part_hierarchy_integrity":
+            errs.extend(_validate_part_hierarchy_integrity(path, lines, validator))
         else:
             errs.append(f"{path}: unknown validator kind: {kind}")
     return errs
@@ -121,6 +129,14 @@ def _apply_json_validators(path: Path, obj: Any, validators: List[Dict[str, Any]
             errs.extend(_validate_parameter_consistency_json(path, obj, validator, build_dir))
         elif kind == "no_duplicate_definitions":
             errs.extend(_validate_no_duplicate_definitions_json(path, obj, validator))
+        elif kind == "part_categories":
+            errs.extend(_validate_part_categories_json(path, obj, validator))
+        elif kind == "part_category_values":
+            errs.extend(_validate_part_category_values_json(path, obj, validator, build_dir))
+        elif kind == "part_naming_convention":
+            errs.extend(_validate_part_naming_convention_json(path, obj, validator))
+        elif kind == "part_hierarchy_integrity":
+            errs.extend(_validate_part_hierarchy_integrity_json(path, obj, validator))
         else:
             errs.append(f"{path}: unknown validator kind: {kind}")
     return errs
@@ -1013,5 +1029,175 @@ def _validate_no_duplicate_definitions_json(path: Path, obj: Any, validator: Dic
                 if name in seen_names:
                     errs.append(f"{path}:[{i}]: duplicate name '{name}'")
                 seen_names.add(name)
+    
+    return errs
+
+def _validate_part_categories(path: Path, lines: List[dict], validator: Dict[str, Any]) -> List[str]:
+    """Ensure all parts have required category field"""
+    errs = []
+    for i, part in enumerate(lines):
+        if 'category' not in part or not part['category']:
+            part_id = part.get('id', f'line_{i+1}')
+            errs.append(f"{path}:[{i+1}]: part '{part_id}' missing required 'category' field")
+    return errs
+
+def _validate_part_naming_convention(path: Path, lines: List[dict], validator: Dict[str, Any]) -> List[str]:
+    """Ensure parts follow correct naming convention"""
+    errs = []
+    for i, part in enumerate(lines):
+        part_id = part.get('id', '')
+        category = part.get('category', '')
+        
+        # Anatomical parts should be part:specific with category
+        if part_id.startswith('part:cut:') or part_id.startswith('part:organ:'):
+            specific = part_id.split(':', 2)[-1]  # e.g., 'belly' from 'part:cut:belly'
+            expected_id = f"part:{specific}"
+            errs.append(f"{path}:[{i+1}]: part '{part_id}' should be '{expected_id}' with category: '{category}'")
+    
+    return errs
+
+def _validate_part_hierarchy_integrity(path: Path, lines: List[dict], validator: Dict[str, Any]) -> List[str]:
+    """Ensure every segment in hierarchical part IDs maps to an actual part"""
+    errs = []
+    
+    # Build a set of all part IDs for lookup
+    all_part_ids = {part.get('id', '') for part in lines}
+    
+    for i, part in enumerate(lines):
+        part_id = part.get('id', '')
+        if not part_id.startswith('part:'):
+            continue
+            
+        # Split the ID into segments (e.g., 'part:egg:white' -> ['part', 'egg', 'white'])
+        segments = part_id.split(':')
+        if len(segments) < 2:
+            continue
+            
+        # Check each intermediate segment maps to a part
+        for j in range(2, len(segments)):  # Skip 'part' and first segment
+            parent_id = ':'.join(segments[:j])  # e.g., 'part:egg' from 'part:egg:white'
+            if parent_id not in all_part_ids:
+                errs.append(f"{path}:[{i+1}]: part '{part_id}' references non-existent parent '{parent_id}'")
+    
+    return errs
+
+def _validate_part_categories_json(path: Path, obj: Any, validator: Dict[str, Any]) -> List[str]:
+    """Ensure all parts have required category field (JSON version)"""
+    errs = []
+    if not isinstance(obj, list):
+        return errs
+    
+    for i, part in enumerate(obj):
+        if isinstance(part, dict) and ('category' not in part or not part['category']):
+            part_id = part.get('id', f'line_{i+1}')
+            errs.append(f"{path}:[{i+1}]: part '{part_id}' missing required 'category' field")
+    return errs
+
+def _validate_part_naming_convention_json(path: Path, obj: Any, validator: Dict[str, Any]) -> List[str]:
+    """Ensure parts follow correct naming convention (JSON version)"""
+    errs = []
+    if not isinstance(obj, list):
+        return errs
+        
+    for i, part in enumerate(obj):
+        if not isinstance(part, dict):
+            continue
+            
+        part_id = part.get('id', '')
+        category = part.get('category', '')
+        
+        # Anatomical parts should be part:specific with category
+        if part_id.startswith('part:cut:') or part_id.startswith('part:organ:'):
+            specific = part_id.split(':', 2)[-1]  # e.g., 'belly' from 'part:cut:belly'
+            expected_id = f"part:{specific}"
+            errs.append(f"{path}:[{i+1}]: part '{part_id}' should be '{expected_id}' with category: '{category}'")
+    
+    return errs
+
+def _validate_part_category_values(path: Path, lines: List[dict], validator: Dict[str, Any], build_dir: Path) -> List[str]:
+    """Ensure all parts use valid category values"""
+    errs = []
+    
+    # Load valid categories from ontology file
+    try:
+        categories_path = build_dir / "compiled" / "categories.json"
+        if not categories_path.exists():
+            errs.append(f"{path}: categories.json not found at {categories_path}")
+            return errs
+            
+        with open(categories_path, 'r') as f:
+            categories_data = json.load(f)
+        
+        valid_categories = {cat['id'] for cat in categories_data if isinstance(cat, dict) and 'id' in cat}
+        
+    except Exception as e:
+        errs.append(f"{path}: failed to load categories.json: {e}")
+        return errs
+    
+    for i, part in enumerate(lines):
+        if 'category' in part:
+            category = part['category']
+            if category not in valid_categories:
+                part_id = part.get('id', f'line_{i+1}')
+                errs.append(f"{path}:[{i+1}]: part '{part_id}' has invalid category '{category}'. Must be one of: {', '.join(sorted(valid_categories))}")
+    return errs
+
+def _validate_part_category_values_json(path: Path, obj: Any, validator: Dict[str, Any], build_dir: Path) -> List[str]:
+    """Ensure all parts use valid category values (JSON version)"""
+    errs = []
+    if not isinstance(obj, list):
+        return errs
+    
+    # Load valid categories from ontology file
+    try:
+        categories_path = build_dir / "compiled" / "categories.json"
+        if not categories_path.exists():
+            errs.append(f"{path}: categories.json not found at {categories_path}")
+            return errs
+            
+        with open(categories_path, 'r') as f:
+            categories_data = json.load(f)
+        
+        valid_categories = {cat['id'] for cat in categories_data if isinstance(cat, dict) and 'id' in cat}
+        
+    except Exception as e:
+        errs.append(f"{path}: failed to load categories.json: {e}")
+        return errs
+    
+    for i, part in enumerate(obj):
+        if isinstance(part, dict) and 'category' in part:
+            category = part['category']
+            if category not in valid_categories:
+                part_id = part.get('id', f'line_{i+1}')
+                errs.append(f"{path}:[{i+1}]: part '{part_id}' has invalid category '{category}'. Must be one of: {', '.join(sorted(valid_categories))}")
+    return errs
+
+def _validate_part_hierarchy_integrity_json(path: Path, obj: Any, validator: Dict[str, Any]) -> List[str]:
+    """Ensure every segment in hierarchical part IDs maps to an actual part (JSON version)"""
+    errs = []
+    if not isinstance(obj, list):
+        return errs
+    
+    # Build a set of all part IDs for lookup
+    all_part_ids = {part.get('id', '') for part in obj if isinstance(part, dict)}
+    
+    for i, part in enumerate(obj):
+        if not isinstance(part, dict):
+            continue
+            
+        part_id = part.get('id', '')
+        if not part_id.startswith('part:'):
+            continue
+            
+        # Split the ID into segments (e.g., 'part:egg:white' -> ['part', 'egg', 'white'])
+        segments = part_id.split(':')
+        if len(segments) < 2:
+            continue
+            
+        # Check each intermediate segment maps to a part
+        for j in range(2, len(segments)):  # Skip 'part' and first segment
+            parent_id = ':'.join(segments[:j])  # e.g., 'part:egg' from 'part:egg:white'
+            if parent_id not in all_part_ids:
+                errs.append(f"{path}:[{i+1}]: part '{part_id}' references non-existent parent '{parent_id}'")
     
     return errs

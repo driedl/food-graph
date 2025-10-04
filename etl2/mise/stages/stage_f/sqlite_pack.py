@@ -26,10 +26,18 @@ CREATE TABLE IF NOT EXISTS synonyms (
   PRIMARY KEY (node_id, synonym)
 );
 
+CREATE TABLE IF NOT EXISTS categories (
+  id          TEXT PRIMARY KEY,
+  name        TEXT NOT NULL,
+  description TEXT,
+  kind        TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS part_def (
   id        TEXT PRIMARY KEY,
   name      TEXT NOT NULL,
   kind      TEXT,                -- optional grouping (e.g., organ, product)
+  category  TEXT REFERENCES categories(id) ON DELETE RESTRICT,
   parent_id TEXT REFERENCES part_def(id) ON DELETE SET NULL
 );
 
@@ -231,6 +239,18 @@ def _load_cuisine_map(in_dir: Path) -> List[Dict[str, Any]]:
     path = in_dir / "rules" / "cuisine_map.jsonl"
     return read_jsonl(path) if path.exists() else []
 
+def _load_categories(build_dir: Path) -> Dict[str, Dict[str, Any]]:
+    """Load categories from compiled/categories.json"""
+    path = build_dir / "compiled" / "categories.json"
+    if not path.exists():
+        return {}
+    categories = read_json(path)
+    if isinstance(categories, list):
+        return {cat["id"]: cat for cat in categories if isinstance(cat, dict) and "id" in cat}
+    elif isinstance(categories, dict):
+        return categories
+    return {}
+
 def _param_get(obj: Dict[str, Any], dotted: str):
     """Simple dotted path resolver inside a dict"""
     cur = obj
@@ -369,6 +389,23 @@ def build_sqlite(*, in_dir: Path, build_dir: Path, db_path: Path, verbose: bool 
     family_meta = _load_family_meta(in_dir)
     flag_rules = _load_flag_rules(in_dir)
     cuisine_map = _load_cuisine_map(in_dir)
+    categories = _load_categories(build_dir)
+
+    # Insert categories first (required for part_def foreign key)
+    cur.execute("DELETE FROM categories")
+    for cat_id, cat_data in categories.items():
+        cur.execute("""
+            INSERT INTO categories (id, name, description, kind)
+            VALUES (?, ?, ?, ?)
+        """, (
+            cat_id,
+            cat_data.get("name", ""),
+            cat_data.get("description"),
+            cat_data.get("kind", "")
+        ))
+
+    # Commit categories before inserting parts (foreign key constraint)
+    con.commit()
 
     # Insert nodes + synonyms (+collect synonyms for FTS)
     _syn_by_node: Dict[str, List[str]] = {}
@@ -426,23 +463,81 @@ def build_sqlite(*, in_dir: Path, build_dir: Path, db_path: Path, verbose: bool 
             print(f"Row: {row}")
             raise
 
-    for pid, pdata in parts_index.items():
+    # Sort parts by dependency order using topological sort
+    def topological_sort(parts_dict):
+        """Sort parts so that parents come before children"""
+        # Build dependency graph
+        graph = {}
+        in_degree = {}
+        
+        for pid, pdata in parts_dict.items():
+            graph[pid] = []
+            in_degree[pid] = 0
+        
+        for pid, pdata in parts_dict.items():
+            parent_id = pdata.get("parent_id") if pdata else None
+            if parent_id and parent_id in graph:
+                graph[parent_id].append(pid)
+                in_degree[pid] += 1
+        
+        # Topological sort using Kahn's algorithm
+        queue = [pid for pid, degree in in_degree.items() if degree == 0]
+        result = []
+        
+        while queue:
+            current = queue.pop(0)
+            result.append((current, parts_dict[current]))
+            
+            for child in graph[current]:
+                in_degree[child] -= 1
+                if in_degree[child] == 0:
+                    queue.append(child)
+        
+        # Check for cycles
+        if len(result) != len(parts_dict):
+            remaining = set(parts_dict.keys()) - {pid for pid, _ in result}
+            print(f"[WARNING] Circular dependencies detected in parts: {remaining}")
+        
+        return result
+    
+    sorted_parts = topological_sort(parts_index)
+    
+    for pid, pdata in sorted_parts:
         pdata = pdata or {}
         name = pdata.get("name")
         if name:
             name = name.strip()
         kind = pdata.get("kind")
+        category = pdata.get("category")
         parent_id = pdata.get("parent_id")
         if name:
             cur.execute("""
-              INSERT INTO part_def (id, name, kind, parent_id)
-              VALUES (?, ?, ?, ?)
+              INSERT INTO part_def (id, name, kind, category, parent_id)
+              VALUES (?, ?, ?, ?, ?)
               ON CONFLICT(id) DO UPDATE SET
                 name=excluded.name,
                 kind=COALESCE(excluded.kind, part_def.kind),
+                category=COALESCE(excluded.category, part_def.category),
                 parent_id=COALESCE(excluded.parent_id, part_def.parent_id)
-            """, (pid, name, kind, parent_id))
+            """, (pid, name, kind, category, parent_id))
     
+    # Commit parts before processing aliases (foreign key constraint)
+    con.commit()
+    
+    # Validate part categories
+    cur.execute("""
+        SELECT p.id, p.category
+        FROM part_def p
+        WHERE p.category IS NOT NULL 
+        AND p.category NOT IN (SELECT id FROM categories)
+    """)
+    invalid_categories = cur.fetchall()
+    if invalid_categories:
+        print(f"[ERROR] Parts with invalid categories: {invalid_categories}")
+        # Don't fail the build, but warn
+        for part_id, category in invalid_categories:
+            print(f"  Part {part_id} references invalid category: {category}")
+
     # Populate part_ancestors (transitive closure)
     cur.execute("DELETE FROM part_ancestors")
     cur.execute("""
@@ -693,8 +788,19 @@ def build_sqlite(*, in_dir: Path, build_dir: Path, db_path: Path, verbose: bool 
     # 3) Populate part_synonym from part_aliases
     cur.execute("DELETE FROM part_synonym")
     for pid, aliases in part_aliases.items():
+        # Check if part exists
+        cur.execute("SELECT COUNT(*) FROM part_def WHERE id = ?", (pid,))
+        part_exists = cur.fetchone()[0]
+        if part_exists == 0:
+            print(f"[WARNING] Part alias references non-existent part: {pid}")
+            continue
+            
         for a in aliases:
-            cur.execute("INSERT OR IGNORE INTO part_synonym(part_id, synonym) VALUES (?, ?)", (pid, a))
+            try:
+                cur.execute("INSERT OR IGNORE INTO part_synonym(part_id, synonym) VALUES (?, ?)", (pid, a))
+            except Exception as e:
+                print(f"[ERROR] Failed to insert alias for part {pid}: {e}")
+                raise
 
     # 4) Populate taxon_ancestors (transitive closure)
     cur.execute("DELETE FROM taxon_ancestors")
@@ -726,6 +832,7 @@ def build_sqlite(*, in_dir: Path, build_dir: Path, db_path: Path, verbose: bool 
     cur.execute("INSERT OR REPLACE INTO meta (key, val) VALUES (?, ?)", ("build_time", datetime.now(timezone.utc).isoformat()))
     cur.execute("INSERT OR REPLACE INTO meta (key, val) VALUES (?, ?)", ("taxa_count", str(len(taxa))))
     cur.execute("INSERT OR REPLACE INTO meta (key, val) VALUES (?, ?)", ("parts_count", str(len(parts_index))))
+    cur.execute("INSERT OR REPLACE INTO meta (key, val) VALUES (?, ?)", ("categories_count", str(len(categories))))
     cur.execute("INSERT OR REPLACE INTO meta (key, val) VALUES (?, ?)", ("substrates_count", str(len(substrates))))
     cur.execute("INSERT OR REPLACE INTO meta (key, val) VALUES (?, ?)", ("tpt_count", str(len(tpt))))
     cur.execute("INSERT OR REPLACE INTO meta (key, val) VALUES (?, ?)", ("schema_version", "6"))
@@ -743,4 +850,4 @@ def build_sqlite(*, in_dir: Path, build_dir: Path, db_path: Path, verbose: bool 
     con.close()
     
     if verbose:
-        print(f"  • Packed {len(taxa)} taxa, {len(parts_index)} parts, {len(substrates)} substrates, {len(tpt)} TPTs")
+        print(f"  • Packed {len(taxa)} taxa, {len(parts_index)} parts, {len(categories)} categories, {len(substrates)} substrates, {len(tpt)} TPTs")

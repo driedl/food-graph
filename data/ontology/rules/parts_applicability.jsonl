@@ -85,7 +85,7 @@
 {"part":"part:muscle","applies_to":["tx:animalia:chordata:aves:anseriformes:anatidae:cairina:moschata_domestica"],"exclude":[]}
 
 {"part":"part:muscle","applies_to":["tx:animalia:chordata:mammalia:lagomorpha:leporidae:oryctolagus:cuniculus"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:mammalia:lagomorpha:leporidae:lepus:europeaus"],"exclude":[]}
+{"part":"part:muscle","applies_to":["tx:animalia:chordata:mammalia:lagomorpha:leporidae:lepus:europaeus"],"exclude":[]}
 
 {"part":"part:muscle","applies_to":["tx:animalia:chordata:mammalia:artiodactyla:cervidae:cervus:elaphus"],"exclude":[]}
 {"part":"part:muscle","applies_to":["tx:animalia:chordata:mammalia:artiodactyla:cervidae:cervus:canadensis"],"exclude":[]}
@@ -112,9 +112,9 @@
 {"part":"part:muscle","applies_to":["tx:animalia:chordata:actinopterygii:scombriformes:scombridae:thunnus:thynnus"],"exclude":[]}
 {"part":"part:muscle","applies_to":["tx:animalia:chordata:actinopterygii:scombriformes:scombridae:katsuwonus:pelamis"],"exclude":[]}
 
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:actinopterygii:gadiformes:gadoidea:gadus:morhua"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:actinopterygii:gadiformes:gadoidea:gadus:chalcogrammus"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:actinopterygii:gadiformes:gadoidea:melanogrammus:aeglefinus"],"exclude":[]}
+{"part":"part:muscle","applies_to":["tx:animalia:chordata:actinopterygii:gadiformes:gadidae:gadus:morhua"],"exclude":[]}
+{"part":"part:muscle","applies_to":["tx:animalia:chordata:actinopterygii:gadiformes:gadidae:gadus:chalcogrammus"],"exclude":[]}
+{"part":"part:muscle","applies_to":["tx:animalia:chordata:actinopterygii:gadiformes:gadidae:melanogrammus:aeglefinus"],"exclude":[]}
 {"part":"part:muscle","applies_to":["tx:animalia:chordata:actinopterygii:gadiformes:merlucciidae:merluccius:productus"],"exclude":[]}
 
 {"part":"part:muscle","applies_to":["tx:animalia:chordata:actinopterygii:clupeiformes:clupeidae:clupea:harengus"],"exclude":[]}

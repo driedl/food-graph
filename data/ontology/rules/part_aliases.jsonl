@@ -5,7 +5,7 @@
 {"part_id":"part:root","aliases":["roots"]}
 {"part_id":"part:bulb","aliases":["bulbs"]}
 {"part_id":"part:flower","aliases":["florets","flowerhead","inflorescence"]}
-{"part_id":"part:peel","aliases":["zest","rind"]}
+{"part_id":"part:fruit:peel","aliases":["zest","rind"]}
 {"part_id":"part:milk","aliases":["dairy","dairy milk","whole milk","raw milk"]}
 {"part_id":"part:egg","aliases":["eggs"]}
 {"part_id":"part:muscle","aliases":["meat","flesh"]}

@@ -42,6 +42,10 @@ artifacts:
       - kind: hierarchy_acyclic
       - kind: expected_parents
       - kind: no_duplicate_definitions
+      - kind: part_categories
+      - kind: part_category_values
+      - kind: part_naming_convention
+      - kind: part_hierarchy_integrity
   
   - path: compiled/attributes.json
     type: json
@@ -52,6 +56,13 @@ artifacts:
       - kind: no_duplicate_definitions
   
   - path: compiled/nutrients.json
+    type: json
+    must_exist: true
+    validators:
+      - kind: array_of_objects
+      - kind: no_duplicate_definitions
+  
+  - path: compiled/categories.json
     type: json
     must_exist: true
     validators:

@@ -34,7 +34,7 @@
 {"taxon_id":"tx:animalia:chordata:aves:guineafowliformes:numididae:numida:meleagris","part_id":"part:muscle","name":"Guinea Fowl","display_name":"Guinea Fowl"}
 {"taxon_id":"tx:animalia:chordata:aves:columbiformes:columbidae:columba:livia_domestica","part_id":"part:muscle","name":"Squab","display_name":"Squab"}
 {"taxon_id":"tx:animalia:chordata:mammalia:lagomorpha:leporidae:oryctolagus:cuniculus","part_id":"part:muscle","name":"Rabbit","display_name":"Rabbit"}
-{"taxon_id":"tx:animalia:chordata:mammalia:lagomorpha:leporidae:lepus:europeaus","part_id":"part:muscle","name":"Hare","display_name":"Hare"}
+{"taxon_id":"tx:animalia:chordata:mammalia:lagomorpha:leporidae:lepus:europaeus","part_id":"part:muscle","name":"Hare","display_name":"Hare"}
 {"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:cervidae:cervus:canadensis","part_id":"part:muscle","name":"Elk","display_name":"Elk"}
 {"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:cervidae:alces:alces","part_id":"part:muscle","name":"Moose","display_name":"Moose"}
 {"taxon_id":"tx:animalia:chordata:mammalia:perissodactyla:equidae:equus:caballus","part_id":"part:muscle","name":"Horse","display_name":"Horse"}
@@ -52,9 +52,9 @@
 {"taxon_id":"tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae:oncorhynchus:mykiss","part_id":"part:muscle","name":"Trout","display_name":"Trout"}
 {"taxon_id":"tx:animalia:chordata:actinopterygii:scombriformes:scombridae:thunnus:albacares","part_id":"part:muscle","name":"Tuna","display_name":"Tuna"}
 {"taxon_id":"tx:animalia:chordata:actinopterygii:scombriformes:scombridae:thunnus:obesus","part_id":"part:muscle","name":"Tuna","display_name":"Tuna"}
-{"taxon_id":"tx:animalia:chordata:actinopterygii:gadiformes:gadoidea:gadus:morhua","part_id":"part:muscle","name":"Cod","display_name":"Cod"}
-{"taxon_id":"tx:animalia:chordata:actinopterygii:gadiformes:gadoidea:melanogrammus:aeglefinus","part_id":"part:muscle","name":"Haddock","display_name":"Haddock"}
-{"taxon_id":"tx:animalia:chordata:actinopterygii:gadiformes:gadoidea:gadus:chalcogrammus","part_id":"part:muscle","name":"Pollock","display_name":"Pollock"}
+{"taxon_id":"tx:animalia:chordata:actinopterygii:gadiformes:gadidae:gadus:morhua","part_id":"part:muscle","name":"Cod","display_name":"Cod"}
+{"taxon_id":"tx:animalia:chordata:actinopterygii:gadiformes:gadidae:melanogrammus:aeglefinus","part_id":"part:muscle","name":"Haddock","display_name":"Haddock"}
+{"taxon_id":"tx:animalia:chordata:actinopterygii:gadiformes:gadidae:gadus:chalcogrammus","part_id":"part:muscle","name":"Pollock","display_name":"Pollock"}
 {"taxon_id":"tx:animalia:chordata:actinopterygii:clupeiformes:clupeidae:clupea:harengus","part_id":"part:muscle","name":"Herring","display_name":"Herring"}
 {"taxon_id":"tx:animalia:chordata:actinopterygii:clupeiformes:engraulidae:engraulis:encrasicolus","part_id":"part:muscle","name":"Anchovy","display_name":"Anchovy"}
 {"taxon_id":"tx:animalia:chordata:actinopterygii:clupeiformes:clupeidae:sardina:pilchardus","part_id":"part:muscle","name":"Sardine","display_name":"Sardine"}

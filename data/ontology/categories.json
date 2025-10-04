@@ -1,0 +1,194 @@
+[
+    {
+        "id": "fruit",
+        "name": "Fruit",
+        "description": "Fleshy fruit tissue from plants",
+        "kind": "plant"
+    },
+    {
+        "id": "seed",
+        "name": "Seed",
+        "description": "Plant seeds and kernels",
+        "kind": "plant"
+    },
+    {
+        "id": "leaf",
+        "name": "Leaf",
+        "description": "Plant leaves and greens",
+        "kind": "plant"
+    },
+    {
+        "id": "grain",
+        "name": "Grain",
+        "description": "Cereal grains and caryopses",
+        "kind": "plant"
+    },
+    {
+        "id": "stem",
+        "name": "Stem",
+        "description": "Plant stems and stalks",
+        "kind": "plant"
+    },
+    {
+        "id": "flower",
+        "name": "Flower",
+        "description": "Plant flowers and buds",
+        "kind": "plant"
+    },
+    {
+        "id": "root",
+        "name": "Root",
+        "description": "Plant roots and underground parts",
+        "kind": "plant"
+    },
+    {
+        "id": "tuber",
+        "name": "Tuber",
+        "description": "Plant tubers and underground storage organs",
+        "kind": "plant"
+    },
+    {
+        "id": "bulb",
+        "name": "Bulb",
+        "description": "Plant bulbs and underground storage organs",
+        "kind": "plant"
+    },
+    {
+        "id": "rhizome",
+        "name": "Rhizome",
+        "description": "Plant rhizomes and underground stems",
+        "kind": "plant"
+    },
+    {
+        "id": "kernel",
+        "name": "Kernel",
+        "description": "Plant kernels and seeds",
+        "kind": "plant"
+    },
+    {
+        "id": "peel",
+        "name": "Peel",
+        "description": "Plant peels, rinds, and outer layers",
+        "kind": "plant"
+    },
+    {
+        "id": "bran",
+        "name": "Bran",
+        "description": "Grain bran and outer layers",
+        "kind": "plant"
+    },
+    {
+        "id": "germ",
+        "name": "Germ",
+        "description": "Grain germ and embryo",
+        "kind": "plant"
+    },
+    {
+        "id": "endosperm",
+        "name": "Endosperm",
+        "description": "Grain endosperm and starchy tissue",
+        "kind": "plant"
+    },
+    {
+        "id": "hull",
+        "name": "Hull",
+        "description": "Grain hulls and husks",
+        "kind": "plant"
+    },
+    {
+        "id": "muscle",
+        "name": "Muscle",
+        "description": "Animal muscle tissue",
+        "kind": "animal"
+    },
+    {
+        "id": "cut",
+        "name": "Cut",
+        "description": "Meat cuts and anatomical segments",
+        "kind": "animal"
+    },
+    {
+        "id": "organ",
+        "name": "Organ",
+        "description": "Animal organs and internal parts",
+        "kind": "animal"
+    },
+    {
+        "id": "fat",
+        "name": "Fat",
+        "description": "Animal fat and adipose tissue",
+        "kind": "animal"
+    },
+    {
+        "id": "skin",
+        "name": "Skin",
+        "description": "Animal skin and outer covering",
+        "kind": "animal"
+    },
+    {
+        "id": "bone",
+        "name": "Bone",
+        "description": "Animal bones and skeletal parts",
+        "kind": "animal"
+    },
+    {
+        "id": "marrow",
+        "name": "Marrow",
+        "description": "Bone marrow and internal bone tissue",
+        "kind": "animal"
+    },
+    {
+        "id": "egg",
+        "name": "Egg",
+        "description": "Animal eggs and reproductive parts",
+        "kind": "animal"
+    },
+    {
+        "id": "fruiting_body",
+        "name": "Fruiting Body",
+        "description": "Fungus fruiting body and reproductive structure",
+        "kind": "fungus"
+    },
+    {
+        "id": "cap",
+        "name": "Cap",
+        "description": "Mushroom cap and upper part",
+        "kind": "fungus"
+    },
+    {
+        "id": "stipe",
+        "name": "Stipe",
+        "description": "Mushroom stipe and stem",
+        "kind": "fungus"
+    },
+    {
+        "id": "dairy",
+        "name": "Dairy",
+        "description": "Dairy products and milk derivatives",
+        "kind": "derived"
+    },
+    {
+        "id": "oil",
+        "name": "Oil",
+        "description": "Oils and fats from plants or animals",
+        "kind": "derived"
+    },
+    {
+        "id": "juice",
+        "name": "Juice",
+        "description": "Expressed juices and liquids",
+        "kind": "derived"
+    },
+    {
+        "id": "byproduct",
+        "name": "Byproduct",
+        "description": "Processing byproducts and waste products",
+        "kind": "derived"
+    },
+    {
+        "id": "soy",
+        "name": "Soy",
+        "description": "Soy products and derivatives",
+        "kind": "derived"
+    }
+]

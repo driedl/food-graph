@@ -3,6 +3,7 @@
     "id": "part:fruit",
     "name": "Fruit",
     "kind": "plant",
+    "category": "fruit",
     "applies_to": [],
     "notes": "Fleshy fruit tissue"
   },
@@ -10,18 +11,21 @@
     "id": "part:seed",
     "name": "Seed",
     "kind": "plant",
+    "category": "seed",
     "applies_to": []
   },
   {
     "id": "part:leaf",
     "name": "Leaf",
     "kind": "plant",
+    "category": "leaf",
     "applies_to": []
   },
   {
     "id": "part:grain",
     "name": "Caryopsis (Grain)",
     "kind": "plant",
+    "category": "grain",
     "applies_to": [
       "tx:plantae:poaceae"
     ],
@@ -31,57 +35,82 @@
     "id": "part:muscle",
     "name": "Muscle",
     "kind": "animal",
+    "category": "muscle",
     "applies_to": []
   },
   {
-    "id": "part:cut:belly",
+    "id": "part:organ",
+    "name": "Organ",
+    "kind": "animal",
+    "category": "organ",
+    "notes": "Internal organs and body parts"
+  },
+  {
+    "id": "part:cut",
+    "name": "Cut",
+    "kind": "animal",
+    "category": "cut",
+    "parent_id": "part:muscle",
+    "notes": "Meat cuts from muscle tissue"
+  },
+  {
+    "id": "part:belly",
     "name": "Belly",
     "kind": "animal",
+    "category": "cut",
     "applies_to": [],
     "notes": "Pork belly / bacon source"
   },
   {
-    "id": "part:cut:loin",
+    "id": "part:loin",
     "name": "Loin",
     "kind": "animal",
+    "category": "cut",
     "applies_to": []
   },
   {
-    "id": "part:cut:brisket",
+    "id": "part:brisket",
     "name": "Brisket",
     "kind": "animal",
+    "category": "cut",
     "applies_to": [],
     "notes": "Beef brisket"
   },
   {
-    "id": "part:cut:round",
+    "id": "part:round",
     "name": "Round",
     "kind": "animal",
+    "category": "cut",
     "applies_to": [],
     "notes": "Beef round/leg"
   },
   {
-    "id": "part:organ:liver",
+    "id": "part:liver",
     "name": "Liver",
     "kind": "animal",
+    "category": "organ",
     "applies_to": []
   },
   {
-    "id": "part:organ:kidney",
+    "id": "part:kidney",
     "name": "Kidney",
     "kind": "animal",
+    "category": "organ",
     "applies_to": []
   },
   {
-    "id": "part:organ:heart",
+    "id": "part:heart",
     "name": "Heart",
     "kind": "animal",
+    "category": "organ",
     "applies_to": []
   },
   {
     "id": "part:fat:leaf",
     "name": "Leaf fat",
     "kind": "animal",
+    "category": "fat",
+    "parent_id": "part:fat",
     "applies_to": [],
     "notes": "Perirenal fat"
   },
@@ -89,140 +118,156 @@
     "id": "part:fat:subcutaneous",
     "name": "Subcutaneous fat",
     "kind": "animal",
+    "category": "fat",
+    "parent_id": "part:fat",
     "applies_to": []
   },
   {
-    "id": "part:cut:breast",
+    "id": "part:breast",
     "name": "Breast",
     "kind": "animal",
+    "category": "cut",
     "applies_to": [],
     "notes": "Chicken breast cut"
   },
   {
     "id": "part:stem",
     "name": "Stem",
-    "kind": "plant"
+    "kind": "plant",
+    "category": "stem"
   },
   {
     "id": "part:flower",
     "name": "Flower",
-    "kind": "plant"
+    "kind": "plant",
+    "category": "flower"
   },
   {
     "id": "part:root",
     "name": "Root",
-    "kind": "plant"
+    "kind": "plant",
+    "category": "root"
   },
   {
     "id": "part:tuber",
     "name": "Tuber",
-    "kind": "plant"
+    "kind": "plant",
+    "category": "tuber"
   },
   {
     "id": "part:bulb",
     "name": "Bulb",
-    "kind": "plant"
+    "kind": "plant",
+    "category": "bulb"
   },
   {
     "id": "part:rhizome",
     "name": "Rhizome",
-    "kind": "plant"
+    "kind": "plant",
+    "category": "rhizome"
   },
   {
     "id": "part:kernel",
     "name": "Kernel",
-    "kind": "plant"
-  },
-  {
-    "id": "part:peel",
-    "name": "Peel / Rind",
-    "kind": "plant"
-  },
-  {
-    "id": "part:pith",
-    "name": "Pith / Albedo",
-    "kind": "plant"
-  },
-  {
-    "id": "part:flavedo",
-    "name": "Flavedo (Zest layer)",
-    "kind": "plant"
+    "kind": "plant",
+    "category": "kernel"
   },
   {
     "id": "part:bran",
     "name": "Bran",
     "kind": "plant",
+    "category": "bran",
     "parent_id": "part:grain"
   },
   {
     "id": "part:germ",
     "name": "Germ",
     "kind": "plant",
+    "category": "germ",
     "parent_id": "part:grain"
   },
   {
     "id": "part:endosperm",
     "name": "Endosperm",
     "kind": "plant",
+    "category": "endosperm",
     "parent_id": "part:grain"
   },
   {
     "id": "part:hull",
     "name": "Hull / Husk",
-    "kind": "plant"
+    "kind": "plant",
+    "category": "hull"
   },
   {
     "id": "part:expressed_juice",
     "name": "Expressed juice",
-    "kind": "derived"
+    "kind": "derived",
+    "category": "juice"
   },
   {
     "id": "part:expressed_oil",
     "name": "Expressed oil",
-    "kind": "derived"
+    "kind": "derived",
+    "category": "oil"
+  },
+  {
+    "id": "part:oil",
+    "name": "Oil",
+    "kind": "derived",
+    "category": "oil",
+    "notes": "Processed oils from expressed oil"
   },
   {
     "id": "part:fruiting_body",
     "name": "Fruiting body",
-    "kind": "fungus"
+    "kind": "fungus",
+    "category": "fruiting_body"
   },
   {
-    "id": "part:cap",
+    "id": "part:fruiting_body:cap",
     "name": "Cap",
     "kind": "fungus",
+    "category": "cap",
     "parent_id": "part:fruiting_body"
   },
   {
-    "id": "part:stipe",
+    "id": "part:fruiting_body:stipe",
     "name": "Stipe (stem)",
     "kind": "fungus",
+    "category": "stipe",
     "parent_id": "part:fruiting_body"
   },
   {
     "id": "part:skin",
     "name": "Skin",
-    "kind": "animal"
+    "kind": "animal",
+    "category": "skin"
   },
   {
     "id": "part:fat",
     "name": "Fat",
-    "kind": "animal"
+    "kind": "animal",
+    "category": "fat"
   },
   {
     "id": "part:bone",
     "name": "Bone",
-    "kind": "animal"
+    "kind": "animal",
+    "category": "bone"
   },
   {
     "id": "part:marrow",
     "name": "Marrow",
     "kind": "animal",
+    "category": "marrow",
     "parent_id": "part:bone"
   },
   {
     "id": "part:roe",
     "name": "Roe",
-    "kind": "animal"
+    "kind": "animal",
+    "category": "egg"
   },
   {
     "id": "part:egg",
@@ -247,36 +292,42 @@
   {
     "id": "part:milk",
     "name": "Milk",
-    "kind": "animal"
+    "kind": "animal",
+    "category": "dairy"
   },
   {
     "id": "part:cream",
     "name": "Cream",
     "kind": "animal",
+    "category": "dairy",
     "parent_id": "part:milk"
   },
   {
     "id": "part:curd",
     "name": "Curd",
     "kind": "animal",
+    "category": "dairy",
     "parent_id": "part:milk"
   },
   {
     "id": "part:whey",
     "name": "Whey",
     "kind": "animal",
+    "category": "dairy",
     "parent_id": "part:milk"
   },
   {
     "id": "part:buttermilk",
     "name": "Buttermilk",
     "kind": "animal",
+    "category": "dairy",
     "parent_id": "part:cream"
   },
   {
     "id": "part:plant_milk",
     "name": "Plant Milk",
     "kind": "plant",
+    "category": "dairy",
     "applies_to": [],
     "notes": "Generic plant milk from aqueous extraction"
   },
@@ -284,6 +335,7 @@
     "id": "part:okara",
     "name": "Okara",
     "kind": "plant",
+    "category": "byproduct",
     "applies_to": [],
     "notes": "Plant fiber pulp from milling/straining"
   },
@@ -291,6 +343,7 @@
     "id": "part:tofu_serum",
     "name": "Tofu Serum",
     "kind": "plant",
+    "category": "byproduct",
     "applies_to": [],
     "notes": "Whey-like tofu serum from coagulation"
   }

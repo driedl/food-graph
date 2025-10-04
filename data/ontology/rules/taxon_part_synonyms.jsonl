@@ -10,7 +10,7 @@
 {"taxon_id":"tx:animalia:chordata:aves:galliformes:phasianidae:coturnix:japonica","part_id":"part:egg","synonyms":["quail eggs"]}
 
 {"taxon_id":"tx:animalia:chordata:mammalia:lagomorpha:leporidae:oryctolagus:cuniculus","part_id":"part:muscle","synonyms":["rabbit meat","coney","lapin"]}
-{"taxon_id":"tx:animalia:chordata:mammalia:lagomorpha:leporidae:lepus:europeaus","part_id":"part:muscle","synonyms":["hare meat"]}
+{"taxon_id":"tx:animalia:chordata:mammalia:lagomorpha:leporidae:lepus:europaeus","part_id":"part:muscle","synonyms":["hare meat"]}
 {"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:cervidae:cervus:elaphus","part_id":"part:muscle","synonyms":["venison","deer meat"]}
 {"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:cervidae:cervus:canadensis","part_id":"part:muscle","synonyms":["elk meat","wapiti"]}
 {"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:cervidae:alces:alces","part_id":"part:muscle","synonyms":["moose meat","elk (EU)"]}
@@ -25,7 +25,7 @@
 {"taxon_id":"tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae:salmo:salar","part_id":"part:muscle","synonyms":["lox","gravlax","salmon fillet"]}
 {"taxon_id":"tx:animalia:chordata:actinopterygii:scombriformes:scombridae:thunnus:albacares","part_id":"part:muscle","synonyms":["ahi","yellowfin tuna"]}
 {"taxon_id":"tx:animalia:chordata:actinopterygii:scombriformes:scombridae:thunnus:obesus","part_id":"part:muscle","synonyms":["ahi","bigeye tuna"]}
-{"taxon_id":"tx:animalia:chordata:actinopterygii:gadiformes:gadoidea:gadus:morhua","part_id":"part:muscle","synonyms":["codfish","bacalhau (salted)"]}
+{"taxon_id":"tx:animalia:chordata:actinopterygii:gadiformes:gadidae:gadus:morhua","part_id":"part:muscle","synonyms":["codfish","bacalhau (salted)"]}
 {"taxon_id":"tx:animalia:arthropoda:malacostraca:decapoda:penaeidae:litopenaeus:vannamei","part_id":"part:muscle","synonyms":["whiteleg shrimp","prawn"]}
 
 {"taxon_id":"tx:animalia:chordata:actinopterygii:scombriformes:scombridae:thunnus:","part_id":"part:muscle","synonyms":["ahi","yellowfin","bluefin","tuna"]}
@@ -41,4 +41,4 @@
 {"taxon_id":"tx:animalia:mollusca:bivalvia:ostreida:ostreidae:crassostrea:gigas","part_id":"part:muscle","synonyms":["oyster","pacific oyster"]}
 {"taxon_id":"tx:animalia:chordata:actinopterygii:acipenseriformes:acipenseridae:acipenser:baerii","part_id":"part:roe","synonyms":["black caviar","sturgeon caviar"]}
 {"taxon_id":"tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae:salmo:salar","part_id":"part:roe","synonyms":["ikura","red caviar"]}
-{"taxon_id":"tx:animalia:chordata:actinopterygii:gadiformes:gadoidea:gadus:chalcogrammus","part_id":"part:roe","synonyms":["tarako","mentaiko","pollock roe"]}
+{"taxon_id":"tx:animalia:chordata:actinopterygii:gadiformes:gadidae:gadus:chalcogrammus","part_id":"part:roe","synonyms":["tarako","mentaiko","pollock roe"]}

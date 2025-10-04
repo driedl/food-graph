@@ -257,7 +257,7 @@
     {
         "id": "BUTTER_DERIVATIVES",
         "identity_transforms": [
-            "tf:clarify?"
+            "tf:clarify_butter"
         ],
         "identity_params": [],
         "naming": {

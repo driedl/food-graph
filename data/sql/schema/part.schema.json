@@ -16,12 +16,18 @@
     },
     "kind": {
       "type": "string",
-      "enum": ["plant", "animal", "fungus", "derived", "any"],
+      "enum": [
+        "plant",
+        "animal",
+        "fungus",
+        "derived",
+        "any"
+      ],
       "description": "Biological kind: plant|animal|fungus|derived|any"
     },
     "category": {
       "type": "string",
-      "description": "Part category: organ, cut, fat, egg, grain, fruit, dairy, oil, etc."
+      "description": "Part category for filtering and organization. Must be a valid category ID from categories.json"
     },
     "parent_id": {
       "type": "string",
