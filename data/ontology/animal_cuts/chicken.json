@@ -4,19 +4,19 @@
   ],
   "parts": [
     {
-      "id": "part:cut:breast",
+      "id": "part:breast",
       "name": "Breast"
     },
     {
-      "id": "part:cut:thigh",
+      "id": "part:thigh",
       "name": "Thigh"
     },
     {
-      "id": "part:cut:wing",
+      "id": "part:wing",
       "name": "Wing"
     },
     {
-      "id": "part:cut:drumstick",
+      "id": "part:drumstick",
       "name": "Drumstick"
     }
   ]

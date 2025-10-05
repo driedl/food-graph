@@ -39,21 +39,6 @@
     "applies_to": []
   },
   {
-    "id": "part:organ",
-    "name": "Organ",
-    "kind": "animal",
-    "category": "organ",
-    "notes": "Internal organs and body parts"
-  },
-  {
-    "id": "part:cut",
-    "name": "Cut",
-    "kind": "animal",
-    "category": "cut",
-    "parent_id": "part:muscle",
-    "notes": "Meat cuts from muscle tissue"
-  },
-  {
     "id": "part:belly",
     "name": "Belly",
     "kind": "animal",

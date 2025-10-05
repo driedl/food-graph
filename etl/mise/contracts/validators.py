@@ -1048,11 +1048,8 @@ def _validate_part_naming_convention(path: Path, lines: List[dict], validator: D
         part_id = part.get('id', '')
         category = part.get('category', '')
         
-        # Anatomical parts should be part:specific with category
-        if part_id.startswith('part:cut:') or part_id.startswith('part:organ:'):
-            specific = part_id.split(':', 2)[-1]  # e.g., 'belly' from 'part:cut:belly'
-            expected_id = f"part:{specific}"
-            errs.append(f"{path}:[{i+1}]: part '{part_id}' should be '{expected_id}' with category: '{category}'")
+        # Legacy part:cut: and part:organ: patterns are no longer valid
+        # These should be part:specific with appropriate category
     
     return errs
 
@@ -1106,11 +1103,8 @@ def _validate_part_naming_convention_json(path: Path, obj: Any, validator: Dict[
         part_id = part.get('id', '')
         category = part.get('category', '')
         
-        # Anatomical parts should be part:specific with category
-        if part_id.startswith('part:cut:') or part_id.startswith('part:organ:'):
-            specific = part_id.split(':', 2)[-1]  # e.g., 'belly' from 'part:cut:belly'
-            expected_id = f"part:{specific}"
-            errs.append(f"{path}:[{i+1}]: part '{part_id}' should be '{expected_id}' with category: '{category}'")
+        # Legacy part:cut: and part:organ: patterns are no longer valid
+        # These should be part:specific with appropriate category
     
     return errs
 

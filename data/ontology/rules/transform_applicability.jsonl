@@ -1,10 +1,10 @@
-{"transform":"tf:trim","applies_to":[{"taxon_prefix":"tx:animalia","parts":["part:muscle","part:cut:loin","part:cut:round","part:cut:brisket","part:cut:belly"]}]}
-{"transform":"tf:cure","applies_to":[{"taxon_prefix":"tx:animalia","parts":["part:cut:belly"]}]}
-{"transform":"tf:smoke","applies_to":[{"taxon_prefix":"tx:animalia","parts":["part:cut:belly","part:cut:brisket"]}]}
-{"transform":"tf:cook","applies_to":[{"taxon_prefix":"tx:animalia","parts":["part:cut:belly","part:cut:brisket","part:cut:breast"]}]}
-{"transform":"tf:brine","applies_to":[{"taxon_prefix":"tx:animalia","parts":["part:cut:breast","part:cut:brisket"]}]}
-{"transform":"tf:cure","applies_to":[{"taxon_prefix":"tx:animalia","parts":["part:cut:brisket"]}]}
-{"transform":"tf:cook","applies_to":[{"taxon_prefix":"tx:animalia","parts":["part:muscle","part:cut:loin","part:cut:round","part:cut:brisket","part:cut:brisket:flat","part:cut:brisket:point","part:cut:belly","part:cut:breast","part:cut:thigh","part:cut:wing","part:cut:drumstick","part:organ:liver"]}]}
+{"transform":"tf:trim","applies_to":[{"taxon_prefix":"tx:animalia","parts":["part:muscle","part:loin","part:round","part:brisket","part:belly"]}]}
+{"transform":"tf:cure","applies_to":[{"taxon_prefix":"tx:animalia","parts":["part:belly"]}]}
+{"transform":"tf:smoke","applies_to":[{"taxon_prefix":"tx:animalia","parts":["part:belly","part:brisket"]}]}
+{"transform":"tf:cook","applies_to":[{"taxon_prefix":"tx:animalia","parts":["part:belly","part:brisket","part:breast"]}]}
+{"transform":"tf:brine","applies_to":[{"taxon_prefix":"tx:animalia","parts":["part:breast","part:brisket"]}]}
+{"transform":"tf:cure","applies_to":[{"taxon_prefix":"tx:animalia","parts":["part:brisket"]}]}
+{"transform":"tf:cook","applies_to":[{"taxon_prefix":"tx:animalia","parts":["part:muscle","part:loin","part:round","part:brisket","part:brisket:flat","part:brisket:point","part:belly","part:breast","part:thigh","part:wing","part:drumstick","part:liver"]}]}
 {"transform":"tf:cure","applies_to":[{"taxon_prefix":"tx:animalia:chordata:mammalia","parts":["part:muscle"]},{"taxon_prefix":"tx:animalia:chordata:actinopterygii","parts":["part:fillet"]}]}
 {"transform":"tf:smoke","applies_to":[{"taxon_prefix":"tx:animalia:chordata:mammalia","parts":["part:muscle"]},{"taxon_prefix":"tx:animalia:chordata:actinopterygii","parts":["part:fillet"]}]}
 {"transform":"tf:dry","applies_to":[{"taxon_prefix":"tx:fungi","parts":["part:fruiting_body"]},{"taxon_prefix":"tx:animalia:chordata:actinopterygii","parts":["part:fillet"]},{"taxon_prefix":"tx:plantae","parts":["part:fruit","part:seed"]}]}

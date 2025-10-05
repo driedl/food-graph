@@ -85,7 +85,7 @@
 
 1. **Param bucketing shape**: Stage E expects `"tf:family.param" → {cuts, labels}`; current file mixes another shape and keys (e.g., `age.time_d`).
 2. **Family expansions**: File exists but too sparse to generate rich TPTs when curated seed is absent.
-3. **Small applicability holes**: A few missing lines for `part:expressed_oil`, `part:butter`, and `part:cut:fillet`, and transforms like `tf:refine_oil`, `tf:clarify`.
+3. **Small applicability holes**: A few missing lines for `part:expressed_oil`, `part:butter`, and `part:fillet`, and transforms like `tf:refine_oil`, `tf:clarify`.
 
 ---
 
@@ -115,7 +115,7 @@
 
 * Append to `rules/parts_applicability.jsonl` if missing:
 
-  * `part:cut:fillet` → `tx:animalia:chordata:actinopterygii`
+  * `part:fillet` → `tx:animalia:chordata:actinopterygii`
   * `part:expressed_oil` → `tx:plantae:oleaceae:olea:europaea`
   * `part:butter` → `tx:animalia:chordata:mammalia:artiodactyla:bovidae`
 * Append to `rules/transform_applicability.jsonl`:
@@ -284,8 +284,8 @@ B) **Docs (inline)**
 ```jsonl
 {"family":"CULTURED_DAIRY","applies_to":[{"taxon_prefix":"tx:animalia:chordata:mammalia:artiodactyla:bovidae","parts":["part:milk"]}],"path":[{"id":"tf:ferment"}]}
 {"family":"BRINED_FERMENT_VEG","applies_to":[{"taxon_prefix":"tx:plantae:brassicaceae","parts":["part:leaf"]},{"taxon_prefix":"tx:plantae:cucurbitaceae:cucumis:sativus","parts":["part:fruit"]}],"path":[{"id":"tf:salt","params":{"salt_pct":2.5}},{"id":"tf:ferment"}]}
-{"family":"DRY_CURED_MEAT","applies_to":[{"taxon_prefix":"tx:animalia:chordata:mammalia:artiodactyla:suidae","parts":["part:cut:belly"]}],"path":[{"id":"tf:cure","params":{"style":"dry","nitrite_ppm":110}}]}
-{"family":"SMOKED_MEAT_FISH","applies_to":[{"taxon_prefix":"tx:animalia:chordata:actinopterygii","parts":["part:cut:fillet"]}],"path":[{"id":"tf:smoke","params":{"mode":"cold"}}]}
+{"family":"DRY_CURED_MEAT","applies_to":[{"taxon_prefix":"tx:animalia:chordata:mammalia:artiodactyla:suidae","parts":["part:belly"]}],"path":[{"id":"tf:cure","params":{"style":"dry","nitrite_ppm":110}}]}
+{"family":"SMOKED_MEAT_FISH","applies_to":[{"taxon_prefix":"tx:animalia:chordata:actinopterygii","parts":["part:fillet"]}],"path":[{"id":"tf:smoke","params":{"mode":"cold"}}]}
 {"family":"VIRGIN_OIL","applies_to":[{"taxon_prefix":"tx:plantae:oleaceae:olea:europaea","parts":["part:expressed_oil"]}],"path":[{"id":"tf:press"}]}
 {"family":"REFINED_OIL","applies_to":[{"taxon_prefix":"tx:plantae:oleaceae:olea:europaea","parts":["part:expressed_oil"]}],"path":[{"id":"tf:press"},{"id":"tf:refine_oil"}]}
 {"family":"BUTTER_DERIVATIVES","applies_to":[{"taxon_prefix":"tx:animalia:chordata:mammalia","parts":["part:butter"]}],"path":[{"id":"tf:clarify"}]}
@@ -294,7 +294,7 @@ B) **Docs (inline)**
 ### C) `rules/parts_applicability.jsonl` (append if missing)
 
 ```jsonl
-{"part":"part:cut:fillet","applies_to":["tx:animalia:chordata:actinopterygii"]}
+{"part":"part:fillet","applies_to":["tx:animalia:chordata:actinopterygii"]}
 {"part":"part:expressed_oil","applies_to":["tx:plantae:oleaceae:olea:europaea"]}
 {"part":"part:butter","applies_to":["tx:animalia:chordata:mammalia:artiodactyla:bovidae"]}
 ```
@@ -310,7 +310,7 @@ B) **Docs (inline)**
 
 ```jsonl
 {"taxon_id":"tx:plantae:oleaceae:olea:europaea","part_id":"part:expressed_oil","name":"Olive Oil","display_name":"Olive Oil"}
-{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:suidae:sus:scrofa_domesticus","part_id":"part:cut:belly","name":"Pork Belly","display_name":"Pork Belly"}
+{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:suidae:sus:scrofa_domesticus","part_id":"part:belly","name":"Pork Belly","display_name":"Pork Belly"}
 ```
 
 ---

@@ -4,7 +4,7 @@
   ],
   "parts": [
     {
-      "id": "part:cut:belly",
+      "id": "part:belly",
       "name": "Belly",
       "aliases": [
         "pork belly",
@@ -12,7 +12,7 @@
       ]
     },
     {
-      "id": "part:cut:loin",
+      "id": "part:loin",
       "name": "Loin"
     }
   ]

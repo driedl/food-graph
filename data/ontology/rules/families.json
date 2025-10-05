@@ -1,6 +1,7 @@
 [
     {
         "id": "CULTURED_DAIRY",
+        "display_name": "Cultured Dairy",
         "identity_transforms": [
             "tf:ferment",
             "tf:strain?"
@@ -50,6 +51,7 @@
     },
     {
         "id": "DRY_CURED_MEAT",
+        "display_name": "Dry Cured Meat",
         "identity_transforms": [
             "tf:cure",
             "tf:age",
@@ -105,6 +107,7 @@
     },
     {
         "id": "SMOKED_MEAT_FISH",
+        "display_name": "Smoked Meat & Fish",
         "identity_transforms": [
             "tf:smoke"
         ],
@@ -148,6 +151,7 @@
     },
     {
         "id": "BRINED_FERMENT_VEG",
+        "display_name": "Brined & Fermented Vegetables",
         "identity_transforms": [
             "tf:salt",
             "tf:ferment"
@@ -199,6 +203,7 @@
     },
     {
         "id": "VIRGIN_OIL",
+        "display_name": "Virgin Oils",
         "identity_transforms": [
             "tf:press"
         ],
@@ -217,6 +222,7 @@
     },
     {
         "id": "REFINED_OIL",
+        "display_name": "Refined Oils",
         "identity_transforms": [
             "tf:press",
             "tf:refine_oil"
@@ -237,6 +243,7 @@
     },
     {
         "id": "FLOURS_MEALS",
+        "display_name": "Flours & Meals",
         "identity_transforms": [
             "tf:mill"
         ],
@@ -256,6 +263,7 @@
     },
     {
         "id": "BUTTER_DERIVATIVES",
+        "display_name": "Butter Derivatives",
         "identity_transforms": [
             "tf:clarify_butter"
         ],

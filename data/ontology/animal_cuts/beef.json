@@ -4,28 +4,28 @@
   ],
   "parts": [
     {
-      "id": "part:cut:brisket",
+      "id": "part:brisket",
       "name": "Brisket",
       "aliases": [
         "plate brisket"
       ],
       "children": [
         {
-          "id": "part:cut:brisket:flat",
+          "id": "part:brisket:flat",
           "name": "Brisket (flat)"
         },
         {
-          "id": "part:cut:brisket:point",
+          "id": "part:brisket:point",
           "name": "Brisket (point)"
         }
       ]
     },
     {
-      "id": "part:cut:round",
+      "id": "part:round",
       "name": "Round"
     },
     {
-      "id": "part:cut:loin",
+      "id": "part:loin",
       "name": "Loin"
     }
   ]

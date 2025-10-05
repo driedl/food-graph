@@ -8,7 +8,7 @@
 {"id":"part:oil:virgin","name":"virgin oil","kind":"derived","category":"oil","parent_id":"part:oil","notes":"Unrefined, cold-pressed oil"}
 {"id":"part:oil:refined","name":"refined oil","kind":"derived","category":"oil","parent_id":"part:oil","notes":"Refined, processed oil"}
 {"id":"part:fillet","name":"fillet","kind":"derived","category":"cut","parent_id":"part:muscle","notes":"Boneless longitudinal section (fish/meat)"}
-{"id":"part:leg","name":"leg (hind ham)","kind":"derived","category":"cut","parent_id":"part:cut","notes":"Hind leg cut"}
+{"id":"part:leg","name":"leg (hind ham)","kind":"derived","category":"cut","parent_id":"part:muscle","notes":"Hind leg cut"}
 {"id":"part:fruit:peel","name":"fruit peel","kind":"derived","category":"fruit","parent_id":"part:fruit","notes":"Peel has layers; see children"}
 {"id":"part:fruit:peel:flavedo","name":"flavedo (zest)","kind":"derived","category":"fruit","parent_id":"part:fruit:peel","notes":"Outer colored layer of citrus peel"}
 {"id":"part:fruit:peel:albedo","name":"albedo (pith)","kind":"derived","category":"fruit","parent_id":"part:fruit:peel","notes":"Inner white layer of citrus peel"}

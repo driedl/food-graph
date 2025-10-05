@@ -1,7 +1,7 @@
 {"family":"CULTURED_DAIRY","taxon_prefix":"tx:animalia:chordata:mammalia:artiodactyla:bovidae","parts":["part:milk","part:cream"]}
-{"family":"DRY_CURED_MEAT","taxon_prefix":"tx:animalia:chordata:mammalia:artiodactyla:suidae","parts":["part:cut:belly","part:cut:leg"]}
-{"family":"SMOKED_MEAT_FISH","taxon_prefix":"tx:animalia:chordata:actinopterygii","parts":["part:cut:fillet"]}
-{"family":"SMOKED_MEAT_FISH","taxon_prefix":"tx:animalia:chordata:mammalia","parts":["part:cut:belly","part:cut:shoulder"]}
+{"family":"DRY_CURED_MEAT","taxon_prefix":"tx:animalia:chordata:mammalia:artiodactyla:suidae","parts":["part:belly","part:leg"]}
+{"family":"SMOKED_MEAT_FISH","taxon_prefix":"tx:animalia:chordata:actinopterygii","parts":["part:fillet"]}
+{"family":"SMOKED_MEAT_FISH","taxon_prefix":"tx:animalia:chordata:mammalia","parts":["part:belly","part:shoulder"]}
 {"family":"BRINED_FERMENT_VEG","taxon_prefix":"tx:plantae:brassicaceae","parts":["part:leaf"]}
 {"family":"BRINED_FERMENT_VEG","taxon_prefix":"tx:plantae:cucurbitaceae:cucumis:sativus","parts":["part:fruit"]}
 {"family":"VIRGIN_OIL","taxon_prefix":"tx:plantae:oleaceae:olea:europaea","parts":["part:expressed_oil","part:fruit"]}

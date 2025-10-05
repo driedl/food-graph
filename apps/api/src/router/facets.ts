@@ -63,7 +63,7 @@ export const facetsRouter = t.router({
     overlayDataForTaxon: t.procedure
         .input(z.object({
             taxonId: z.string(),
-            overlayTypes: z.array(z.enum(['parts', 'identity', 'families', 'cuisines', 'flags', 'docs', 'tf'])).default([]),
+            overlayTypes: z.array(z.enum(['parts', 'identity', 'families', 'cuisines', 'flags', 'docs', 'tf'])).default(['parts', 'families', 'cuisines', 'flags', 'docs']),
             tfId: z.string().optional()
         }))
         .query(({ input }) => {
@@ -74,17 +74,19 @@ export const facetsRouter = t.router({
                 const partsData = db.prepare(`
                     SELECT 
                         n.id,
-                        COUNT(DISTINCT p.id) as partsCount
+                        COUNT(DISTINCT p.id) as partsCount,
+                        GROUP_CONCAT(DISTINCT p.name) as partsList
                     FROM nodes n
                     LEFT JOIN tpt_nodes tpt ON tpt.taxon_id = n.id
                     LEFT JOIN part_def p ON p.id = tpt.part_id
                     WHERE n.parent_id = ?
                     GROUP BY n.id
-                `).all(input.taxonId) as Array<{ id: string; partsCount: number }>
+                `).all(input.taxonId) as Array<{ id: string; partsCount: number; partsList: string }>
 
                 partsData.forEach(row => {
                     if (!results[row.id]) results[row.id] = {}
                     results[row.id]._partsCount = row.partsCount
+                    results[row.id]._parts = row.partsList?.split(',').filter(Boolean) || []
                 })
             }
 
@@ -93,10 +95,10 @@ export const facetsRouter = t.router({
                 const identityData = db.prepare(`
                     SELECT 
                         n.id,
-                        AVG(CAST(JSON_ARRAY_LENGTH(tpt.identity) AS REAL)) as identityAvg
+                        AVG(CAST(JSON_ARRAY_LENGTH(tpt.path_json) AS REAL)) as identityAvg
                     FROM nodes n
                     LEFT JOIN tpt_nodes tpt ON tpt.taxon_id = n.id
-                    WHERE n.parent_id = ? AND tpt.identity IS NOT NULL
+                    WHERE n.parent_id = ? AND tpt.path_json IS NOT NULL
                     GROUP BY n.id
                 `).all(input.taxonId) as Array<{ id: string; identityAvg: number }>
 
@@ -111,16 +113,18 @@ export const facetsRouter = t.router({
                 const familiesData = db.prepare(`
                     SELECT 
                         n.id,
-                        COUNT(DISTINCT tpt.family) as familiesCount
+                        COUNT(DISTINCT tpt.family) as familiesCount,
+                        GROUP_CONCAT(DISTINCT tpt.family) as familiesList
                     FROM nodes n
                     LEFT JOIN tpt_nodes tpt ON tpt.taxon_id = n.id
                     WHERE n.parent_id = ? AND tpt.family IS NOT NULL
                     GROUP BY n.id
-                `).all(input.taxonId) as Array<{ id: string; familiesCount: number }>
+                `).all(input.taxonId) as Array<{ id: string; familiesCount: number; familiesList: string }>
 
                 familiesData.forEach(row => {
                     if (!results[row.id]) results[row.id] = {}
                     results[row.id]._familiesCount = row.familiesCount
+                    results[row.id]._families = row.familiesList?.split(',').filter(Boolean) || []
                 })
             }
 
@@ -129,17 +133,19 @@ export const facetsRouter = t.router({
                 const cuisinesData = db.prepare(`
                     SELECT 
                         n.id,
-                        COUNT(DISTINCT tc.cuisine) as cuisinesCount
+                        COUNT(DISTINCT tc.cuisine) as cuisinesCount,
+                        GROUP_CONCAT(DISTINCT tc.cuisine) as cuisinesList
                     FROM nodes n
                     LEFT JOIN tpt_nodes tpt ON tpt.taxon_id = n.id
                     LEFT JOIN tpt_cuisines tc ON tc.tpt_id = tpt.id
                     WHERE n.parent_id = ?
                     GROUP BY n.id
-                `).all(input.taxonId) as Array<{ id: string; cuisinesCount: number }>
+                `).all(input.taxonId) as Array<{ id: string; cuisinesCount: number; cuisinesList: string }>
 
                 cuisinesData.forEach(row => {
                     if (!results[row.id]) results[row.id] = {}
                     results[row.id]._cuisinesCount = row.cuisinesCount
+                    results[row.id]._cuisines = row.cuisinesList?.split(',').filter(Boolean) || []
                 })
             }
 
@@ -148,17 +154,19 @@ export const facetsRouter = t.router({
                 const flagsData = db.prepare(`
                     SELECT 
                         n.id,
-                        COUNT(DISTINCT tf.flag) as flagsCount
+                        COUNT(DISTINCT tf.flag) as flagsCount,
+                        GROUP_CONCAT(DISTINCT tf.flag) as flagsList
                     FROM nodes n
                     LEFT JOIN tpt_nodes tpt ON tpt.taxon_id = n.id
                     LEFT JOIN tpt_flags tf ON tf.tpt_id = tpt.id
                     WHERE n.parent_id = ?
                     GROUP BY n.id
-                `).all(input.taxonId) as Array<{ id: string; flagsCount: number }>
+                `).all(input.taxonId) as Array<{ id: string; flagsCount: number; flagsList: string }>
 
                 flagsData.forEach(row => {
                     if (!results[row.id]) results[row.id] = {}
                     results[row.id]._flagsCount = row.flagsCount
+                    results[row.id]._flags = row.flagsList?.split(',').filter(Boolean) || []
                 })
             }
 
@@ -167,9 +175,9 @@ export const facetsRouter = t.router({
                 const docsData = db.prepare(`
                     SELECT 
                         n.id,
-                        CASE WHEN d.id IS NOT NULL THEN 1 ELSE 0 END as hasDocs
+                        CASE WHEN td.taxon_id IS NOT NULL THEN 1 ELSE 0 END as hasDocs
                     FROM nodes n
-                    LEFT JOIN docs d ON d.taxon_id = n.id
+                    LEFT JOIN taxon_doc td ON td.taxon_id = n.id
                     WHERE n.parent_id = ?
                 `).all(input.taxonId) as Array<{ id: string; hasDocs: number }>
 

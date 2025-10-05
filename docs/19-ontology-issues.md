@@ -7,7 +7,7 @@ This document tracks inconsistencies found in the food graph ontology and sugges
 ### 1. Duplicate Parts
 
 #### Liver Parts
-- `part:organ:liver` (line 80) - "Liver" with kind "animal" ✅ **Keep this one**
+- `part:liver` (with category: "organ") (line 80) - "Liver" with kind "animal" ✅ **Keep this one**
 - `part:liver` (line 235) - "Liver" with kind "animal" ❌ **Remove - duplicate**
 
 #### Egg Parts
@@ -53,7 +53,7 @@ This document tracks inconsistencies found in the food graph ontology and sugges
 ### 4. Inconsistent Naming Patterns
 
 #### Current Patterns
-- **Hierarchical:** `part:organ:liver`, `part:cut:brisket`, `part:fat:leaf`
+- **Hierarchical:** `part:fat:leaf` (true parent-child relationships only)
 - **Flat:** `part:liver`, `part:muscle`, `part:bone`
 - **Legacy:** `part:egg_white` vs `part:egg:white`
 
@@ -78,8 +78,8 @@ part:{category}:{specific}
 ```
 
 Examples:
-- `part:organ:liver`
-- `part:cut:brisket`
+- `part:liver` (with category: "organ")
+- `part:brisket` (with category: "cut")
 - `part:fat:leaf`
 - `part:egg:white`
 - `part:grain:bran`
@@ -879,13 +879,13 @@ if __name__ == "__main__":
 {"id":"part:oil:virgin","name":"virgin oil","kind":"derived","category":"oil","parent_id":"part:expressed_oil"}
 {"id":"part:oil:refined","name":"refined oil","kind":"derived","category":"oil","parent_id":"part:expressed_oil"}
 {"id":"part:fillet","name":"fillet","kind":"animal","category":"cut","parent_id":"part:muscle","notes":"Boneless longitudinal section (fish/meat)"}
-{"id":"part:cut:leg","name":"leg (hind ham)","kind":"animal","category":"cut","parent_id":"part:muscle"}
+{"id":"part:leg","name":"leg (hind ham)","kind":"animal","category":"cut","parent_id":"part:muscle"}
 {"id":"part:fruit:peel","name":"fruit peel","kind":"derived","category":"fruit","parent_id":"part:fruit","notes":"Peel has layers; see children"}
 {"id":"part:fruit:peel:flavedo","name":"flavedo (zest)","kind":"derived","category":"fruit","parent_id":"part:fruit:peel"}
 {"id":"part:fruit:peel:albedo","name":"albedo (pith)","kind":"derived","category":"fruit","parent_id":"part:fruit:peel"}
 ```
 
-**Note:** Anatomical cuts like `part:fillet` and `part:cut:leg` use `kind:"animal"` + `category:"cut"` as they are anatomical segmentations, not process-derived products.
+**Note:** Anatomical cuts like `part:fillet` and `part:leg` use `kind:"animal"` + `category:"cut"` as they are anatomical segmentations, not process-derived products.
 
 #### B. Schema Updates:
 
@@ -1083,17 +1083,17 @@ Parts that could benefit from notes for clarity:
 
 ### 13. Missing Parts in Animal Cuts (Medium - 3 items)
 **Chicken cuts missing from parts.json:**
-- **`part:cut:thigh`** - Defined in chicken.json but not in parts.json
-- **`part:cut:wing`** - Defined in chicken.json but not in parts.json  
-- **`part:cut:drumstick`** - Defined in chicken.json but not in parts.json
+- **`part:thigh`** - Defined in chicken.json but not in parts.json
+- **`part:wing`** - Defined in chicken.json but not in parts.json  
+- **`part:drumstick`** - Defined in chicken.json but not in parts.json
 
 ### 14. Inconsistent Family Assignments (Low - 5 items)
 **Family allowlist inconsistencies:**
-- **`part:cut:leg`** - Referenced in family_allowlist.jsonl but not defined in parts.json
-- **`part:cut:shoulder`** - Referenced in family_allowlist.jsonl but not defined in parts.json
+- **`part:leg`** - Referenced in family_allowlist.jsonl but not defined in parts.json
+- **`part:shoulder`** - Referenced in family_allowlist.jsonl but not defined in parts.json
 - **`part:meat`** - Referenced in family_expansions.jsonl but not defined in parts.json
-- **`part:cut:fillet`** - Referenced in transform_applicability.jsonl but not defined in parts.json
-- **`part:cut:brisket:flat`** - Referenced in transform_applicability.jsonl but not defined in parts.json
+- **`part:fillet`** - Referenced in transform_applicability.jsonl but not defined in parts.json
+- **`part:brisket:flat`** - Referenced in transform_applicability.jsonl but not defined in parts.json
 
 ### 15. Duplicate Name Overrides (Low - 2 items)
 - **Chicken Egg** - Appears twice in name_overrides.jsonl (lines 22 and 89)
@@ -1265,7 +1265,7 @@ SELECT * FROM chain;
 - `part:lard` (derived) → parent `part:fat` → parent `part:muscle`
 - `part:tofu` (derived) → parent `part:seed`
 - `part:fillet` (derived) → parent `part:muscle`
-- `part:cut:leg` (derived) → parent `part:muscle`
+- `part:leg` (derived) → parent `part:muscle`
 
 **Implementation Examples**:
 ```json
@@ -1276,7 +1276,7 @@ SELECT * FROM chain;
   {"id":"part:fermented_milk","name":"fermented milk","kind":"derived","parent_id":"part:milk"},
   {"id":"part:tofu","name":"tofu","kind":"derived","parent_id":"part:seed"},
   {"id":"part:fillet","name":"fillet","kind":"cut","parent_id":"part:muscle"},
-  {"id":"part:cut:leg","name":"leg (hind ham)","kind":"cut","parent_id":"part:muscle"}
+  {"id":"part:leg","name":"leg (hind ham)","kind":"cut","parent_id":"part:muscle"}
 ]
 ```
 
@@ -1318,7 +1318,7 @@ SELECT * FROM chain;
 
 **Cuisine Mappings** (`rules/cuisine_map.jsonl`):
 ```jsonl
-{"match":{"taxon_prefix":"tx:animalia:chordata:mammalia:artiodactyla:suidae:sus","parts":["part:cut:belly"]},"cuisines":["American","British","German"]}
+{"match":{"taxon_prefix":"tx:animalia:chordata:mammalia:artiodactyla:suidae:sus","parts":["part:belly"]},"cuisines":["American","British","German"]}
 {"match":{"taxon_prefix":"tx:animalia:chordata:actinopterygii:salmoniformes:salmo","parts":["part:fillet"]},"cuisines":["Nordic","Jewish"]}
 {"match":{"taxon_prefix":"tx:plantae:fabaceae:glycine:max","parts":["part:seed","part:tofu"]},"cuisines":["Chinese","Japanese","Korean","Indian"]}
 {"match":{"taxon_prefix":"tx:plantae:oleaceae:olea:europaea","parts":["part:expressed_oil"]},"cuisines":["Mediterranean","Middle Eastern"]}
@@ -1326,14 +1326,14 @@ SELECT * FROM chain;
 
 **Name Overrides** (`rules/name_overrides.jsonl`):
 ```jsonl
-{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:suidae:sus:scrofa_domesticus","part_id":"part:cut:belly","name":"pork belly","display_name":"Pork belly"}
+{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:suidae:sus:scrofa_domesticus","part_id":"part:belly","name":"pork belly","display_name":"Pork belly"}
 {"taxon_id":"tx:plantae:oleaceae:olea:europaea","part_id":"part:expressed_oil","name":"olive oil","display_name":"Olive oil"}
 ```
 
 **Taxon Part Synonyms** (`rules/taxon_part_synonyms.jsonl`):
 ```jsonl
 {"taxon_id":"tx:plantae:oleaceae:olea:europaea","part_id":"part:expressed_oil","synonyms":["evoo","virgin olive oil","refined olive oil"]}
-{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:suidae:sus:scrofa_domesticus","part_id":"part:cut:belly","synonyms":["streaky"]}
+{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:suidae:sus:scrofa_domesticus","part_id":"part:belly","synonyms":["streaky"]}
 ```
 
 ### 4. Transform Parameter Validation Issues (Critical)
@@ -1447,7 +1447,7 @@ WHERE instr(c.path, '|' || t.id || '|') > 0;
 {"id":"tpt:tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus:part:butter:unknown:ghee","taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus","part_id":"part:butter","family":"DAIRY_BUTTER","path":[{"id":"tf:clarify_butter","params":{"stage":"ghee"}}],"identity":[{"id":"tf:clarify_butter","params":{}}],"identity_hash":"","name":"Ghee","synonyms":["clarified butter"],"notes":null}
 
 // Cured meats
-{"id":"tpt:tx:animalia:chordata:mammalia:artiodactyla:suidae:sus:scrofa_domesticus:part:cut:belly:unknown:us-bacon","taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:suidae:sus:scrofa_domesticus","part_id":"part:cut:belly","family":"PORK_CURED_SMOKED","path":[{"id":"tf:cure","params":{"style":"dry","nitrite_ppm":120}},{"id":"tf:smoke","params":{"mode":"hot","time_h":4,"temp_C":80}}],"identity":[{"id":"tf:cure","params":{"nitrite_ppm":120,"style":"dry"}},{"id":"tf:smoke","params":{"mode":"hot"}}],"identity_hash":"","name":"American Bacon","synonyms":["streaky bacon (hot-smoked)"],"notes":null}
+{"id":"tpt:tx:animalia:chordata:mammalia:artiodactyla:suidae:sus:scrofa_domesticus:part:belly:unknown:us-bacon","taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:suidae:sus:scrofa_domesticus","part_id":"part:belly","family":"PORK_CURED_SMOKED","path":[{"id":"tf:cure","params":{"style":"dry","nitrite_ppm":120}},{"id":"tf:smoke","params":{"mode":"hot","time_h":4,"temp_C":80}}],"identity":[{"id":"tf:cure","params":{"nitrite_ppm":120,"style":"dry"}},{"id":"tf:smoke","params":{"mode":"hot"}}],"identity_hash":"","name":"American Bacon","synonyms":["streaky bacon (hot-smoked)"],"notes":null}
 
 // Fish products
 {"id":"tpt:tx:animalia:chordata:actinopterygii:salmoniformes:salmo:salar:part:fillet:unknown:cold-smoked-salmon","taxon_id":"tx:animalia:chordata:actinopterygii:salmoniformes:salmo:salar","part_id":"part:fillet","family":"FISH_CURED_SMOKED","path":[{"id":"tf:cure","params":{"style":"dry","nitrite_ppm":0}},{"id":"tf:smoke","params":{"mode":"cold","temp_C":22,"time_h":12}}],"identity":[{"id":"tf:cure","params":{"style":"dry","nitrite_ppm":0}},{"id":"tf:smoke","params":{"mode":"cold"}}],"identity_hash":"","name":"Cold-smoked Salmon","synonyms":["lox"],"notes":null}
@@ -1468,7 +1468,7 @@ WHERE instr(c.path, '|' || t.id || '|') > 0;
 {"id":"tpt:tx:animalia:chordata:mammalia:artiodactyla:suidae:sus:scrofa_domesticus:part:muscle:unknown:prosciutto","taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:suidae:sus:scrofa_domesticus","part_id":"part:muscle","family":"PORK_CURED_SMOKED","path":[{"id":"tf:cure","params":{"salt_pct":3,"nitrite_ppm":0}},{"id":"tf:age","params":{"time_d":365}}],"identity":[{"id":"tf:cure","params":{"salt_pct":3,"nitrite_ppm":0}},{"id":"tf:age","params":{}}],"identity_hash":"","name":"Prosciutto crudo","synonyms":["prosciutto"],"notes":null}
 
 // American bacon - tests multi-param allOf and safety flags
-{"id":"tpt:tx:animalia:chordata:mammalia:artiodactyla:suidae:sus:scrofa_domesticus:part:cut:belly:unknown:us-bacon","taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:suidae:sus:scrofa_domesticus","part_id":"part:cut:belly","family":"PORK_CURED_SMOKED","path":[{"id":"tf:cure","params":{"nitrite_ppm":120}},{"id":"tf:smoke","params":{"mode":"hot","temp_C":80,"time_h":4}}],"identity":[{"id":"tf:cure","params":{"nitrite_ppm":120}},{"id":"tf:smoke","params":{"mode":"hot"}}],"identity_hash":"","name":"American Bacon","synonyms":["streaky bacon (hot-smoked)"],"notes":null}
+{"id":"tpt:tx:animalia:chordata:mammalia:artiodactyla:suidae:sus:scrofa_domesticus:part:belly:unknown:us-bacon","taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:suidae:sus:scrofa_domesticus","part_id":"part:belly","family":"PORK_CURED_SMOKED","path":[{"id":"tf:cure","params":{"nitrite_ppm":120}},{"id":"tf:smoke","params":{"mode":"hot","temp_C":80,"time_h":4}}],"identity":[{"id":"tf:cure","params":{"nitrite_ppm":120}},{"id":"tf:smoke","params":{"mode":"hot"}}],"identity_hash":"","name":"American Bacon","synonyms":["streaky bacon (hot-smoked)"],"notes":null}
 
 // Cold-smoked salmon - tests mode validation and cuisine mapping
 {"id":"tpt:tx:animalia:chordata:actinopterygii:salmoniformes:salmo:salar:part:fillet:unknown:cold-smoked-salmon","taxon_id":"tx:animalia:chordata:actinopterygii:salmoniformes:salmo:salar","part_id":"part:fillet","family":"FISH_CURED_SMOKED","path":[{"id":"tf:cure","params":{"style":"dry","nitrite_ppm":0}},{"id":"tf:smoke","params":{"mode":"cold","temp_C":22,"time_h":12}}],"identity":[{"id":"tf:cure","params":{"style":"dry","nitrite_ppm":0}},{"id":"tf:smoke","params":{"mode":"cold"}}],"identity_hash":"","name":"Cold-smoked Salmon","synonyms":["lox"],"notes":null}
@@ -1598,7 +1598,7 @@ The following **lintable rules** have been validated and can be adopted for ETL2
 7. **One ID, one place.**
 
    * Define every `part:*` exactly once in `parts.json`. Other files (e.g., `animal_cuts/*.json`) may **reference** parts but never introduce new IDs or nested “children” trees.
-   * Today: `part:cut:brisket:flat/point`, `part:cut:thigh/wing/drumstick` are defined outside `parts.json`.
+   * Today: `part:brisket:flat/point`, `part:thigh/wing/drumstick` are defined outside `parts.json`.
 8. **Hierarchy is explicit and acyclic.**
 
    * If a part is a child, set `parent_id` and ensure the parent exists. No drift between `parent_id` and “children” arrays elsewhere.
@@ -1636,7 +1636,7 @@ The following **lintable rules** have been validated and can be adopted for ETL2
 15. **No phantom parts.**
 
 * Any part referenced in `applicability`, `implied_parts`, or `family_allowlist` must exist in `parts.json`.
-* Today: references to `part:meat`, `part:cut:fillet`, `part:cut:leg`, `part:cut:shoulder` don’t match canonical part IDs (`part:muscle`, `part:fillet`, etc.).
+* Today: references to `part:meat`, `part:fillet`, `part:leg`, `part:shoulder` don't match canonical part IDs (`part:muscle`, `part:fillet`, etc.).
 
 16. **No duplicated applicability rows.**
 
@@ -1726,7 +1726,7 @@ The following **lintable rules** have been validated and can be adopted for ETL2
 # Data hygiene (examples of what to catch later, not to fix now)
 
 * Misspellings: e.g., `lepus:europeaus` (should be `europaeus`), family/rank swaps (`gadoidea` vs `gadidae`).
-* Phantom IDs: `part:meat`, `part:cut:leg`, `part:cut:shoulder`.
+* Phantom IDs: `part:meat`, `part:leg`, `part:shoulder`.
 * Transform collisions: multiple `tf:smoke`/`tf:cure` with incompatible params and orders.
 * Synonyms that encode transforms (“smoked salmon”, “bacalhau”), attributes (“raw milk”), or marketing (“free range eggs”).
 * Mixed taxonomy backbones (`Alliaceae` vs `Amaryllidaceae`).

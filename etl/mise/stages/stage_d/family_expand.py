@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Dict, List, Any, Iterable, Tuple, Set
 import json
 
-from ...io import read_jsonl, write_jsonl, ensure_dir
+from ...io import read_jsonl, write_jsonl, read_json, ensure_dir
 from ...shared.normalize import normalize_applies_to
 
 def _load_allowlist(path: Path) -> set[str]:
@@ -18,55 +18,69 @@ def _load_allowlist(path: Path) -> set[str]:
     return out
 
 
-def _load_family_rules(path: Path) -> List[Dict[str, Any]]:
+def _load_family_rules(families_path: Path, allowlist_path: Path) -> List[Dict[str, Any]]:
     """
-    Spec (JSONL):
-      {
-        "family": "DRY_CURED_MEAT",
-        "applies_to": ["tx:animalia", {"taxon_prefix":"tx:animalia:mammalia","parts":["part:meat"]}],
-        "path": [{"id":"tf:cure","params":{"style":"dry"}}],
-        "name": "optional name template input",
-        "synonyms": ["optional", "syns"],
-        "notes": "optional"
-      }
+    Load family definitions from families.json and applicability rules from family_allowlist.jsonl.
+    Combine them to create expansion rules with proper (taxon, part) restrictions.
     """
-    if not path.exists():
+    if not families_path.exists():
         return []
-    rows = read_jsonl(path)
+    
+    # Load family definitions
+    families = read_json(families_path)
+    if not isinstance(families, list):
+        families = [families] if isinstance(families, dict) else []
+    
+    # Load allowlist rules
+    allowlist_rules = []
+    if allowlist_path.exists():
+        allowlist_data = read_jsonl(allowlist_path)
+        # Group by family
+        allowlist_by_family = {}
+        for rule in allowlist_data:
+            fam_id = rule.get("family")
+            if fam_id:
+                if fam_id not in allowlist_by_family:
+                    allowlist_by_family[fam_id] = []
+                allowlist_by_family[fam_id].append({
+                    "taxon_prefix": rule.get("taxon_prefix", ""),
+                    "parts": rule.get("parts", [])
+                })
+    else:
+        allowlist_by_family = {}
+    
     rules: List[Dict[str, Any]] = []
-    for r in rows:
-        fam = r.get("family")
-        path = r.get("path") or []
-        if not isinstance(fam, str) or not fam or not isinstance(path, list):
+    for family in families:
+        fam_id = family.get("id")
+        identity_transforms = family.get("identity_transforms", [])
+        
+        if not fam_id or not identity_transforms:
             continue
-        def _params_map(raw: Any) -> Dict[str, Any]:
-            if isinstance(raw, dict):
-                return {str(k): v for k, v in raw.items()}
-            if isinstance(raw, list):
-                out: Dict[str, Any] = {}
-                for item in raw:
-                    if isinstance(item, dict):
-                        if "key" in item and "value" in item:
-                            out[str(item["key"])] = item["value"]
-                        elif len(item) == 1:
-                            k = next(iter(item.keys()))
-                            out[str(k)] = item[k]
-                return out
-            return {}
-        def _norm_path(path_arr: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-            out = []
-            for s in (path_arr or []):
-                if isinstance(s, dict) and "id" in s:
-                    out.append({"id": s["id"], "params": _params_map(s.get("params"))})
-            return out
+            
+        # Convert identity_transforms to path format
+        path = []
+        for tf_id in identity_transforms:
+            if tf_id.endswith('?'):
+                # Optional transform - we'll handle this in expansion
+                tf_id = tf_id[:-1]
+            path.append({"id": tf_id, "params": {}})
+        
+        # Get applicability rules for this family
+        applies_to = allowlist_by_family.get(fam_id, [])
+        if not applies_to:
+            # If no allowlist rules, apply to all substrates (fallback)
+            applies_to = [{"taxon_prefix": "", "parts": []}]
+        
+        # Create expansion rule for this family
         rules.append({
-            "family": fam,
-            "applies_to": normalize_applies_to(r.get("applies_to") or []),
-            "path": _norm_path(path),
-            "name": r.get("name"),
-            "synonyms": r.get("synonyms") or [],
-            "notes": r.get("notes"),
+            "family": fam_id,
+            "applies_to": applies_to,
+            "path": path,
+            "name": family.get("display_name", fam_id),
+            "synonyms": [],
+            "notes": f"Generated from families.json + allowlist for {fam_id}"
         })
+    
     return rules
 
 def _substrate_pairs(graph_dir: Path) -> Set[Tuple[str, str]]:
@@ -84,18 +98,16 @@ def expand_families(
     out_path  = tmp_dir / "tpt_generated.jsonl"
 
     # inputs
-    rules_path = in_dir / "rules" / "family_expansions.jsonl"
+    families_path = in_dir / "rules" / "families.json"
     allowlist_path = in_dir / "rules" / "family_allowlist.jsonl"
 
-    rules = _load_family_rules(rules_path)
+    rules = _load_family_rules(families_path, allowlist_path)
     if not rules:
         # still emit empty file
         write_jsonl(out_path, [])
         if verbose:
-            print("• Stage D: no family_expansions.jsonl → wrote empty generated set.")
+            print("• Stage D: no families.json → wrote empty generated set.")
         return
-
-    allowed = _load_allowlist(allowlist_path)  # optional; empty set means "allow all"
     pairs = _substrate_pairs(tmp_dir.parent / "graph")
 
     out_rows: List[Dict[str, Any]] = []
@@ -107,8 +119,6 @@ def expand_families(
 
     for rule in rules:
         fam = rule["family"]
-        if allowed and fam not in allowed:
-            continue
         for ap in rule["applies_to"] or [{"taxon_prefix": "", "parts": []}]:
             tpref = ap.get("taxon_prefix", "")
             parts = ap.get("parts") or []

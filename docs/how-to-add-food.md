@@ -8,7 +8,7 @@ This is the single source of truth for how to extend our food ontology and make 
 
 - **Taxa (`tx:`)**: The biological tree (plants, animals, fungi…). IDs are colon-separated paths:
   `tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus`.
-- **Parts (`part:`)**: Anatomical or product subcomponents usable across taxa (e.g., `part:milk`, `part:curd`, `part:cut:ribeye`). Parts form a hierarchy and can have synonyms.
+- **Parts (`part:`)**: Anatomical or product subcomponents usable across taxa (e.g., `part:milk`, `part:curd`, `part:ribeye`). Parts form a hierarchy and can have synonyms.
 - **Transforms (`tf:`)**: Canonical processing steps (e.g., `tf:coagulate`, `tf:ferment`, `tf:strain`). Each has a JSON schema for parameters and an `identity` flag.
   **Important:** Only **identity** transforms are allowed in canonical composition paths.
 - **Rules**:
@@ -63,7 +63,7 @@ This is the single source of truth for how to extend our food ontology and make 
 
 - An anatomical or product subcomponent that can be “the thing you eat or process next.” Examples:
   - Cross-kingdom: `part:seed`, `part:oil` (derived), `part:flour`
-  - Animal: `part:muscle`, `part:fat`, `part:organ:liver`, `part:cut:ribeye`
+  - Animal: `part:muscle`, `part:fat`, `part:liver`, `part:ribeye`
   - Dairy: `part:milk`, `part:cream`, `part:curd`, `part:whey`, `part:butter`, `part:buttermilk`
 
 - Parts are **reusable** across taxa; applicability is controlled by rules.
@@ -91,7 +91,7 @@ Two ways:
 
    ```json
    {
-     "part": "part:cut:ribeye",
+     "part": "part:ribeye",
      "applies_to": ["tx:animalia:chordata:mammalia:artiodactyla:bovidae"],
      "exclude": [
        "tx:animalia:chordata:mammalia:artiodactyla:bovidae:ovis:aries"
@@ -286,7 +286,7 @@ Two ways:
      ],
      "parts": [
        {
-         "id": "part:cut:ribeye",
+         "id": "part:ribeye",
          "name": "Ribeye",
          "children": [
            /* … */
@@ -304,7 +304,7 @@ Two ways:
    {
      "name": "Bison ribeye (raw)",
      "taxonId": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bison:bison",
-     "partId": "part:cut:ribeye",
+     "partId": "part:ribeye",
      "transforms": []
    }
    ```

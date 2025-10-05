@@ -2,7 +2,7 @@
   {
     "name": "Bacon (pork belly, cured+smoked)",
     "taxonId": "tx:animalia:chordata:mammalia:artiodactyla:suidae:sus:scrofa_domesticus",
-    "partId": "part:cut:belly",
+    "partId": "part:belly",
     "transforms": [
       {
         "id": "tf:cure",
@@ -22,7 +22,7 @@
   {
     "name": "Beef brisket, smoked",
     "taxonId": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus",
-    "partId": "part:cut:brisket",
+    "partId": "part:brisket",
     "transforms": [
       {
         "id": "tf:smoke",
@@ -35,7 +35,7 @@
   {
     "name": "Chicken breast, roasted",
     "taxonId": "tx:animalia:chordata:aves:galliformes:phasianidae:gallus:gallus_domesticus",
-    "partId": "part:cut:breast",
+    "partId": "part:breast",
     "transforms": [
       {
         "id": "tf:cook",

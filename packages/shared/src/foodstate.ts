@@ -2,7 +2,7 @@ import type { Database } from 'better-sqlite3'
 import type { ComposeInput, ComposeResult, KV } from './index.js'
 
 function orderKeyFromDB(db: Database) {
-  const rows = db.prepare('SELECT id, ordering FROM transform_def').all() as Array<{id:string; ordering:number|null}>
+  const rows = db.prepare('SELECT id, ordering FROM transform_def').all() as Array<{ id: string; ordering: number | null }>
   const map = new Map<string, number>()
   for (const r of rows) map.set(r.id, (r.ordering ?? 999))
   return (id: string) => map.get(id) ?? 999
@@ -54,8 +54,8 @@ export function composeFoodState(db: Database, input: ComposeInput): ComposeResu
   if (!hasPart) errors.push(`Part ${partId} not applicable to ${taxonId}`)
 
   // 3) Load transform defs -> schema map
-  const tdefs = db.prepare('SELECT id, identity, schema_json FROM transform_def').all() as Array<{ id: string; identity: 0|1; schema_json: string | null }>
-  const defMap = new Map<string, { identity: boolean; schema: Array<{key:string;kind:string;enum?:string[]}> }>()
+  const tdefs = db.prepare('SELECT id, identity, schema_json FROM transform_def').all() as Array<{ id: string; identity: 0 | 1; schema_json: string | null }>
+  const defMap = new Map<string, { identity: boolean; schema: Array<{ key: string; kind: string; enum?: string[] }> }>()
   for (const d of tdefs) {
     defMap.set(d.id, { identity: !!d.identity, schema: (d.schema_json ? JSON.parse(d.schema_json) : []) })
   }
@@ -106,7 +106,7 @@ export function composeFoodState(db: Database, input: ComposeInput): ComposeResu
           if (typeof v !== 'number' || Number.isNaN(v)) errors.push(`Transform ${t.id}: param ${spec.key} must be number`)
           break
         case 'enum':
-          if (typeof v !== 'string' || !spec.enum?.includes(v)) errors.push(`Transform ${t.id}: param ${spec.key} must be one of [${(spec.enum||[]).join(', ')}]`)
+          if (typeof v !== 'string' || !spec.enum?.includes(v)) errors.push(`Transform ${t.id}: param ${spec.key} must be one of [${(spec.enum || []).join(', ')}]`)
           break
         case 'string':
           if (typeof v !== 'string') errors.push(`Transform ${t.id}: param ${spec.key} must be string`)
@@ -138,7 +138,7 @@ export function composeFoodState(db: Database, input: ComposeInput): ComposeResu
   const path = [
     'fs:/',
     lastSeg(taxonId),                   // e.g., "animalia/chordata/.../sus/scrofa_domesticus"
-    partId,                             // "part:muscle" or "part:cut:belly"
+    partId,                             // "part:muscle" or "part:belly"
     chain ? chain : undefined
   ].filter(Boolean).join('/')
 

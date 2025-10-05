@@ -53,12 +53,28 @@ Everything downstream (search facets, families, cuisine hints, safety flags) is 
   * Each param: `{ key, kind, enum?, unit?, identity_param? }`
 * **`families.json`**: product family definitions used for grouping/labeling.
 
-  * Keys → `{ identity_transforms:[], identity_params?:[], buckets?:[] }`
+  * Keys → `{ id, display_name, identity_transforms:[], identity_params?:[], naming, defaults, param_buckets }`
+* **`family_allowlist.jsonl`**: applicability rules specifying which (taxon, part) combinations each family can be applied to.
+
+  * Each line: `{ "family": "FAMILY_ID", "taxon_prefix": "tx:...", "parts": ["part:..."] }`
 * **`param_buckets.json`** (optional): reusable numeric/enum bucket sets referenced by families.
 
 ### Rules & UX metadata
 
-* **`rules/family_meta.json`**: UI labels/icons/colors for families.
+* **Family display names**: Defined in `families.json` with `display_name` field.
+
+### Family System Architecture
+
+The family system uses two complementary files:
+
+* **`families.json`**: Contains family metadata (display names, transforms, naming rules, defaults, param buckets)
+* **`family_allowlist.jsonl`**: Contains applicability rules (which taxon+part combinations each family can be applied to)
+
+This separation allows:
+- **Clean PR diffs**: Changes to applicability rules don't clutter family metadata
+- **Focused maintenance**: Family definitions vs applicability rules are separate concerns  
+- **Scalability**: Allowlist can grow without bloating the main families file
+- **Precision control**: Prevents nonsensical TPTs (e.g., cultured dairy from fish muscle)
 * **`rules/diet_safety_rules.jsonl`**: emitted flags when conditions match.
 
   * Grammar:
@@ -76,7 +92,7 @@ Everything downstream (search facets, families, cuisine hints, safety flags) is 
 
   * Encourage **prefix rules** with explicit `exclude` arrays.
 * **`implied_parts.jsonl`** (optional): parts to auto-attach; must be subset of applicability.
-* **`family_allowlist.jsonl`**: whitelists `(taxon_prefix, parts[])` into families.
+* **Family expansion**: Families are expanded to (taxon, part) pairs based on `identity_transforms` in `families.json` and applicability rules in `family_allowlist.jsonl`.
 
 ### Product prototyping
 
@@ -216,8 +232,8 @@ Confirm that `part:cream` exists in `parts.core.json` and that the merged regist
 
 ### Adding a new product family
 
-1. Add family to `families.json` (identity transforms/params).
-2. Add label/icon/color in `rules/family_meta.json`.
+1. Add family to `families.json` with `id`, `display_name`, `identity_transforms`, `identity_params`, `naming`, `defaults`, and `param_buckets`.
+2. Add applicability rules to `family_allowlist.jsonl` specifying which (taxon, part) combinations the family can be applied to.
 3. (Optional) Add buckets in `param_buckets.json` and reference them.
 
 ### Adding/adjusting parts
@@ -286,9 +302,9 @@ Confirm that `part:cream` exists in `parts.core.json` and that the merged regist
 
 ```json
 {
-  "id":"tpt:tx:animalia:chordata:mammalia:artiodactyla:suidae:sus:scrofa_domesticus:part:cut:belly:unknown:us-bacon",
+  "id":"tpt:tx:animalia:chordata:mammalia:artiodactyla:suidae:sus:scrofa_domesticus:part:belly:unknown:us-bacon",
   "taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:suidae:sus:scrofa_domesticus",
-  "part_id":"part:cut:belly",
+  "part_id":"part:belly",
   "family":"PORK_CURED_SMOKED",
   "path":[
     {"id":"tf:cure","params":{"style":"dry","nitrite_ppm":120}},

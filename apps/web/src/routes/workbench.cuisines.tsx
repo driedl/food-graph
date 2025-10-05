@@ -22,7 +22,7 @@ function CuisinesPage() {
     const setSearch = (patch: Partial<typeof search>) =>
         navigate({ to: '/workbench/cuisines', search: (s: any) => ({ ...s, ...patch }) })
 
-    const cuisQ = (trpc as any).browse?.getCuisines?.useQuery({
+    const cuisQ = trpc.browse.getCuisines.useQuery({
         q: search.q || undefined,
         limit: search.limit,
         offset: search.offset,
@@ -33,7 +33,7 @@ function CuisinesPage() {
 
     const pickCuisine = (c: string) => setSearch({ cuisine: c, offset: 0 })
 
-    const entsQ = (trpc as any).browse?.getCuisineEntities?.useQuery(
+    const entsQ = trpc.browse.getCuisineEntities.useQuery(
         {
             cuisine: search.cuisine || '',
             limit: search.limit,
@@ -45,13 +45,20 @@ function CuisinesPage() {
     const entsTotal: number = entsQ?.data?.total ?? ents.length
 
     const gotoTPT = (id: string) =>
-        navigate({ to: '/workbench/tpt/$id', params: { id } })
+        navigate({ to: '/workbench/tpt/$id', params: { id }, search: { tab: 'overview' } })
     const gotoTP = (taxonId: string, partId: string) =>
         navigate({ to: '/workbench/tp/$taxonId/$partId', params: { taxonId, partId }, search: { tab: 'overview', family: '', limit: 50, offset: 0, compare: '' } })
 
     return (
         <div className="p-4 space-y-3">
-            <div className="text-lg font-semibold">Cuisines</div>
+            <div className="flex items-center gap-2">
+                <div className="text-lg font-semibold">Cuisines</div>
+                {search.q && (
+                    <Badge variant="secondary" className="text-xs">
+                        Filtered by: "{search.q}"
+                    </Badge>
+                )}
+            </div>
 
             <div className="flex items-center gap-2">
                 <Input
@@ -68,46 +75,77 @@ function CuisinesPage() {
             </div>
 
             <div className="rounded border divide-y">
-                {(rows.length ? rows : []).map((r: any) => (
-                    <div key={r.cuisine || r.id} className="p-2 flex items-center justify-between">
-                        <div className="min-w-0">
-                            <div className="text-sm font-medium truncate">{r.cuisine || r.id}</div>
+                {cuisQ?.isLoading ? (
+                    <div className="p-4 text-center text-sm text-muted-foreground">Loading cuisines...</div>
+                ) : rows.length > 0 ? (
+                    rows.map((r: any) => (
+                        <div
+                            key={r.cuisine || r.id}
+                            className="p-3 flex items-center justify-between hover:bg-muted/50 cursor-pointer transition-colors group"
+                            onClick={() => pickCuisine(r.cuisine || r.id)}
+                        >
+                            <div className="min-w-0 flex-1">
+                                <div className="text-sm font-medium truncate group-hover:text-primary transition-colors">
+                                    {r.cuisine || r.id}
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Badge variant="secondary" className="text-[10px] uppercase">{r.count ?? r.tptCount ?? 0}</Badge>
+                            </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <Badge variant="secondary" className="text-[10px] uppercase">{r.count ?? r.tptCount ?? 0}</Badge>
-                            <Button size="sm" onClick={() => pickCuisine(r.cuisine || r.id)}>Open</Button>
-                        </div>
+                    ))
+                ) : (
+                    <div className="p-4 text-center text-sm text-muted-foreground">
+                        {search.q ? `No cuisines found matching "${search.q}"` : 'No cuisines found.'}
                     </div>
-                ))}
-                {!rows.length && <div className="p-3 text-sm text-muted-foreground">No cuisines.</div>}
+                )}
             </div>
 
             {search.cuisine && (
                 <div className="space-y-2">
                     <div className="flex items-center justify-between">
                         <div className="text-sm font-medium">
-                            Cuisine: <span className="font-mono">{search.cuisine}</span>
+                            <span className="text-muted-foreground">Cuisine:</span> <span className="font-mono">{search.cuisine}</span>
                         </div>
                         <div className="text-xs text-muted-foreground">
                             {entsQ?.isLoading ? 'Loading…' : `Results: ${entsTotal}`}
                         </div>
                     </div>
                     <div className="rounded border divide-y">
-                        {(ents.length ? ents : []).map((e) => (
-                            <div key={e.id} className="p-2 text-sm flex items-center justify-between">
-                                <div className="min-w-0">
-                                    <div className="truncate">{e.name || e.id}</div>
-                                    <div className="text-[11px] text-muted-foreground break-all">{e.id}</div>
+                        {entsQ?.isLoading ? (
+                            <div className="p-4 text-center text-sm text-muted-foreground">Loading TPTs...</div>
+                        ) : ents.length > 0 ? (
+                            ents.map((e) => (
+                                <div key={e.id} className="p-3 text-sm hover:bg-muted/30 transition-colors">
+                                    <div className="flex items-center justify-between">
+                                        <div className="min-w-0 flex-1">
+                                            <button
+                                                className="text-left hover:text-primary transition-colors group"
+                                                onClick={() => gotoTPT(e.id)}
+                                            >
+                                                <div className="font-medium truncate group-hover:underline">{e.name || e.id}</div>
+                                            </button>
+                                            <div className="text-[11px] text-muted-foreground break-all mt-1">{e.id}</div>
+                                            {e.taxonId && e.partId && (
+                                                <button
+                                                    className="text-xs text-muted-foreground hover:text-primary transition-colors mt-1 hover:underline"
+                                                    onClick={() => gotoTP(e.taxonId, e.partId)}
+                                                >
+                                                    View as TP: {e.taxon_name} + {e.part_name}
+                                                </button>
+                                            )}
+                                        </div>
+                                        <div className="flex items-center gap-2 ml-4">
+                                            <Badge variant="outline" className="text-[10px]">{e.family || 'unknown'}</Badge>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    {e.taxonId && e.partId && (
-                                        <Button size="sm" variant="secondary" onClick={() => gotoTP(e.taxonId, e.partId)}>TP</Button>
-                                    )}
-                                    <Button size="sm" onClick={() => gotoTPT(e.id)}>TPT</Button>
-                                </div>
+                            ))
+                        ) : (
+                            <div className="p-4 text-center text-sm text-muted-foreground">
+                                No TPTs found for this cuisine.
                             </div>
-                        ))}
-                        {!ents.length && <div className="p-3 text-sm text-muted-foreground">No entities.</div>}
+                        )}
                     </div>
 
                     <div className="flex justify-between items-center">

@@ -39,7 +39,7 @@ function FamiliesPage() {
             limit: search.limit,
             offset: search.offset,
         },
-        { enabled: !!search.family }
+        { enabled: true }
     )
     const ents: any[] = entitiesQ?.data?.rows ?? []
     const entsTotal: number = entitiesQ?.data?.total ?? ents.length
@@ -68,64 +68,69 @@ function FamiliesPage() {
                 </div>
             </div>
 
-            {/* Families list */}
-            <div className="rounded border divide-y">
-                {(rows.length ? rows : []).map((r) => (
-                    <div key={r.id || r.family} className="p-2 flex items-center justify-between">
-                        <div className="min-w-0">
-                            <div className="text-sm font-medium truncate">{r.label || r.family || r.id}</div>
-                            <div className="text-[11px] text-muted-foreground">{r.id || r.family}</div>
+            {/* Family Filter Bar */}
+            <div className="flex flex-wrap gap-2 mb-4">
+                <Button
+                    variant={!search.family ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setSearch({ family: '', offset: 0 })}
+                >
+                    All Families ({total})
+                </Button>
+                {rows.map((r) => (
+                    <Button
+                        key={r.id}
+                        variant={search.family === r.id ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => pickFamily(r.id)}
+                    >
+                        {r.label} ({r.count})
+                    </Button>
+                ))}
+            </div>
+
+            {/* TPT Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {(ents.length ? ents : []).map((tpt) => (
+                    <div key={tpt.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <div className="flex items-start justify-between mb-2">
+                            <h3 className="font-medium text-sm">{tpt.name}</h3>
+                            <Badge variant="secondary" className="text-xs">{tpt.family}</Badge>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <Badge variant="secondary" className="text-[10px] uppercase">{r.count ?? r.tptCount ?? 0}</Badge>
-                            <Button size="sm" onClick={() => pickFamily(r.id || r.family)}>Open</Button>
+                        <div className="text-xs text-muted-foreground mb-3">
+                            <div>{tpt.taxon_name}</div>
+                            <div>{tpt.part_name}</div>
+                        </div>
+                        <div className="flex gap-2">
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => gotoTPT(tpt.id)}
+                            >
+                                View TPT
+                            </Button>
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => gotoTP(tpt.taxon_id, tpt.part_id)}
+                            >
+                                View TP
+                            </Button>
                         </div>
                     </div>
                 ))}
-                {!rows.length && (
-                    <div className="p-3 text-sm text-muted-foreground">No families.</div>
+                {!ents.length && search.family && (
+                    <div className="col-span-full p-8 text-center text-muted-foreground">
+                        No TPTs found for family "{search.family}"
+                    </div>
+                )}
+                {!ents.length && !search.family && (
+                    <div className="col-span-full p-8 text-center text-muted-foreground">
+                        No TPTs found. Try selecting a family above.
+                    </div>
                 )}
             </div>
 
-            {/* Selected family → entities */}
-            {search.family && (
-                <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                        <div className="text-sm font-medium">
-                            Family: <span className="font-mono">{search.family}</span>
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                            {entitiesQ?.isLoading ? 'Loading…' : `Results: ${entsTotal}`}
-                        </div>
-                    </div>
-                    <div className="rounded border divide-y">
-                        {(ents.length ? ents : []).map((e) => (
-                            <div key={e.id} className="p-2 text-sm flex items-center justify-between">
-                                <div className="min-w-0">
-                                    <div className="truncate">{e.name || e.id}</div>
-                                    <div className="text-[11px] text-muted-foreground break-all">{e.id}</div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    {e.taxonId && e.partId && (
-                                        <Button size="sm" variant="secondary" onClick={() => gotoTP(e.taxonId, e.partId)}>TP</Button>
-                                    )}
-                                    <Button size="sm" onClick={() => gotoTPT(e.id)}>TPT</Button>
-                                </div>
-                            </div>
-                        ))}
-                        {!ents.length && (
-                            <div className="p-3 text-sm text-muted-foreground">No entities.</div>
-                        )}
-                    </div>
-
-                    {/* simple pager */}
-                    <div className="flex justify-between items-center">
-                        <Button size="sm" variant="outline" onClick={() => setSearch({ offset: Math.max(0, search.offset - search.limit) })} disabled={search.offset <= 0}>Prev</Button>
-                        <div className="text-xs text-muted-foreground">offset {search.offset}</div>
-                        <Button size="sm" variant="outline" onClick={() => setSearch({ offset: search.offset + search.limit })} disabled={ents.length < search.limit}>Next</Button>
-                    </div>
-                </div>
-            )}
         </div>
     )
 }

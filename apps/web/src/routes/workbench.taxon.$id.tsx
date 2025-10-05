@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import React, { useState } from 'react'
+import React from 'react'
 import { trpc } from '@/lib/trpc'
 import { Card, CardContent, CardHeader, CardTitle } from '@ui/card'
 import { Badge } from '@ui/badge'
@@ -11,16 +11,12 @@ import StructureExplorer from '@/components/StructureExplorer'
 import NodeHeader from '@/components/NodeHeader'
 import { RANK_COLOR } from '@/lib/constants'
 import ErrorBoundary from '@/components/ErrorBoundary'
-import { OverlaysBar } from '@/components/overlays/OverlaysBar'
-import { badgesForTaxon } from '@/components/overlays/OverlayBadges'
-import { parseOverlayParam, serializeOverlayParam } from '@/lib/overlays'
 
 export const Route = createFileRoute('/workbench/taxon/$id')({
     validateSearch: (s: Record<string, unknown>) => {
         const tab = typeof s.tab === 'string' && ['overview', 'lists'].includes(s.tab) ? s.tab : 'overview'
         const limit = Number.isFinite(Number(s.limit)) ? Math.max(10, Math.min(500, Number(s.limit))) : 50
-        const overlay = parseOverlayParam(typeof s.overlay === 'string' ? s.overlay : undefined)
-        return { tab, limit, overlay }
+        return { tab, limit }
     },
     component: TaxonPage,
 })
@@ -28,18 +24,16 @@ export const Route = createFileRoute('/workbench/taxon/$id')({
 function TaxonPage() {
     const { id } = Route.useParams()
     const navigate = useNavigate()
-    const search = Route.useSearch() as { tab: string; limit: number; overlay: any }
+    const search = Route.useSearch() as { tab: string; limit: number }
+
     const setSearch = (patch: Partial<typeof search>) => {
         const newSearch = { ...search, ...patch }
+
         navigate({
             to: '/workbench/taxon/$id',
             params: { id },
             search: newSearch
         })
-    }
-
-    const handleOverlayChange = (overlay: any) => {
-        setSearch({ overlay: serializeOverlayParam(overlay) })
     }
 
     // Queries
@@ -54,14 +48,12 @@ function TaxonPage() {
         { enabled: !!id }
     )
 
-    // Overlay data query
+    // Overlay data query - always fetch all overlay data
     const overlayDataQ = trpc.facets.overlayDataForTaxon.useQuery(
         {
-            taxonId: id,
-            overlayTypes: search.overlay.on,
-            tfId: search.overlay.tfId
+            taxonId: id
         },
-        { enabled: !!id && search.overlay.on.length > 0 }
+        { enabled: !!id }
     )
 
     // Extract data
@@ -198,14 +190,16 @@ function TaxonPage() {
 
                         <TabsContent value="lists" className="flex-1 min-h-0 p-4 overflow-hidden">
                             <div className="space-y-4">
-                                <OverlaysBar
-                                    value={search.overlay}
-                                    onChange={handleOverlayChange}
-                                />
-
                                 <div className="flex items-center justify-between">
-                                    <div className="text-sm font-medium">
-                                        Children ({childCount})
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-sm font-medium">
+                                            Children ({childCount})
+                                        </span>
+                                        {childrenData.length > 0 && (
+                                            <Badge variant="secondary" className="text-xs">
+                                                {childrenData[0].rank}
+                                            </Badge>
+                                        )}
                                     </div>
                                     {childCount > childrenData.length && (
                                         <Button
@@ -218,54 +212,100 @@ function TaxonPage() {
                                     )}
                                 </div>
 
-                                <div className="rounded-md border">
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead>Name</TableHead>
-                                                <TableHead>Rank</TableHead>
-                                                <TableHead>Slug</TableHead>
-                                                <TableHead>ID</TableHead>
-                                                {search.overlay.on.length > 0 && <TableHead>Overlays</TableHead>}
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {childrenData.map((child) => {
-                                                const overlayData = overlayDataQ.data?.[child.id] || {}
-                                                const childWithOverlay = { ...child, ...overlayData }
-                                                return (
-                                                    <TableRow
-                                                        key={child.id}
-                                                        className="cursor-pointer hover:bg-muted/50"
-                                                        onClick={() => handleJump(child.id)}
-                                                    >
-                                                        <TableCell className="font-medium">
-                                                            {child.name}
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Badge
-                                                                variant="secondary"
-                                                                className="text-xs"
-                                                            >
-                                                                {child.rank}
-                                                            </Badge>
-                                                        </TableCell>
-                                                        <TableCell className="text-sm text-muted-foreground">
-                                                            {child.slug}
-                                                        </TableCell>
-                                                        <TableCell className="text-xs text-muted-foreground font-mono">
-                                                            {child.id}
-                                                        </TableCell>
-                                                        {search.overlay.on.length > 0 && (
-                                                            <TableCell>
-                                                                {badgesForTaxon(childWithOverlay as any, search.overlay)}
-                                                            </TableCell>
-                                                        )}
-                                                    </TableRow>
-                                                )
-                                            })}
-                                        </TableBody>
-                                    </Table>
+                                <div className="space-y-3">
+                                    {childrenData.map((child) => {
+                                        const overlayData = overlayDataQ.data?.[child.id] || {}
+                                        return (
+                                            <Card
+                                                key={child.id}
+                                                className="cursor-pointer hover:bg-muted/50 transition-colors"
+                                                onClick={() => handleJump(child.id)}
+                                            >
+                                                <CardContent className="p-4">
+                                                    <div className="space-y-3">
+                                                        {/* Header: Name and basic info */}
+                                                        <div className="flex items-start justify-between">
+                                                            <div>
+                                                                <h3 className="font-semibold text-lg">{child.name}</h3>
+                                                                <p className="text-sm text-muted-foreground">/{child.slug}</p>
+                                                            </div>
+                                                            {overlayData._docs && (
+                                                                <Badge variant="default" className="text-xs">
+                                                                    Docs Available
+                                                                </Badge>
+                                                            )}
+                                                        </div>
+
+                                                        {/* Overlay data in organized sections */}
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                                                            {/* Left column */}
+                                                            <div className="space-y-2">
+                                                                {overlayData._parts && overlayData._parts.length > 0 && (
+                                                                    <div>
+                                                                        <span className="text-muted-foreground font-medium text-xs uppercase tracking-wide">Parts</span>
+                                                                        <div className="flex flex-wrap gap-1 mt-1">
+                                                                            {overlayData._parts.map((part: string, i: number) => (
+                                                                                <Badge key={i} variant="outline" className="text-xs">
+                                                                                    {part}
+                                                                                </Badge>
+                                                                            ))}
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+
+                                                                {overlayData._families && overlayData._families.length > 0 && (
+                                                                    <div>
+                                                                        <span className="text-muted-foreground font-medium text-xs uppercase tracking-wide">Families</span>
+                                                                        <div className="flex flex-wrap gap-1 mt-1">
+                                                                            {overlayData._families.map((family: string, i: number) => (
+                                                                                <Badge key={i} variant="secondary" className="text-xs">
+                                                                                    {family.replace(/_/g, ' ').toLowerCase()}
+                                                                                </Badge>
+                                                                            ))}
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+
+                                                            {/* Right column */}
+                                                            <div className="space-y-2">
+                                                                {overlayData._cuisines && overlayData._cuisines.length > 0 && (
+                                                                    <div>
+                                                                        <span className="text-muted-foreground font-medium text-xs uppercase tracking-wide">Cuisines</span>
+                                                                        <div className="flex flex-wrap gap-1 mt-1">
+                                                                            {overlayData._cuisines.map((cuisine: string, i: number) => (
+                                                                                <Badge key={i} variant="default" className="text-xs">
+                                                                                    {cuisine}
+                                                                                </Badge>
+                                                                            ))}
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+
+                                                                {overlayData._flags && overlayData._flags.length > 0 && (
+                                                                    <div>
+                                                                        <span className="text-muted-foreground font-medium text-xs uppercase tracking-wide">Flags</span>
+                                                                        <div className="flex flex-wrap gap-1 mt-1">
+                                                                            {overlayData._flags.map((flag: string, i: number) => (
+                                                                                <Badge key={i} variant="destructive" className="text-xs">
+                                                                                    {flag.replace(/_/g, ' ')}
+                                                                                </Badge>
+                                                                            ))}
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Footer: ID */}
+                                                        <div className="pt-2 border-t border-muted">
+                                                            <p className="text-xs text-muted-foreground font-mono">{child.id}</p>
+                                                        </div>
+                                                    </div>
+                                                </CardContent>
+                                            </Card>
+                                        )
+                                    })}
                                 </div>
 
                                 {childrenData.length === 0 && (
