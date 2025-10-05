@@ -12,7 +12,7 @@ from .validators import run_validators
 def verify(stage: str, in_dir: Path, build_dir: Path, verbose: bool = False) -> int:
     """Verify a stage's contract and return 0 for success, 1 for failure"""
     # Handle stage naming: stage_0 -> stage_0, stage_a -> stage_a, etc.
-    # Path: etl2/mise/contracts/engine.py -> etl2/mise/stages/stage_X/
+    # Path: etl/mise/contracts/engine.py -> etl/mise/stages/stage_X/
     stage_dir = Path(__file__).resolve().parents[1] / "stages" / stage
     contract_path = stage_dir / "contract.yml"
     

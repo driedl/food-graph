@@ -6,7 +6,7 @@ import { argv, exit, stdin } from 'node:process'
 
 // Get the ETL2 database path
 const getDbPath = () => {
-  return env.ETL2_DB_PATH  // ETL2 database
+  return env.ETL_DB_PATH  // ETL database
 }
 
 const db = new Database(getDbPath())

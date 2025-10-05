@@ -12,7 +12,7 @@ def run(in_dir: Path, build_dir: Path, skip_validate: bool = False, verbose: boo
     compiled_dir = build_dir / "compiled"
     ensure_dir(compiled_dir)
 
-    # 1) Compile taxa + copy assets into etl2/build/compiled
+    # 1) Compile taxa + copy assets into etl/build/compiled
     out_taxa = compiled_dir / "taxa.jsonl"
     rc = compile_taxa_into(
         taxa_root=in_dir / "taxa",

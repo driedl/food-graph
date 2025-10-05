@@ -151,7 +151,7 @@ B) **Docs (inline)**
 
 ### Phase 3 — Build & Verification
 
-1. **Clean build**: `rm -rf etl2/build && mise run build --with-tests`
+1. **Clean build**: `rm -rf etl/build && mise run build --with-tests`
    *Expected*: all stages 0→F succeed; `graph.dev.sqlite` contains:
 
    * `search_fts` entries for taxa, TP (with synonyms), and TPT.

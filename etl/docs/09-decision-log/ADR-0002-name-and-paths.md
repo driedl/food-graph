@@ -4,7 +4,7 @@
 **Date:** 2025-10-02
 
 ## Decision
-Name the new ETL package **mise**. Default build root at `etl2/build` with the following subdirs:
+Name the new ETL package **mise**. Default build root at `etl/build` with the following subdirs:
 
 - `tmp/` intermediates
 - `out/` API-ready

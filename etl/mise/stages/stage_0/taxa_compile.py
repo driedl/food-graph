@@ -93,7 +93,7 @@ def compile_taxa_into(*, taxa_root: Path, ontology_root: Path,
     if verbose:
         print(f"✓ Wrote {len(objs)} taxa → {out_taxa_path}")
 
-    # Copy assets into etl2/build/compiled
+    # Copy assets into etl/build/compiled
     assets = ["attributes.json", "nutrients.json", "transforms.json", "categories.json"]
     for asset in assets:
         src = ontology_root / asset

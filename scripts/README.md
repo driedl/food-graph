@@ -9,7 +9,7 @@ Developer utilities for aggregating code, inspecting API routes, syncing the dat
 ## Key Scripts
 
 - `aggregate/aggregate.ts` — Aggregates code/config for LLM context
-  - Configs: `aggregate/default.json`, `aggregate/api.json`, `aggregate/etl2.json`
+  - Configs: `aggregate/default.json`, `aggregate/api.json`, `aggregate/etl.json`
   - Usage: `pnpm ag --categories monorepo` (see default config)
 - `print-trpc-routes.ts` — Lists API routes
 - `run-sql.ts` — Run SQL queries against the SQLite DB

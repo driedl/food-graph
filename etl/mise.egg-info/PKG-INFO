@@ -15,14 +15,14 @@ It replaces ad‑hoc, monolithic scripts with **small, testable stages** and **c
 It coexists with the legacy `etl/` so you can switch the API to either build via envs.
 
 - Runner: Python 3.11+ (CLI)
-- Artifacts: `etl2/build/{tmp,out,graph,database,report}`
+- Artifacts: `etl/build/{tmp,out,graph,database,report}`
 - Status: bootstrapped; stages will be layered in along the TPT plan
 
 ## Quickstart
 
 ```bash
 # install (editable)
-python -m pip install -e ./etl2
+python -m pip install -e ./etl
 
 # run the pipeline
 python -m mise run build --with-tests
@@ -36,8 +36,8 @@ python -m mise run build
 Expose the DB (or other artifacts) to the API via envs:
 
 ```
-GRAPH_DB_PATH=etl2/build/database/graph.dev.sqlite
-GRAPH_BUILD_ROOT=etl2/build
+GRAPH_DB_PATH=etl/build/database/graph.dev.sqlite
+GRAPH_BUILD_ROOT=etl/build
 ```
 
 The API can toggle between legacy and mise builds by switching paths.

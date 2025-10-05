@@ -557,7 +557,7 @@ part:egg (kind: "animal", category: "egg", applies_to: [all egg-laying animals])
 ### **Stage F Patch (Python + SQL)**
 
 #### A. DDL Additions
-Add to `etl2/mise/stages/stage_f/sqlite_pack.py` in the main DDL string:
+Add to `etl/mise/stages/stage_f/sqlite_pack.py` in the main DDL string:
 
 ```sql
 -- Part closure (mirror of taxon_ancestors)
@@ -756,7 +756,7 @@ finally:
 
 ### **Lint Pack (Stage F post-pack checks)**
 
-#### Create `etl2/mise/stages/stage_f/validate_sqlite.py`:
+#### Create `etl/mise/stages/stage_f/validate_sqlite.py`:
 
 ```python
 from __future__ import annotations
@@ -933,9 +933,9 @@ if __name__ == "__main__":
 
 ### **CI Integration**
 
-Add to CI pipeline after `pnpm etl2:run`:
+Add to CI pipeline after `pnpm etl:run`:
 ```bash
-python3 etl2/mise/stages/stage_f/validate_sqlite.py
+python3 etl/mise/stages/stage_f/validate_sqlite.py
 ```
 
 This comprehensive plan addresses all identified issues with clear solutions and justifications. The phased approach allows for systematic implementation while maintaining system stability.
@@ -1116,10 +1116,10 @@ Parts that could benefit from notes for clarity:
 4. **Hierarchy validation** - Parent-child relationship validation
 
 ### Implementation Details
-- **Location**: `etl2/mise/contracts/validators.py` - New validator functions added
+- **Location**: `etl/mise/contracts/validators.py` - New validator functions added
 - **Contracts**: Updated `stage_0/contract.yml` and `stage_a/contract.yml`
-- **Execution**: Runs automatically with `pnpm etl2:run --with-tests`
-- **Reports**: Structured JSON reports in `etl2/build/report/verify_stage_*.json`
+- **Execution**: Runs automatically with `pnpm etl:run --with-tests`
+- **Reports**: Structured JSON reports in `etl/build/report/verify_stage_*.json`
 
 ### Validation Results
 - **Schema Violations**: ✅ Caught `kind: "bird"` violations (should be `kind: "animal"`)
@@ -1128,7 +1128,7 @@ Parts that could benefit from notes for clarity:
 - **Parameter Consistency**: ✅ Ready to catch family/transform parameter mismatches
 
 ### Automation & Reporting
-- **Structured Reports**: JSON format in `etl2/build/report/verify_stage_*.json`
+- **Structured Reports**: JSON format in `etl/build/report/verify_stage_*.json`
 - **Error Format**: `file:path:[line]: error description with context`
 - **CI/CD Integration**: Pipeline fails on validation errors
 - **Fix Generation**: Easy to parse and generate automated fixes
@@ -1136,17 +1136,17 @@ Parts that could benefit from notes for clarity:
 ### Quick Reference Commands
 ```bash
 # Run full pipeline with validation
-pnpm etl2:run
+pnpm etl:run
 
 # Run specific stage with validation
-cd etl2 && python3 -m mise run A --with-tests
+cd etl && python3 -m mise run A --with-tests
 
 # Check validation reports
-cat etl2/build/report/verify_stage_0.json
-cat etl2/build/report/lint.json
+cat etl/build/report/verify_stage_0.json
+cat etl/build/report/lint.json
 
 # Clean and rebuild
-pnpm etl2:clean && pnpm etl2:run
+pnpm etl:clean && pnpm etl:run
 ```
 
 ## Notes

@@ -1,6 +1,6 @@
-# ETL2 Agent Guide
+# ETL Agent Guide
 
-This guide helps AI agents understand and work with the ETL2 system effectively.
+This guide helps AI agents understand and work with the ETL system effectively.
 
 ## Quick Start
 
@@ -11,20 +11,20 @@ This guide helps AI agents understand and work with the ETL2 system effectively.
 
 ### Database Queries
 - **Ad-hoc SQL queries**: `pnpm sql "SELECT * FROM nodes LIMIT 5"`
-- This connects to the ETL2 database and runs queries directly
+- This connects to the ETL database and runs queries directly
 - Useful for debugging data issues and exploring the schema
-- **Database browser**: `pnpm db:open` opens sqlite3 CLI on the ETL2 database
+- **Database browser**: `pnpm db:open` opens sqlite3 CLI on the ETL database
 
-## ETL2 ↔ API Relationship
+## ETL ↔ API Relationship
 
 ### Architecture
-- **ETL2** compiles ontology data into a SQLite database
-- **API** copies the ETL2 database to its own location and reads from there
-- **ETL2 database**: `etl2/build/database/graph.dev.sqlite`
-- **API database**: `apps/api/database/graph.dev.sqlite` (auto-copied from ETL2)
+- **ETL** compiles ontology data into a SQLite database
+- **API** copies the ETL database to its own location and reads from there
+- **ETL database**: `etl/build/database/graph.dev.sqlite`
+- **API database**: `apps/api/database/graph.dev.sqlite` (auto-copied from ETL)
 
 ### Workflow
-1. **ETL2 stages** (0→F) process raw ontology data
+1. **ETL stages** (0→F) process raw ontology data
 2. **Stage F** creates the final SQLite database with all tables
 3. **API startup** checks if its database exists and is up-to-date
 4. **Auto-copy** happens if database is missing or version mismatch detected
@@ -41,7 +41,7 @@ This guide helps AI agents understand and work with the ETL2 system effectively.
 
 ## Debugging Commands
 
-### ETL2 Pipeline
+### ETL Pipeline
 ```bash
 # Run specific stage
 python3 -m mise run F --verbose
@@ -50,7 +50,7 @@ python3 -m mise run F --verbose
 python3 -m mise run build --verbose
 
 # Check stage verification
-python3 -c "from mise.contracts.engine import verify; verify('stage_f', Path('etl2'), Path('etl2/build'), verbose=True)"
+python3 -c "from mise.contracts.engine import verify; verify('stage_f', Path('etl'), Path('etl/build'), verbose=True)"
 ```
 
 ### Database Inspection
@@ -83,13 +83,13 @@ curl "http://localhost:3000/api/entities/get?id=tx:plantae"
 
 ### Stage F Verification Fails
 - **Problem**: Contract expects wrong database filename
-- **Check**: `etl2/mise/stages/stage_f/contract.yml` should have `database/graph.dev.sqlite`
+- **Check**: `etl/mise/stages/stage_f/contract.yml` should have `database/graph.dev.sqlite`
 - **Fix**: Update contract path to match actual database location
 
 ### API Can't Find Database
-- **Problem**: API can't find ETL2 database to copy from
-- **Check**: `ETL2_DB_PATH` environment variable points to ETL2 database
-- **Fix**: Set `ETL2_DB_PATH=etl2/build/database/graph.dev.sqlite` or let it use default
+- **Problem**: API can't find ETL database to copy from
+- **Check**: `ETL_DB_PATH` environment variable points to ETL database
+- **Fix**: Set `ETL_DB_PATH=etl/build/database/graph.dev.sqlite` or let it use default
 
 ### Missing Tables Error
 - **Problem**: API expects tables that don't exist
@@ -105,17 +105,17 @@ lsof -ti:3000 | xargs kill -9
 
 ## File Locations
 
-- **ETL2 source**: `etl2/mise/stages/`
-- **Database output**: `etl2/build/database/graph.dev.sqlite`
+- **ETL source**: `etl/mise/stages/`
+- **Database output**: `etl/build/database/graph.dev.sqlite`
 - **API source**: `apps/api/src/`
-- **Config**: `packages/config/src/index.ts` (uses `ETL2_DB_PATH` env var)
-- **Reports**: `etl2/build/report/`
+- **Config**: `packages/config/src/index.ts` (uses `ETL_DB_PATH` env var)
+- **Reports**: `etl/build/report/`
 
 ## Schema Changes
 
-When adding new tables to ETL2:
-1. Update `etl2/mise/stages/stage_f/sqlite_pack.py` DDL
+When adding new tables to ETL:
+1. Update `etl/mise/stages/stage_f/sqlite_pack.py` DDL
 2. Add population logic in `build_sqlite()` function
-3. Update `etl2/mise/stages/stage_f/contract.yml` validators
+3. Update `etl/mise/stages/stage_f/contract.yml` validators
 4. Update `apps/api/src/db.ts` required tables list
 5. Test with `python3 -m mise run F --verbose`

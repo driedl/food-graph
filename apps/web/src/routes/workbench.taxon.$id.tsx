@@ -30,12 +30,14 @@ function TaxonPage() {
     const { id } = Route.useParams()
     const navigate = useNavigate()
     const search = Route.useSearch() as { tab: string; limit: number; overlay: any }
-    const setSearch = (patch: Partial<typeof search>) =>
+    const setSearch = (patch: Partial<typeof search>) => {
+        const newSearch = { ...search, ...patch }
         navigate({
             to: '/workbench/taxon/$id',
             params: { id },
-            search: (s: any) => ({ ...s, ...patch })
+            search: newSearch
         })
+    }
 
     const handleOverlayChange = (overlay: any) => {
         setSearch({ overlay: serializeOverlayParam(overlay) })
@@ -143,8 +145,8 @@ function TaxonPage() {
                         <TabsContent value="overview" className="flex-1 min-h-0 p-4">
                             <div className="grid grid-cols-2 gap-4 h-full">
                                 {/* Left: Docs */}
-                                <Card className="min-h-0 flex flex-col">
-                                    <CardHeader className="pb-2">
+                                <Card className="flex flex-col h-full">
+                                    <CardHeader className="pb-2 flex-shrink-0">
                                         <CardTitle className="text-sm">Documentation</CardTitle>
                                     </CardHeader>
                                     <CardContent className="flex-1 min-h-0 overflow-auto">
@@ -155,12 +157,13 @@ function TaxonPage() {
                                 </Card>
 
                                 {/* Right: Structure */}
-                                <div className="space-y-4 min-h-0 flex flex-col">
-                                    <Card className="flex-1 min-h-0 flex flex-col">
-                                        <CardHeader className="pb-2">
+                                <div className="space-y-4 flex flex-col h-full">
+                                    {/* Structure - 50% height */}
+                                    <Card className="flex flex-col h-1/2 min-h-0">
+                                        <CardHeader className="pb-2 flex-shrink-0">
                                             <CardTitle className="text-sm">Structure</CardTitle>
                                         </CardHeader>
-                                        <CardContent className="flex-1 min-h-0 overflow-hidden">
+                                        <CardContent className="flex-1 min-h-0 overflow-auto">
                                             <ErrorBoundary>
                                                 <StructureExplorer
                                                     node={nodeData as any}
@@ -179,7 +182,7 @@ function TaxonPage() {
 
                                     {/* Families */}
                                     {familiesQ?.data && familiesQ.data.length > 0 && (
-                                        <Card>
+                                        <Card className="flex-shrink-0">
                                             <CardHeader className="pb-2">
                                                 <CardTitle className="text-sm">Families under this taxon</CardTitle>
                                             </CardHeader>
@@ -200,9 +203,9 @@ function TaxonPage() {
                                         </Card>
                                     )}
 
-                                    {/* Parts Coverage */}
-                                    <Card className="flex-1 min-h-0 flex flex-col">
-                                        <CardHeader className="pb-2">
+                                    {/* Parts Coverage - 50% height */}
+                                    <Card className="flex flex-col h-1/2 min-h-0">
+                                        <CardHeader className="pb-2 flex-shrink-0">
                                             <CardTitle className="text-sm">Parts Coverage</CardTitle>
                                         </CardHeader>
                                         <CardContent className="flex-1 min-h-0 overflow-auto">
@@ -219,7 +222,6 @@ function TaxonPage() {
                                 </div>
                             </div>
                         </TabsContent>
-
 
                         <TabsContent value="lists" className="flex-1 min-h-0 p-4">
                             <div className="space-y-4">

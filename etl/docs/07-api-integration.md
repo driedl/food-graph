@@ -12,5 +12,5 @@ Example dev setup:
 GRAPH_DB_PATH=etl/dist/database/graph.dev.sqlite pnpm dev
 
 # mise
-GRAPH_DB_PATH=etl2/build/database/graph.dev.sqlite pnpm dev
+GRAPH_DB_PATH=etl/build/database/graph.dev.sqlite pnpm dev
 ```

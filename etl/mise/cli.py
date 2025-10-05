@@ -108,14 +108,14 @@ def main():
     run = sub.add_parser("run", help="Run a stage")
     run.add_argument("stage", choices=["0", "A", "B", "C", "D", "E", "F", "0A", "0AB", "0ABC", "0ABCDE", "0ABCDEF", "build"], help="Stage(s) to run")
     run.add_argument("--in", dest="in_dir", default="data/ontology")
-    run.add_argument("--build", dest="build_dir", default="etl2/build")
+    run.add_argument("--build", dest="build_dir", default="etl/build")
     run.add_argument("--verbose", action="store_true")
     run.add_argument("--with-tests", action="store_true", help="Run contract verification after each stage")
     
     test = sub.add_parser("test", help="Test a stage's contract")
     test.add_argument("stage", choices=["0", "A", "B", "C", "D", "E", "F"], help="Stage to test")
     test.add_argument("--in", dest="in_dir", default="data/ontology")
-    test.add_argument("--build", dest="build_dir", default="etl2/build")
+    test.add_argument("--build", dest="build_dir", default="etl/build")
     test.add_argument("--verbose", action="store_true")
     
     args = ap.parse_args()

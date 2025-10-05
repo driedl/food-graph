@@ -20,14 +20,14 @@ db.pragma('journal_mode = WAL')
 export { db }
 
 function copyETLArtifact() {
-  const src = env.ETL2_DB_PATH  // ETL2 source database
+  const src = env.ETL_DB_PATH  // ETL source database
   const dst = DB_PATH           // API's own database location
 
   if (!fs.existsSync(src)) {
-    throw new Error(`[api] ETL2 artifact not found at ${src}. Run ETL2 compile first.`)
+    throw new Error(`[api] ETL artifact not found at ${src}. Run ETL compile first.`)
   }
 
-  console.log(`[api] Auto-copying ETL2 artifact: ${src} -> ${dst}`)
+  console.log(`[api] Auto-copying ETL artifact: ${src} -> ${dst}`)
 
   // Ensure destination directory exists
   fs.mkdirSync(path.dirname(dst), { recursive: true })
@@ -44,7 +44,7 @@ function copyETLArtifact() {
   if (fs.existsSync(walSrc)) fs.copyFileSync(walSrc, walDst)
   if (fs.existsSync(shmSrc)) fs.copyFileSync(shmSrc, shmDst)
 
-  console.log(`[api] ETL2 artifact copied successfully`)
+  console.log(`[api] ETL artifact copied successfully`)
 }
 
 function tableExists(name: string): boolean {
@@ -84,7 +84,7 @@ export function verifyGraphArtifact() {
   const missing = requiredTables.filter(t => !tableExists(t))
   if (missing.length) {
     if (env.AUTO_COPY_ETL_DB === 'true') {
-      console.log(`[api] Graph DB missing required tables: ${missing.join(', ')}. Auto-copying from ETL2...`)
+      console.log(`[api] Graph DB missing required tables: ${missing.join(', ')}. Auto-copying from ETL...`)
       copyETLArtifact()
       // Reconnect to the copied database
       db.close()
@@ -101,7 +101,7 @@ export function verifyGraphArtifact() {
     } else {
       throw new Error(
         `[api] Graph DB is missing required tables: ${missing.join(', ')}. ` +
-        `Rebuild via ETL2 and copy the artifact to ${DB_PATH}.`
+        `Rebuild via ETL and copy the artifact to ${DB_PATH}.`
       )
     }
   }
@@ -111,25 +111,25 @@ export function verifyGraphArtifact() {
     ? (db.prepare("SELECT val FROM meta WHERE key='schema_version'").get() as { val?: string } | undefined)?.val
     : undefined
 
-  // Read ETL2 build version
-  let etl2SchemaVersion: string | undefined
+  // Read ETL build version
+  let etlSchemaVersion: string | undefined
   try {
-    const etl2Db = new Database(env.ETL2_DB_PATH)
-    etl2Db.pragma('journal_mode = WAL')
-    const etl2Meta = etl2Db.prepare("SELECT val FROM meta WHERE key='schema_version'").get() as { val?: string } | undefined
-    etl2SchemaVersion = etl2Meta?.val
-    etl2Db.close()
+    const etlDb = new Database(env.ETL_DB_PATH)
+    etlDb.pragma('journal_mode = WAL')
+    const etlMeta = etlDb.prepare("SELECT val FROM meta WHERE key='schema_version'").get() as { val?: string } | undefined
+    etlSchemaVersion = etlMeta?.val
+    etlDb.close()
   } catch (error) {
-    console.warn(`[api] Could not read ETL2 schema version: ${error}`)
+    console.warn(`[api] Could not read ETL schema version: ${error}`)
   }
 
-  // Copy ETL2 database if it's newer or if API database doesn't exist
+  // Copy ETL database if it's newer or if API database doesn't exist
   const shouldCopy = !currentSchemaVersion ||
-    (etl2SchemaVersion && parseInt(etl2SchemaVersion) > parseInt(currentSchemaVersion))
+    (etlSchemaVersion && parseInt(etlSchemaVersion) > parseInt(currentSchemaVersion))
 
   if (shouldCopy) {
     if (env.AUTO_COPY_ETL_DB === 'true') {
-      console.log(`[api] ${!currentSchemaVersion ? 'No API database found' : `ETL2 version ${etl2SchemaVersion} > API version ${currentSchemaVersion}`}. Auto-copying from ETL2...`)
+      console.log(`[api] ${!currentSchemaVersion ? 'No API database found' : `ETL version ${etlSchemaVersion} > API version ${currentSchemaVersion}`}. Auto-copying from ETL...`)
       copyETLArtifact()
       // Reconnect to the copied database
       db.close()
@@ -137,8 +137,8 @@ export function verifyGraphArtifact() {
       db.pragma('journal_mode = WAL')
     } else {
       throw new Error(
-        `[api] ${!currentSchemaVersion ? 'API database missing' : `ETL2 version ${etl2SchemaVersion} > API version ${currentSchemaVersion}`}. ` +
-        `Rebuild via ETL2 and copy the artifact to ${DB_PATH}.`
+        `[api] ${!currentSchemaVersion ? 'API database missing' : `ETL version ${etlSchemaVersion} > API version ${currentSchemaVersion}`}. ` +
+        `Rebuild via ETL and copy the artifact to ${DB_PATH}.`
       )
     }
   }
@@ -153,6 +153,6 @@ export function verifyGraphArtifact() {
 
   // Warning for old artifacts in development
   if (env.NODE_ENV === 'development' && age && age > 7) {
-    console.warn(`[api] Graph artifact is ${age} days old. Consider rebuilding with ETL2 for latest changes.`)
+    console.warn(`[api] Graph artifact is ${age} days old. Consider rebuilding with ETL for latest changes.`)
   }
 }
