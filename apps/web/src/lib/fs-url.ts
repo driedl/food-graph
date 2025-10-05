@@ -13,8 +13,8 @@ export function pathToFs(pathname: string): string | null {
   return 'fs:/' + decoded
 }
 
-// Extract taxon id from /workbench/node/:id
+// Extract taxon id from /workbench/taxon/:id
 export function pathToNodeId(pathname: string): string | null {
-  const m = pathname.match(/^\/workbench\/node\/([^/]+)\/?$/)
+  const m = pathname.match(/^\/workbench\/taxon\/([^/]+)\/?$/)
   return m ? m[1] : null
 }

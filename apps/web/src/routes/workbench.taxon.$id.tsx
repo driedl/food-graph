@@ -7,7 +7,6 @@ import { Button } from '@ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@ui/tabs'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/table'
 import { DocsPanel } from '@/components/inspector/DocsPanel'
-import { PartsPanel } from '@/components/inspector/PartsPanel'
 import StructureExplorer from '@/components/StructureExplorer'
 import NodeHeader from '@/components/NodeHeader'
 import { RANK_COLOR } from '@/lib/constants'
@@ -50,7 +49,6 @@ function TaxonPage() {
     )
     const lineageQ = trpc.taxonomy.pathToRoot.useQuery({ id }, { enabled: !!id })
     const docs = trpc.docs.getByTaxon.useQuery({ taxonId: id }, { enabled: !!id })
-    const parts = trpc.taxonomy.partTree.useQuery({ id }, { enabled: !!id })
     const familiesQ = trpc.facets.familiesForTaxon.useQuery(
         { taxonId: id, limit: 20 },
         { enabled: !!id }
@@ -80,14 +78,6 @@ function TaxonPage() {
 
     const handleJump = (targetId: string) => {
         navigate({ to: '/workbench/taxon/$id', params: { id: targetId } })
-    }
-
-    const handlePartClick = (partId: string) => {
-        navigate({
-            to: '/workbench/tp/$taxonId/$partId',
-            params: { taxonId: id, partId },
-            search: { tab: 'overview', family: '', limit: 50, offset: 0, compare: '' }
-        })
     }
 
     const handleFamilyClick = (family: string) => {
@@ -142,28 +132,28 @@ function TaxonPage() {
                             <TabsTrigger value="lists">Lists</TabsTrigger>
                         </TabsList>
 
-                        <TabsContent value="overview" className="flex-1 min-h-0 p-4">
+                        <TabsContent value="overview" className="flex-1 min-h-0 p-4 overflow-hidden">
                             <div className="grid grid-cols-2 gap-4 h-full">
                                 {/* Left: Docs */}
-                                <Card className="flex flex-col h-full">
+                                <Card className="flex flex-col h-full min-h-0">
                                     <CardHeader className="pb-2 flex-shrink-0">
                                         <CardTitle className="text-sm">Documentation</CardTitle>
                                     </CardHeader>
-                                    <CardContent className="flex-1 min-h-0 overflow-auto">
+                                    <div className="flex-1 min-h-0 overflow-auto p-4">
                                         <ErrorBoundary>
                                             <DocsPanel docs={docs.data as any} node={nodeData as any} />
                                         </ErrorBoundary>
-                                    </CardContent>
+                                    </div>
                                 </Card>
 
-                                {/* Right: Structure */}
-                                <div className="space-y-4 flex flex-col h-full">
-                                    {/* Structure - 50% height */}
-                                    <Card className="flex flex-col h-1/2 min-h-0">
+                                {/* Right: Structure and Families */}
+                                <div className="flex flex-col h-full min-h-0 gap-4">
+                                    {/* Structure - takes remaining space */}
+                                    <Card className="flex flex-col flex-1 min-h-0">
                                         <CardHeader className="pb-2 flex-shrink-0">
                                             <CardTitle className="text-sm">Structure</CardTitle>
                                         </CardHeader>
-                                        <CardContent className="flex-1 min-h-0 overflow-auto">
+                                        <div className="flex-1 min-h-0 overflow-auto p-4">
                                             <ErrorBoundary>
                                                 <StructureExplorer
                                                     node={nodeData as any}
@@ -177,16 +167,16 @@ function TaxonPage() {
                                                     onShowMore={handleShowMore}
                                                 />
                                             </ErrorBoundary>
-                                        </CardContent>
+                                        </div>
                                     </Card>
 
-                                    {/* Families */}
+                                    {/* Families - only if data exists, takes minimal space */}
                                     {familiesQ?.data && familiesQ.data.length > 0 && (
                                         <Card className="flex-shrink-0">
                                             <CardHeader className="pb-2">
                                                 <CardTitle className="text-sm">Families under this taxon</CardTitle>
                                             </CardHeader>
-                                            <CardContent>
+                                            <CardContent className="max-h-32 overflow-auto">
                                                 <div className="flex flex-wrap gap-2">
                                                     {familiesQ.data.map((f: any) => (
                                                         <Badge
@@ -202,28 +192,11 @@ function TaxonPage() {
                                             </CardContent>
                                         </Card>
                                     )}
-
-                                    {/* Parts Coverage - 50% height */}
-                                    <Card className="flex flex-col h-1/2 min-h-0">
-                                        <CardHeader className="pb-2 flex-shrink-0">
-                                            <CardTitle className="text-sm">Parts Coverage</CardTitle>
-                                        </CardHeader>
-                                        <CardContent className="flex-1 min-h-0 overflow-auto">
-                                            <ErrorBoundary>
-                                                <PartsPanel
-                                                    parts={parts.data as any}
-                                                    selectedPartId=""
-                                                    onSelect={handlePartClick}
-                                                    readOnly={true}
-                                                />
-                                            </ErrorBoundary>
-                                        </CardContent>
-                                    </Card>
                                 </div>
                             </div>
                         </TabsContent>
 
-                        <TabsContent value="lists" className="flex-1 min-h-0 p-4">
+                        <TabsContent value="lists" className="flex-1 min-h-0 p-4 overflow-hidden">
                             <div className="space-y-4">
                                 <OverlaysBar
                                     value={search.overlay}

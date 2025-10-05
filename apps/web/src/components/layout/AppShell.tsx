@@ -64,7 +64,7 @@ export default function AppShell() {
 
     // Bootstrap root
     useEffect(() => {
-        // Only bootstrap to root if we are NOT already deep-linking via /workbench/node/:id or /workbench/fs/*
+        // Only bootstrap to root if we are NOT already deep-linking via /workbench/taxon/:id or /workbench/fs/*
         if (root.data && !currentId) {
             const { pathname } = window.location
             if (pathToFs(pathname) || pathToNodeId(pathname)) return
@@ -246,11 +246,11 @@ export default function AppShell() {
         if ((selectedPartId || chosen.length) && !fs) {
             return
         }
-        // Prefer fs form when part/tx chosen; fallback to node form for "just node"
+        // Prefer fs form when part/tx chosen; fallback to taxon form for "just node"
         const targetPath =
             fs && (selectedPartId || chosen.length)
                 ? fsToPath(fs)
-                : `/workbench/node/${currentId}`
+                : `/workbench/taxon/${currentId}`
 
         // Idempotence: avoid churn if FS string hasn't meaningfully changed
         if (fs) {
@@ -271,10 +271,29 @@ export default function AppShell() {
     }, [currentId, fsPreview, selectedPartId, chosen, lineageQ.data, router])
 
     return (
-        <div className="p-4">
-            {/* Top status bar */}
+        <div className="h-full p-4">
+            {/* Top status bar with navigation */}
             <div className="mb-3 flex items-center justify-between">
-                <div className="text-lg font-semibold tracking-tight">Food Graph Workbench</div>
+                <div className="flex items-center gap-4">
+                    <div className="text-lg font-semibold tracking-tight">Food Graph Workbench</div>
+                    <div className="flex items-center gap-1 text-sm">
+                        <Button variant="ghost" size="sm" onClick={nav.gotoFamilies}>
+                            Families
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={nav.gotoCuisines}>
+                            Cuisines
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={nav.gotoFlags}>
+                            Flags
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={nav.gotoSearch}>
+                            Search
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={nav.gotoMeta}>
+                            Meta
+                        </Button>
+                    </div>
+                </div>
                 <div className="flex items-center gap-2 text-xs">
                     <div className="hidden lg:flex text-xs text-muted-foreground px-2 py-1 rounded-md border bg-muted/30">
                         Press <kbd className="mx-1 rounded border bg-background px-1">⌘</kbd><span>K</span> to search
@@ -285,25 +304,6 @@ export default function AppShell() {
                         <Badge className="border-red-600">API: down</Badge>
                     )}
                 </div>
-            </div>
-
-            {/* Navigation bar */}
-            <div className="mb-3 flex items-center gap-1 text-sm">
-                <Button variant="ghost" size="sm" onClick={nav.gotoFamilies}>
-                    Families
-                </Button>
-                <Button variant="ghost" size="sm" onClick={nav.gotoCuisines}>
-                    Cuisines
-                </Button>
-                <Button variant="ghost" size="sm" onClick={nav.gotoFlags}>
-                    Flags
-                </Button>
-                <Button variant="ghost" size="sm" onClick={nav.gotoSearch}>
-                    Search
-                </Button>
-                <Button variant="ghost" size="sm" onClick={nav.gotoMeta}>
-                    Meta
-                </Button>
             </div>
 
             {/* Desktop layout: Left rail / Center canvas / Right rail */}
