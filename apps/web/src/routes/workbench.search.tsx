@@ -35,7 +35,7 @@ function SearchQAPage() {
     const setSearch = (patch: Partial<typeof search>) =>
         navigate({ to: '/workbench/search', search: (s: any) => ({ ...s, ...patch }) })
 
-    const queryQ = (trpc as any).search?.query?.useQuery({
+    const queryQ = trpc.search.query.useQuery({
         q: search.q || '',
         type: search.type === 'any' ? undefined : search.type,
         taxonId: search.taxonId || undefined,
@@ -46,18 +46,16 @@ function SearchQAPage() {
         flags: search.flags || undefined,
         limit: search.limit,
         offset: search.offset,
-        withScores: true,
-        debug: true,
     }, { enabled: !!search.q })
 
-    const rows: any[] = queryQ?.data?.rows ?? []
+    const rows: any[] = queryQ?.data?.results ?? []
     const total: number = queryQ?.data?.total ?? rows.length
     const facets = queryQ?.data?.facets ?? {}
 
-    const gotoTaxon = (id: string) => navigate({ to: '/workbench/taxon/$id', params: { id } })
+    const gotoTaxon = (id: string) => navigate({ to: '/workbench/taxon/$id', params: { id }, search: {} })
     const gotoTP = (taxonId: string, partId: string) =>
-        navigate({ to: '/workbench/tp/$taxonId/$partId', params: { taxonId, partId } })
-    const gotoTPT = (id: string) => navigate({ to: '/workbench/tpt/$id', params: { id } })
+        navigate({ to: '/workbench/tp/$taxonId/$partId', params: { taxonId, partId }, search: { tab: 'overview', family: '', limit: 50, offset: 0, compare: '' } })
+    const gotoTPT = (id: string) => navigate({ to: '/workbench/tpt/$id', params: { id }, search: { tab: 'overview' } })
 
     const kindBadge = (k: string) => {
         const label = k === 'tp' ? 'food' : k
@@ -146,20 +144,6 @@ function SearchQAPage() {
                 </div>
             )}
 
-            {/* FTS Debug Info */}
-            {!!search.q && queryQ?.data?.debug && (
-                <div className="rounded border p-3 bg-muted/30">
-                    <div className="text-xs font-medium mb-2">FTS5 Debug Info</div>
-                    <div className="text-xs space-y-1">
-                        <div>Query: <code className="bg-muted px-1 rounded">{queryQ.data.debug.query || search.q}</code></div>
-                        <div>Total matches: {queryQ.data.debug.totalMatches || total}</div>
-                        <div>Deduplication: {queryQ.data.debug.deduped ? 'Yes' : 'No'}</div>
-                        {queryQ.data.debug.ftsVersion && (
-                            <div>FTS Version: {queryQ.data.debug.ftsVersion}</div>
-                        )}
-                    </div>
-                </div>
-            )}
 
             {/* results */}
             {!!search.q && (
@@ -184,26 +168,26 @@ function SearchQAPage() {
                                 <div key={r.id} className="p-3 flex items-center justify-between">
                                     <div className="min-w-0 flex-1">
                                         <div className="flex items-center gap-2">
-                                            <div className="truncate font-medium">{r.name || r.display_name || r.id}</div>
-                                            {kindBadge(r.ref_type || r.kind)}
+                                            <div className="truncate font-medium">{r.name || r.displayName || r.id}</div>
+                                            {kindBadge(r.kind)}
                                             {r.score !== undefined && (
                                                 <span className="text-xs text-muted-foreground">score: {r.score.toFixed(3)}</span>
                                             )}
                                         </div>
                                         <div className="text-xs text-muted-foreground mt-1">
-                                            {r.ref_type === 'taxon' && `/${r.slug} (${r.rank})`}
-                                            {r.ref_type === 'tp' && `TP: ${r.taxon_id}:${r.part_id}`}
-                                            {r.ref_type === 'tpt' && `TPT: ${r.family}`}
+                                            {r.kind === 'taxon' && `/${r.slug}`}
+                                            {r.kind === 'tp' && `TP: ${r.taxonId}:${r.partId}`}
+                                            {r.kind === 'tpt' && `TPT: ${r.family}`}
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        {r.ref_type === 'taxon' && (
+                                        {r.kind === 'taxon' && (
                                             <Button size="sm" onClick={() => gotoTaxon(r.id)}>View</Button>
                                         )}
-                                        {r.ref_type === 'tp' && r.taxon_id && r.part_id && (
-                                            <Button size="sm" onClick={() => gotoTP(r.taxon_id, r.part_id)}>View</Button>
+                                        {r.kind === 'tp' && r.taxonId && r.partId && (
+                                            <Button size="sm" onClick={() => gotoTP(r.taxonId, r.partId)}>View</Button>
                                         )}
-                                        {r.ref_type === 'tpt' && (
+                                        {r.kind === 'tpt' && (
                                             <Button size="sm" onClick={() => gotoTPT(r.id)}>View</Button>
                                         )}
                                     </div>

@@ -11,6 +11,7 @@ import { facetsRouter } from './facets'
 import { docsRouter } from './docs'
 import { foodstateRouter } from './foodstate'
 import { evidenceRouter } from './evidence'
+import { metaRouter } from './meta'
 
 export const appRouter = t.router({
     health: t.procedure.query(() => ({ ok: true })),
@@ -26,6 +27,7 @@ export const appRouter = t.router({
     docs: docsRouter,
     foodstate: foodstateRouter,
     evidence: evidenceRouter,
+    meta: metaRouter,
 })
 
 export type AppRouter = typeof appRouter
