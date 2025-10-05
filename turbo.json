@@ -19,25 +19,13 @@
     "typecheck": {
       "outputs": []
     },
-    "etl:build": {
-      "outputs": [
-        "etl/dist/**",
-        "data/ontology/compiled/**"
-      ]
-    },
-    "etl:validate": {
-      "outputs": []
-    },
-    "etl:clean": {
-      "outputs": []
-    },
-    "etl2:run": {
+    "etl:run": {
       "inputs": [
-        "etl2/**",
+        "etl/**",
         "data/ontology/**"
       ],
       "outputs": [
-        "etl2/build/**"
+        "etl/build/**"
       ]
     }
   },

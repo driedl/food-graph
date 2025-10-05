@@ -26,7 +26,7 @@ pnpm install
 # pnpm ontology:fix-newlines
 
 # compile ontology → SQLite
-pnpm db:build     # writes ./etl/dist/database/graph.dev.sqlite
+pnpm etl:run      # writes ./etl/build/database/graph.dev.sqlite
 
 # run API + Web (concurrently via Turbo)
 pnpm dev
@@ -102,9 +102,9 @@ data/
   sql/                 # Database schema definitions
     └── schema/        # JSON schema files for validation
 
-etl/                   # Data compilation pipeline
-  └── py/             # Python ETL scripts
-      └── compile.py  # Main ontology → SQLite compiler
+etl/                   # Data compilation pipeline (Python)
+  └── mise/           # Python ETL framework
+      └── stages/     # Pipeline stages
 
 scripts/               # Development & maintenance utilities
   ├── aggregate.ts    # Data aggregation tools
@@ -154,7 +154,7 @@ Root configuration:
 ### Key architectural decisions:
 
 - **Workspace packages**: Shared types flow from `packages/shared` → `packages/api-contract` → frontend
-- **Data pipeline**: `data/ontology/` (source) → `data/ontology/compiled/` (intermediate) → `etl/dist/database/` (final)
+- **Data pipeline**: `data/ontology/` (source) → `etl/build/` (compiled artifacts and database)
 - **Type safety**: Full TypeScript coverage with tRPC providing end-to-end type safety
 - **Build system**: Turbo for monorepo orchestration, Vite for frontend, tsx for backend
 - **Database**: SQLite with migrations and FTS (Full-Text Search) support
@@ -168,20 +168,20 @@ At repo root:
 
 - `pnpm dev` — run API + Web together (Turbo pipeline)
 - `pnpm dev:api` / `pnpm dev:web` — run individually
-- `pnpm db:build` — compile ontology → `etl/dist/database/graph.dev.sqlite`
+- `pnpm etl:run` — compile ontology → `etl/build/database/graph.dev.sqlite`
 - `pnpm db:open` — open the current DB in `sqlite3`
 - `pnpm lint` / `pnpm typecheck` — standard hygiene
 
-### ETL2 (Python)
+### ETL (Python)
 
-The new Python-based ETL pipeline (eventually replacing the legacy `etl/`):
+The Python-based ETL pipeline:
 
-- `pnpm etl2:install` — install Python dependencies
-- `pnpm etl2:plan` — show pipeline stages and cache status
-- `pnpm etl2:run` — run Stage A (load + lint + normalize)
-- `pnpm etl2:clean` — clean build artifacts
+- `pnpm etl:install` — install Python dependencies
+- `pnpm etl:plan` — show pipeline stages and cache status
+- `pnpm etl:run` — run the full pipeline (load + lint + normalize + build)
+- `pnpm etl:clean` — clean build artifacts
 
-> ETL2 outputs to `etl2/build/database/graph.dev.sqlite`. Set `GRAPH_DB_PATH=etl2/build/database/graph.dev.sqlite` to use with the API.
+> ETL outputs to `etl/build/database/graph.dev.sqlite`. Set `GRAPH_DB_PATH=etl/build/database/graph.dev.sqlite` to use with the API.
 
 > If you prefer not to use Turbo, you can run `pnpm -C apps/api dev` and `pnpm -C apps/web dev` in separate terminals.
 
@@ -192,7 +192,7 @@ The new Python-based ETL pipeline (eventually replacing the legacy `etl/`):
 The API looks for a SQLite DB path:
 
 - **Env var:** `DB_PATH`
-- **Default (if unset):** `<process.cwd()>/etl/dist/database/graph.dev.sqlite`
+- **Default (if unset):** `<process.cwd()>/etl/build/database/graph.dev.sqlite`
 
 Because `apps/api` runs from its own working directory, we recommend setting an explicit path.
 
@@ -203,10 +203,10 @@ Create `apps/api/.env`:
 PORT=3000
 
 # Point to the compiled DB at repo root
-DB_PATH=../../etl/dist/database/graph.dev.sqlite
+DB_PATH=../../etl/build/database/graph.dev.sqlite
 ```
 
-(Alternatively, keep the default and compile into `apps/api/etl/dist/database/…`.)
+(Alternatively, keep the default and compile into `apps/api/etl/build/database/…`.)
 
 ---
 

@@ -44,38 +44,22 @@
         },
         "etl": {
             "name": "ETL Processing",
-            "description": "Python scripts, TypeScript ETL pipeline, and shared utilities",
+            "description": "ETL Python pipeline with Mise framework and documentation",
             "patterns": [
                 "etl/**/*.py",
-                "etl/src/**/*.ts",
-                "etl/src/**/*.js",
-                "packages/shared/**/*.ts",
-                "packages/shared/**/*.js",
-                "packages/shared/**/*.json"
+                "etl/**/*.md",
+                "etl/**/*.toml",
+                "etl/**/*.txt",
+                "etl/**/*.yml",
+                "etl/**/*.yaml"
             ],
             "ignore": [
-                "etl/node_modules/**",
-                "etl/src/pipeline/steps/doc-reporter.ts"
-            ]
-        },
-        "etl2": {
-            "name": "ETL2 Processing",
-            "description": "ETL2 Python pipeline with Mise framework and documentation",
-            "patterns": [
-                "etl2/**/*.py",
-                "etl2/**/*.md",
-                "etl2/**/*.toml",
-                "etl2/**/*.txt",
-                "etl2/**/*.yml",
-                "etl2/**/*.yaml"
-            ],
-            "ignore": [
-                "etl2/build/**",
-                "etl2/**/__pycache__/**",
-                "etl2/**/*.pyc",
-                "etl2/**/*.egg-info/**",
-                "etl2/**/__init__.py",
-                "etl2/docs/adr/**"
+                "etl/build/**",
+                "etl/**/__pycache__/**",
+                "etl/**/*.pyc",
+                "etl/**/*.egg-info/**",
+                "etl/**/__init__.py",
+                "etl/docs/adr/**"
             ]
         },
         "ontology_taxa": {
@@ -97,7 +81,6 @@
                 "data/ontology/**/*.json",
                 "data/ontology/**/*.jsonl",
                 "data/sql/**/*.json",
-                "etl/dist/database/*.json"
             ],
             "ignore": [
                 "data/ontology/compiled/**",
@@ -151,6 +134,42 @@
                 "apps/*/postcss.config.js",
                 "packages/*/package.json",
                 "packages/*/tsconfig.json"
+            ]
+        },
+        "monorepo": {
+            "name": "Monorepo Structure",
+            "description": "Monorepo framework and architecture files for LLM understanding",
+            "patterns": [
+                "package.json",
+                "pnpm-workspace.yaml",
+                "turbo.json",
+                "tsconfig.base.json",
+                "**/README.md",
+                "docs/01_ARCHITECTURE.md",
+                "docs/00_VISION.md",
+                "apps/*/package.json",
+                "apps/*/tsconfig.json",
+                "apps/*/vite.config.ts",
+                "apps/*/tailwind.config.ts",
+                "apps/*/postcss.config.js",
+                "packages/*/package.json",
+                "packages/*/tsconfig.json",
+                "apps/api/src/index.ts",
+                "apps/web/src/main.tsx",
+                "apps/api/src/db.ts",
+                "packages/shared/src/index.ts",
+                "packages/api-contract/src/index.ts",
+                "packages/config/src/index.ts",
+                "etl/pyproject.toml",
+                "etl/mise/config.py",
+                "etl/mise/cli.py",
+                "data/sql/schema/*.schema.json"
+            ],
+            "ignore": [
+                "apps/*/node_modules/**",
+                "packages/*/node_modules/**",
+                "apps/*/dist/**",
+                "packages/*/dist/**"
             ]
         }
     },

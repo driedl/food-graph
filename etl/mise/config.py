@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict
 
-DEFAULT_BUILD_ROOT = "etl2/build"
+DEFAULT_BUILD_ROOT = "etl/build"
 
 @dataclass
 class BuildConfig:

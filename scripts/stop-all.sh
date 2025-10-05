@@ -144,7 +144,6 @@ kill_processes "tsx.*apps/web" "Web tsx processes"
 # 3. Node.js processes related to our apps
 kill_processes "node.*apps/api" "API Node processes"
 kill_processes "node.*apps/web" "Web Node processes"
-kill_processes "node.*etl" "ETL Node processes"
 
 # 4. Turbo processes (if using turbo)
 kill_processes "turbo" "Turbo processes"

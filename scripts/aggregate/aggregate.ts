@@ -5,7 +5,7 @@
  *
  * Usage:
  *   pnpm ag                           # Interactive mode (default config)
- *   pnpm ag --config etl2             # Use ETL2 config
+ *   pnpm ag --config etl              # Use ETL config
  *   pnpm ag --compact                 # Quick compact mode
  *   pnpm ag --summary                 # Summary mode (excerpts/signatures)
  *   pnpm ag --verbose                 # Full verbose mode
@@ -667,7 +667,7 @@ function showHelp() {
 
 Usage:
   pnpm ag                    # Interactive mode (default config)
-  pnpm ag --config etl2      # Use ETL2 config
+  pnpm ag --config etl       # Use ETL config
   pnpm ag --compact          # Quick compact mode
   pnpm ag --summary          # Summary mode with excerpts
   pnpm ag --verbose          # Full verbose mode
@@ -681,7 +681,7 @@ Content Levels:
   verbose    - Full file contents (perfect for AI context)
 
 Config System:
-  --config <name>    - Use specific config (e.g., etl2)
+  --config <name>    - Use specific config (e.g., etl)
   --list-configs     - Show available configurations
   Configs define categories, UI behavior, and processing limits
 
@@ -707,7 +707,7 @@ The script automatically detects relevant code and config files:
 
 Examples:
   pnpm ag                                    # Interactive selection (default config)
-  pnpm ag --config etl2                      # ETL2 analysis (simplified flow)
+  pnpm ag --config etl                       # ETL analysis (simplified flow)
   pnpm ag --verbose --categories web         # Web app only (full)
   pnpm ag --summary --categories web         # Web app only (signatures)
   pnpm ag --compact --categories api         # API code summary

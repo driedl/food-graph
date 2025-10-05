@@ -63,9 +63,9 @@ food-graph/
 │   ├── shared/           # Shared types and FoodState logic
 │   ├── config/           # Environment and path configuration
 │   └── api-contract/     # API type definitions
-├── etl/                  # ETL pipeline (Python + TypeScript)
-│   ├── python/           # Compilation scripts
-│   └── src/pipeline/     # Pipeline orchestration
+├── etl/                  # ETL pipeline (Python)
+│   └── mise/             # Python ETL framework
+│       └── stages/       # Pipeline stages
 ├── data/
 │   ├── ontology/         # Source of truth (Git)
 │   │   ├── taxa/         # **/*.tx.md files with frontmatter
@@ -87,7 +87,7 @@ The ETL pipeline transforms Git-authored ontology data into a queryable SQLite d
 ### Pipeline Steps
 
 ```bash
-pnpm etl:build
+pnpm etl:run
 ```
 
 **Runs:**
@@ -99,7 +99,7 @@ pnpm etl:build
 5. **Verify** — Integrity checks and search tests
 6. **Doc Report** — Coverage analysis
 
-**Output:** `etl/dist/database/graph.dev.sqlite`
+**Output:** `etl/build/database/graph.dev.sqlite`
 
 ### Ontology File Formats
 
@@ -254,13 +254,13 @@ pnpm dev:web
 pnpm check
 
 # Build database from ontology
-pnpm etl:build
+pnpm etl:run
 
 # Run ETL validation only
-pnpm etl:validate
+pnpm etl:run --with-tests
 
 # Run smoke tests
-pnpm etl:smoke-tests
+pnpm etl:run --with-tests
 
 # List all tRPC routes
 pnpm api:routes
@@ -270,7 +270,7 @@ pnpm api:routes
 
 ```bash
 # View ETL pipeline config
-cat etl/src/pipeline/config.ts
+cat etl/mise/config.py
 
 # Check database stats
 pnpm sql "SELECT
@@ -414,10 +414,10 @@ Located in `docs/`:
 
 ```bash
 # Rebuild from ontology
-pnpm etl:build
+pnpm etl:run
 
 # Check if file exists
-ls -lh etl/dist/database/graph.dev.sqlite
+ls -lh etl/build/database/graph.dev.sqlite
 ```
 
 ### FTS Search Not Working
@@ -447,7 +447,7 @@ curl http://localhost:3000/trpc/health
 ```bash
 # Clean and rebuild
 pnpm etl:clean
-pnpm etl:build
+pnpm etl:run
 ```
 
 ## 🎯 Development Tips
@@ -456,7 +456,7 @@ pnpm etl:build
 2. **Path Resolution**: Use `@nutrition/config` for all file paths (never hardcode)
 3. **FTS5 Search**: Supports phrase matching, boolean operators, prefix matching with `*`
 4. **Performance**: Database uses WAL mode; read queries are concurrent
-5. **Validation**: Run `pnpm etl:validate` before committing ontology changes
+5. **Validation**: Run `pnpm etl:run --with-tests` before committing ontology changes
 6. **Hot Reload**: API uses `tsx watch`; web uses Vite HMR
 7. **Transform Order**: Transforms execute in `ordering` sequence (lower = earlier)
 8. **Part Inheritance**: Parts cascade down taxonomy via `has_part` materialization
@@ -466,7 +466,7 @@ pnpm etl:build
 Environment variables (via `@nutrition/config`):
 
 - `PORT` — API server port (default: 3000)
-- `DB_PATH` — SQLite database path (default: `etl/dist/database/graph.dev.sqlite`)
+- `DB_PATH` — SQLite database path (default: `etl/build/database/graph.dev.sqlite`)
 - `NODE_ENV` — Environment: development|test|production
 
 ## 📦 Package Reference

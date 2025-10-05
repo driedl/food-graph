@@ -1,3 +1,40 @@
+# Ontology Authoring
+
+Last reviewed: 2025-10-05
+
+## Purpose
+
+Canonical, Git-first definitions for taxa, parts, transforms, attributes, nutrients, and rules that define the food graph.
+
+## Structure
+
+- `taxa/` — Hierarchy across kingdoms; `.md` docs and `.jsonl` indices
+- `attributes.json` — Attribute registry and semantics
+- `nutrients.json` — Nutrient catalog
+- `parts.json` — Edible/anatomical parts
+- `transforms.json` — Processing transform families and parameter schemas
+- `categories.json` — Domain categories for UI/ETL convenience
+- `rules/` — Domain rules (applicability, expansions, synonyms, param buckets)
+
+## Authoring Conventions
+
+- JSONL newline-delimited records for large lists (`*.jsonl`)
+- Deterministic IDs and stable prefixes (`tx:`, `attr:`)
+- Prefer additive changes; avoid rewrites that break IDs
+- See schemas in `data/sql/schema/` for DB shapes and validation intentions
+
+## How this feeds ETL
+
+- ETL reads from `data/ontology/**` and produces:
+  - Normalized artifacts under `etl/build/compiled/`
+  - A SQLite DB at `etl/build/database/graph.dev.sqlite`
+  - Validation reports under `etl/build/report/`
+
+## File Type Notes
+
+- `.tx.md` documentation files may include YAML frontmatter to annotate taxa
+- `.jsonl` indexes allow streaming validation and partial rebuilds
+
 ## Quick QA checklist (NDJSON hygiene)
 
 **IDs & prefixes**

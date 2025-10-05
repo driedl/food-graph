@@ -1,0 +1,103 @@
+{
+    "name": "ETL Analysis",
+    "description": "Complete ETL package for external LLM analysis",
+    "categories": {
+        "etl_full": {
+            "name": "ETL Complete Package",
+            "description": "All ETL code, configs, and docs (no markdown, no build files)",
+            "patterns": [
+                "etl/**/*.py",
+                "etl/**/*.toml",
+                "etl/**/*.yml",
+                "etl/**/*.yaml",
+                "etl/**/*.json"
+            ],
+            "ignore": [
+                "etl/build/**",
+                "etl/**/__pycache__/**",
+                "etl/**/*.pyc",
+                "etl/**/*.egg-info/**",
+                "etl/**/__init__.py",
+                "etl/docs/**/*.md",
+                "etl/**/*.md"
+            ],
+            "excludeExtensions": [
+                ".md"
+            ]
+        },
+        "etl_core": {
+            "name": "ETL Core Logic",
+            "description": "Core ETL implementation files only (no tests, contracts, metadata)",
+            "patterns": [
+                "etl/**/*.py"
+            ],
+            "ignore": [
+                "etl/build/**",
+                "etl/**/__pycache__/**",
+                "etl/**/*.pyc",
+                "etl/**/*.egg-info/**",
+                "etl/**/__init__.py",
+                "etl/docs/**/*.md",
+                "etl/**/*.md",
+                "etl/tests/**",
+                "etl/**/contract.yml",
+                "etl/**/*.toml",
+                "etl/**/*.yml",
+                "etl/**/*.yaml",
+                "etl/**/*.json",
+                "etl/mise/stages/stage_0/validate_taxa.py"
+            ],
+            "excludeExtensions": [
+                ".md",
+                ".yml",
+                ".yaml",
+                ".toml",
+                ".json"
+            ]
+        },
+        "schemas": {
+            "name": "ETL Schemas",
+            "description": "All schema definitions for ETL data structures, validation, and database schema",
+            "patterns": [
+                "data/sql/schema/*.schema.json",
+                "etl/mise/stages/stage_f/sqlite_pack.py",
+                "etl/mise/stages/stage_a/flags_validate.py",
+                "etl/mise/contracts/validators.py",
+                "etl/docs/04-schemas.md"
+            ],
+            "ignore": [],
+            "includeExtensions": [
+                ".json",
+                ".py",
+                ".md"
+            ]
+        },
+        "stage_f": {
+            "name": "Stage F - Database Packer",
+            "description": "Stage F implementation that builds SQLite database from compiled ontology artifacts",
+            "patterns": [
+                "etl/mise/stages/stage_f/**/*.py",
+                "etl/mise/stages/stage_f/**/*.yml",
+                "etl/mise/io.py",
+                "etl/mise/config.py"
+            ],
+            "ignore": [],
+            "excludeExtensions": []
+        }
+    },
+    "defaults": {
+        "contentLevel": "verbose",
+        "outputDestination": "file",
+        "outputFile": "generated/etl-analysis.md"
+    },
+    "ui": {
+        "skipCategorySelection": false,
+        "skipVerbositySelection": false,
+        "customPrompts": {
+            "outputDestination": "Where should the ETL analysis be saved?"
+        }
+    },
+    "processing": {
+        "maxAggregateFileSize": 120000
+    }
+}

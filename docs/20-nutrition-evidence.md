@@ -1,834 +1,550 @@
+# Plan: Add a Nutrition “Evidence Layer” to the Existing Food Ontology — **with concrete evidence-build mechanics**
 
-# What nutrition data looks like “in the wild”
-
-**Per-nutrient rows per food is the norm.** Most public datasets model a food with many nutrient records (one row per nutrient). USDA FoodData Central (FDC) does exactly this: the `food_nutrient` table stores the **amount of a nutrient per 100 g** of the food, along with unit, derivation and stats (min, max, median, etc.). 
-
-**FDC data types** (Foundation Foods, SR Legacy, Branded, FNDDS) all surface nutrients as an array of `{nutrient, amount, unit, derivation…}` attached to a food, with the 100 g basis as the default expression for amounts. ([FoodData Central][1])
-
-**Global tagging exists for nutrients.** FAO/INFOODS publishes a widely used registry of **component identifiers (tagnames)** (e.g., `ENERC_KCAL`, `PROCNT`, `FAT`, `CHOCDF`, `FIBTG`…), and their guidance standardizes reporting **per 100 g edible portion** (and per serving/household measures as needed). These tags are ideal as your canonical nutrient IDs. ([FAOHome][2])
-
-**Regulatory/label ecosystems also align on a small core.** Even when values are given **per serving** (e.g., label/NFP or GDSN), the set is the same macro/micro family; you can convert to 100 g when serving size and density are available, while retaining the original basis for provenance. (INFOODS explicitly discusses per-100 g EP vs per serving conventions.) ([FAOHome][2])
-
-**Preparation matters.** Sources often publish foods in raw and cooked states, and traditionally use **retention factors** to estimate vitamin/mineral losses on cooking; USDA’s retention-factor tables are commonly referenced in imputation workflows. ([intake.org][3])
-
-> TL;DR: Expect to ingest a lot of “food × nutrient” rows (per 100 g by default), with varied derivations (analytical vs label-calculated) and preparation states. You don’t need to mirror any one source’s ontology to use them.
+> This is the complete plan that keeps your ontology fast, clean, and Git-friendly while adding a simple, POC-grade evidence pipeline. I’ve preserved everything valuable from the earlier spec and folded in the specifics for **file-based evidence builds**, **LLM-assisted mapping**, and **how profiles get materialized** without slowing your ontology pack step.
 
 ---
 
-# Design goals (what we want)
+## Executive Summary
 
-* **Keep your food graph clean** (T, TP, TPT remain your source of truth).
-* **Ingest any dataset** (FDC/CIQUAL/CoFID/brand/GDSN) as raw evidence, unchanged.
-* **Normalize nutrients once**, using a global registry (INFOODS tags), plus robust units.
-* **Attach provenance to evidence**, not to the graph nodes directly.
-* **Roll up** evidence into **stable per-node nutrition profiles** (per 100 g EP by default), with clear conflict-resolution rules.
-* **Be transform-aware** (TPT identity → “as prepared/as eaten” basis).
+Public nutrition data arrives as **per-food × per-nutrient** rows, typically **per 100 g EP**, with units, derivations, and preparation states. We’ll keep the ontology (T, TP, TPT) **unchanged**, ingest heterogeneous sources **verbatim** into a **Git-tracked, JSONL evidence layer**, normalize nutrients to **INFOODS tagnames (+ UCUM units)**, and compute **stable per-node profiles** (per 100 g EP) via transparent rollups that preserve provenance.
 
----
+**POC emphasis**
 
-# Schemas (no code; contracts and relationships)
-
-## 1) Canonical nutrient registry (global)
-
-**`nutrient_def`**
-
-* `nutrient_id` (PK) — use **INFOODS tagname** (e.g., `PROCNT`, `FAT`, `CHOCDF`, `FIBTG`, `ENERC_KCAL`).
-* `name`, `category` (macro | vitamin | mineral | fatty_acid | amino_acid | other)
-* `canonical_unit` (UCUM: `g`, `mg`, `µg`, `kcal`, `kJ`, `IU`…)
-* `alt_units` (list; optional) + **conversion** metadata (e.g., `kcal↔kJ`, `IU↔µg` where science allows).
-* `notes` (definition/scoping, e.g., “available carbohydrate by difference”).
-
-**`nutrient_alias_map`**
-
-* Maps **source-specific identifiers** → `nutrient_id`.
-
-  * Examples: FDC `nutrient.number=1003` → `PROCNT`; `1004` → `FAT`; `1005` → `CHOCDF`; `1008` → `ENERC_KCAL`. 
-  * INFOODS already matches your canonical IDs. ([FAOHome][2])
-
-**Why INFOODS?** It’s internationally used and explicitly designed for cross-database mapping, not just US-centric. ([FAOHome][2])
-
-## 2) Sources, foods, and raw evidence
-
-**`nutrition_source`**
-
-* `source_id` (PK), `name`, `version`, `license`, `citation`, `ingest_date`, `kind` (foundation | branded | survey | lab | gdsn | other)
-* Optional **quality defaults** (e.g., “analytical preferred over label” per source subtype). ([FoodData Central][1])
-
-**`external_food`**
-
-* `(source_id, external_food_id)` (PK)
-* `label` (source name), `brand` (if any), `data_type` (FDC: Foundation/SR Legacy/Branded/FNDDS), `description`
-* `state` (raw | cooked | dried | canned | “as packaged” | other)
-* `prep_method` (free-text + mapping to your **tf:** transforms when feasible)
-* `edible_portion_note` (EP basis)
-* `serving_size_unit`, `serving_size_amount` (if present)
-* `density_g_per_ml` (optional; helps convert serving → per 100 g)
-
-**`external_food_nutrient`**
-
-* `(source_id, external_food_id, nutrient_id)` (PK) — **one row per nutrient**.
-* `amount` (numeric) — **as provided**; carry `unit` (UCUM).
-* `basis` (per_100g | per_100ml | per_serving | per_100kcal | per_100kJ)
-* `derivation` (analytical | calculated | label | imputed | recipe), `method_code`/`lab_method` if available, `sample_n`, `std_error`, `min`, `max`, `median`.
-
-  * FDC documents these fields at `food_nutrient` level (amount per 100 g, unit, derivation, stats). 
-
-> This is your **immutable raw evidence** layer. No coercion beyond unit/basis normalization.
-
-## 3) Mapping evidence to your graph
-
-**`external_food_mapping`**
-
-* `(source_id, external_food_id)` → `graph_node_id` (TP or TPT), `node_type` (TP|TPT), `confidence` (0–1), `method` (rules | FTS | human curation), `notes`.
-* Allow **many→one** (multiple source foods mapped to one node) and **one→many** (ambiguous, mark low confidence).
-
-**Best practice:** Map **like-with-like**:
-
-* Raw Apple (TP) ⇄ raw apple entries.
-* “Butter, salted” (TPT butter) ⇄ butter records.
-* “Yogurt, Greek, plain” ⇄ strained-yogurt TPTs (your identity path knows it’s strained).
-
-## 4) Normalized profiles (rollups) for graph nodes
-
-**`nutrition_profile_current`**
-
-* `(graph_node_id, nutrient_id)` (PK)
-* `amount_per_100g` (canonical unit), `amount_basis` (usually per_100g EP), `method` (weighted_median | meta_mean | choose_best_source), `n_sources`, `last_updated`.
-* `provenance_summary` (compact string like: “FDC Foundation (3), FNDDS (1), CIQUAL (1)”)
-
-**`nutrition_profile_history`** (optional)
-
-* Snapshots over time for auditability.
-
-**`nutrition_profile_provenance`** (optional, drill-down)
-
-* Link each `(graph_node_id, nutrient_id)` to the **subset of external rows** that contributed, with weights and outlier flags.
+* No extra DB at ingest time: evidence lives as **JSONL files** in the repo (easy to diff/review).
+* Mapping is **LLM-assisted** to propose `(taxon, part, transforms)`; a **human approves** new nodes.
+* A separate **profiles build** attaches `graph.db` and turns evidence JSONL into `nutrition_profile_*` tables (in `app.db` or appended to `graph.db` if you prefer), fast and deterministic.
+* **Use your existing node IDs** (`taxon_part_nodes.id` and `tpt_nodes.id`) as foreign keys. No new ID scheme.
 
 ---
 
-# Ingestion & normalization rules
+## Goals & Principles (unchanged, tightened)
 
-**1) Units & basis**
+**Goals**
 
-* Canonicalize to **INFOODS + UCUM** units. Keep original units alongside canonical.
-* Prefer **per 100 g edible portion** as your **default basis**. Convert from per serving/100 ml where possible; otherwise store natively and mark `basis`. (INFOODS guidance explicitly frames 100 g EP as a standard expression.) ([FAOHome][2])
-* Energy: support both `ENERC_KCAL` and `ENERC_KJ`, define fixed conversion.
+* Keep T/TP/TPT the **source of truth** for food identity.
+* Ingest any dataset (FDC/CIQUAL/CoFID/GDSN/brands) **unchanged** as evidence.
+* Normalize nutrients once via **INFOODS** + **UCUM**.
+* Attach **provenance to evidence**, not to graph nodes.
+* **Roll up** evidence into **per-node profiles** (per 100 g EP) with transparent conflict resolution + versioned policy.
+* Be **transform-aware**: TPT identity encodes “as prepared/as eaten”.
 
-**2) Preparation state**
+**Principles**
 
-* If source food is cooked, **do not back-project to raw**. Treat it as a distinct mapped node (ideally a TPT whose identity path includes the relevant **tf:cook**). If needed, apply **retention factors** only in a transparent imputation pipeline (tagged as `derivation=imputed`). ([intake.org][3])
-
-**3) Conflict resolution / rollup**
-
-* **Tier sources** (e.g., analytical > curated foundation > survey > label > inferred).
-* Aggregate per `(node, nutrient)` using **robust stats**:
-
-  * Drop extreme outliers (MAD/percentile trims).
-  * Compute **weighted median** (weights by source tier, recency, sample_n).
-  * Keep `min`, `max`, `n_sources`.
-* Always keep the **raw evidence**—profiles are reproducible summaries.
-
-**4) Transform-aware mapping**
-
-* Use your **identity path** to map “as prepared”. Example:
-
-  * `tpt:…:yogurt` (has `tf:ferment` + `tf:strain`) ⇄ foods named “Greek/strained yogurt”.
-  * `tpt:…:bacon` (cured+smoked) ⇄ cured smoked pork belly entries.
-* If a source food’s label implies transforms, record that in `external_food.prep_method` and/or a transform-like annotation to guide mapping.
+* **Evidence lives off-graph**; nodes stay ontology-clean.
+* **Canonical basis** = **per 100 g EP** (retain native bases in evidence for provenance).
+* **INFOODS tagnames** are canonical nutrient IDs.
+* **Reproducible**: same evidence + same config ⇒ same profiles.
+* **Imputation** only when necessary; clearly flagged and down-weighted.
 
 ---
 
-# Why this avoids “nutrition evidence” glued to nodes
+## Architecture (POC)
 
-* Your nodes (TP/TPT) stay **ontology-clean**. Provenance lives one hop away in `external_food_*`.
-* You can **roll up** across all children mapped to a node (or even across a family) without duplicating evidence rows.
-* Switching profile methodology later doesn’t mutate source data or the ontology; you just recompute `nutrition_profile_*`.
+* **graph.db** — built by your existing **Stage F** pack (`sqlite_pack.py`). Contains `nodes`, `part_def`, TP/TPT tables, closures, FTS, flags, cuisines, etc. (Fast to rebuild.)
+* **evidence/** (Git-tracked) — **JSONL + JSON** files:
 
----
+  * `<source_id>/foods.jsonl`, `nutrients.jsonl`, `mapping.jsonl`, plus `source.json` (metadata).
+  * Global `nutrient_def.json`, `nutrient_alias_map.json`, `rollup_config.json`.
+* **app.db** (or `build.db`) — read-optimized artifact with `nutrition_profile_*` (+ optional %DV). Built by **profiles step** that **attaches** `graph.db` and **reads** `evidence/**/*.jsonl`.
 
-# Minimum viable fields cheat-sheet (what to insist on from any source)
-
-* For every external food: **human label**, **basis** (per 100 g/serving), **state/prep**, and **portion/serving info** if basis ≠ 100 g.
-* For every nutrient row: **nutrient identifier**, **amount**, **unit**, **derivation** (analytical/calculated/label), and any **variance stats** if provided.
-
-  * FDC provides all of these in `food_nutrient` including derivation and stats; amounts are per 100 g. 
-* Map all nutrient identifiers to **INFOODS tags**. ([FAOHome][2])
+> You can also write profiles back into `graph.db` if you want a single DB for the app. For POC, I recommend **separate** `app.db` so your ontology regen remains blazing fast.
 
 ---
 
-# Open considerations (worth deciding up front)
+## Evidence Repository Layout (Git)
 
-* **Jurisdictional DVs/NRVs:** If you’ll surface %DV, keep a small table keyed by market/regulation (US FDA, EU). (Not required for ingestion.)
-* **Edible portion normalization:** Some sources embed in the definition; keep an `EP_flag` and a short note.
-* **Density estimation:** Labels often give per serving; you’ll need density or drained‐weight data to convert confidently (store uncertainty if estimated).
-* **Families & transforms in profiles:** You can also compute **family-level medians** (e.g., “hard cheeses”) by aggregating over descendants using your part/taxon closures.
+```
+evidence/
+  nutrient_def.json                 # INFOODS-first registry
+  nutrient_alias_map.json           # map FDC/CIQUAL/etc. → INFOODS
+  rollup_config.json                # versioned knobs (weights/outliers/etc.)
 
----
+  fdc-2024-09/                      # one folder per source release
+    source.json                     # name, version, license, kind, ingest_date
+    foods.jsonl                     # external foods (one per line)
+    nutrients.jsonl                 # external food × nutrient rows
+    mapping.jsonl                   # mapping to TP/TPT node_id (nullable)
+    logs/                           # optional ingest reports
 
-## Why this is compatible with multiple public datasets
+  ciqual-2020/
+    source.json
+    foods.jsonl
+    nutrients.jsonl
+    mapping.jsonl
 
-* **USDA FoodData Central** (Foundation/SR Legacy/Branded/FNDDS) → nutrients per 100 g as `food_nutrient` rows with derivations and stats; perfect for `external_food_*`. 
-* **INFOODS** → gives you the stable **nutrient ID system** (tagnames) and reinforces 100 g EP reporting. ([FAOHome][2])
-* **Others (CIQUAL, CoFID, etc.)** → follow similar per-food, per-nutrient shapes focused on 100 g conventions, so they’ll slide into the same evidence schema (INFOODS tags smooth the mapping). ([FAOHome][2])
-
----
-
-## How this ties back to your graph
-
-* **TP nodes (normally eaten raw parts)** get profiles by direct mapping (e.g., Apple flesh).
-* **TPT nodes (processed products)** get profiles that already reflect transforms (e.g., bacon, yogurt, cheddar), because you map them to matching prepared foods in sources.
-* **Up-the-tree rollups** (e.g., “all hard cheeses”) use your **part_ancestors** + taxon closures to summarize over descendants.
-
-[1]: https://fdc.nal.usda.gov/data-documentation "Data Documentation | USDA FoodData Central"
-[2]: https://www.fao.org/fileadmin/templates/food_composition/documents/1nutrition/Conversion_Guidelines-V1.0.pdf "Microsoft Word - Conversion Guidelines Nov2012-4-clean.docx"
-[3]: https://www.intake.org/resource/usda-table-nutrient-retention-factors-release-6?utm_source=chatgpt.com "USDA Table of Nutrient Retention Factors - Release 6"
-
+  ...more sources...
+```
 
 ---
 
-Perfect—here’s the “nutrition layer” spec you asked for: the exact tables/fields, semantics, and the roll-up logic to turn heterogeneous public datasets into clean, reproducible nutrition profiles for your TP/TPT nodes. No code, just contracts and examples.
+## Evidence File Contracts (POC JSONL/JSON)
+
+### `nutrient_def.json` (global)
+
+INFOODS-first registry.
+
+```json
+[
+  {
+    "nutrient_id": "PROCNT",
+    "name": "Protein",
+    "category": "macro",
+    "canonical_unit": "g",
+    "precision": 1,
+    "is_energy": false,
+    "notes": "Total protein"
+  },
+  {
+    "nutrient_id": "ENERC_KCAL",
+    "name": "Energy",
+    "category": "macro",
+    "canonical_unit": "kcal",
+    "precision": 0,
+    "is_energy": true
+  }
+]
+```
+
+### `nutrient_alias_map.json` (global)
+
+Maps source codes → INFOODS.
+
+```json
+{
+  "fdc": {
+    "1003": "PROCNT",
+    "1004": "FAT",
+    "1005": "CHOCDF",
+    "1008": "ENERC_KCAL"
+  },
+  "ciqual": { "PROCNT": "PROCNT", "...": "..." }
+}
+```
+
+### `<source_id>/source.json`
+
+```json
+{
+  "source_id": "fdc-2024-09",
+  "name": "USDA FoodData Central",
+  "version": "2024.09",
+  "license": "https://...",
+  "citation": "...",
+  "kind": "foundation",
+  "ingest_date": "2025-10-05",
+  "default_quality_tier": 1
+}
+```
+
+### `<source_id>/foods.jsonl`
+
+One line per external food (immutable evidence row).
+
+```json
+{"source_id":"fdc-2024-09","external_food_id":"123456","label":"Yogurt, Greek, plain, whole milk","brand":null,"data_type":"Foundation","state":"fermented","prep_method":"strained","edible_portion_flag":true,"serving_size_amount":null,"serving_size_unit":null,"household_measure":null,"density_g_per_ml":null,"country":"US","lang":"en"}
+{"source_id":"fdc-2024-09","external_food_id":"789012","label":"Bacon, cooked, pan-fried","data_type":"SR_Legacy","state":"cooked","prep_method":"fried","edible_portion_flag":true}
+```
+
+### `<source_id>/nutrients.jsonl`
+
+One line per (food × nutrient). Units/basis **as provided**.
+
+```json
+{"source_id":"fdc-2024-09","external_food_id":"123456","nutrient":"PROCNT","amount":10.2,"unit":"g","basis":"per_100g","derivation":"analytical","sample_n":8}
+{"source_id":"fdc-2024-09","external_food_id":"123456","nutrient":"ENERC_KCAL","amount":120,"unit":"kcal","basis":"per_100g","derivation":"analytical"}
+{"source_id":"fdc-2024-09","external_food_id":"789012","nutrient":"FAT","amount":42,"unit":"g","basis":"per_100g","derivation":"analytical"}
+```
+
+> `nutrient` must resolve via `nutrient_alias_map` to an INFOODS tag (reject if unmappable).
+
+### `<source_id>/mapping.jsonl`
+
+**One row per food in `foods.jsonl`.** `node_id` is either the resolved TP/TPT id in `graph.db`, or null (new candidate). Includes LLM suggestion payload for audit.
+
+```json
+{
+  "source_id":"fdc-2024-09",
+  "external_food_id":"123456",
+  "node_id":"tpt:bos_taurus:milk:greek_yogurt",        // existing TPT → good
+  "node_type":"TPT",
+  "confidence":0.93,
+  "method":"llm+fts",
+  "llm_suggestion":{
+    "taxon_hints":["bos taurus","cow"],
+    "part_id":"part:milk",
+    "transforms":[{"id":"tf:ferment","params":{"starter":"lactobacillus"}},{"id":"tf:strain","params":{"strain_level":10}}],
+    "notes":"explicit 'Greek' implies strained yogurt",
+    "novelty":{"new_part":null,"new_transform":null}
+  }
+}
+```
+
+If the LLM/curator believes it’s a **new node** (TP or TPT doesn’t exist), leave `node_id:null` and propose identity:
+
+```json
+{
+  "source_id":"fdc-2024-09",
+  "external_food_id":"999999",
+  "node_id": null,                                  // candidate
+  "node_type":"TPT",
+  "confidence":0.78,
+  "method":"llm+human",
+  "proposed_identity":{
+    "taxon_id":"tx:plantae:poaceae:oryza:sativa",
+    "part_id":"part:grain",
+    "identity_steps":[{"id":"tf:parboil"}],
+    "display_name":"Parboiled Rice"
+  },
+  "llm_suggestion":{ "...": "..." }
+}
+```
+
+> This is the **single “delta”** you asked about: `node_id` present → use it; `node_id:null` → **candidate** for ontology enrichment (human review).
+
+### `rollup_config.json` (global)
+
+Versioned knobs used by the profiles build (same as before):
+
+```json
+{
+  "tier_weights":{"1":1.0,"2":0.7,"3":0.5,"4":0.3},
+  "outlier_rule":{"method":"mad","k":3},
+  "aggregator":{"method":"weighted_median"},
+  "confidence_threshold_for_mapping":0.7,
+  "energy_reconciliation":{"enabled":true,"tolerance_pct":8},
+  "recency_decay":{"apply_to":["branded"],"lambda_per_year":0.05},
+  "min_rows_per_profile":2,
+  "imputation":{"enabled":true,"max_share_pct":0.2}
+}
+```
 
 ---
 
-# 0) Principles (recap)
+## LLM-Assisted Mapping (POC)
 
-* **Evidence lives off-graph.** External foods and their per-nutrient rows are ingested verbatim into an evidence layer; we never reshape the ontology to match a source.
-* **One canonical nutrient vocabulary.** We adopt **INFOODS tagnames** (e.g., `PROCNT`, `FAT`, `CHOCDF`, `FIBTG`, `ENERC_KCAL`) as our stable `nutrient_id`. Everything maps to these.
-* **Canonical basis = per 100 g EP.** We store/compute normalized amounts per 100 g **edible portion**. We also retain the native basis (per serving, per 100 ml, etc.) in evidence for provenance.
-* **Transform-aware mapping.** TPT identity (e.g., cured+smoked) tells us which external cooked/prepared foods to map.
-* **Rollups are reproducible views.** Profiles are computed from evidence with transparent weighting, outlier handling, and provenance.
+**Model**: Use a capable, instruction-following model (e.g., **GPT-5 Thinking** in non-tool, non-chain mode) to produce a **single JSON object** per food.
+**Inputs**:
 
----
+* Food `label`, `brand`, `data_type`, `state`, `prep_method`.
+* Top-K candidates from `graph.db.search_fts` (by querying with the label and any detected keywords).
+* **Transforms registry** (`transform_def`), **parts list** (`part_def`), **taxon synonyms** (optional hints).
 
-# 1) Canonical nutrient registry
+**Output JSON (inline into `mapping.jsonl.llm_suggestion`)**:
 
-### `nutrient_def` (global dictionary)
+```json
+{
+  "taxon_hints": ["bos taurus"],
+  "part_id": "part:milk",
+  "transforms": [{"id":"tf:ferment"},{"id":"tf:strain","params":{"strain_level":10}}],
+  "attributes": {"attr:fat_pct": 4},
+  "notes": "…",
+  "novelty": { "new_part": null, "new_transform": null }
+}
+```
 
-* `nutrient_id` (PK, string) — INFOODS tagname (e.g., `PROCNT`, `FAT`, `ENERC_KCAL`, `VITA_RAE`).
-* `name` (string) — human label (e.g., “Protein”, “Fat”, “Vitamin A (RAE)”).
-* `category` (enum) — `macro | vitamin | mineral | fatty_acid | amino_acid | carbohydrate | sugar | organic_acid | other`.
-* `canonical_unit` (UCUM string) — e.g., `g`, `mg`, `µg`, `kcal`, `kJ`, `IU` (only when appropriate).
-* `precision` (int) — suggested decimal places for display.
-* `is_energy` (bool) — true for `ENERC_KCAL`/`ENERC_KJ`.
-* `notes` (text) — definition/boundaries (e.g., “Carbohydrate by difference”, “Vitamin A as µg retinol activity equivalents”).
-* `parent_id` (nullable) — optional grouping (e.g., `FA` parent for fatty acids).
+**Post-processing**:
 
-### `nutrient_alias_map`
+* Resolve **node_id**:
 
-* `source` (enum) — `fdc | ciqual | cof id | gdsn | brand | other`.
-* `source_nutrient_key` (string) — the source’s identifier (number, code, or name).
-* `nutrient_id` (FK → `nutrient_def`).
-* `unit_hint` (nullable) — if source is ambiguous; else null.
-* `confidence` (0–1) — mapping confidence (1 for unambiguous canonical matches).
-* `notes`.
+  * If a TPT in `graph.db` matches `(taxon_id, part_id, identity_hash)` (or the canonical signature) → set `node_id`.
+  * Else set `node_id:null`, fill `proposed_identity` for human review.
+* Add `confidence` (from LLM score × string-match features).
 
-*(This lets you plug in any dataset without expanding your nutrient vocabulary.)*
+> Keep it **simple**: a single pass per food that writes one line to `mapping.jsonl`. You can re-run just this step for a source without touching other sources.
 
 ---
 
-# 2) Source registry & raw evidence
+## What changes (lightly) in **graph.db**
 
-### `nutrition_source`
+You asked to use the existing ID scheme — we will. Two small, optional hardening tweaks help the mapping step:
 
-* `source_id` (PK, string) — e.g., `fdc-2024-09`.
-* `name` (string) — “USDA FoodData Central”, “CIQUAL 2020”, etc.
-* `version` (string), `license` (string/URL), `citation` (text), `kind` (enum: `foundation | branded | survey | lab | gdsn | other`).
-* `ingest_date` (date).
-* `default_quality_tier` (int) — lower is better (e.g., 1 analytic foundation, 2 curated survey, 3 label).
+1. **Uniqueness by identity** (avoid duplicate states)
 
-### `external_food`
+```sql
+-- enforce uniqueness of identity within a TP
+CREATE UNIQUE INDEX IF NOT EXISTS uq_tpt_identity
+ON tpt_nodes(taxon_id, part_id, identity_hash);
+```
 
-* `(source_id, external_food_id)` (PK) — the dataset’s native key.
-* `label` (string) — human name from source.
-* `brand` (nullable).
-* `data_type` (enum) — e.g., FDC: `Foundation | SR_Legacy | Branded | FNDDS`; others: dataset-specific buckets.
-* `state` (enum) — `raw | cooked | dried | fermented | canned | pickled | as_packaged | other`.
-* `prep_method` (string) — free text + optional normalized tokens (e.g., `boiled`, `baked`, `smoked hot`). We don’t force tf-mapping here, but we **can** record hints for mapping.
-* `edible_portion_flag` (bool) — whether values are explicitly on edible portion basis.
-* `serving_size_amount` (nullable numeric), `serving_size_unit` (nullable UCUM).
-* `household_measure` (nullable string) — “1 cup”, “1 slice” (for branded/label data).
-* `density_g_per_ml` (nullable) — helpful for serving→100 g conversions in liquids.
-* `country` (nullable), `lang` (nullable).
-* `notes`.
+2. **(Optional) string signature** for matching (debuggable)
 
-### `external_food_nutrient`
+* Add a `signature` TEXT column to `tpt_nodes` (computed in Stage E before pack) as:
+  `taxon_id | part_id | normalized(identity-steps)`; optionally `UNIQUE(signature)`.
+* Keep `path_json` as the canonical identity path.
 
-* `(source_id, external_food_id, nutrient_id)` (PK).
-* `amount` (numeric) — amount as provided by source.
-* `unit` (UCUM string) — source unit, **before** normalization.
-* `basis` (enum) — `per_100g | per_100ml | per_serving | per_package | per_100kcal | per_100kJ`.
-* `derivation` (enum) — `analytical | calculated | label | imputed | recipe | unknown`.
-* `method_code` (nullable) — source-specific lab method or calc code.
-* `sample_n` (nullable int), `std_error` (nullable numeric), `min` (nullable), `max` (nullable), `median` (nullable).
-* `quality_tier_override` (nullable int) — if a particular row deserves a better/worse tier than the source default.
-* `last_updated` (date).
-
-*(This is the immutable evidence layer: one row per food × nutrient, with native units and basis preserved.)*
+Everything else in Stage F remains as-is.
 
 ---
 
-# 3) Mapping evidence to graph nodes
+## Profiles Build (from evidence → app.db)
 
-### `external_food_mapping`
+A single script/step (call it `profiles:compute`) creates/refreshes nutrition tables by **attaching** your packed ontology.
 
-* `(source_id, external_food_id)` (PK).
-* `graph_node_id` (string) — **TP** or **TPT** id.
-* `node_type` (enum) — `TP | TPT`.
-* `confidence` (0–1).
-* `method` (enum) — `rules | text_match | ontology | human | hybrid`.
-* `transform_hints` (json) — optional hints extracted from the source label/state (e.g., `{ "smoke": "cold", "cure": "dry" }`).
-* `notes`.
+**Inputs**:
 
-**Mapping norms**
+* `graph.db` (from Stage F pack).
+* `evidence/**/source.json`, `foods.jsonl`, `nutrients.jsonl`, `mapping.jsonl`.
+* `nutrient_def.json`, `nutrient_alias_map.json`, `rollup_config.json`.
 
-* Prefer **as-prepared** matches: e.g., “Greek yogurt, plain” ↔ TPT with `ferment+strain`.
-* Avoid back-projecting cooked → raw; if necessary, tag imputation later.
+**Outputs** (in `app.db` by default):
 
----
+* `nutrition_profile_current`
+* `nutrition_profile_provenance`
+* optional `nutrition_profile_history`
+* optional `%DV` tables (`daily_value_table`) and `portion_definition`
 
-# 4) Normalization scaffolding
+**Algorithm** (unchanged, now grounded in files):
 
-### `unit_conversion`
+1. **Load registry**
+   Read `nutrient_def.json` and `nutrient_alias_map.json` (reject unmapped nutrients).
 
-* `from_unit` (UCUM), `to_unit` (UCUM), `nutrient_id` (nullable; most are generic).
-* `factor` (numeric), `offset` (numeric, default 0).
-* `notes`.
-  *(Handle `kcal↔kJ`, `µg RAE↔IU` where appropriate and scientifically defensible.)*
+2. **Stream evidence**
+   Iterate `foods.jsonl` and `nutrients.jsonl`.
+   Normalize units to canonical (UCUM) and filter rows convertible to **per 100 g** (via serving+density if needed, else mark excluded).
 
-### `basis_normalization_rule`
+3. **Join mapping**
+   For each external food, read `mapping.jsonl`:
 
-* `from_basis` → `to_basis` (we standardize to `per_100g`).
-* `requires` (json) — what’s needed to convert (e.g., serving_size + density).
-* `method` (enum) — `direct | density | EP_factor | cannot_convert`.
-* `notes`.
+   * If `node_id` present and `confidence ≥ threshold`: route nutrient rows to that node.
+   * If `node_id:null`: skip from rollups (but persist as “**candidate**; unmapped” in diagnostics).
 
-*(We convert to per 100 g EP when possible; otherwise we’ll carry the native basis along and **exclude** those rows from certain rollups unless a safe conversion is available.)*
+4. **QC**
 
----
+   * Reject negatives unless below-LOD sentinel → coerce to 0, flag.
+   * **Energy reconciliation** (if `ENERC_KCAL` and macros present): ±8% tolerance; otherwise flag.
 
-# 5) Computed profiles (stable per-node nutrition)
+5. **Weighting & Outliers**
 
-### `nutrition_profile_current`
+   * Weights = `tier_weights[source.kind]` × `log(1+sample_n)` × optional recency decay.
+   * Remove outliers (MAD k=3 or P5–P95 trims).
 
-* `(graph_node_id, nutrient_id)` (PK).
-* `amount_per_100g` (numeric, canonical unit from `nutrient_def`).
-* `basis` (enum) — typically `per_100g`.
-* `method` (enum) — `weighted_median | weighted_mean | choose_best | fallback_impute`.
-* `n_sources` (int) — number of **distinct external foods** contributing.
-* `n_rows` (int) — total evidence rows contributing.
-* `last_recomputed` (timestamp).
-* `provenance_summary` (string) — compact, human-readable e.g., “FDC Foundation×3, FNDDS×1, CIQUAL×1”.
-* `flags` (json) — diagnostics (e.g., “high variance”, “basis_mixed_filtered”).
+6. **Aggregate**
 
-### `nutrition_profile_provenance`
+   * Default aggregator: **weighted median** per `(node_id, nutrient_id)`.
+   * Persist into `nutrition_profile_current` + **detailed** `nutrition_profile_provenance` (with `used`, `reason_excluded`).
 
-* `(graph_node_id, nutrient_id, source_id, external_food_id)` (compound PK).
-* `weight` (numeric) — the weight assigned after QC/tiering.
-* `used` (bool) — true if included post-outlier filter; false if excluded.
-* `reason_excluded` (nullable string) — e.g., “outlier_high”, “basis_not_convertible”.
+7. **Summaries & Flags**
 
-### `nutrition_profile_history` (optional)
+   * `provenance_summary` (“FDC Foundation×3; CIQUAL×1; Branded×2”).
+   * Flags: `high_variance`, `basis_mixed_filtered`, `%imputed`, etc.
 
-* Snapshots of `nutrition_profile_current` for audit/versioning.
+**Tables (same as original spec; POC DDL recap)**
 
----
+```sql
+CREATE TABLE IF NOT EXISTS nutrition_profile_current (
+  node_id TEXT NOT NULL,            -- FK to graph.taxon_part_nodes.id or tpt_nodes.id
+  nutrient_id TEXT NOT NULL,        -- INFOODS tag
+  amount_per_100g REAL NOT NULL,
+  basis TEXT NOT NULL DEFAULT 'per_100g',
+  method TEXT NOT NULL,             -- weighted_median|... (from config)
+  n_sources INTEGER NOT NULL,
+  n_rows INTEGER NOT NULL,
+  last_recomputed TEXT NOT NULL,
+  provenance_summary TEXT,
+  flags TEXT,                       -- JSON
+  PRIMARY KEY (node_id, nutrient_id)
+);
 
-# 6) Roll-up algorithm (configurable, deterministic)
+CREATE TABLE IF NOT EXISTS nutrition_profile_provenance (
+  node_id TEXT NOT NULL,
+  nutrient_id TEXT NOT NULL,
+  source_id TEXT NOT NULL,
+  external_food_id TEXT NOT NULL,
+  weight REAL NOT NULL,
+  used INTEGER NOT NULL,            -- 1 used; 0 excluded
+  reason_excluded TEXT,             -- outlier_high|basis_unconvertible|...
+  amount_norm REAL,                 -- normalized to canonical + per_100g
+  unit TEXT NOT NULL DEFAULT '',    -- canonical UCUM
+  basis TEXT NOT NULL DEFAULT 'per_100g',
+  derivation TEXT,                  -- analytical|label|...
+  sample_n INTEGER,
+  PRIMARY KEY (node_id, nutrient_id, source_id, external_food_id)
+);
+```
 
-**Goal:** For each `(graph_node_id, nutrient_id)`, compute a single normalized value, reproducible from evidence.
-
-**Defaults (tunable):**
-
-1. **Collect candidates**
-
-   * Pull all `external_food_nutrient` joined via `external_food_mapping` to the node (TP/TPT).
-   * Filter to rows that can be normalized to **per 100 g** with canonical unit. If not convertible, keep as **eligible but excluded** (for diagnostics).
-
-2. **Normalize**
-
-   * Map `nutrient_id` via `nutrient_alias_map`.
-   * Convert `unit` → `canonical_unit` using `unit_conversion`.
-   * Convert `basis` → `per_100g` using `basis_normalization_rule` (serving size, density, EP flags).
-
-3. **Weighting**
-
-   * Assign a **quality tier** per row: by source default, overridden by row if present.
-   * Base weight = `tier_weight` (e.g., 1.0 for analytical foundation, 0.7 for curated/survey, 0.5 for label, 0.3 for imputed).
-   * Multiplied by `log(1 + sample_n)` if `sample_n` exists.
-   * Optional **recency decay**: multiply by `exp(-λ * age_years)` for branded/rapidly changing products; skip for canonical commodities.
-
-4. **Outlier handling**
-
-   * Compute robust center (median) and dispersion (MAD or IQR).
-   * Exclude rows beyond a threshold (default: **outside [P5, P95]** or **> 3× MAD**). Mark `reason_excluded`.
-
-5. **Aggregate**
-
-   * Default aggregator: **weighted median** (resists skew from uneven label data).
-   * Tie-breaker: weighted mean among the middle 50% of weighted mass.
-
-6. **Provenance & flags**
-
-   * Record `n_sources`, `n_rows`.
-   * Compute flags like `high_variance` (IQR/median > threshold), `basis_mixed_filtered` (had to exclude per-serving rows), etc.
-   * Store compact `provenance_summary`.
-
-**Policy switch:** `method=choose_best` for nutrients where one dataset is authoritative (e.g., specific amino acid profiles from a lab compendium).
+> You can **keep these tables in `app.db`** or attach/appended into `graph.db`. POC default: separate file to keep ontology rebuilds fast.
 
 ---
 
-# 7) Transform-aware estimation (only when needed)
+## Ingestion & Normalization Rules (unchanged, now tied to files)
 
-When no suitable prepared food exists:
+1. **Units & basis**
 
-* Use the node’s identity to **impute** from a related node plus standard factors:
+   * Canonicalize to INFOODS + UCUM; retain original fields in provenance.
+   * Prefer **per 100 g EP**; convert from per serving/100 ml when possible, else exclude from rollups (but keep for diagnostics).
+   * Energy: support `ENERC_KCAL` and `ENERC_KJ` conversions.
 
-  * **Cooking yields/retention factors** (water/fat changes; vitamin retention).
-  * **Curing/brining salt uptake**.
-* Tag such rows with `derivation=imputed` and lower weight (e.g., 0.3). Keep the factor tables separate:
+2. **Preparation state**
 
-  * `retention_factor` (per nutrient × process family).
-  * `yield_factor` (mass basis changes by transform).
-* This keeps the line between **measured** and **estimated** bright.
+   * Don’t back-project cooked → raw; map to appropriate TPT.
+   * Only impute via factors (retention/yield) when no prepared evidence exists; tag `derivation=imputed`, lower weight.
 
----
+3. **Conflict resolution / rollup**
 
-# 8) Rollups above the leaf (families & closures)
+   * Tier sources (analytical > curated > survey > label > imputed).
+   * Drop outliers; aggregate with **weighted median**.
+   * Persist `min`, `max`, `n_sources` via provenance/flags (optional).
 
-You can compute medians for **families** or **ancestry groups**:
+4. **Transform-aware mapping**
 
-* Use `part_ancestors` and `taxon_ancestors` to gather descendants of, say, `part:cheese:hard`.
-* Aggregate **across nodes** (TP/TPT) using the same outlier/weight pipeline but **without** mixing per-serving rows that can’t be normalized.
-* Store in optional `nutrition_profile_family` with `group_id` (e.g., family code) and the same fields as `nutrition_profile_current`.
-
----
-
-# 9) Serving sizes & regulatory %DV (optional layer)
-
-### `daily_value_table` (optional)
-
-* `(jurisdiction, year)` → a set of `(nutrient_id, daily_value_amount, unit)`.
-* Lets you compute %DV for a given market; keep separate from core profiles.
-
-### `portion_definition` (optional)
-
-* Node-specific or family-specific “typical portion” for UI (e.g., 30 g cheese).
-* Never used to **store** nutrition; only for friendly conversions in apps.
+   * Use TPT identity (transforms + params) to match as-prepared foods.
+   * Capture transform hints from labels into `mapping.jsonl.llm_suggestion`.
 
 ---
 
-# 10) Minimal examples (illustrative)
+## Acceptance Checks (must pass to ship profiles)
 
-*(Abbreviated for readability; values are exemplary.)*
-
-**`nutrient_def`**
-
-* `PROCNT` | “Protein” | macro | `g` | 1 | false
-* `FAT` | “Total fat” | macro | `g` | 1 | false
-* `CHOCDF` | “Carbohydrate, by difference” | carbohydrate | `g` | 1 | false
-* `FIBTG` | “Fiber, total dietary” | fiber | `g` | 1 | false
-* `ENERC_KCAL` | “Energy” | macro | `kcal` | 0 | true
-
-**`nutrition_source`**
-
-* `fdc-2024-09` | “USDA FoodData Central” | 2024.09 | license… | `foundation` | ingest_date…
-
-**`external_food`**
-
-* `(fdc-2024-09, 123456)` → label: “Yogurt, Greek, plain, whole milk”, state:`fermented`, prep:`strained`, EP: true
-* `(fdc-2024-09, 789012)` → label: “Bacon, cooked, pan-fried”, state:`cooked`, prep:`fried`, EP: true
-
-**`external_food_nutrient`** (selected)
-
-* (fdc-2024-09, 123456, `PROCNT`) → amount: 10.2, unit:`g`, basis:`per_100g`, derivation:`analytical`
-* (fdc-2024-09, 123456, `ENERC_KCAL`) → 120, `kcal`, `per_100g`, `analytical`
-* (fdc-2024-09, 789012, `FAT`) → 42.0, `g`, `per_100g`, `analytical`
-
-**`external_food_mapping`**
-
-* `(fdc-2024-09, 123456)` → `tpt:…:yogurt:greece_style` (node_type:`TPT`, confidence:0.95, method:`hybrid`)
-* `(fdc-2024-09, 789012)` → `tpt:…:sus:belly:cured_smoked` (node_type:`TPT`, confidence:0.9)
-
-**Computed `nutrition_profile_current`**
-
-* `(tpt:…:yogurt…, PROCNT)` → 10.3 g/100 g, method:`weighted_median`, n_sources:4, n_rows:7
-* `(tpt:…:bacon…, FAT)` → 41.5 g/100 g, method:`weighted_median`, n_sources:5, n_rows:9
+* **Mapping yield**: ≥ threshold (per source type) for `node_id` non-null among foods with nutrients.
+* **Core coverage**: energy/protein/fat/carb/sugar/fiber present for ≥ Y% of mapped foods.
+* **Energy reconciliation**: >90% of cases within ±8%.
+* **No unit/basis leaks** among `used=1`.
+* **Outliers**: excluded share per nutrient ≤ Z%.
+* **Provenance**: every profile has ≥1 non-imputed row unless marked `fallback_impute`.
 
 ---
 
-# 11) Common queries (mental model)
+## LLM Prompt & Minimal Orchestration (POC)
 
-* **Get the profile for a TPT:** look up `(graph_node_id, nutrient_id)` in `nutrition_profile_current`. If missing, recompute from `external_food_*` via mapping.
-* **Get a family profile (e.g., hard cheeses):** gather descendant nodes via `part_ancestors` + roll up as above into `nutrition_profile_family`.
-* **Explain this number:** join to `nutrition_profile_provenance` to list contributing external foods and their weights; optionally show exclusions and reasons.
+**Candidate generation (cheap):**
 
----
+* Query `graph.db.search_fts` with the food label; take top 20 (taxon + TP + TPT).
+* Pass those **names only** (no IDs) to the LLM alongside the **transforms/parts dictionaries**.
 
-# 12) Data quality & governance
+**Prompt shape (succinct):**
 
-* Always keep the **raw evidence immutable**.
-* Make the rollup **idempotent**: same evidence + same config ⇒ same profiles.
-* Track **config version** (weights, outlier thresholds) alongside profiles so you can rebuild and compare.
-* Prefer **weighted medians** for robustness across mixed source qualities.
-* Keep **imputed** values clearly marked and down-weighted.
+* “Given this food name: ‘…’, pick part + transforms; emit JSON with `part_id`, `transforms`, optional `attributes`, and `novelty` if a needed part/transform is missing. Use only these **allowed** `parts` and `transforms` unless novelty is obvious. If it maps directly to one of these candidate names, set `maps_to_name`.”
 
----
+**Post-LLM rules:**
 
-# 13) Where this fits your ontology
+* If `maps_to_name` present → resolve to TP/TPT by name (or your `signature`), set `node_id`.
+* Else if `(part + transforms)` equals an existing TPT identity → resolve via `(taxon_id, part_id, identity_hash)`.
+* Else → `node_id:null` + `proposed_identity` for human review.
 
-* **TP nodes** (e.g., `tx:plantae:rosaceae:malus … + part:fruit`) map to raw commodity entries.
-* **TPT nodes** map to prepared foods (identity path ≈ preparation), making nutrition **as eaten**.
-* **Closures** (`part_ancestors`, `taxon_ancestors`) let you compute **category medians** (e.g., “all hard cheeses”) without baking any of that into the ontology itself.
+> **Yes, I can produce these JSON rows** given your identity structure. This stays “non-tool, non-reasoning” on the LLM side; your runner orchestrates I/O.
 
 ---
 
-# 14) Open knobs you can tune later
+## Phases & Deliverables (with evidence specifics)
 
-* Tier weights per source kind.
-* Outlier thresholds (MAD vs IQR trims).
-* Recency decay for branded.
-* Jurisdictional DVs for UI %DV.
-* Whether to store **per 100 ml** as co-primary basis for liquids (we still normalize to per 100 g for cross-category comparability).
+**Phase 0 — Foundations**
 
----
+* Seed `nutrient_def.json` (INFOODS core), `nutrient_alias_map.json`.
+* Add `uq_tpt_identity` (and optional `signature` column) to pack.
 
-awesome — here’s the “reference JSON schemas + ingestion contract” for the nutrition layer. it’s concise but complete enough that a new data partner (or an engineer) can wire a source end-to-end without guesswork.
+**Phase 1 — Evidence Ingestion (files only)**
 
----
+* Emit `<source>/foods.jsonl`, `nutrients.jsonl` unchanged from source (except light normalization of text encodings).
+* Write `source.json`.
 
-# 1) Reference JSON Schemas (contracts, not executable code)
+**Phase 2 — Mapping to Nodes**
 
-Below, every table is expressed as a schema *contract*: field → type → constraints → semantics. Types: `string | number | integer | boolean | enum | date | json`. Units use UCUM strings (`g`, `mg`, `µg`, `kcal`, `kJ`, `ml`).
+* Generate `mapping.jsonl` via (`search_fts` → LLM) + human review for `node_id:null` rows.
+* **Policy:** accept `node_id` only when `confidence ≥ threshold` (from `rollup_config`).
 
-## 1.1 Nutrient dictionary
+**Phase 3 — Profiles Build**
 
-### `nutrient_def`
+* Run `profiles:compute` to fill `nutrition_profile_*` in `app.db` (attach `graph.db`, stream evidence files).
 
-* `nutrient_id` (string, PK) — **INFOODS tagname** (e.g., `PROCNT`, `FAT`, `CHOCDF`, `FIBTG`, `ENERC_KCAL`, `VITA_RAE`).
-* `name` (string) — human label.
-* `category` (enum) — `macro | vitamin | mineral | fatty_acid | amino_acid | carbohydrate | sugar | organic_acid | other`.
-* `canonical_unit` (string, UCUM) — unit to which all evidence will be normalized for this nutrient.
-* `precision` (integer, 0–6) — display precision.
-* `is_energy` (boolean) — true only for `ENERC_KCAL`/`ENERC_KJ`.
-* `parent_id` (string, nullable, FK→nutrient_def.nutrient_id) — optional grouping.
-* `notes` (string, nullable).
+**Phase 4 — QA & Acceptance**
 
-### `nutrient_alias_map`
+* Run the acceptance checks and emit a compact report in `evidence/<source>/logs/acceptance.json`.
 
-* `source` (enum) — `fdc | ciqual | cof id | gdsn | branded | other`.
-* `source_nutrient_key` (string, PK with `source`) — the source’s ID or canonical field name.
-* `nutrient_id` (string, FK→nutrient_def).
-* `unit_hint` (string, UCUM, nullable) — only if the source is ambiguous or context-dependent.
-* `confidence` (number, 0–1, default 1.0).
-* `notes` (string, nullable).
+**Phase 5 (optional) — %DV/Portions**
+
+* `daily_value_table`, `portion_definition` (UI only).
+
+**Phase 6 (optional) — Imputation Factors**
+
+* `retention_factor.jsonl`, `yield_factor.jsonl` (used only when mapping lacks prepared foods).
 
 ---
 
-## 1.2 Source registry & raw evidence
+## Common Queries (unchanged mental model)
 
-### `nutrition_source`
-
-* `source_id` (string, PK) — e.g., `fdc-2024-09`.
-* `name` (string).
-* `version` (string) — dataset release label.
-* `license` (string/URL).
-* `citation` (string).
-* `kind` (enum) — `foundation | branded | survey | lab | gdsn | other`.
-* `ingest_date` (date).
-* `default_quality_tier` (integer) — lower = better (e.g., 1 analytic, 2 curated, 3 label).
-* `notes` (string, nullable).
-
-### `external_food`
-
-* `source_id` (string, FK→nutrition_source, PK part).
-* `external_food_id` (string, PK part) — the source’s key.
-* `label` (string) — source name.
-* `brand` (string, nullable).
-* `data_type` (string/enum) — source-specific category (e.g., FDC `Foundation | Branded | FNDDS`).
-* `state` (enum) — `raw | cooked | dried | fermented | canned | pickled | as_packaged | other`.
-* `prep_method` (string, nullable) — free text; we’ll derive transform hints separately.
-* `edible_portion_flag` (boolean) — true if already EP-normalized.
-* `serving_size_amount` (number, nullable).
-* `serving_size_unit` (string, UCUM, nullable).
-* `household_measure` (string, nullable) — “1 cup”, “1 slice”.
-* `density_g_per_ml` (number, nullable).
-* `country` (string ISO 3166-1 alpha-2, nullable).
-* `lang` (string BCP-47, nullable).
-* `notes` (string, nullable).
-
-### `external_food_nutrient`
-
-* `source_id` (string, PK part, FK).
-* `external_food_id` (string, PK part, FK).
-* `nutrient_id` (string, PK part, FK→nutrient_def).
-* `amount` (number) — **as provided** by source, pre-normalization.
-* `unit` (string, UCUM) — as provided.
-* `basis` (enum) — `per_100g | per_100ml | per_serving | per_package | per_100kcal | per_100kJ`.
-* `derivation` (enum) — `analytical | calculated | label | imputed | recipe | unknown`.
-* `method_code` (string, nullable) — lab method/calculation code.
-* `sample_n` (integer, nullable).
-* `std_error` (number, nullable).
-* `min` (number, nullable).
-* `max` (number, nullable).
-* `median` (number, nullable).
-* `quality_tier_override` (integer, nullable).
-* `last_updated` (date, nullable).
-
-**Row-level invariant:** `(source_id, external_food_id, nutrient_id)` is unique.
+* **Get profile for a node** → `nutrition_profile_current(node_id, nutrient_id)`.
+* **Explain value** → join to `nutrition_profile_provenance` (weights, inclusions/exclusions).
+* **Family rollup** → use ontology closures (`taxon_ancestors`, `part_ancestors`) and re-aggregate across descendants.
 
 ---
 
-## 1.3 Mapping evidence → graph nodes
+## Data Quality & Governance (fits Git)
 
-### `external_food_mapping`
-
-* `source_id` (string, PK part).
-* `external_food_id` (string, PK part).
-* `graph_node_id` (string) — **TP** or **TPT** id (your ontology id space).
-* `node_type` (enum) — `TP | TPT`.
-* `confidence` (number, 0–1).
-* `method` (enum) — `rules | text_match | ontology | human | hybrid`.
-* `transform_hints` (json, nullable) — e.g., `{ "smoke": "cold", "cure": "dry" }`.
-* `notes` (string, nullable).
-
-**Uniqueness policy:** A given `(source_id, external_food_id)` *may* map to multiple nodes, but rollups will only use mappings whose `confidence ≥ threshold` (default 0.7). Keep duplicates rare and justified.
+* Evidence rows are **immutable** once committed (fixes via new source versions).
+* `mapping.jsonl` is your **curation ledger**; PRs cleanly show deltas (`node_id` filled, new candidates).
+* Rollups are **idempotent**; keep `rollup_config.json` versioned.
+* Bright line for **imputed** vs measured (weights + flags).
 
 ---
 
-## 1.4 Normalization scaffolding
+## Tiny Worked Example (as before, now with files)
 
-### `unit_conversion`
-
-* `from_unit` (string, UCUM, PK part).
-* `to_unit` (string, UCUM, PK part).
-* `nutrient_id` (string, nullable, FK) — null = general conversion; set when conversion is nutrient-specific (e.g., IU↔µg RAE).
-* `factor` (number) — multiplicative factor.
-* `offset` (number, default 0) — additive offset (rare).
-* `notes` (string, nullable).
-
-### `basis_normalization_rule`
-
-* `from_basis` (enum) — see above.
-* `to_basis` (enum) — **must be `per_100g`** in our pipeline.
-* `requires` (json) — e.g., `["serving_size_amount","serving_size_unit"]`, `["density_g_per_ml"]`, `["edible_portion_flag"]`.
-* `method` (enum) — `direct | density | EP_factor | cannot_convert`.
-* `notes` (string, nullable).
+* `fdc-2024-09/foods.jsonl` → Greek yogurt, bacon.
+* `nutrients.jsonl` → PROCNT=10.2 g/100 g for yogurt; FAT=42 g/100 g for bacon.
+* `mapping.jsonl` → Greek yogurt maps to existing TPT; bacon maps to TPT with `cure+smoke`.
+* `profiles:compute` → weighted median → stored into `nutrition_profile_current` with provenance and flags.
 
 ---
 
-## 1.5 Computed profiles
+## Build Commands (POC CLI shape)
 
-### `nutrition_profile_current`
-
-* `graph_node_id` (string, PK part).
-* `nutrient_id` (string, PK part, FK→nutrient_def).
-* `amount_per_100g` (number) — canonical unit from `nutrient_def`.
-* `basis` (enum) — typically `per_100g`.
-* `method` (enum) — `weighted_median | weighted_mean | choose_best | fallback_impute`.
-* `n_sources` (integer) — distinct external foods contributing.
-* `n_rows` (integer) — total evidence rows used.
-* `last_recomputed` (date/time).
-* `provenance_summary` (string) — compact human string (“FDC Foundation×3; CIQUAL×1”).
-* `flags` (json) — e.g., `{"high_variance": true, "basis_mixed_filtered": true}`.
-
-### `nutrition_profile_provenance`
-
-* `graph_node_id` (string, PK part).
-* `nutrient_id` (string, PK part).
-* `source_id` (string, PK part).
-* `external_food_id` (string, PK part).
-* `weight` (number) — post-QC weight used in aggregation.
-* `used` (boolean) — false if filtered (e.g., outlier).
-* `reason_excluded` (string, nullable) — `outlier_high | outlier_low | basis_unconvertible | duplicate_inferior | other`.
-
-### `nutrition_profile_history` (optional)
-
-* same columns as `nutrition_profile_current` + `profile_version` (integer) and `config_version` (string).
+* `graph:pack` → runs Stage F to produce `graph.db` (no change to your current runner).
+* `evidence:ingest <source>` → writes `<source>/{source.json,foods.jsonl,nutrients.jsonl}`.
+* `evidence:map <source>` → reads foods, hits `search_fts`+LLM, writes `mapping.jsonl` (leaves `node_id:null` for candidates).
+* `profiles:compute` → attaches `graph.db`, streams all `evidence/**`, writes/refreshes `nutrition_profile_*` in `app.db`.
+* `profiles:report` → acceptance metrics JSON.
 
 ---
 
-## 1.6 Optional helpers (kept separate)
+## What we are **not** doing (on purpose, POC discipline)
 
-### `daily_value_table`
-
-* `jurisdiction` (enum) — `us | eu | ca | au | other`.
-* `year` (integer).
-* `nutrient_id` (FK).
-* `daily_value_amount` (number).
-* `unit` (UCUM).
-* **PK:** `(jurisdiction, year, nutrient_id)`.
-
-### `portion_definition`
-
-* `graph_node_id` (string, PK).
-* `portion_amount` (number).
-* `portion_unit` (UCUM).
-* `label` (string) — e.g., “1 slice”, “1 Tbsp”.
-* `notes` (string, nullable).
-
-### `retention_factor` (for imputation only)
-
-* `process_code` (enum) — e.g., `boil | bake | fry | smoke_cold | smoke_hot | cure_dry | cure_wet | ferment`.
-* `nutrient_id` (FK).
-* `retained_fraction` (number, 0–1).
-* `source_citation` (string).
-
-### `yield_factor`
-
-* `process_code` (enum).
-* `basis` (enum) — `raw→cooked | cooked→raw` (directional).
-* `mass_change_fraction` (number) — e.g., −0.2 for 20% water loss.
+* No background services; no heavy ETL warehouse.
+* No new ID scheme — we reuse your packed IDs.
+* No hard dependency on a second database for evidence; files in Git suffice.
+* No complex “semantic signatures” beyond the (optional) `tpt_nodes.signature` helper.
 
 ---
 
-# 2) Ingestion Contract (what a new source must deliver + what we guarantee)
+## What details are **still missing / need decisions**
 
-## 2.1 What we expect from a new source
+1. **Exact LLM model + prompt**
 
-**A. Source metadata**
+   * We sketched the I/O; finalize the minimal prompt, temperature, and top-K candidate count from FTS (10? 20?).
+   * Decide confidence scoring formula (LLM score × FTS similarity).
 
-* Name, version, license, citation, `kind` classification.
-* Release date and refresh cadence.
+2. **Thresholds**
 
-**B. Foods table**
+   * `confidence_threshold_for_mapping` default (0.7?), outlier rule (MAD k=3 vs P5–P95), % caps for imputation per nutrient.
 
-* Stable `external_food_id`.
-* Human `label`; `brand` if branded.
-* `state` + `prep_method` if available (raw/cooked/fermented/etc.).
-* Serving information (amount, unit), household measure (if branded).
-* Density (if liquids) or a clear way to get 100 g values.
-* EP flag if values are already on edible portion.
+3. **Liquid handling**
 
-**C. Nutrient rows**
+   * Whether to treat **per 100 ml** as co-primary for display while profiles remain per 100 g; finalize density policies and uncertainty flags.
 
-* One row per (food × nutrient) with: **nutrient identifier**, amount, unit, basis, derivation (analytical/label/etc.), optional method codes, sample n/SE or equivalent dispersion indicators.
-* If the nutrient system is *not* INFOODS, provide a **nutrient dictionary** for mapping (IDs, names, units, definitions).
+4. **Energy reconciliation policy**
 
-**D. Coverage statement**
+   * Exact macro → kcal factors and tolerance (±8% suggested); decide nutrients included (alcohol? polyols?).
 
-* % of foods with: energy, protein, fat, carbohydrate, sodium, sugar, fiber.
-* Known gaps (e.g., “vitamin D missing for branded”).
+5. **New ontology proposals path**
 
-**E. Provenance & quality**
+   * Where to record `proposed_identity` → do we write a **candidate JSONL** the ontology build can read to create new TPTs (behind a flag) or do we gate via manual edits only?
 
-* For each nutrient row, whether it’s analytical, computed or label; any flags for outliers or imputation.
+6. **%DV tables**
 
----
+   * Jurisdictions (US/EU/CA/…) and years to seed; or defer entirely for POC.
 
-## 2.2 What we do during ingestion (deterministic pipeline)
+7. **Imputation tables**
 
-1. **Register source** → `nutrition_source`.
+   * Source(s) and minimal subset to seed (e.g., USDA Retention Factors core vitamins).
 
-2. **Nutrient mapping**
+8. **Where to store profiles**
 
-   * Map source nutrients to `nutrient_def` via `nutrient_alias_map`.
-   * Add missing aliases with `confidence` < 1.0 only if unambiguous after review.
-   * Refuse to ingest rows whose nutrient cannot be mapped.
+   * Keep in `app.db` (recommended) or append to `graph.db` (single-file app)? Pick one to avoid ambiguity.
 
-3. **Unit & basis normalization eligibility**
+9. **Performance knobs**
 
-   * Validate `unit` is UCUM; if not, add a controlled conversion or reject.
-   * Mark rows convertible to `per_100g` using serving size, density, or EP flags.
-   * Keep non-convertible rows but **exclude** them from rollups by default, noting `basis_unconvertible`.
-
-4. **Food mapping**
-
-   * Autolink `external_food` → graph nodes using your ontology:
-
-     * TP (raw/primary) mappings use taxon + part cues.
-     * TPT (prepared) mappings use transform hints in labels (e.g., “smoked”, “Greek”, “salted”, “pressed”, “aged”).
-   * Keep `external_food_mapping.method` and `confidence`. Human accept high-impact ambiguous cases.
-
-5. **QC**
-
-   * Hard bounds per nutrient (e.g., sodium ≤ 100 g salt equivalent, protein ≤ 100 g/100 g, negative values forbidden unless defined as below-LOD sentinel which we normalize to 0 with a `flags.lod` note).
-   * Cross-checks: if both `ENERC_KCAL` and macros present, verify within tolerance (±8%) to flag potential label rounding issues.
-   * Deduplicate identical rows across overlapping sub-releases.
-
-6. **Rollup**
-
-   * Normalize eligible rows to canonical unit + `per_100g`.
-   * Weight rows (tier → weight; optional recency decay for branded).
-   * Filter outliers (MAD/IQR).
-   * Aggregate (**weighted median** default).
-   * Persist to `nutrition_profile_current` + `nutrition_profile_provenance`.
-
-7. **Diagnostics**
-
-   * Emit variance flags, basis-mix flags, and a `provenance_summary`.
+   * Batch sizes for streaming JSONL → SQLite inserts; indexes to create/drop during load for speed.
 
 ---
 
-## 2.3 Acceptance checks (must pass before profiles ship)
+### Bottom line
 
-* **Mapping yield:** ≥ X% of external foods mapped to at least one node (policy: X depends on source type; 60–80% for commodity datasets; lower acceptable for branded).
-* **Nutrient coverage:** core 6 nutrients present for ≥ Y% of mapped foods.
-* **Energy reconciliation:** where both energy and macros exist, >90% rows within ±8%.
-* **No unit/basis leaks:** 0 rows in `nutrition_profile_provenance.used=true` whose evidence couldn’t be normalized to per 100 g + canonical unit.
-* **Outlier sanity:** share of rows excluded as outliers per nutrient ≤ Z% (tunable; typical 1–10%).
-* **Provenance fidelity:** every profile has at least 1 row with `derivation ∈ {analytical, curated/survey}` unless marked `fallback_impute`.
-
----
-
-# 3) Rollup policy (config object you can version)
-
-### `nutrition_rollup_config` (conceptual)
-
-* `tier_weights`: `{1:1.0, 2:0.7, 3:0.5, 4:0.3}`
-* `recency_decay`: `{apply_to: ["branded"], lambda_per_year: 0.05}`
-* `outlier_rule`: `{method: "mad", k: 3}` or `{method: "quantile", lower: 0.05, upper: 0.95}`
-* `aggregator`: `{method: "weighted_median"}`
-* `min_rows_per_profile`: `2` (fallback to `choose_best` if fewer)
-* `confidence_threshold_for_mapping`: `0.7`
-* `energy_reconciliation`: `{enabled: true, tolerance_pct: 8}`
-* `imputation`: `{enabled: true, max_share_pct: 20}` (cap how much imputed content can drive a profile)
-* `exclusions`: e.g., `{"nutrients": ["ALCOHOL"], "sources": []}`
-
-Store a `config_version` string alongside profile rows for audit.
-
----
-
-# 4) Guidance for mapping TP vs TPT
-
-* **TP (taxon+part)**: map **raw or minimally processed** commodities (e.g., “Apple, raw, with skin”, “Beef, raw, ribeye”). Good for default “ingredient” nutrition.
-* **TPT (prepared)**: map food entries whose labels encode transforms present in the node identity (e.g., “Bacon, cooked, pan-fried” → `cure + smoke + cook`; “Yogurt, Greek” → `ferment + strain`; “Olive oil, extra virgin” → `press` only).
-* When a source has only raw forms but we need prepared: use **retention_factor** and **yield_factor** imputation with explicit low weight (derivation=`imputed`).
-
----
-
-# 5) Glossary / invariants that keep the system sane
-
-* **Canonical basis** is **per 100 g edible portion**. Liquids also normalize to per 100 g (we may *display* per 100 ml for UX, but profiles keep per 100 g for cross-category comparability).
-* **INFOODS tagnames** anchor the nutrient vocabulary; all sources must map to these (or an extension we add deliberately).
-* **Evidence immutability:** `external_*` rows are never edited in place; corrections are additional rows in a new `source_id` (new version).
-* **Reproducibility:** Same evidence + same `nutrition_rollup_config` ⇒ same `nutrition_profile_current`.
-
----
-
-# 6) Tiny worked example (one nutrient, one node)
-
-* Node: `tpt:…:Greek yogurt (whole milk)`
-* Evidence after mapping & normalization to per 100 g:
-
-  * FDC Foundation: `PROCNT = 10.2 g` (tier 1)
-  * CIQUAL: `PROCNT = 9.8 g` (tier 1)
-  * Branded Label A: `PROCNT = 11.0 g` (tier 3)
-  * Branded Label B: `PROCNT = 13.0 g` (tier 3) **outlier** (excluded)
-* Weights: tier1=1.0; tier3=0.5
-* Weighted median across {10.2 (w=1.0), 9.8 (1.0), 11.0 (0.5)} → **10.2 g/100 g**
-* Stored as:
-
-  * `nutrition_profile_current(tpt…, PROCNT) = 10.2 g`
-  * `provenance`: three rows used (two tier1, one tier3); one excluded outlier.
-
----
-
-# 7) What to do next (optional knobs)
-
-* Pre-seed `nutrient_def` with the INFOODS core + commonly used vitamins/minerals/FA/amino acids.
-* Decide your default `tier_weights` and `outlier_rule` once, version them (`config_version`), and commit them to the repo.
-* Start with FDC (Foundation + SR Legacy + FNDDS) and one EU dataset (e.g., CIQUAL) to test cross-source reconciliation.
-* Pick 10 representative nodes (5 TP, 5 TPT) as **golden profiles** to smoke-test the end-to-end flow and provenance UX.
-
----
-
+This version bakes the **simple, file-first evidence build** into your existing workflow, uses your **current TP/TPT IDs**, and adds only what’s necessary: a JSONL **mapping ledger**, a **minimal LLM assist**, and a deterministic **profiles step**. It stays POC-friendly, fast, and Git-reviewable—while preserving the full rigor of nutrient normalization, transform-aware mapping, and provenance you wanted.
