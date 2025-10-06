@@ -1,0 +1,39 @@
+[2025-10-06T05:19:12.290405] run start model=gpt-4o-mini min_conf=0.7 topk=15 limit=2
+[2025-10-06T05:19:22.085114] run start model=gpt-4o-mini min_conf=0.7 topk=15 limit=2
+[2025-10-06T05:19:44.528613] run start model=gpt-4o-mini min_conf=0.7 topk=15 limit=2
+[2025-10-06T05:21:52.394756] run start model=gpt-4o-mini min_conf=0.7 topk=15 limit=2
+[2025-10-06T05:22:22.963194] run start model=gpt-4o-mini min_conf=0.7 topk=15 limit=2
+[2025-10-06T05:23:38.805501] run start model=gpt-4o-mini min_conf=0.7 topk=15 limit=2
+[2025-10-06T05:24:23.810201] run start model=gpt-4o-mini min_conf=0.7 topk=15 limit=2
+[ERR] fdc:321358 Hummus, commercial: openai SDK not installed. pip install openai>=1.0.0
+[ERR] fdc:321359 Milk, reduced fat, fluid, 2% milkfat, with added vitamin A and vitamin D: openai SDK not installed. pip install openai>=1.0.0
+[done] processed=2 rejected=2 total_time=1.01s avg_per_food=0.00s
+[tokens] input=0 output=0 total=0
+[2025-10-06T05:53:42.334892] run start model=gpt-4o-mini min_conf=0.7 topk=15 limit=1
+[done] processed=0 rejected=0 total_time=1.05s avg_per_food=0.00s
+[tokens] input=0 output=0 total=0
+[2025-10-06T05:54:31.998619] run start model=gpt-4o-mini min_conf=0.7 topk=15 limit=5
+[ERR] fdc:321360 Tomatoes, grape, raw: openai SDK not installed. pip install openai>=1.0.0
+[ERR] fdc:321505 Salt, table, iodized: openai SDK not installed. pip install openai>=1.0.0
+[ERR] fdc:321611 Beans, snap, green, canned, regular pack, drained solids: openai SDK not installed. pip install openai>=1.0.0
+[done] processed=3 rejected=3 total_time=1.07s avg_per_food=0.00s
+[tokens] input=0 output=0 total=0
+[2025-10-06T05:55:22.437247] run start model=gpt-4o-mini min_conf=0.7 topk=15 limit=1
+[done] processed=0 rejected=0 total_time=1.03s avg_per_food=0.00s
+[tokens] input=0 output=0 total=0
+[2025-10-06T05:55:48.224612] run start model=gpt-4o-mini min_conf=0.7 topk=15 limit=1
+[ERR] fdc:321358 Hummus, commercial: OPENAI_API_KEY environment variable is required but not set. Please set it with your OpenAI API key.
+[done] processed=1 rejected=1 total_time=0.99s avg_per_food=0.00s
+[tokens] input=0 output=0 total=0
+[2025-10-06T05:56:55.374960] run start model=gpt-4o-mini min_conf=0.7 topk=15 limit=1
+[ERR] fdc:321358 Hummus, commercial: OPENAI_API_KEY environment variable is required but not set. Please set it with your OpenAI API key.
+[done] processed=1 rejected=1 total_time=1.01s avg_per_food=0.00s
+[tokens] input=0 output=0 total=0
+[2025-10-06T05:58:40.797817] run start model=gpt-4o-mini min_conf=0.7 topk=15 limit=1
+[ERR] fdc:321358 Hummus, commercial: OPENAI_API_KEY environment variable is required but not set. Please set it with your OpenAI API key.
+[done] processed=1 rejected=1 total_time=1.04s avg_per_food=0.00s
+[tokens] input=0 output=0 total=0
+[2025-10-06T05:59:21.789511] run start model=gpt-4o-mini min_conf=0.7 topk=15 limit=1
+[ERR] fdc:321358 Hummus, commercial: LLM failed after 3 attempts: Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}
+[done] processed=1 rejected=1 total_time=17.41s avg_per_food=0.00s
+[tokens] input=0 output=0 total=0

@@ -26,6 +26,9 @@
     "stop:force": "./scripts/stop-all.sh --force",
     "stop:all-ports": "./scripts/stop-all.sh --all-ports",
     "stop:force-all-ports": "./scripts/stop-all.sh --force --all-ports",
+    "evidence:map": "cd etl && python3 -m evidence.map",
+    "evidence:map:limit": "cd etl && python3 -m evidence.map --limit",
+    "evidence:profiles": "cd etl && python3 -m evidence.profiles",
     "check": "pnpm typecheck && pnpm lint"
   },
   "devDependencies": {
