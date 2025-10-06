@@ -1,0 +1,41 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "required": [
+        "food_id",
+        "name"
+    ],
+    "properties": {
+        "food_id": {
+            "type": "string"
+        },
+        "name": {
+            "type": "string"
+        },
+        "brand": {
+            "type": [
+                "string",
+                "null"
+            ]
+        },
+        "lang": {
+            "type": [
+                "string",
+                "null"
+            ]
+        },
+        "country": {
+            "type": [
+                "string",
+                "null"
+            ]
+        },
+        "category": {
+            "type": [
+                "string",
+                "null"
+            ]
+        }
+    },
+    "additionalProperties": true
+}

@@ -1,0 +1,35 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "required": [
+        "food_id",
+        "nutrient_id",
+        "value",
+        "unit"
+    ],
+    "properties": {
+        "food_id": {
+            "type": "string"
+        },
+        "nutrient_id": {
+            "type": "string"
+        },
+        "value": {
+            "type": "number"
+        },
+        "unit": {
+            "type": "string"
+        },
+        "basis": {
+            "enum": [
+                "per_100g",
+                "per_100ml",
+                "per_serving"
+            ]
+        },
+        "method": {
+            "type": "string"
+        }
+    },
+    "additionalProperties": true
+}

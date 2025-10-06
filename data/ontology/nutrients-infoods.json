@@ -1,0 +1,568 @@
+{
+    "canonical_scheme": "INFOODS_tagnames",
+    "version": "v1.0",
+    "notes": "Canonical IDs use INFOODS tagnames. Where SR Legacy nutrient numbers are widely known, they are included. Units reflect typical database usage. This set covers FDA label nutrients + common macro/micro + key lipid and sugar components. Fine-grained amino/fatty-acid isomers and rare constituents can be added later.",
+    "nutrients": [
+        {
+            "id": "ENERC_KCAL",
+            "name": "Energy (kcal)",
+            "unit": "kcal",
+            "sr_legacy_num": "208",
+            "aliases": [
+                "energy_kcal",
+                "calories"
+            ],
+            "confidence": "high"
+        },
+        {
+            "id": "ENERC",
+            "name": "Energy (kJ)",
+            "unit": "kJ",
+            "sr_legacy_num": "268",
+            "aliases": [
+                "energy_kj"
+            ],
+            "confidence": "high"
+        },
+        {
+            "id": "WATER",
+            "name": "Water",
+            "unit": "g",
+            "sr_legacy_num": "255",
+            "aliases": [
+                "moisture"
+            ],
+            "confidence": "high"
+        },
+        {
+            "id": "ASH",
+            "name": "Ash",
+            "unit": "g",
+            "sr_legacy_num": "207",
+            "aliases": [],
+            "confidence": "high"
+        },
+        {
+            "id": "PROT",
+            "name": "Protein",
+            "unit": "g",
+            "sr_legacy_num": "203",
+            "aliases": [],
+            "confidence": "high"
+        },
+        {
+            "id": "FAT",
+            "name": "Total lipid (fat)",
+            "unit": "g",
+            "sr_legacy_num": "204",
+            "aliases": [
+                "total_fat"
+            ],
+            "confidence": "high"
+        },
+        {
+            "id": "CHOCDF",
+            "name": "Carbohydrate, by difference",
+            "unit": "g",
+            "sr_legacy_num": "205",
+            "aliases": [
+                "carbohydrate"
+            ],
+            "confidence": "high"
+        },
+        {
+            "id": "FIBTG",
+            "name": "Dietary fiber, total",
+            "unit": "g",
+            "sr_legacy_num": "291",
+            "aliases": [
+                "fiber"
+            ],
+            "confidence": "high"
+        },
+        {
+            "id": "SUGAR",
+            "name": "Sugars, total",
+            "unit": "g",
+            "sr_legacy_num": "269",
+            "aliases": [
+                "sugars_total"
+            ],
+            "confidence": "high"
+        },
+        {
+            "id": "STARCH",
+            "name": "Starch",
+            "unit": "g",
+            "sr_legacy_num": "209",
+            "aliases": [],
+            "confidence": "high"
+        },
+        {
+            "id": "ALC",
+            "name": "Alcohol (ethanol)",
+            "unit": "g",
+            "sr_legacy_num": "221",
+            "aliases": [
+                "ETOH"
+            ],
+            "confidence": "high"
+        },
+        {
+            "id": "CHOL",
+            "name": "Cholesterol",
+            "unit": "mg",
+            "sr_legacy_num": "601",
+            "aliases": [],
+            "confidence": "high"
+        },
+        {
+            "id": "NA",
+            "name": "Sodium",
+            "unit": "mg",
+            "sr_legacy_num": "307",
+            "aliases": [],
+            "confidence": "high"
+        },
+        {
+            "id": "K",
+            "name": "Potassium",
+            "unit": "mg",
+            "sr_legacy_num": "306",
+            "aliases": [],
+            "confidence": "high"
+        },
+        {
+            "id": "CA",
+            "name": "Calcium",
+            "unit": "mg",
+            "sr_legacy_num": "301",
+            "aliases": [],
+            "confidence": "high"
+        },
+        {
+            "id": "P",
+            "name": "Phosphorus",
+            "unit": "mg",
+            "sr_legacy_num": "305",
+            "aliases": [],
+            "confidence": "high"
+        },
+        {
+            "id": "MG",
+            "name": "Magnesium",
+            "unit": "mg",
+            "sr_legacy_num": "304",
+            "aliases": [],
+            "confidence": "high"
+        },
+        {
+            "id": "FE",
+            "name": "Iron",
+            "unit": "mg",
+            "sr_legacy_num": "303",
+            "aliases": [],
+            "confidence": "high"
+        },
+        {
+            "id": "ZN",
+            "name": "Zinc",
+            "unit": "mg",
+            "sr_legacy_num": "309",
+            "aliases": [],
+            "confidence": "high"
+        },
+        {
+            "id": "CU",
+            "name": "Copper",
+            "unit": "mg",
+            "sr_legacy_num": "312",
+            "aliases": [],
+            "confidence": "high"
+        },
+        {
+            "id": "MN",
+            "name": "Manganese",
+            "unit": "mg",
+            "sr_legacy_num": "315",
+            "aliases": [],
+            "confidence": "high"
+        },
+        {
+            "id": "SE",
+            "name": "Selenium",
+            "unit": "µg",
+            "sr_legacy_num": "317",
+            "aliases": [],
+            "confidence": "high"
+        },
+        {
+            "id": "CLD",
+            "name": "Chloride",
+            "unit": "mg",
+            "sr_legacy_num": null,
+            "aliases": [
+                "chloride"
+            ],
+            "confidence": "medium"
+        },
+        {
+            "id": "CR",
+            "name": "Chromium",
+            "unit": "µg",
+            "sr_legacy_num": null,
+            "aliases": [],
+            "confidence": "medium"
+        },
+        {
+            "id": "MO",
+            "name": "Molybdenum",
+            "unit": "µg",
+            "sr_legacy_num": null,
+            "aliases": [],
+            "confidence": "medium"
+        },
+        {
+            "id": "I",
+            "name": "Iodine",
+            "unit": "µg",
+            "sr_legacy_num": null,
+            "aliases": [],
+            "confidence": "medium"
+        },
+        {
+            "id": "F",
+            "name": "Fluoride",
+            "unit": "mg",
+            "sr_legacy_num": null,
+            "aliases": [],
+            "confidence": "medium"
+        },
+        {
+            "id": "VITA_RAE",
+            "name": "Vitamin A (RAE)",
+            "unit": "µg",
+            "sr_legacy_num": "320",
+            "aliases": [
+                "vitamin_a_rae"
+            ],
+            "confidence": "high"
+        },
+        {
+            "id": "RETOL",
+            "name": "Retinol",
+            "unit": "µg",
+            "sr_legacy_num": null,
+            "aliases": [],
+            "confidence": "medium"
+        },
+        {
+            "id": "CARTA",
+            "name": "Alpha-carotene",
+            "unit": "µg",
+            "sr_legacy_num": null,
+            "aliases": [],
+            "confidence": "medium"
+        },
+        {
+            "id": "CARTB",
+            "name": "Beta-carotene",
+            "unit": "µg",
+            "sr_legacy_num": null,
+            "aliases": [],
+            "confidence": "medium"
+        },
+        {
+            "id": "CRYPX",
+            "name": "Beta-cryptoxanthin",
+            "unit": "µg",
+            "sr_legacy_num": null,
+            "aliases": [],
+            "confidence": "medium"
+        },
+        {
+            "id": "VITD",
+            "name": "Vitamin D (D2 + D3)",
+            "unit": "µg",
+            "sr_legacy_num": null,
+            "aliases": [
+                "cholecalciferol_equiv"
+            ],
+            "confidence": "medium"
+        },
+        {
+            "id": "TOCPHA",
+            "name": "Vitamin E (alpha-tocopherol)",
+            "unit": "mg",
+            "sr_legacy_num": "323",
+            "aliases": [],
+            "confidence": "high"
+        },
+        {
+            "id": "VITK1",
+            "name": "Vitamin K (phylloquinone)",
+            "unit": "µg",
+            "sr_legacy_num": "430",
+            "aliases": [],
+            "confidence": "high"
+        },
+        {
+            "id": "THIA",
+            "name": "Thiamin (B1)",
+            "unit": "mg",
+            "sr_legacy_num": "404",
+            "aliases": [],
+            "confidence": "high"
+        },
+        {
+            "id": "RIBF",
+            "name": "Riboflavin (B2)",
+            "unit": "mg",
+            "sr_legacy_num": "405",
+            "aliases": [],
+            "confidence": "high"
+        },
+        {
+            "id": "NIA",
+            "name": "Niacin (B3)",
+            "unit": "mg",
+            "sr_legacy_num": "406",
+            "aliases": [],
+            "confidence": "high"
+        },
+        {
+            "id": "PANTAC",
+            "name": "Pantothenic acid (B5)",
+            "unit": "mg",
+            "sr_legacy_num": "410",
+            "aliases": [],
+            "confidence": "high"
+        },
+        {
+            "id": "VITB6A",
+            "name": "Vitamin B6",
+            "unit": "mg",
+            "sr_legacy_num": "415",
+            "aliases": [],
+            "confidence": "high"
+        },
+        {
+            "id": "FOL",
+            "name": "Folate, total",
+            "unit": "µg",
+            "sr_legacy_num": "417",
+            "aliases": [],
+            "confidence": "high"
+        },
+        {
+            "id": "FOLAC",
+            "name": "Folic acid",
+            "unit": "µg",
+            "sr_legacy_num": "431",
+            "aliases": [],
+            "confidence": "high"
+        },
+        {
+            "id": "FOLDFE",
+            "name": "Folate, DFE",
+            "unit": "µg",
+            "sr_legacy_num": "435",
+            "aliases": [
+                "dietary_folate_equivalents"
+            ],
+            "confidence": "high"
+        },
+        {
+            "id": "VITB12",
+            "name": "Vitamin B12",
+            "unit": "µg",
+            "sr_legacy_num": "418",
+            "aliases": [
+                "cobalamin"
+            ],
+            "confidence": "high"
+        },
+        {
+            "id": "BIOTN",
+            "name": "Biotin (B7)",
+            "unit": "µg",
+            "sr_legacy_num": null,
+            "aliases": [],
+            "confidence": "medium"
+        },
+        {
+            "id": "CHOLN",
+            "name": "Choline, total",
+            "unit": "mg",
+            "sr_legacy_num": "421",
+            "aliases": [],
+            "confidence": "high"
+        },
+        {
+            "id": "VITC",
+            "name": "Vitamin C (ascorbic acid)",
+            "unit": "mg",
+            "sr_legacy_num": "401",
+            "aliases": [],
+            "confidence": "high"
+        },
+        {
+            "id": "FASAT",
+            "name": "Fatty acids, total saturated",
+            "unit": "g",
+            "sr_legacy_num": "606",
+            "aliases": [],
+            "confidence": "high"
+        },
+        {
+            "id": "FAMS",
+            "name": "Fatty acids, total monounsaturated",
+            "unit": "g",
+            "sr_legacy_num": "645",
+            "aliases": [],
+            "confidence": "high"
+        },
+        {
+            "id": "FAPU",
+            "name": "Fatty acids, total polyunsaturated",
+            "unit": "g",
+            "sr_legacy_num": "646",
+            "aliases": [],
+            "confidence": "high"
+        },
+        {
+            "id": "FATRN",
+            "name": "Fatty acids, total trans",
+            "unit": "g",
+            "sr_legacy_num": null,
+            "aliases": [],
+            "confidence": "medium"
+        },
+        {
+            "id": "ALA",
+            "name": "Alpha-linolenic acid (18:3 n-3)",
+            "unit": "g",
+            "sr_legacy_num": null,
+            "aliases": [
+                "C18:3n-3"
+            ],
+            "confidence": "medium"
+        },
+        {
+            "id": "LINO",
+            "name": "Linoleic acid (18:2 n-6)",
+            "unit": "g",
+            "sr_legacy_num": null,
+            "aliases": [
+                "C18:2n-6"
+            ],
+            "confidence": "medium"
+        },
+        {
+            "id": "EPA",
+            "name": "Eicosapentaenoic acid (20:5 n-3)",
+            "unit": "g",
+            "sr_legacy_num": null,
+            "aliases": [
+                "C20:5n-3"
+            ],
+            "confidence": "medium"
+        },
+        {
+            "id": "DPA",
+            "name": "Docosapentaenoic acid (22:5 n-3)",
+            "unit": "g",
+            "sr_legacy_num": null,
+            "aliases": [
+                "C22:5n-3"
+            ],
+            "confidence": "medium"
+        },
+        {
+            "id": "DHA",
+            "name": "Docosahexaenoic acid (22:6 n-3)",
+            "unit": "g",
+            "sr_legacy_num": null,
+            "aliases": [
+                "C22:6n-3"
+            ],
+            "confidence": "medium"
+        },
+        {
+            "id": "SUCR",
+            "name": "Sucrose",
+            "unit": "g",
+            "sr_legacy_num": "210",
+            "aliases": [],
+            "confidence": "high"
+        },
+        {
+            "id": "GLC",
+            "name": "Glucose (dextrose)",
+            "unit": "g",
+            "sr_legacy_num": "211",
+            "aliases": [
+                "glucose"
+            ],
+            "confidence": "high"
+        },
+        {
+            "id": "FRU",
+            "name": "Fructose",
+            "unit": "g",
+            "sr_legacy_num": "212",
+            "aliases": [],
+            "confidence": "high"
+        },
+        {
+            "id": "LAC",
+            "name": "Lactose",
+            "unit": "g",
+            "sr_legacy_num": "213",
+            "aliases": [],
+            "confidence": "high"
+        },
+        {
+            "id": "MAL",
+            "name": "Maltose",
+            "unit": "g",
+            "sr_legacy_num": "214",
+            "aliases": [],
+            "confidence": "high"
+        },
+        {
+            "id": "SUGAR_ADD",
+            "name": "Sugars, added",
+            "unit": "g",
+            "sr_legacy_num": null,
+            "aliases": [
+                "added_sugars"
+            ],
+            "confidence": "medium"
+        },
+        {
+            "id": "CAFFN",
+            "name": "Caffeine",
+            "unit": "mg",
+            "sr_legacy_num": null,
+            "aliases": [],
+            "confidence": "medium"
+        },
+        {
+            "id": "THEO",
+            "name": "Theobromine",
+            "unit": "mg",
+            "sr_legacy_num": null,
+            "aliases": [],
+            "confidence": "medium"
+        },
+        {
+            "id": "BETN",
+            "name": "Betaine",
+            "unit": "mg",
+            "sr_legacy_num": null,
+            "aliases": [],
+            "confidence": "medium"
+        }
+    ]
+}

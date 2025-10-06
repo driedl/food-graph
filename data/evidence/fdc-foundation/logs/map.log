@@ -1,0 +1,88 @@
+
+=== SYSTEM INSTRUCTIONS BEGIN ===
+You map FDC food names to a canonical FoodState for a nutrition graph. Output STRICT JSON only.
+
+RULES
+- Reject mixtures/processed foods (e.g., hummus, sauces, soups, deli meats, breads, cookies): disposition="skip".
+- Use ONLY allowed ids from registries: parts:[...] and transforms:[{id, param_keys[]}].
+- If transforms are uncertain: node_kind="tp" and transforms=[].
+- Prefer the most specific taxon you can justify; if uncertain, back off (lower confidence) or mark "ambiguous".
+- Include ONLY identity-bearing params; omit unknowns.
+
+INPUT
+{"label":"...","category":"...","registries":{"parts":["part:..."],"transforms":[{"id":"tf:...","param_keys":["..."]}]}}
+
+OUTPUT
+{
+  "disposition": "map" | "skip" | "ambiguous",
+  "node_kind": "taxon" | "tp" | "tpt",
+  "identity_json": {
+    "taxon_id": "tx:..." | null,
+    "part_id": "part:..." | null,
+    "transforms": [ { "id":"tf:...", "params": { /* only identity params */ } } ]
+  },
+  "confidence": 0.0-1.0,
+  "reason_short": "≤20 words",
+  "new_taxa": [],
+  "new_parts": [],
+  "new_transforms": []
+}
+
+HEURISTICS
+- Fruits/vegetables: choose botanical part; raw ⇒ "tp".
+- Cereals/legumes (raw): seeds/grain; milling only if name implies it.
+- Animal muscle cuts: part=muscle/cut if indicated.
+- Dairy/yogurt/cheese/sauces/spreads: skip (processed) unless obviously plain milk (not in this pass).
+- Do not map branded or composite names.
+
+MICRO-EXAMPLES
+Input:
+{"label":"Hummus, commercial","category":"Legumes and Legume Products","registries":{"parts":[],"transforms":[]}}
+Output:
+{"disposition":"skip","node_kind":"taxon","identity_json":{"taxon_id":null,"part_id":null,"transforms":[]},"confidence":0.98,"reason_short":"processed mixture","new_taxa":[],"new_parts":[],"new_transforms":[]}
+
+Input:
+{"label":"Apple, raw","category":"Fruits and Fruit Juices","registries":{"parts":["part:fruit"],"transforms":[]}}
+Output:
+{"disposition":"map","node_kind":"tp","identity_json":{"taxon_id":"tx:plantae:rosaceae:malus:domestica","part_id":"part:fruit","transforms":[]},"confidence":0.88,"reason_short":"raw edible fruit","new_taxa":[],"new_parts":[],"new_transforms":[]}
+=== SYSTEM INSTRUCTIONS END ===
+
+--- PROMPT BEGIN ---
+Map this FDC food record to a canonical FoodState.
+
+Input:
+{"label":"Peaches, yellow, raw","category":"Fruits and Fruit Juices","registries":{"parts":["part:belly","part:bone","part:bran","part:breast","part:brisket","part:bulb","part:butter","part:buttermilk","part:cheese","part:cheese:hard","part:cheese:soft","part:cream","part:curd","part:egg","part:egg:white","part:egg:yolk","part:endosperm","part:expressed_juice","part:expressed_oil","part:fat","part:fat:leaf","part:fat:subcutaneous","part:fermented_milk","part:fillet","part:flower","part:fruit","part:fruit:peel","part:fruit:peel:albedo","part:fruit:peel:flavedo","part:fruiting_body","part:fruiting_body:cap","part:fruiting_body:stipe","part:germ","part:ghee","part:grain","part:heart","part:hull","part:kernel","part:kidney","part:lard","part:leaf","part:leg","part:liver","part:loin","part:marrow","part:milk","part:muscle","part:oil","part:oil:refined","part:oil:virgin","part:okara","part:plant_milk","part:rhizome","part:roe","part:root","part:round","part:seed","part:skin","part:stem","part:tofu","part:tofu_serum","part:tuber","part:whey","part:yogurt"],"transforms":[{"id":"tf:pasteurize","param_keys":[]},{"id":"tf:skim","param_keys":[]},{"id":"tf:homogenize","param_keys":[]},{"id":"tf:standardize_fat","param_keys":[]},{"id":"tf:soak","param_keys":[]},{"id":"tf:separate","param_keys":[]},{"id":"tf:trim","param_keys":[]},{"id":"tf:sprout","param_keys":[]},{"id":"tf:brine","param_keys":[]},{"id":"tf:coagulate","param_keys":[]},{"id":"tf:ferment","param_keys":[]},{"id":"tf:strain","param_keys":[]},{"id":"tf:blanch","param_keys":[]},{"id":"tf:cook_curd","param_keys":[]},{"id":"tf:press","param_keys":[]},{"id":"tf:dry","param_keys":[]},{"id":"tf:stretch","param_keys":[]},{"id":"tf:churn","param_keys":[]},{"id":"tf:dehull","param_keys":[]},{"id":"tf:split","param_keys":[]},{"id":"tf:clarify_butter","param_keys":[]},{"id":"tf:mill","param_keys":[]},{"id":"tf:salt","param_keys":["salt_pct"]},{"id":"tf:polish","param_keys":[]},{"id":"tf:cure","param_keys":["style","nitrite_ppm"]},{"id":"tf:enrich","param_keys":[]},{"id":"tf:evaporate","param_keys":[]},{"id":"tf:roast","param_keys":[]},{"id":"tf:smoke","param_keys":["mode"]},{"id":"tf:add_sugar","param_keys":[]},{"id":"tf:cook","param_keys":[]},{"id":"tf:age","param_keys":[]},{"id":"tf:can","param_keys":[]},{"id":"tf:refine_oil","param_keys":[]}]}}
+
+Output the JSON response as specified in the system prompt.
+--- PROMPT END ---
+[done] processed=5 rejected=0 total_time=1.13s avg_per_food=0.00s
+[tokens] input=0 output=0 total=0 avg_input=0.0 avg_output=0.0
+[2025-10-06T20:30:01.766982] run start model=gpt-5-mini min_conf=0.7 topk=15 limit=10
+[FOOD] fdc:327046 | Kiwifruit, green, raw
+[METRICS] fdc:327046 | llm=15352ms | tokens=1387+827 | total=15.4s
+[FOOD] fdc:327198 | Melons, cantaloupe, raw
+[METRICS] fdc:327198 | llm=12605ms | tokens=1387+697 | total=12.6s
+[FOOD] fdc:327357 | Nectarines, raw
+[MISSING_TAXON] fdc:327357 | tx:plantae:rosaceae:prunus:persica:var:nucipersica
+[METRICS] fdc:327357 | llm=14273ms | tokens=1384+963 | total=14.3s
+[FOOD] fdc:327501 | Oranges, raw, navels (Includes foods for USDA's Food Distribution Program)
+[METRICS] fdc:327501 | llm=10258ms | tokens=1396+756 | total=10.3s
+[FOOD] fdc:327699 | Strawberries, raw
+[MISSING_TAXON] fdc:327699 | tx:plantae:rosaceae:fragaria:ananassa
+[METRICS] fdc:327699 | llm=11615ms | tokens=1384+501 | total=11.6s
+[BATCH] processed=5 rejected=0 avg_time=12.84s
+[FOOD] fdc:327923 | Lettuce, cos or romaine, raw
+[METRICS] fdc:327923 | llm=9800ms | tokens=1388+500 | total=9.8s
+[FOOD] fdc:329596 | Egg, yolk, raw, frozen, pasteurized
+[MISSING_TAXON] fdc:329596 | tx:animalia:chordata:aves:gallus:gallus
+[METRICS] fdc:329596 | llm=17975ms | tokens=1389+1298 | total=18.0s
+[FOOD] fdc:330869 | Turkey, ground, 93% lean, 7% fat, pan-broiled crumbles
+[MISSING_TAXON] fdc:330869 | tx:animalia:aves:phasianidae:meleagris:gallopavo
+[METRICS] fdc:330869 | llm=19520ms | tokens=1397+1319 | total=19.5s
+[FOOD] fdc:332597 | Pears, raw, bartlett (Includes foods for USDA's Food Distribution Program)
+[METRICS] fdc:332597 | llm=8511ms | tokens=1396+499 | total=8.5s
+[FOOD] fdc:332791 | Olives, green, Manzanilla, stuffed with pimiento
+[METRICS] fdc:332791 | llm=8060ms | tokens=1392+487 | total=8.1s
+[BATCH] processed=10 rejected=1 avg_time=12.82s
+[done] processed=10 rejected=1 total_time=128.90s avg_per_food=12.82s
+[tokens] input=13900 output=7847 total=21747 avg_input=1390.0 avg_output=784.7

@@ -11,40 +11,19 @@ except Exception as e:
 class LLMError(Exception): ...
 
 DEFAULT_SYSTEM = """
-You convert FDC food records into a canonical FoodState for a nutrition graph.
+You map FDC food names to a canonical FoodState for a nutrition graph. Output STRICT JSON only.
 
-DEFINITIONS (strict)
-- Taxon ID: biological path starting with "tx:", e.g.
-  tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos
-- Part ID: edible/anatomical part starting with "part:"; MUST be in PART_REGISTRY.
-- Transform ID: process starting with "tf:"; MUST be in TF_REGISTRY; include only identity-bearing params.
-- Node kinds:
-  - "taxon": only taxon known (no reliable part).
-  - "tp": taxon + part known; transforms unknown/uncertain.
-  - "tpt": taxon + part + ordered transforms (with params) known.
+RULES
+- Reject mixtures/processed foods (e.g., hummus, sauces, soups, deli meats, breads, cookies): disposition="skip".
+- Use ONLY allowed ids from registries: parts:[...] and transforms:[{id, param_keys[]}].
+- If transforms are uncertain: node_kind="tp" and transforms=[].
+- Prefer the most specific taxon you can justify; if uncertain, back off (lower confidence) or mark "ambiguous".
+- Include ONLY identity-bearing params; omit unknowns.
 
-INPUT (per item)
-{
-  "label": "string",                    // e.g., "Hummus, commercial"
-  "category": "string",                 // e.g., "Legumes and Legume Products"
-  "registries": {
-    "parts": ["part:...", "part:...", ...],  // Array of part IDs only
-    "tf": ["tf:...", "tf:...", ...],         // Array of transform IDs only
-    "tf_params": {                            // Allowed params per transform
-      "tf:id": ["param_key", ...]
-    }
-  }
-}
+INPUT
+{"label":"...","category":"...","registries":{"parts":["part:..."],"transforms":[{"id":"tf:...","param_keys":["..."]}]}}
 
-GLOBAL RULES
-- Reject mixtures/processed foods: if label/category implies multi-ingredient, commercial processing, or prepared product (e.g., "hummus", "soup", "bar", "spread", "cereal", "mix", "frozen meal", "commercial"), then disposition="skip".
-- Use only IDs from PART_REGISTRY and TF_REGISTRY. Never invent IDs. If something is truly missing, propose it under `new` as free text (no IDs).
-- If transforms are uncertain, choose node_kind="tp" and set transforms=[].
-- Prefer the most specific taxon you can justify; if species is uncertain, choose genus (lower confidence) or mark disposition="ambiguous" if even genus isn't safe.
-- Order transforms logically (use provided transform.order if present; otherwise prep→cook→post).
-- Include only identity-bearing params that are clearly implied; omit unknown values.
-
-OUTPUT (STRICT JSON only; no prose, no markdown, no extra keys)
+OUTPUT
 {
   "disposition": "map" | "skip" | "ambiguous",
   "node_kind": "taxon" | "tp" | "tpt",
@@ -55,48 +34,28 @@ OUTPUT (STRICT JSON only; no prose, no markdown, no extra keys)
   },
   "confidence": 0.0-1.0,
   "reason_short": "≤20 words",
-  "new": {
-    "taxa":      [ { "name":"free text", "reason":"why it's needed" } ],
-    "parts":     [ { "name":"free text", "reason":"why it's needed" } ],
-    "transforms":[ { "name":"free text", "reason":"why it's needed" } ]
-  }
+  "new_taxa": [],
+  "new_parts": [],
+  "new_transforms": []
 }
 
-HEURISTICS (compact)
-- Fruits/vegetables: choose botanical part (fruit/leaf/root/seed/flower) consistent with label; raw state ⇒ "tp".
-- Cereals/legumes (raw): seeds/grain parts; milling/pressing only if the label clearly implies it.
-- Animal muscle cuts: taxon to genus/species if clear; part=muscle or specific cut if label indicates.
-- Dairy: "yogurt/strained/greek" implies ferment (+ strain if explicit). Otherwise choose tp with milk.
-- Do not map branded or composite names (sauces, dips, hummus, soups) → "skip".
+HEURISTICS
+- Fruits/vegetables: choose botanical part; raw ⇒ "tp".
+- Cereals/legumes (raw): seeds/grain; milling only if name implies it.
+- Animal muscle cuts: part=muscle/cut if indicated.
+- Dairy/yogurt/cheese/sauces/spreads: skip (processed) unless obviously plain milk (not in this pass).
+- Do not map branded or composite names.
 
 MICRO-EXAMPLES
 Input:
-{"label":"Hummus, commercial","category":"Legumes and Legume Products","registries":{"parts":["part:fruit"],"tf":[],"tf_params":{}}}
+{"label":"Hummus, commercial","category":"Legumes and Legume Products","registries":{"parts":[],"transforms":[]}}
 Output:
-{
-  "disposition":"skip",
-  "node_kind":"taxon",
-  "identity_json":{"taxon_id":null,"part_id":null,"transforms":[]},
-  "confidence":0.98,
-  "reason_short":"processed mixture (policy: reject)",
-  "new":{"taxa":[],"parts":[],"transforms":[]}
-}
+{"disposition":"skip","node_kind":"taxon","identity_json":{"taxon_id":null,"part_id":null,"transforms":[]},"confidence":0.98,"reason_short":"processed mixture","new_taxa":[],"new_parts":[],"new_transforms":[]}
 
 Input:
-{"label":"Apple, raw","category":"Fruits and Fruit Juices","registries":{"parts":["part:fruit"],"tf":[],"tf_params":{}}}
+{"label":"Apple, raw","category":"Fruits and Fruit Juices","registries":{"parts":["part:fruit"],"transforms":[]}}
 Output:
-{
-  "disposition":"map",
-  "node_kind":"tp",
-  "identity_json":{
-    "taxon_id":"tx:plantae:rosaceae:malus:domestica",
-    "part_id":"part:fruit",
-    "transforms":[]
-  },
-  "confidence":0.88,
-  "reason_short":"raw edible fruit part",
-  "new":{"taxa":[],"parts":[],"transforms":[]}
-}
+{"disposition":"map","node_kind":"tp","identity_json":{"taxon_id":"tx:plantae:rosaceae:malus:domestica","part_id":"part:fruit","transforms":[]},"confidence":0.88,"reason_short":"raw edible fruit","new_taxa":[],"new_parts":[],"new_transforms":[]}
 """.strip()
 
 def call_llm(*, model: str, system: str, user: str, max_retries: int = 3, temperature: Optional[float] = None) -> Dict[str, Any]:
@@ -120,7 +79,10 @@ def call_llm(*, model: str, system: str, user: str, max_retries: int = 3, temper
                     {"role": "user", "content": user},
                 ],
             }
-            if temperature is not None:
+            # gpt-5-mini only supports temperature=1
+            if "gpt-5-mini" in (model or "").lower():
+                create_args["temperature"] = 1.0
+            elif temperature is not None:
                 create_args["temperature"] = temperature
             resp = client.chat.completions.create(**create_args)
             content = resp.choices[0].message.content or "{}"

@@ -8,7 +8,7 @@ from datetime import datetime
 from jsonschema import validate, ValidationError
 
 from .lib.jsonl import write_jsonl, append_jsonl, read_jsonl, index_jsonl_by
-from .lib.fdc import load_foundation_foods_json, filter_nutrients_for_foods, load_nutrient_index
+from .lib.fdc import load_foundation_foods_json, filter_nutrients_for_foods, load_nutrient_index, filter_base_foods
 from .lib.llm import call_llm, DEFAULT_SYSTEM
 from .db import GraphDB
 
@@ -43,7 +43,9 @@ MAPPING_SCHEMA = {
         "disposition":{"enum":["map","skip","ambiguous"]},
         "reason_short":{"type":"string"},
         "rationales":{"type":"array","items":{"type":"string"}},
-        "new":{"type":"object"}
+        "new_taxa":{"type":"array","items":{"type":"object"}},
+        "new_parts":{"type":"array","items":{"type":"object"}},
+        "new_transforms":{"type":"array","items":{"type":"object"}}
     },
     "additionalProperties": True
 }
@@ -107,26 +109,20 @@ def _soft_validate_and_log(obj: Dict[str, Any], gdb: GraphDB, log_file_path: Pat
                     f.write(f"[VALIDATION_ERROR] {fid} | param validation failed: {e}\n")
 
 def _prompt(food: Dict[str,Any], parts: List[Dict[str,Any]], transforms: List[Dict[str,Any]]) -> str:
-    # Create compact registry format to reduce tokens
-    parts_ids = [p["id"] for p in parts]
-    transforms_data = []
-    tf_params = {}
-    
+    # Token-lean registries: only IDs, and param key lists (no types/names)
+    parts_ids = [p.get("id") for p in parts if p.get("id")]
+    tf_compact = []
     for t in transforms:
-        transforms_data.append({"id": t["id"]})
-        if t.get("params"):
-            # Only include identity params
-            identity_params = [p["key"] for p in t["params"] if p.get("identity_param")]
-            if identity_params:
-                tf_params[t["id"]] = identity_params
-    
+        tf_compact.append({
+            "id": t.get("id"),
+            "param_keys": [p.get("key") for p in (t.get("params") or []) if p.get("key")]
+        })
     input_data = {
         "label": food.get('name', ''),
         "category": food.get("category", ""),
         "registries": {
             "parts": parts_ids,
-            "tf": [t["id"] for t in transforms],
-            "tf_params": tf_params
+            "transforms": tf_compact
         }
     }
     
@@ -157,6 +153,9 @@ def main():
     ap.add_argument("--limit", type=int, default=5, help="Limit number of foods processed (default: 5)")
     ap.add_argument("--prompt-only", action="store_true", help="Generate and log the full prompt, then exit without calling LLM")
     ap.add_argument("--registry-limit", type=int, default=0, help="If >0, cap number of parts/transforms included in registries to reduce tokens")
+    ap.add_argument("--include-derived", action="store_true", help="Include single-ingredient derivatives (oils, flours, salt/sugar, tahini).")
+    ap.add_argument("--use-candidates", action="store_true", help="(Phase 2) inject search candidates; off by default.")
+    ap.add_argument("--nutrient-registry", default="data/ontology/nutrients-infoods.json", help="Path to INFOODS registry.")
     ap.add_argument("--overwrite", action="store_true", help="Rewrite mapping.jsonl instead of appending/resuming")
     ap.add_argument("--debug-prompts", action="store_true", help="Save prompts and responses to debug directories")
     args = ap.parse_args()
@@ -271,7 +270,8 @@ def main():
     # Normalize to lowercase for comparison
     categories_skip = [cat.lower() for cat in categories_skip]
     # Load all foundation foods (only ~400 total)
-    foods = load_foundation_foods_json(fdc_dir, categories_skip=categories_skip, limit=None)  # Load all foundation foods
+    foods_all = load_foundation_foods_json(fdc_dir, categories_skip=categories_skip, limit=None)
+    foods = filter_base_foods(foods_all, include_derived=args.include_derived)
     # Normalize foods and filter out already processed ones, respecting limit for new foods
     norm_foods: List[Dict[str, Any]] = []
     for r in foods:
@@ -296,54 +296,90 @@ def main():
     fn_rows = filter_nutrients_for_foods(fdc_dir, keep_ids)
     nutrient_index = load_nutrient_index(fdc_dir)
     
-    # Nutrient mapping from FDC to canonical IDs
-    nutrient_map = {
-        1008: "nutr:energy_kcal", 2047: "nutr:energy_kcal",
-        1051: "nutr:water_g",
-        1003: "nutr:protein_g",
-        1004: "nutr:fat_g",
-        1005: "nutr:carbohydrate_g",
-        1079: "nutr:fiber_g",
-        2000: "nutr:sugars_g", 1063: "nutr:sugars_g",
-        1253: "nutr:cholesterol_mg",
-        1258: "nutr:saturated_fat_g",
-        1312: "nutr:monounsaturated_fat_g",
-        1313: "nutr:polyunsaturated_fat_g",
-        1093: "nutr:sodium_mg",
-        1092: "nutr:potassium_mg",
-        1087: "nutr:calcium_mg",
-        1089: "nutr:iron_mg",
-        1090: "nutr:magnesium_mg",
-        1091: "nutr:phosphorus_mg",
-        1095: "nutr:zinc_mg",
-        1098: "nutr:copper_mg",
-        1103: "nutr:selenium_mcg",
-        1106: "nutr:vitamin_a_rae_mcg",
-        1109: "nutr:vitamin_e_mg",
-        1114: "nutr:vitamin_d_mcg",
-        1162: "nutr:vitamin_c_mg",
-        1165: "nutr:thiamin_mg",
-        1166: "nutr:riboflavin_mg",
-        1167: "nutr:niacin_mg",
-        1170: "nutr:pantothenic_acid_mg",
-        1175: "nutr:vitamin_b6_mg",
-        1057: "nutr:caffeine_mg"
-    }
+    # 3a) Load INFOODS registry mapping (fdc nutrient id -> INFOODS tag) and canonical units
+    def _load_infoods_aliases(path: Path):
+        import json
+        fdc_to_tag: Dict[int, str] = {}
+        tag_to_unit: Dict[str, str] = {}
+        if path.exists():
+            data = json.loads(path.read_text(encoding="utf-8"))
+            # Handle the specific structure of nutrients-infoods.json
+            if isinstance(data, dict) and "nutrients" in data:
+                nutrients = data["nutrients"]
+                for it in nutrients:
+                    tag = it.get("id")  # e.g., "PROCNT"
+                    if not tag:
+                        continue
+                    unit = it.get("unit") or ""
+                    if unit:
+                        tag_to_unit[tag] = unit
+                    # Look for FDC aliases in the aliases array
+                    aliases = it.get("aliases", [])
+                    if isinstance(aliases, list):
+                        for alias in aliases:
+                            # Check if this looks like an FDC nutrient ID (numeric)
+                            try:
+                                fdc_id = int(str(alias))
+                                fdc_to_tag[fdc_id] = tag
+                            except:
+                                pass
+            # Fallback for other structures
+            elif isinstance(data, list):
+                for it in data:
+                    tag = it.get("nutrient_id") or it.get("id") or it.get("tag")
+                    if not tag:
+                        continue
+                    unit = it.get("canonical_unit") or it.get("unit") or ""
+                    if unit:
+                        tag_to_unit[tag] = unit
+                    # aliases: support shapes like {"aliases":{"fdc":["1003","1004"]}}
+                    aliases = (it.get("aliases") or {})
+                    fdc_alias = aliases.get("fdc") if isinstance(aliases, dict) else None
+                    if isinstance(fdc_alias, list):
+                        for a in fdc_alias:
+                            try: fdc_to_tag[int(str(a))] = tag
+                            except: pass
+                    elif isinstance(fdc_alias, (str,int)):
+                        try: fdc_to_tag[int(str(fdc_alias))] = tag
+                        except: pass
+            elif isinstance(data, dict):
+                for tag, it in data.items():
+                    if isinstance(it, dict):
+                        unit = it.get("canonical_unit") or it.get("unit") or ""
+                        if unit:
+                            tag_to_unit[tag] = unit
+                        aliases = it.get("aliases") or {}
+                        fdc_alias = aliases.get("fdc")
+                        if isinstance(fdc_alias, list):
+                            for a in fdc_alias:
+                                try: fdc_to_tag[int(str(a))] = tag
+                                except: pass
+                        elif isinstance(fdc_alias, (str,int)):
+                            try: fdc_to_tag[int(str(fdc_alias))] = tag
+                            except: pass
+        return fdc_to_tag, tag_to_unit
+
+    nr_path = (project_root / args.nutrient_registry).resolve()
+    fdc_to_infoods, infoods_units = _load_infoods_aliases(nr_path)
+
+    # fallback minimal map if registry lacks a code (kept tiny on purpose)
+    _fallback = {1003:"PROCNT",1004:"FAT",1005:"CHOCDF",1008:"ENERC_KCAL",1051:"WATER",1079:"FIBTG",1093:"NA",1087:"CA"}
     
+    # UCUM-ish unit normalization for simple FDC unit names
+    _UNIT_MAP = {"G":"g","MG":"mg","UG":"µg","KCAL":"kcal","KJ":"kJ","IU":"IU"}
     norm_nutrients: List[Dict[str, Any]] = []
     for r in fn_rows:
         fdc_nutr_id = int(r.get("nutrient_id", 0))
-        canonical_id = nutrient_map.get(fdc_nutr_id)
-        if not canonical_id:
+        tag = fdc_to_infoods.get(fdc_nutr_id) or _fallback.get(fdc_nutr_id)
+        if not tag:
             continue  # Skip unmapped nutrients
-            
         nutr = nutrient_index.get(str(fdc_nutr_id), {})
         norm_nutrients.append({
             "food_id": f"fdc:{r.get('fdc_id')}",
             "fdc_nutrient_id": fdc_nutr_id,
-            "canonical_nutrient_id": canonical_id,
+            "nutrient_id": tag,  # INFOODS tag
             "nutrient_name": nutr.get("name") or nutr.get("description") or "",
-            "unit": nutr.get("unit_name") or "",
+            "unit": infoods_units.get(tag) or _UNIT_MAP.get((nutr.get("unit_name") or "").upper(), nutr.get("unit_name") or ""),
             "value": r.get("amount"),
             "basis": "per_100g",
             "method": "FDC",
@@ -374,6 +410,9 @@ def main():
             f.write(f"[FOOD] {fid} | {name}\n")
         print(f"[FOOD] {fid} | {name}")
         
+        # Phase-2: cands optional
+        if args.use_candidates:
+            _ = gdb.search_candidates(name, topk=args.topk)  # not injected yet
         prompt = _prompt(food, parts, transforms)
         
         # Debug logging for prompts
@@ -427,6 +466,12 @@ def main():
             obj = response
             obj["food_id"] = fid
             obj["name"] = name
+            # normalize "new" fields to Phase-1 schema
+            if "new" in obj and isinstance(obj.get("new"), dict):
+                new = obj.pop("new") or {}
+                obj.setdefault("new_taxa", new.get("taxa", []))
+                obj.setdefault("new_parts", new.get("parts", []))
+                obj.setdefault("new_transforms", new.get("transforms", []))
             
             # Strict validation - fail on schema errors
             try:
@@ -507,6 +552,20 @@ def main():
     with log_file_path.open("a", encoding="utf-8") as f:
         f.write(f"[done] processed={processed} rejected={rejected_count} total_time={timing_stats['total_time']:.2f}s avg_per_food={avg_time_per_food:.2f}s\n")
         f.write(f"[tokens] input={timing_stats['input_tokens']} output={timing_stats['output_tokens']} total={timing_stats['total_tokens']} avg_input={avg_input_tokens:.1f} avg_output={avg_output_tokens:.1f}\n")
+
+    # Acceptance summary (Phase-1)
+    accept = {
+        "model": args.model,
+        "processed": processed,
+        "rejected": rejected_count,
+        "yield_pct": (0 if processed==0 else round(100.0*(processed-rejected_count)/processed,1)),
+        "total_time_s": round(timing_stats["total_time"],2),
+        "avg_tokens_in": round(avg_input_tokens,1),
+        "avg_tokens_out": round(avg_output_tokens,1),
+        "include_derived": bool(args.include_derived)
+    }
+    with (logs_dir / "acceptance.json").open("w", encoding="utf-8") as f:
+        json.dump(accept, f, ensure_ascii=False, indent=2)
     
     # Print summary to console
     print(f"\n=== Evidence Mapping Complete ===")
