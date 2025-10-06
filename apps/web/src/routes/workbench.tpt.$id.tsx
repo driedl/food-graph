@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useRouter } from '@tanstack/react-router'
 import React, { useMemo } from 'react'
 import { trpc } from '@/lib/trpc'
 import { TPTOverview } from '@/components/tpt/TPTOverview'
@@ -28,14 +28,38 @@ function TabButton({ active, onClick, children }: { active: boolean; onClick: ()
 
 function TPTPage() {
     const { id } = Route.useParams()
-    const router = Route.useRouter()
+    const router = useRouter()
     const search = Route.useSearch() as { tab: 'overview' | 'explain' }
 
     // minimal meta for header + FS
     const metaQ = (trpc as any).tpt?.get?.useQuery({ id })
     const meta = metaQ?.data
+    const metaError = metaQ?.error
 
     const lineageQ = trpc.taxonomy.pathToRoot.useQuery({ id: meta?.taxonId ?? '' }, { enabled: !!meta?.taxonId })
+
+    // Handle case where TPT doesn't exist
+    if (metaError) {
+        return (
+            <div className="p-4">
+                <div className="text-lg font-semibold text-red-600">TPT Not Found</div>
+                <div className="text-sm text-muted-foreground mt-2">
+                    The TPT <code className="bg-muted px-1 rounded">{id}</code> doesn't exist in the current graph.
+                </div>
+                <div className="text-sm text-muted-foreground mt-2">
+                    This TPT may need to be added to the ontology and rebuilt. Check the ETL process or add the required data to make this node available.
+                </div>
+                <div className="mt-4">
+                    <button
+                        className="px-3 py-1 text-sm bg-muted hover:bg-muted/80 rounded border"
+                        onClick={() => router.navigate({ to: '/workbench' })}
+                    >
+                        Back to Workbench
+                    </button>
+                </div>
+            </div>
+        )
+    }
 
     // Basic FS preview (taxon path + part only; identity omitted for readability)
     const fsPreview = useMemo(() => {
