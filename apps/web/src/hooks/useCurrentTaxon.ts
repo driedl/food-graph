@@ -6,12 +6,12 @@ import { pathToNodeId } from '../lib/fs-url'
  * This serves as the single source of truth for the current taxon.
  */
 export function useCurrentTaxon(): string | null {
-  const location = useLocation()
-  
-  // Extract taxon ID from various route patterns
-  const taxonId = pathToNodeId(location.pathname)
-  
-  return taxonId
+    const location = useLocation()
+
+    // Extract taxon ID from various route patterns
+    const taxonId = pathToNodeId(location.pathname)
+
+    return taxonId
 }
 
 /**

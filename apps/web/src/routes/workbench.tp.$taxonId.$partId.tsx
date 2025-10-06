@@ -43,8 +43,8 @@ function TPPage() {
         })
 
     // Queries
-    const taxonQ = trpc.taxonomy.getById.useQuery({ id: taxonId }, { enabled: !!taxonId })
-    const partQ = trpc.taxonomy.getPartById.useQuery({ id: partId }, { enabled: !!partId })
+    const taxonQ = trpc.taxonomy.getNode.useQuery({ id: taxonId }, { enabled: !!taxonId })
+    const partQ = trpc.taxonomy.getTaxonPart.useQuery({ id: partId }, { enabled: !!partId })
     const familiesQ = (trpc as any).facets?.familiesForTaxonPart?.useQuery(
         { taxonId, partId },
         { enabled: !!taxonId && !!partId }

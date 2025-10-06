@@ -12,7 +12,7 @@ export function TaxonPanel({
   rankColor: Record<string, string>
 }) {
   const navigate = useNavigate()
-  
+
   const handleJump = (id: string) => {
     navigate({ to: '/workbench/taxon/$id', params: { id } })
   }
