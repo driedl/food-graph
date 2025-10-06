@@ -27,6 +27,7 @@ export const PartsPanel = memo(function PartsPanel({
   onSelect: (id: string) => void
   readOnly?: boolean
 }) {
+  console.log('PartsPanel render - parts length:', parts?.length, 'selectedPartId:', selectedPartId)
   if (!parts) return <div className="text-sm text-muted-foreground">No parts available</div>
 
   const groups = (parts || []).reduce((acc: Record<string, Array<any>>, p) => {

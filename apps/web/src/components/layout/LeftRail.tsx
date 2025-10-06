@@ -15,15 +15,10 @@ export default function LeftRail({
   rankColor,
   rootId,
   currentId,
-  onPick,
-  onPickTP,
 }: {
   rankColor: Record<string, string>
   rootId?: string
   currentId: string
-  onPick: (id: string) => void
-  /** Navigate directly to a FoodState context by setting taxon + part. */
-  onPickTP: (taxonId: string, partId: string) => void
 }) {
   const navigate = useNavigate()
   // Search + filters
@@ -68,7 +63,7 @@ export default function LeftRail({
 
   const clickResult = (row: any) => {
     if (row.kind === 'taxon') {
-      onPick(row.id)
+      navigate({ to: '/workbench/taxon/$id', params: { id: row.id } })
     } else if (row.kind === 'tp') {
       // For TP results, we need to parse the ref_id to get taxonId and partId
       // The ref_id format should be like "tx:plantae:poaceae:triticum:aestivum:part:seed"
@@ -76,15 +71,17 @@ export default function LeftRail({
       if (parts.length === 2) {
         const taxonId = parts[0]
         const partId = `part:${parts[1]}`
-        onPickTP(taxonId, partId)
+        navigate({ 
+          to: '/workbench/tp/$taxonId/$partId', 
+          params: { taxonId, partId },
+          search: { tab: 'overview', family: '', limit: 50, offset: 0, compare: '' }
+        })
       } else {
         console.warn('Unexpected TP ref_id format:', row.id)
       }
     } else if (row.kind === 'tpt') {
-      // For TPT results, we need to get the taxonId and partId from the database
-      // For now, just navigate to the TPT page directly
-      // TODO: Implement proper TP navigation for TPT results
-      console.log('TPT clicked:', row.id)
+      // For TPT results, navigate to the TPT page directly
+      navigate({ to: '/workbench/tpt/$id', params: { id: row.id }, search: { tab: 'overview' } })
     }
   }
 
@@ -220,7 +217,7 @@ export default function LeftRail({
                     <li key={k.id}>
                       <button
                         className={`w-full text-left px-2 py-1 rounded hover:bg-muted/40 ${currentId === k.id ? 'bg-muted/60' : ''}`}
-                        onClick={() => onPick(k.id)}
+                        onClick={() => navigate({ to: '/workbench/taxon/$id', params: { id: k.id } })}
                       >
                         <div className="flex items-center justify-between">
                           <span className="truncate">{k.name}</span>

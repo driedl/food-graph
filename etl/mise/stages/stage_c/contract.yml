@@ -5,3 +5,6 @@ artifacts:
     validators:
       - kind: field_presence
         fields: ["taxon_id","part_id","path","path_full"]
+      - kind: field_presence
+        fields: ["family_hint"]
+        optional: true

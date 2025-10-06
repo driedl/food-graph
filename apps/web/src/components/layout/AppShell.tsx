@@ -18,6 +18,7 @@ import { fsToPath, pathToFs, pathToNodeId } from '../../lib/fs-url'
 import { RANK_COLOR } from '../../lib/constants'
 import { useGlobalHotkeys } from '../../hooks/useGlobalHotkeys'
 import { useNavigationHelpers } from '../../lib/nav'
+import { useCurrentTaxonWithFallback } from '../../hooks/useCurrentTaxon'
 
 /** Shared types matching API rows */
 interface TaxonNode {
@@ -42,18 +43,28 @@ export default function AppShell() {
     const health = trpc.health.useQuery()
     const root = trpc.taxonomy.getRoot.useQuery(undefined, { refetchOnWindowFocus: false })
 
-    // Focus / navigation state
-    const [currentId, setCurrentId] = useState<string | null>(null)
+    // Get current taxon ID from router (single source of truth)
+    const currentId = useCurrentTaxonWithFallback((root.data as any)?.id)
 
-    // Queries scoped to current node - using new neighborhood API
+    // Queries scoped to current node - using router-centric currentId
     const [childLimit, setChildLimit] = useState(50)
     const neighborhood = trpc.taxonomy.neighborhood.useQuery(
         { id: currentId!, childLimit, orderBy: 'name' },
-        { enabled: !!currentId, keepPreviousData: true }
+        { enabled: !!currentId, keepPreviousData: true, refetchOnMount: true }
     )
-    const docs = trpc.docs.getByTaxon.useQuery({ taxonId: currentId! }, { enabled: !!currentId })
-    const parts = trpc.taxonomy.partTree.useQuery({ id: currentId! }, { enabled: !!currentId })
-    const lineageQ = trpc.taxonomy.pathToRoot.useQuery({ id: currentId! }, { enabled: !!currentId })
+    const docs = trpc.docs.getByTaxon.useQuery(
+        { taxonId: currentId! },
+        { enabled: !!currentId, refetchOnMount: true }
+    )
+    const parts = trpc.taxonomy.partTree.useQuery(
+        { id: currentId! },
+        { enabled: !!currentId, refetchOnMount: true }
+    )
+    const lineageQ = trpc.taxonomy.pathToRoot.useQuery(
+        { id: currentId! },
+        { enabled: !!currentId, refetchOnMount: true }
+    )
+
 
     // Extract data from neighborhood response
     const nodeData = neighborhood.data?.node as TaxonNode | undefined
@@ -62,64 +73,14 @@ export default function AppShell() {
     const siblingsData = (neighborhood.data?.siblings || []) as TaxonNode[]
     const parentId = parentData?.id ?? null
 
-    // Bootstrap root
-    useEffect(() => {
-        // Only bootstrap to root if we are NOT already deep-linking via /workbench/taxon/:id or /workbench/fs/*
-        if (root.data && !currentId) {
-            const { pathname } = window.location
-            if (pathToFs(pathname) || pathToNodeId(pathname)) return
-            setCurrentId((root.data as TaxonNode).id)
-        }
-    }, [root.data, currentId])
     // Reset limit when node changes
     useEffect(() => { setChildLimit(50) }, [currentId])
-
-    // --- URL → State (sync state from URL whenever location changes) ----------
-    useEffect(() => {
-        const applyFromLocation = async () => {
-            const { pathname } = router.state.location
-            const currentPath = lastPathRef.current
-
-            // Skip if this is the path we just wrote (prevents loops)
-            if (pathname === currentPath && currentPath !== '') {
-                return
-            }
-
-            // Set flags and update lastPathRef BEFORE setting any state to prevent State→URL from interfering
-            isApplyingFromUrl.current = true
-            isParsingUrl.current = true // Prevent auto-clear of selectedPartId
-            lastPathRef.current = pathname // Update BEFORE state changes to prevent State→URL from overwriting
-
-            const fs = pathToFs(pathname)
-            const nodeId = pathToNodeId(pathname)
-
-            if (fs) {
-                await handleParse(fs) // will set currentId, selectedPartId
-            } else if (nodeId) {
-                setCurrentId(nodeId)
-                setSelectedPartId('')
-                setChosen([])
-            }
-
-            isApplyingFromUrl.current = false
-            isParsingUrl.current = false
-        }
-        applyFromLocation()
-    }, [router.state.location.pathname])
 
     // Right-rail tabs
     const [tab, setTab] = useState<'taxon' | 'pt' | 'foodstate'>('taxon')
 
-    // Parts/Transforms builder state
-    // Always store WITHOUT the `part:` prefix internally
+    // Parts/Transforms builder state - now using router-centric approach
     const [selectedPartId, setSelectedPartId] = useState<string>('')
-    const isParsingUrl = useRef(false) // Track when parsing URL to prevent auto-clear
-    useEffect(() => {
-        // Don't auto-clear part when we're syncing from URL
-        if (!isParsingUrl.current) {
-            setSelectedPartId('')
-        }
-    }, [currentId])
     const transforms = trpc.taxonomy.getTransformsFor.useQuery(
         { taxonId: currentId || '', partId: selectedPartId || '', identityOnly: false },
         { enabled: !!currentId && !!selectedPartId && selectedPartId.startsWith('part:') }
@@ -128,17 +89,6 @@ export default function AppShell() {
     type ChosenTx = { id: string; params: Record<string, any> }
     const [chosen, setChosen] = useState<ChosenTx[]>([])
     useEffect(() => { setChosen([]) }, [selectedPartId, currentId])
-    // When FS parse provided a tentative transform list, stage it here and hydrate after transforms load
-    const pendingFromParse = useRef<ChosenTx[] | null>(null)
-
-    // Once transform metadata is available, accept only identity transforms that exist for this part
-    useEffect(() => {
-        if (!transforms.data || !pendingFromParse.current) return
-        const ids = new Map(transforms.data.map((t: any) => [t.id, !!t.identity]))
-        const filtered = (pendingFromParse.current || []).filter((t) => ids.has(t.id) && ids.get(t.id))
-        setChosen(filtered)
-        pendingFromParse.current = null
-    }, [transforms.data])
 
     const onToggleTx = (txId: string, isIdentity: boolean) => {
         if (!isIdentity) return // non-identity cannot be in identity chain
@@ -204,7 +154,8 @@ export default function AppShell() {
                 if (kingdomIndex >= 0) {
                     const taxonomicPath = parsed.taxonPath.slice(kingdomIndex)
                     const taxonId = 'tx:' + taxonomicPath.join(':')
-                    setCurrentId(taxonId)
+                    // Navigate to the parsed taxon
+                    router.navigate({ to: '/workbench/taxon/$id', params: { id: taxonId } })
                 } else {
                     console.warn('[Parser] No kingdom found in path:', parsed.taxonPath)
                 }
@@ -214,61 +165,21 @@ export default function AppShell() {
                 setSelectedPartId(parsed.partId)
             }
             if (parsed.transforms && parsed.transforms.length) {
-                pendingFromParse.current = parsed.transforms.map((t: any) => ({
+                setChosen(parsed.transforms.map((t: any) => ({
                     id: t.id.replace(/^tx:/, ''),
                     params: t.params ?? {},
-                }))
+                })))
             } else {
-                pendingFromParse.current = null
+                setChosen([])
             }
         } finally {
             setFsToParse(null)
         }
-    }, [parseQ.data, fsToParse])
+    }, [parseQ.data, fsToParse, router])
+
     const handleParse = async (fs: string) => {
         setFsToParse(fs)
     }
-
-    // --- State → URL (push new history entries when state changes) ------------
-    const lastPathRef = useRef<string>('')
-    const isApplyingFromUrl = useRef(false) // Track when we're syncing FROM url to prevent loops
-
-    useEffect(() => {
-        if (!currentId || isApplyingFromUrl.current) return
-        // Hold only while we are actively applying from URL (not just because we are on an FS route)
-        if (isParsingUrl.current && !selectedPartId && !chosen.length) {
-            return
-        }
-        const fs = fsPreview
-        // If we intend to write an FS URL (because part/tx is present) but don't
-        // have enough data to build it yet, don't downgrade to /node/:id.
-        // Wait for lineage to load (it will trigger this effect again when ready).
-        if ((selectedPartId || chosen.length) && !fs) {
-            return
-        }
-        // Prefer fs form when part/tx chosen; fallback to taxon form for "just node"
-        const targetPath =
-            fs && (selectedPartId || chosen.length)
-                ? fsToPath(fs)
-                : `/workbench/taxon/${currentId}`
-
-        // Idempotence: avoid churn if FS string hasn't meaningfully changed
-        if (fs) {
-            if (fs !== lastFsRef.current) {
-                lastFsRef.current = fs
-            } else if (targetPath === lastPathRef.current) {
-                return
-            }
-        }
-
-        if (targetPath && targetPath !== lastPathRef.current) {
-            const isFirstWrite = !lastPathRef.current
-            // Update lastPathRef BEFORE navigation so it's available immediately
-            lastPathRef.current = targetPath
-            // Use router.navigate to properly update TanStack Router state
-            router.navigate({ to: targetPath, replace: isFirstWrite })
-        }
-    }, [currentId, fsPreview, selectedPartId, chosen, lineageQ.data, router])
 
     return (
         <div className="h-full p-4">
@@ -313,19 +224,6 @@ export default function AppShell() {
                     rankColor={rankColor}
                     rootId={(root.data as any)?.id}
                     currentId={currentId ?? ''}
-                    onPick={(id) => {
-                        setSelectedPartId('')   // leaving FS flow → plain taxon view
-                        setChosen([])
-                        setTab('taxon')
-                        setCurrentId(id)
-                    }}
-                    onPickTP={(taxonId, partId) => {
-                        setCurrentId(taxonId)
-                        // partId from search results already includes the part: prefix
-                        setSelectedPartId(partId)
-                        setChosen([])
-                        setTab('pt')
-                    }}
                 />
 
                 {/* Center: Page content via Outlet */}
@@ -351,11 +249,11 @@ export default function AppShell() {
                             <div className="min-h-0">
                                 {tab === 'taxon' && (
                                     <TaxonPanel
+                                        key={`taxon-${currentId}`}
                                         node={nodeData as any}
                                         path={(lineageQ.data as any[] | undefined)}
                                         children={childrenData as any}
                                         parentId={parentId}
-                                        onJump={(id) => setCurrentId(id)}
                                         rankColor={rankColor}
                                     />
                                 )}
@@ -363,6 +261,7 @@ export default function AppShell() {
                                     <div className="grid grid-cols-2 gap-3 min-h-0">
                                         <div className="min-h-0 overflow-auto">
                                             <PartsPanel
+                                                key={`parts-${currentId}`}
                                                 parts={parts.data as any}
                                                 selectedPartId={selectedPartId}
                                                 onSelect={(id) => setSelectedPartId(id)}
@@ -373,6 +272,7 @@ export default function AppShell() {
                                                 <div className="text-sm text-muted-foreground">Select a part to view transforms.</div>
                                             ) : (
                                                 <TransformsPanel
+                                                    key={`transforms-${currentId}-${selectedPartId}`}
                                                     loading={transforms.isLoading}
                                                     data={transforms.data as any}
                                                     chosen={chosen}
@@ -385,6 +285,7 @@ export default function AppShell() {
                                 )}
                                 {tab === 'foodstate' && (
                                     <FoodStatePanel
+                                        key={`foodstate-${currentId}`}
                                         fsPreview={fsPreview}
                                         loadingValidate={compose.isFetching}
                                         result={compose.data as any}

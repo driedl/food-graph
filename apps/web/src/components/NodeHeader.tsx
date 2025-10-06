@@ -1,19 +1,23 @@
 import { Skeleton } from '@ui/skeleton'
 import { Separator } from '@ui/separator'
+import { useNavigate } from '@tanstack/react-router'
 
 export default function NodeHeader({
   loading,
   lineage,
   node,
   rankColor,
-  onJump,
 }: {
   loading: boolean
   lineage?: Array<{ id: string; name: string; slug: string; rank: string }>
   node?: { id: string; name: string; slug: string; rank: string }
   rankColor: Record<string, string>
-  onJump: (id: string) => void
 }) {
+  const navigate = useNavigate()
+  
+  const handleJump = (id: string) => {
+    navigate({ to: '/workbench/taxon/$id', params: { id } })
+  }
   if (loading) {
     return (
       <div className="flex items-center gap-2">
@@ -36,7 +40,7 @@ export default function NodeHeader({
         <div className="text-xs text-muted-foreground flex items-center gap-1">
           {(lineage ?? []).map((p, i) => (
             <span key={p.id} className="flex items-center gap-1">
-              <button className="underline" onClick={() => onJump(p.id)}>{p.name}</button>
+              <button className="underline" onClick={() => handleJump(p.id)}>{p.name}</button>
               {i < (lineage!.length - 1) && <span>›</span>}
             </span>
           ))}

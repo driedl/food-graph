@@ -113,7 +113,6 @@ function TaxonPage() {
                             lineage={lineageQ.data as any[] | undefined}
                             node={nodeData}
                             rankColor={RANK_COLOR}
-                            onJump={handleJump}
                         />
                     </ErrorBoundary>
                 </CardHeader>

@@ -834,8 +834,8 @@ def build_sqlite(*, in_dir: Path, build_dir: Path, db_path: Path, verbose: bool 
     cur.execute("INSERT OR REPLACE INTO meta (key, val) VALUES (?, ?)", ("parts_count", str(len(parts_index))))
     cur.execute("INSERT OR REPLACE INTO meta (key, val) VALUES (?, ?)", ("categories_count", str(len(categories))))
     cur.execute("INSERT OR REPLACE INTO meta (key, val) VALUES (?, ?)", ("substrates_count", str(len(substrates))))
-    cur.execute("INSERT OR REPLACE INTO meta (key, val) VALUES (?, ?)", ("tpt_count", str(len(tpt))))
-    cur.execute("INSERT OR REPLACE INTO meta (key, val) VALUES (?, ?)", ("schema_version", "8"))
+    cur.execute("INSERT OR REPLACE INTO meta (key, val) VALUES (?, ?)", ("tpt_count", str(lenpn(tpt))))
+    cur.execute("INSERT OR REPLACE INTO meta (key, val) VALUES (?, ?)", ("schema_version", "9"))
 
     con.commit()
     # Insert/refresh family UI metadata last (doesn't affect FTS)

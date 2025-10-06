@@ -107,8 +107,11 @@ This separation allows:
 * **`taxon_part_nodes`** (generated): materialized `(T, P)` combos (TP). May be backfilled from TPTs.
 * **`derived_foods.jsonl`** or `tpts.jsonl`: actual product instances (TPTs):
 
-  * `{ id, taxon_id, part_id, path[], identity[], family?, name, synonyms[] }`
-  * `identity[]` is the subset of `path[]` used to compute `identity_hash`.
+  * `{ id, taxon_id, part_id, family?, transforms[], name, synonyms[] }`
+  * **`family`** (PREFERRED): Product family ID from `families.json` (e.g., `"CULTURED_DAIRY"`, `"DRY_CURED_MEAT"`)
+  * **`transforms[]`**: Transform chain with identity-bearing parameters
+  * **`identity[]`** is computed from `transforms[]` during ETL processing
+  * **Auto-resolution**: Missing `family` field triggers automatic resolution based on transform path matching in Stage E
 
 ### Category Ontology
 
@@ -242,6 +245,13 @@ Confirm that `part:cream` exists in `parts.core.json` and that the merged regist
 2. **Product parts**: Add to `parts.derived.jsonl` with same schema, MUST set `kind:"derived"` and `parent_id` pointing to core part.
 3. Ensure ancestry makes sense and is acyclic across the merged registry.
 4. If it's a product part, consider a `promoted_parts.jsonl` proto recipe (recipes only, no new IDs).
+
+### Adding curated TPT records
+
+1. Add to `derived_foods.jsonl` with `id`, `taxon_id`, `part_id`, `family?`, `transforms[]`, `name`, `synonyms[]`.
+2. **`family` field is PREFERRED** - should reference a valid family ID from `families.json` for explicit classification.
+3. **`transforms[]`** should contain only identity-bearing transforms with proper parameters.
+4. **Auto-resolution**: Missing `family` field triggers automatic resolution based on transform path matching in Stage E.
 
 ### Adding transforms or params
 

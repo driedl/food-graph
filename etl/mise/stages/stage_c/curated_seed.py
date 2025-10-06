@@ -50,6 +50,7 @@ def ingest_curated_tpt_seed(
 
     out: List[Dict[str, Any]] = []
     errors = 0
+    warnings = 0
 
     for row in read_jsonl(derived):
         taxon_id = row.get("taxon_id"); part_id = row.get("part_id")
@@ -58,6 +59,13 @@ def ingest_curated_tpt_seed(
         if (taxon_id, part_id) not in subs:
             # substrate missing → skip but count error
             errors += 1; continue
+        
+        # Check for family field - preferred but not required (will auto-resolve if missing)
+        family = row.get("family") or row.get("family_id")
+        if not family:
+            warnings += 1
+            if verbose:
+                print(f"⚠️  Warning: Missing family field for curated record {taxon_id}:{part_id} - will attempt auto-resolution from transform path")
 
         path_full = row.get("transforms") or row.get("path") or []
         # keep only identity transforms, normalize params to dict, sort by canonical order
@@ -74,7 +82,7 @@ def ingest_curated_tpt_seed(
             "part_id": part_id,
             "name": row.get("name"),
             "synonyms": row.get("synonyms", []),
-            "family_hint": row.get("family") or row.get("family_id"),
+            "family_hint": family,  # Use the validated family field
             "path_full": path_full,   # original
             "path": path_id,          # identity-only canonical order, params normalized
             "notes": row.get("notes")
@@ -82,4 +90,10 @@ def ingest_curated_tpt_seed(
 
     write_jsonl(tmp_dir / "tpt_seed.jsonl", out)
     if verbose:
-        print(f"• Curated TPT seed: accepted={len(out)}  skipped(errors)={errors}")
+        print(f"• Curated TPT seed: accepted={len(out)}  skipped(errors)={errors}  warnings(family_missing)={warnings}")
+    
+    # Warn about missing family fields but don't fail - auto-resolution will handle it
+    if warnings > 0:
+        print(f"⚠️  {warnings} curated records missing family field - will attempt auto-resolution from transform paths")
+    
+    return 0  # Success - family resolution happens in Stage E

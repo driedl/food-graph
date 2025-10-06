@@ -54,25 +54,27 @@ Public nutrition data arrives as **per-food × per-nutrient** rows, typically **
 ## Evidence Repository Layout (Git)
 
 ```
-evidence/
-  nutrient_def.json                 # INFOODS-first registry
-  nutrient_alias_map.json           # map FDC/CIQUAL/etc. → INFOODS
-  rollup_config.json                # versioned knobs (weights/outliers/etc.)
+data/
+  evidence/
+    _registry/
+      nutrient_def.json            # canonical nutrient ids/units used by evidence builds
+      nutrient_alias_map.json      # source→canonical nutrient name mapping
+      rollup_config.json           # merge/precedence rules for profiles
+    <source>-<version>/            # e.g., fdc-2024-09, ciqual-2020
+      source.json                  # metadata: {name, version, url, retrieved_at, license, checksum}
+      foods.jsonl                  # one row per source food (verbatim-ish)
+      nutrients.jsonl              # food × nutrient records
+      mapping.jsonl                # LLM/heuristic mapping results (one row per food)
+      logs/                        # acceptance, coverage, QA reports (optional)
+```
 
-  fdc-2024-09/                      # one folder per source release
-    source.json                     # name, version, license, kind, ingest_date
-    foods.jsonl                     # external foods (one per line)
-    nutrients.jsonl                 # external food × nutrient rows
-    mapping.jsonl                   # mapping to TP/TPT node_id (nullable)
-    logs/                           # optional ingest reports
+**New ETL2 utilities (POC, outside Stage F)**
 
-  ciqual-2020/
-    source.json
-    foods.jsonl
-    nutrients.jsonl
-    mapping.jsonl
-
-  ...more sources...
+```
+etl2/
+  evidence/
+    map.py         # builds mapping.jsonl from foods.jsonl + graph search + LLM
+    profiles.py    # computes nutrition_profile_* tables from evidence/* → SQLite
 ```
 
 ---
@@ -138,68 +140,56 @@ Maps source codes → INFOODS.
 
 ### `<source_id>/foods.jsonl`
 
-One line per external food (immutable evidence row).
+One line per external food (immutable evidence row). Minimal shape:
 
 ```json
-{"source_id":"fdc-2024-09","external_food_id":"123456","label":"Yogurt, Greek, plain, whole milk","brand":null,"data_type":"Foundation","state":"fermented","prep_method":"strained","edible_portion_flag":true,"serving_size_amount":null,"serving_size_unit":null,"household_measure":null,"density_g_per_ml":null,"country":"US","lang":"en"}
-{"source_id":"fdc-2024-09","external_food_id":"789012","label":"Bacon, cooked, pan-fried","data_type":"SR_Legacy","state":"cooked","prep_method":"fried","edible_portion_flag":true}
+{"food_id":"fdc:12345","name":"Greek yogurt, plain, nonfat","brand":null,"lang":"en","labels":["usda"],"country":"US"}
+{"food_id":"fdc:789012","name":"Bacon, cooked, pan-fried","brand":null,"lang":"en","labels":["usda"],"country":"US"}
 ```
+
+Required: `food_id`, `name`. Optional: `brand`, `lang`, `labels[]`, `country`.
 
 ### `<source_id>/nutrients.jsonl`
 
 One line per (food × nutrient). Units/basis **as provided**.
 
 ```json
-{"source_id":"fdc-2024-09","external_food_id":"123456","nutrient":"PROCNT","amount":10.2,"unit":"g","basis":"per_100g","derivation":"analytical","sample_n":8}
-{"source_id":"fdc-2024-09","external_food_id":"123456","nutrient":"ENERC_KCAL","amount":120,"unit":"kcal","basis":"per_100g","derivation":"analytical"}
-{"source_id":"fdc-2024-09","external_food_id":"789012","nutrient":"FAT","amount":42,"unit":"g","basis":"per_100g","derivation":"analytical"}
+{"food_id":"fdc:12345","nutrient_id":"kcal","value":59,"unit":"kcal/100g","basis":"per_100g","method":"lab|panel|imputed","source_detail":"FDC_2024"}
+{"food_id":"fdc:12345","nutrient_id":"PROCNT","value":10.2,"unit":"g/100g","basis":"per_100g","method":"lab","source_detail":"FDC_2024"}
+{"food_id":"fdc:789012","nutrient_id":"FAT","value":42,"unit":"g/100g","basis":"per_100g","method":"lab","source_detail":"FDC_2024"}
 ```
 
-> `nutrient` must resolve via `nutrient_alias_map` to an INFOODS tag (reject if unmappable).
+Required: `food_id`, `nutrient_id`, `value`. Units should be normalized via `_registry/nutrient_def.json` or flagged in QA.
 
 ### `<source_id>/mapping.jsonl`
 
-**One row per food in `foods.jsonl`.** `node_id` is either the resolved TP/TPT id in `graph.db`, or null (new candidate). Includes LLM suggestion payload for audit.
+**One row per food in `foods.jsonl`.** POC-simple, graph-aware:
 
 ```json
 {
-  "source_id":"fdc-2024-09",
-  "external_food_id":"123456",
-  "node_id":"tpt:bos_taurus:milk:greek_yogurt",        // existing TPT → good
-  "node_type":"TPT",
-  "confidence":0.93,
-  "method":"llm+fts",
-  "llm_suggestion":{
-    "taxon_hints":["bos taurus","cow"],
-    "part_id":"part:milk",
-    "transforms":[{"id":"tf:ferment","params":{"starter":"lactobacillus"}},{"id":"tf:strain","params":{"strain_level":10}}],
-    "notes":"explicit 'Greek' implies strained yogurt",
-    "novelty":{"new_part":null,"new_transform":null}
-  }
-}
-```
-
-If the LLM/curator believes it’s a **new node** (TP or TPT doesn’t exist), leave `node_id:null` and propose identity:
-
-```json
-{
-  "source_id":"fdc-2024-09",
-  "external_food_id":"999999",
-  "node_id": null,                                  // candidate
-  "node_type":"TPT",
-  "confidence":0.78,
-  "method":"llm+human",
-  "proposed_identity":{
-    "taxon_id":"tx:plantae:poaceae:oryza:sativa",
-    "part_id":"part:grain",
-    "identity_steps":[{"id":"tf:parboil"}],
-    "display_name":"Parboiled Rice"
+  "food_id": "fdc:12345",
+  "node_kind": "tpt",                      // 'taxon' | 'tp' | 'tpt'
+  "node_id": "tpt:bos_taurus:milk:yogurt", // graph.db ref_id; null => candidate
+  "identity_json": {                       // always present (source of truth)
+    "taxon_id": "tx:animalia:...:bos:taurus",
+    "part_id": "part:milk",
+    "transforms": [
+      {"id":"tf:ferment","params":{"starter":"lactobacillus"}},
+      {"id":"tf:strain","params":{"strain_level":10}}
+    ]
   },
-  "llm_suggestion":{ "...": "..." }
+  "confidence": 0.86,
+  "rationales": ["name match + synonyms", "strain_level bucketed ≥7% => greek_style"],
+  "new_taxa": [],                          // array of {suggest_id?, display_name, parent_id, rank, notes}
+  "new_parts": [],                         // array of {suggest_id?, name, parent_id?, category}
+  "new_transforms": [],                    // array of {id or suggest_id, params_schema?, notes}
+  "warnings": ["unit mismatch in source panel"]
 }
 ```
 
-> This is the **single “delta”** you asked about: `node_id` present → use it; `node_id:null` → **candidate** for ontology enrichment (human review).
+* **If `node_id` is null** → treat as **candidate ontology additions** (review required).
+* `node_kind` disambiguates which table the `node_id` targets (`nodes`, `taxon_part_nodes`, `tpt_nodes`).
+* `identity_json` is the canonical path you can always rebuild a TPT from (even if `node_id` is unset).
 
 ### `rollup_config.json` (global)
 
@@ -217,6 +207,36 @@ Versioned knobs used by the profiles build (same as before):
   "imputation":{"enabled":true,"max_share_pct":0.2}
 }
 ```
+
+---
+
+## Mapping Workflow (POC)
+
+**Goal:** quick & dirty mapping of source foods → graph identity, plus surfaced ontology gap proposals.
+
+**Steps**
+
+1. **Compile ontology** (unchanged): `pnpm etl2:run` → `etl2/build/database/graph.dev.sqlite`.
+2. **Map**: `pnpm evidence:map`
+
+   * Uses `search_fts` in the graph DB for string matching.
+   * Prompt LLM (no tools) to normalize to `{taxon_id, part_id, transforms[]}` and choose `node_kind`.
+   * Write one `mapping.jsonl` per source directory.
+3. **Profiles**: `pnpm profiles:compute`
+
+   * Join `nutrients.jsonl` with `mapping.jsonl` (only those with `node_id` set, POC).
+   * Compute current rollup and provenance tables into the **same** SQLite.
+
+**Heuristics (POC)**
+
+* Prefer exact `name_overrides` and TP synonyms when present.
+* If transform params map to bucket rules (`param_buckets.json`), snap them before identity.
+* Confidence threshold: default accept ≥0.70; below → leave `node_id=null`, keep `identity_json` as proposal.
+
+**Safety rails**
+
+* Reject LLM outputs that reference unknown `tf:` / `part:` / `tx:` ids (send to `warnings`).
+* Emit `new_*` proposals only when `node_id=null`.
 
 ---
 
@@ -328,39 +348,43 @@ A single script/step (call it `profiles:compute`) creates/refreshes nutrition ta
    * `provenance_summary` (“FDC Foundation×3; CIQUAL×1; Branded×2”).
    * Flags: `high_variance`, `basis_mixed_filtered`, `%imputed`, etc.
 
-**Tables (same as original spec; POC DDL recap)**
+**Tables (POC DDL)**
 
 ```sql
+-- Current, denormalized for reads
 CREATE TABLE IF NOT EXISTS nutrition_profile_current (
-  node_id TEXT NOT NULL,            -- FK to graph.taxon_part_nodes.id or tpt_nodes.id
-  nutrient_id TEXT NOT NULL,        -- INFOODS tag
-  amount_per_100g REAL NOT NULL,
-  basis TEXT NOT NULL DEFAULT 'per_100g',
-  method TEXT NOT NULL,             -- weighted_median|... (from config)
-  n_sources INTEGER NOT NULL,
-  n_rows INTEGER NOT NULL,
-  last_recomputed TEXT NOT NULL,
-  provenance_summary TEXT,
-  flags TEXT,                       -- JSON
-  PRIMARY KEY (node_id, nutrient_id)
+  node_kind   TEXT NOT NULL,                 -- 'tpt'|'tp'
+  node_id     TEXT NOT NULL,                 -- ref to tpt_nodes.id or taxon_part_nodes.id
+  nutrient_id TEXT NOT NULL,
+  value       REAL NOT NULL,
+  unit        TEXT NOT NULL,
+  source_id   TEXT NOT NULL,                 -- e.g., 'fdc-2024-09'
+  updated_at  TEXT NOT NULL,
+  PRIMARY KEY (node_kind, node_id, nutrient_id)
 );
 
+-- Provenance ledger (append-only)
 CREATE TABLE IF NOT EXISTS nutrition_profile_provenance (
-  node_id TEXT NOT NULL,
-  nutrient_id TEXT NOT NULL,
-  source_id TEXT NOT NULL,
-  external_food_id TEXT NOT NULL,
-  weight REAL NOT NULL,
-  used INTEGER NOT NULL,            -- 1 used; 0 excluded
-  reason_excluded TEXT,             -- outlier_high|basis_unconvertible|...
-  amount_norm REAL,                 -- normalized to canonical + per_100g
-  unit TEXT NOT NULL DEFAULT '',    -- canonical UCUM
-  basis TEXT NOT NULL DEFAULT 'per_100g',
-  derivation TEXT,                  -- analytical|label|...
-  sample_n INTEGER,
-  PRIMARY KEY (node_id, nutrient_id, source_id, external_food_id)
+  id            TEXT PRIMARY KEY,            -- ulid/uuid
+  node_kind     TEXT NOT NULL,
+  node_id       TEXT NOT NULL,
+  nutrient_id   TEXT NOT NULL,
+  value         REAL NOT NULL,
+  unit          TEXT NOT NULL,
+  food_id       TEXT NOT NULL,               -- back to evidence row (e.g., fdc:12345)
+  source_id     TEXT NOT NULL,               -- 'fdc-2024-09'
+  mapping_conf  REAL,                        -- copy of mapping.confidence
+  method        TEXT,                        -- lab|panel|imputed
+  captured_at   TEXT,                        -- from source.json or file timestamp
+  inserted_at   TEXT NOT NULL DEFAULT (datetime('now'))
 );
+CREATE INDEX IF NOT EXISTS idx_npp_node ON nutrition_profile_provenance(node_kind, node_id);
 ```
+
+**Rollup policy (POC)**
+
+* Keep **latest by `source_id` precedence** (defined in `_registry/rollup_config.json`) in `nutrition_profile_current`.
+* Always append full provenance.
 
 > You can **keep these tables in `app.db`** or attach/appended into `graph.db`. POC default: separate file to keep ontology rebuilds fast.
 
@@ -485,13 +509,78 @@ CREATE TABLE IF NOT EXISTS nutrition_profile_provenance (
 
 ---
 
-## Build Commands (POC CLI shape)
+## Build Commands & Scripts (POC)
+
+**Root `package.json` (new)**
+
+```json
+{
+  "scripts": {
+    "evidence:map": "python3 etl2/evidence/map.py --graph etl2/build/database/graph.dev.sqlite --evidence data/evidence",
+    "profiles:compute": "python3 etl2/evidence/profiles.py --graph etl2/build/database/graph.dev.sqlite --evidence data/evidence --out etl2/build/database/graph.dev.sqlite"
+  }
+}
+```
+
+**`turbo.json` (optional cache)**
+
+```json
+{
+  "tasks": {
+    "evidence:map": {
+      "inputs": ["data/evidence/**", "etl2/evidence/**", "etl2/build/database/graph.dev.sqlite"],
+      "outputs": ["data/evidence/**/mapping.jsonl"]
+    },
+    "profiles:compute": {
+      "inputs": ["data/evidence/**", "etl2/evidence/**", "etl2/build/database/graph.dev.sqlite"],
+      "outputs": ["etl2/build/database/graph.dev.sqlite"]
+    }
+  }
+}
+```
+
+**Commands**
 
 * `graph:pack` → runs Stage F to produce `graph.db` (no change to your current runner).
 * `evidence:ingest <source>` → writes `<source>/{source.json,foods.jsonl,nutrients.jsonl}`.
 * `evidence:map <source>` → reads foods, hits `search_fts`+LLM, writes `mapping.jsonl` (leaves `node_id:null` for candidates).
 * `profiles:compute` → attaches `graph.db`, streams all `evidence/**`, writes/refreshes `nutrition_profile_*` in `app.db`.
 * `profiles:report` → acceptance metrics JSON.
+
+---
+
+## API Integration
+
+* No changes required for core routes—the API keeps reading the same DB.
+* Optional future routes:
+
+  * `/profiles/:node_id` → current nutrient panel
+  * `/profiles/:node_id/provenance` → ledger
+  * `/evidence/coverage` → % mapped per source
+
+---
+
+## QA & Review Loops
+
+* **Schema checks**: validate all evidence JSONL with simple JSON Schemas (fast fail).
+* **Mapping acceptance**:
+
+  * accept if `confidence ≥ threshold` AND identity ids exist in graph DB.
+  * else: keep `node_id=null`, route to review queue (just `logs/pending.csv` in POC).
+* **Ontology proposals** (`new_taxa`, `new_parts`, `new_transforms`):
+
+  * accumulate into `data/evidence/_proposals/{taxa,parts,transforms}.jsonl`
+  * human review → PR → merged into `data/ontology/**`
+  * next build resolves future `node_id`s automatically.
+
+---
+
+## LLM Usage
+
+* **Model**: GPT-5 Thinking (non-tool, reasoning off) or Gemini 1.5 Pro (cost/speed trade).
+* **Decoding**: temperature 0.2–0.3, max tokens ~600.
+* **Output**: strict JSON; include `confidence`, `rationales`, and `new_*` arrays when applicable.
+* **Guardrails**: reject if unknown ids, or if JSON invalid → log and skip.
 
 ---
 
@@ -504,47 +593,64 @@ CREATE TABLE IF NOT EXISTS nutrition_profile_provenance (
 
 ---
 
-## What details are **still missing / need decisions**
+## Open Questions / TBD
 
-1. **Exact LLM model + prompt**
+1. **Source precedence strategy** in `rollup_config.json` (per nutrient? global?).
+2. **Unit harmonization rules** (e.g., per 100 g vs per serving; density assumptions).
+3. **Language/locale handling** for matching (`lang` on foods, synonyms by locale).
+4. **Limits/backoff** for LLM calls and caching of prompts/responses.
+5. **When to attach to TP vs TPT** if transforms are ambiguous—POC rule?
+6. **Acceptance threshold defaults** and per-source overrides.
+7. **Minimal editor/reviewer workflow** for `_proposals/` (labels, owners).
+8. **Exact LLM model + prompt**
 
    * We sketched the I/O; finalize the minimal prompt, temperature, and top-K candidate count from FTS (10? 20?).
    * Decide confidence scoring formula (LLM score × FTS similarity).
 
-2. **Thresholds**
+9. **Thresholds**
 
    * `confidence_threshold_for_mapping` default (0.7?), outlier rule (MAD k=3 vs P5–P95), % caps for imputation per nutrient.
 
-3. **Liquid handling**
+10. **Liquid handling**
 
-   * Whether to treat **per 100 ml** as co-primary for display while profiles remain per 100 g; finalize density policies and uncertainty flags.
+    * Whether to treat **per 100 ml** as co-primary for display while profiles remain per 100 g; finalize density policies and uncertainty flags.
 
-4. **Energy reconciliation policy**
+11. **Energy reconciliation policy**
 
-   * Exact macro → kcal factors and tolerance (±8% suggested); decide nutrients included (alcohol? polyols?).
+    * Exact macro → kcal factors and tolerance (±8% suggested); decide nutrients included (alcohol? polyols?).
 
-5. **New ontology proposals path**
+12. **%DV tables**
 
-   * Where to record `proposed_identity` → do we write a **candidate JSONL** the ontology build can read to create new TPTs (behind a flag) or do we gate via manual edits only?
+    * Jurisdictions (US/EU/CA/…) and years to seed; or defer entirely for POC.
 
-6. **%DV tables**
+13. **Imputation tables**
 
-   * Jurisdictions (US/EU/CA/…) and years to seed; or defer entirely for POC.
+    * Source(s) and minimal subset to seed (e.g., USDA Retention Factors core vitamins).
 
-7. **Imputation tables**
+14. **Performance knobs**
 
-   * Source(s) and minimal subset to seed (e.g., USDA Retention Factors core vitamins).
-
-8. **Where to store profiles**
-
-   * Keep in `app.db` (recommended) or append to `graph.db` (single-file app)? Pick one to avoid ambiguity.
-
-9. **Performance knobs**
-
-   * Batch sizes for streaming JSONL → SQLite inserts; indexes to create/drop during load for speed.
+    * Batch sizes for streaming JSONL → SQLite inserts; indexes to create/drop during load for speed.
 
 ---
 
 ### Bottom line
 
-This version bakes the **simple, file-first evidence build** into your existing workflow, uses your **current TP/TPT IDs**, and adds only what’s necessary: a JSONL **mapping ledger**, a **minimal LLM assist**, and a deterministic **profiles step**. It stays POC-friendly, fast, and Git-reviewable—while preserving the full rigor of nutrient normalization, transform-aware mapping, and provenance you wanted.
+This version bakes the **simple, file-first evidence build** into your existing workflow, uses your **current TP/TPT IDs**, and adds only what's necessary: a JSONL **mapping ledger**, a **minimal LLM assist**, and a deterministic **profiles step**. It stays POC-friendly, fast, and Git-reviewable—while preserving the full rigor of nutrient normalization, transform-aware mapping, and provenance you wanted.
+
+---
+
+## Quick Start
+
+```bash
+# 1) Build ontology → graph DB
+pnpm etl2:run
+
+# 2) Map all evidence sources → mapping.jsonl
+pnpm evidence:map
+
+# 3) Materialize nutrient profiles into the same DB
+pnpm profiles:compute
+
+# 4) Run API/UI against that DB as usual
+pnpm dev
+```

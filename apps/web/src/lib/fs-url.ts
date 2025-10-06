@@ -13,8 +13,19 @@ export function pathToFs(pathname: string): string | null {
   return 'fs:/' + decoded
 }
 
-// Extract taxon id from /workbench/taxon/:id
+// Extract taxon id from various workbench routes
 export function pathToNodeId(pathname: string): string | null {
-  const m = pathname.match(/^\/workbench\/taxon\/([^/]+)\/?$/)
-  return m ? m[1] : null
+  // Match /workbench/taxon/$id
+  let m = pathname.match(/^\/workbench\/taxon\/([^/]+)\/?$/)
+  if (m) return decodeURIComponent(m[1])
+
+  // Match /workbench/tp/$taxonId/$partId - extract taxonId
+  m = pathname.match(/^\/workbench\/tp\/([^/]+)\/[^/]+\/?$/)
+  if (m) return decodeURIComponent(m[1])
+
+  // Match /workbench/node/$id (legacy)
+  m = pathname.match(/^\/workbench\/node\/([^/]+)\/?$/)
+  if (m) return decodeURIComponent(m[1])
+
+  return null
 }

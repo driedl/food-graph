@@ -175,6 +175,126 @@ def _signature(taxon_id: str, part_id: str, id_payload: List[Dict[str, Any]]) ->
     )
     return hashlib.sha1(blob.encode("utf-8")).hexdigest()
 
+def _resolve_family_for_curated(taxon_id: str, part_id: str, path: List[Dict[str, Any]], 
+                                family_rules: List[Dict[str, Any]]) -> Optional[str]:
+    """
+    Try to resolve a family for a curated TPT record based on its transform path and taxon/part.
+    Returns the first matching family ID, or None if no match.
+    """
+    if not family_rules:
+        return None
+    
+    # Convert path to transform IDs for matching
+    path_tf_ids = [step["id"] for step in path if isinstance(step, dict) and "id" in step]
+    
+    for rule in family_rules:
+        family_id = rule.get("family")
+        applies_to = rule.get("applies_to", [])
+        expected_path = rule.get("path", [])
+        
+        if not family_id or not expected_path:
+            continue
+            
+        # Check if taxon/part matches any applicability rule
+        taxon_matches = False
+        part_matches = False
+        
+        for ap in applies_to:
+            taxon_prefix = ap.get("taxon_prefix", "")
+            parts = ap.get("parts", [])
+            
+            if not taxon_prefix or taxon_id.startswith(taxon_prefix):
+                taxon_matches = True
+            if not parts or part_id in parts:
+                part_matches = True
+                
+            if taxon_matches and part_matches:
+                break
+        
+        if not (taxon_matches and part_matches):
+            continue
+            
+        # Check if transform path matches (allowing for optional transforms)
+        expected_tf_ids = []
+        for tf_def in expected_path:
+            if isinstance(tf_def, dict) and "id" in tf_def:
+                tf_id = tf_def["id"]
+                if tf_id.endswith('?'):
+                    # Optional transform - don't require it
+                    continue
+                expected_tf_ids.append(tf_id)
+        
+        # Check if all required transforms are present in the path
+        if all(tf_id in path_tf_ids for tf_id in expected_tf_ids):
+            return family_id
+    
+    return None
+
+def _load_family_rules(in_dir: Path) -> List[Dict[str, Any]]:
+    """Load family rules from families.json and family_allowlist.jsonl"""
+    families_path = in_dir / "rules" / "families.json"
+    allowlist_path = in_dir / "rules" / "family_allowlist.jsonl"
+    
+    if not families_path.exists():
+        return []
+    
+    # Load family definitions
+    families = read_json(families_path)
+    if not isinstance(families, list):
+        families = [families] if isinstance(families, dict) else []
+    
+    # Load allowlist rules
+    allowlist_rules = []
+    if allowlist_path.exists():
+        allowlist_data = read_jsonl(allowlist_path)
+        # Group by family
+        allowlist_by_family = {}
+        for rule in allowlist_data:
+            fam_id = rule.get("family")
+            if fam_id:
+                if fam_id not in allowlist_by_family:
+                    allowlist_by_family[fam_id] = []
+                allowlist_by_family[fam_id].append({
+                    "taxon_prefix": rule.get("taxon_prefix", ""),
+                    "parts": rule.get("parts", [])
+                })
+    else:
+        allowlist_by_family = {}
+    
+    rules: List[Dict[str, Any]] = []
+    for family in families:
+        fam_id = family.get("id")
+        identity_transforms = family.get("identity_transforms", [])
+        
+        if not fam_id or not identity_transforms:
+            continue
+            
+        # Convert identity_transforms to path format
+        path = []
+        for tf_id in identity_transforms:
+            if tf_id.endswith('?'):
+                # Optional transform - we'll handle this in matching
+                tf_id = tf_id[:-1]
+            path.append({"id": tf_id, "params": {}})
+        
+        # Get applicability rules for this family
+        applies_to = allowlist_by_family.get(fam_id, [])
+        if not applies_to:
+            # If no allowlist rules, apply to all substrates (fallback)
+            applies_to = [{"taxon_prefix": "", "parts": []}]
+        
+        # Create expansion rule for this family
+        rules.append({
+            "family": fam_id,
+            "applies_to": applies_to,
+            "path": path,
+            "name": family.get("display_name", fam_id),
+            "synonyms": [],
+            "notes": f"Generated from families.json + allowlist for {fam_id}"
+        })
+    
+    return rules
+
 def _final_id(taxon_id: str, part_id: str, family: Optional[str], sig: str) -> str:
     # Keep this stable and short; last 12 of SHA1 is plenty for our scale
     suffix = sig[:12]
@@ -194,6 +314,9 @@ def canon_and_id(in_dir: Path, tmp_dir: Path, verbose: bool = False) -> None:
             tindex[t["id"]] = t
         
         buckets = _load_param_buckets(in_dir / "rules")
+        
+        # Load family rules for curated record resolution
+        family_rules = _load_family_rules(in_dir)
         
         # write a lint report for buckets (best-effort)
         lint = _lint_param_buckets(buckets)
@@ -232,6 +355,13 @@ def canon_and_id(in_dir: Path, tmp_dir: Path, verbose: bool = False) -> None:
 
             sig = _signature(taxon_id, part_id, id_payload)
 
+            # Resolve family for curated records that don't have one
+            resolved_family = family_hint
+            if not resolved_family and src == "seed":
+                resolved_family = _resolve_family_for_curated(taxon_id, part_id, path_canon, family_rules)
+                if verbose and resolved_family:
+                    print(f"• Resolved family '{resolved_family}' for curated record {taxon_id}:{part_id}")
+
             # prefer curated
             prev_src = source_of.get(sig)
             if prev_src == "seed":
@@ -243,7 +373,7 @@ def canon_and_id(in_dir: Path, tmp_dir: Path, verbose: bool = False) -> None:
             chosen[sig] = {
                 "taxon_id": taxon_id,
                 "part_id": part_id,
-                "family_hint": family_hint,
+                "family_hint": resolved_family,
                 "path": path_canon,
                 "identity_payload": id_payload,
                 "name": row.get("name"),

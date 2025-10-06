@@ -1,16 +1,21 @@
 import { Separator } from '@ui/separator'
 import { Skeleton } from '@ui/skeleton'
+import { useNavigate } from '@tanstack/react-router'
 
 export function TaxonPanel({
-  node, path, children, parentId, onJump, rankColor
+  node, path, children, parentId, rankColor
 }: {
   node?: { id: string; name: string; slug: string; rank: string }
   path?: Array<{ id: string; name: string; rank: string }>
   children?: Array<any>
   parentId: string | null
-  onJump: (id: string) => void
   rankColor: Record<string, string>
 }) {
+  const navigate = useNavigate()
+  
+  const handleJump = (id: string) => {
+    navigate({ to: '/workbench/taxon/$id', params: { id } })
+  }
   if (!node) return <Skeleton className="h-6 w-40" />
   return (
     <div className="space-y-3 text-sm">
@@ -30,7 +35,7 @@ export function TaxonPanel({
         <div className="text-xs text-muted-foreground">Parent</div>
         <div className="text-xs">
           {parentId ? (
-            <button className="underline" onClick={() => onJump(parentId!)}>
+            <button className="underline" onClick={() => handleJump(parentId!)}>
               {parentId}
             </button>
           ) : (
@@ -44,7 +49,7 @@ export function TaxonPanel({
         <ul className="space-y-1">
           {(path ?? []).map((p) => (
             <li key={p.id} className="flex items-center justify-between">
-              <button className="underline text-left" onClick={() => onJump(p.id)}>
+              <button className="underline text-left" onClick={() => handleJump(p.id)}>
                 {p.name}
               </button>
               <span className={`ml-2 inline-flex items-center rounded border px-2 py-0.5 text-[10px] uppercase ${rankColor[p.rank] || 'bg-zinc-100 text-zinc-700 border-zinc-200'}`}>

@@ -19,7 +19,10 @@ def run(in_dir: Path, build_dir: Path, verbose: bool = False) -> int:
     ensure_dir(tmp_dir)
     
     try:
-        ingest_curated_tpt_seed(in_dir=in_dir, tmp_dir=tmp_dir, verbose=verbose)
+        result = ingest_curated_tpt_seed(in_dir=in_dir, tmp_dir=tmp_dir, verbose=verbose)
+        if result != 0:
+            return result  # Return the error code from ingestion
+        
         if verbose:
             # Count curated seed entries for better feedback
             curated_file = tmp_dir / "tpt_seed.jsonl"
