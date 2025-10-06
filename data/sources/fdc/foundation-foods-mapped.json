@@ -1,0 +1,515 @@
+[
+    {
+        "fdc_id": 321358,
+        "description": "Hummus, commercial",
+        "category": "Legumes and Legume Products",
+        "skip": true,
+        "skip_reason": "mixture/processed spread",
+        "t_guess": null,
+        "tp_guess": null,
+        "tpt_guess": null,
+        "needs_review": false
+    },
+    {
+        "fdc_id": 321360,
+        "description": "Tomatoes, grape, raw",
+        "category": "Vegetables and Vegetable Products",
+        "skip": false,
+        "t_guess": {
+            "taxon_id": "tx:plantae:solanaceae:solanum:lycopersicum",
+            "confidence": 0.86
+        },
+        "tp_guess": {
+            "taxon_id": "tx:plantae:solanaceae:solanum:lycopersicum",
+            "part_id": "part:fruit",
+            "confidence": 0.86
+        },
+        "tpt_guess": {
+            "taxon_id": "tx:plantae:solanaceae:solanum:lycopersicum",
+            "part_id": "part:fruit",
+            "transforms": [],
+            "confidence": 0.86
+        },
+        "needs_review": true,
+        "review_notes": "‘grape’ is market form/variety; keep species-level unless registry has a commodity node."
+    },
+    {
+        "fdc_id": 321900,
+        "description": "Broccoli, raw",
+        "category": "Vegetables and Vegetable Products",
+        "skip": false,
+        "t_guess": {
+            "taxon_id": "tx:plantae:brassicaceae:brassica:oleracea:italica",
+            "confidence": 0.9
+        },
+        "tp_guess": {
+            "taxon_id": "tx:plantae:brassicaceae:brassica:oleracea:italica",
+            "part_id": "part:flower",
+            "confidence": 0.88
+        },
+        "tpt_guess": {
+            "taxon_id": "tx:plantae:brassicaceae:brassica:oleracea:italica",
+            "part_id": "part:flower",
+            "transforms": [],
+            "confidence": 0.88
+        },
+        "needs_review": false
+    },
+    {
+        "fdc_id": 322892,
+        "description": "Milk, whole, 3.25% milkfat, with added vitamin D",
+        "category": "Dairy and Egg Products",
+        "skip": true,
+        "skip_reason": "processed/standardized & fortified (defer for now)",
+        "t_guess": {
+            "taxon_id": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus",
+            "confidence": 0.82
+        },
+        "tp_guess": {
+            "taxon_id": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus",
+            "part_id": "part:milk",
+            "confidence": 0.82
+        },
+        "tpt_guess": {
+            "taxon_id": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus",
+            "part_id": "part:milk",
+            "transforms": [
+                {
+                    "id": "tf:standardize_fat",
+                    "params": {
+                        "fat_pct": 3.25
+                    }
+                }
+            ],
+            "confidence": 0.78
+        },
+        "needs_review": false
+    },
+    {
+        "fdc_id": 323505,
+        "description": "Kale, raw",
+        "category": "Vegetables and Vegetable Products",
+        "skip": false,
+        "t_guess": {
+            "taxon_id": "tx:plantae:brassicaceae:brassica:oleracea:acephala",
+            "confidence": 0.88
+        },
+        "tp_guess": {
+            "taxon_id": "tx:plantae:brassicaceae:brassica:oleracea:acephala",
+            "part_id": "part:leaf",
+            "confidence": 0.9
+        },
+        "tpt_guess": {
+            "taxon_id": "tx:plantae:brassicaceae:brassica:oleracea:acephala",
+            "part_id": "part:leaf",
+            "transforms": [],
+            "confidence": 0.9
+        },
+        "needs_review": false
+    },
+    {
+        "fdc_id": 325430,
+        "description": "Peaches, yellow, raw",
+        "category": "Fruits and Fruit Juices",
+        "skip": false,
+        "t_guess": {
+            "taxon_id": "tx:plantae:rosaceae:prunus:persica",
+            "confidence": 0.87
+        },
+        "tp_guess": {
+            "taxon_id": "tx:plantae:rosaceae:prunus:persica",
+            "part_id": "part:fruit",
+            "confidence": 0.9
+        },
+        "tpt_guess": {
+            "taxon_id": "tx:plantae:rosaceae:prunus:persica",
+            "part_id": "part:fruit",
+            "transforms": [],
+            "confidence": 0.9
+        },
+        "needs_review": false
+    },
+    {
+        "fdc_id": 333374,
+        "description": "Fish, haddock, raw",
+        "category": "Finfish and Shellfish Products",
+        "skip": false,
+        "t_guess": {
+            "taxon_id": "tx:animalia:chordata:actinopterygii:gadiformes:gadidae:melanogrammus:aeglefinus",
+            "confidence": 0.83
+        },
+        "tp_guess": {
+            "taxon_id": "tx:animalia:chordata:actinopterygii:gadiformes:gadidae:melanogrammus:aeglefinus",
+            "part_id": "part:fillet",
+            "confidence": 0.78
+        },
+        "tpt_guess": {
+            "taxon_id": "tx:animalia:chordata:actinopterygii:gadiformes:gadidae:melanogrammus:aeglefinus",
+            "part_id": "part:fillet",
+            "transforms": [],
+            "confidence": 0.78
+        },
+        "needs_review": true,
+        "review_notes": "If whole fish is implied, part may be part:muscle; FDC ‘raw’ entries often reflect edible portion (fillet)."
+    },
+    {
+        "fdc_id": 334194,
+        "description": "Fish, tuna, light, canned in water, drained solids",
+        "category": "Finfish and Shellfish Products",
+        "skip": true,
+        "skip_reason": "processed/canned",
+        "t_guess": {
+            "taxon_id": "tx:animalia:chordata:actinopterygii:perciformes:scombridae:thunnus",
+            "confidence": 0.74
+        },
+        "tp_guess": null,
+        "tpt_guess": null,
+        "needs_review": false
+    },
+    {
+        "fdc_id": 335695,
+        "description": "Beans, Dry, Pinto (0% moisture)",
+        "category": "Legumes and Legume Products",
+        "skip": false,
+        "t_guess": {
+            "taxon_id": "tx:plantae:fabaceae:phaseolus:vulgaris",
+            "confidence": 0.9
+        },
+        "tp_guess": {
+            "taxon_id": "tx:plantae:fabaceae:phaseolus:vulgaris",
+            "part_id": "part:seed",
+            "confidence": 0.92
+        },
+        "tpt_guess": {
+            "taxon_id": "tx:plantae:fabaceae:phaseolus:vulgaris",
+            "part_id": "part:seed",
+            "transforms": [
+                {
+                    "id": "tf:dry",
+                    "params": {
+                        "method": "air",
+                        "target_moisture_pct": 0
+                    }
+                }
+            ],
+            "confidence": 0.85
+        },
+        "needs_review": false
+    },
+    {
+        "fdc_id": 2512380,
+        "description": "Rice, brown, long grain, unenriched, raw",
+        "category": "Cereal Grains and Pasta",
+        "skip": false,
+        "t_guess": {
+            "taxon_id": "tx:plantae:poaceae:oryza:sativa",
+            "confidence": 0.92
+        },
+        "tp_guess": {
+            "taxon_id": "tx:plantae:poaceae:oryza:sativa",
+            "part_id": "part:grain",
+            "confidence": 0.95
+        },
+        "tpt_guess": {
+            "taxon_id": "tx:plantae:poaceae:oryza:sativa",
+            "part_id": "part:grain",
+            "transforms": [
+                {
+                    "id": "tf:dehull",
+                    "params": {
+                        "degree_pct": 100
+                    }
+                },
+                {
+                    "id": "tf:polish",
+                    "params": {
+                        "degree": 0
+                    }
+                }
+            ],
+            "confidence": 0.88
+        },
+        "needs_review": false
+    },
+    {
+        "fdc_id": 2512381,
+        "description": "Rice, white, long grain, unenriched, raw",
+        "category": "Cereal Grains and Pasta",
+        "skip": false,
+        "t_guess": {
+            "taxon_id": "tx:plantae:poaceae:oryza:sativa",
+            "confidence": 0.92
+        },
+        "tp_guess": {
+            "taxon_id": "tx:plantae:poaceae:oryza:sativa",
+            "part_id": "part:grain",
+            "confidence": 0.95
+        },
+        "tpt_guess": {
+            "taxon_id": "tx:plantae:poaceae:oryza:sativa",
+            "part_id": "part:grain",
+            "transforms": [
+                {
+                    "id": "tf:dehull",
+                    "params": {
+                        "degree_pct": 100
+                    }
+                },
+                {
+                    "id": "tf:polish",
+                    "params": {
+                        "degree": 100
+                    }
+                },
+                {
+                    "id": "tf:enrich",
+                    "params": {
+                        "enrichment": "none"
+                    }
+                }
+            ],
+            "confidence": 0.88
+        },
+        "needs_review": false
+    },
+    {
+        "fdc_id": 2346396,
+        "description": "Oats, whole grain, rolled, old fashioned",
+        "category": "Cereal Grains and Pasta",
+        "skip": false,
+        "t_guess": {
+            "taxon_id": "tx:plantae:poaceae:avena:sativa",
+            "confidence": 0.9
+        },
+        "tp_guess": {
+            "taxon_id": "tx:plantae:poaceae:avena:sativa",
+            "part_id": "part:grain",
+            "confidence": 0.92
+        },
+        "tpt_guess": {
+            "taxon_id": "tx:plantae:poaceae:avena:sativa",
+            "part_id": "part:grain",
+            "transforms": [
+                {
+                    "id": "tf:steam",
+                    "params": {
+                        "time_min": 5
+                    }
+                },
+                {
+                    "id": "tf:mill",
+                    "params": {
+                        "oat_form": "rolled"
+                    }
+                }
+            ],
+            "confidence": 0.82
+        },
+        "needs_review": true,
+        "review_notes": "No tf:steam in registry; either add or omit (identity likely captured by tf:mill.oat_form=rolled)."
+    },
+    {
+        "fdc_id": 2346397,
+        "description": "Oats, whole grain, steel cut",
+        "category": "Cereal Grains and Pasta",
+        "skip": false,
+        "t_guess": {
+            "taxon_id": "tx:plantae:poaceae:avena:sativa",
+            "confidence": 0.9
+        },
+        "tp_guess": {
+            "taxon_id": "tx:plantae:poaceae:avena:sativa",
+            "part_id": "part:grain",
+            "confidence": 0.92
+        },
+        "tpt_guess": {
+            "taxon_id": "tx:plantae:poaceae:avena:sativa",
+            "part_id": "part:grain",
+            "transforms": [
+                {
+                    "id": "tf:mill",
+                    "params": {
+                        "oat_form": "steel_cut"
+                    }
+                }
+            ],
+            "confidence": 0.9
+        },
+        "needs_review": false
+    },
+    {
+        "fdc_id": 748608,
+        "description": "Oil, olive, extra virgin",
+        "category": "Fats and Oils",
+        "skip": false,
+        "t_guess": {
+            "taxon_id": "tx:plantae:oleaceae:olea:europaea",
+            "confidence": 0.92
+        },
+        "tp_guess": {
+            "taxon_id": "tx:plantae:oleaceae:olea:europaea",
+            "part_id": "part:expressed_oil",
+            "confidence": 0.88
+        },
+        "tpt_guess": {
+            "taxon_id": "tx:plantae:oleaceae:olea:europaea",
+            "part_id": "part:oil:virgin",
+            "transforms": [
+                {
+                    "id": "tf:press",
+                    "params": {}
+                }
+            ],
+            "confidence": 0.88
+        },
+        "needs_review": false
+    },
+    {
+        "fdc_id": 789890,
+        "description": "Flour, wheat, all-purpose, enriched, bleached",
+        "category": "Cereal Grains and Pasta",
+        "skip": true,
+        "skip_reason": "processed (enriched/bleached flour) — defer",
+        "t_guess": {
+            "taxon_id": "tx:plantae:poaceae:triticum:aestivum",
+            "confidence": 0.86
+        },
+        "tp_guess": {
+            "taxon_id": "tx:plantae:poaceae:triticum:aestivum",
+            "part_id": "part:endosperm",
+            "confidence": 0.76
+        },
+        "tpt_guess": {
+            "taxon_id": "tx:plantae:poaceae:triticum:aestivum",
+            "part_id": "part:endosperm",
+            "transforms": [
+                {
+                    "id": "tf:mill",
+                    "params": {
+                        "target": "flour"
+                    }
+                },
+                {
+                    "id": "tf:enrich",
+                    "params": {
+                        "enrichment": "std_enriched"
+                    }
+                }
+            ],
+            "confidence": 0.74
+        },
+        "needs_review": false
+    },
+    {
+        "fdc_id": 2346398,
+        "description": "Pineapple, raw",
+        "category": "Fruits and Fruit Juices",
+        "skip": false,
+        "t_guess": {
+            "taxon_id": "tx:plantae:bromeliaceae:ananas:comosus",
+            "confidence": 0.9
+        },
+        "tp_guess": {
+            "taxon_id": "tx:plantae:bromeliaceae:ananas:comosus",
+            "part_id": "part:fruit",
+            "confidence": 0.92
+        },
+        "tpt_guess": {
+            "taxon_id": "tx:plantae:bromeliaceae:ananas:comosus",
+            "part_id": "part:fruit",
+            "transforms": [],
+            "confidence": 0.92
+        },
+        "needs_review": false
+    },
+    {
+        "fdc_id": 2684440,
+        "description": "Fish, salmon, sockeye, wild caught, raw",
+        "category": "Finfish and Shellfish Products",
+        "skip": false,
+        "t_guess": {
+            "taxon_id": "tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae:oncorhynchus:nerka",
+            "confidence": 0.92
+        },
+        "tp_guess": {
+            "taxon_id": "tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae:oncorhynchus:nerka",
+            "part_id": "part:fillet",
+            "confidence": 0.85
+        },
+        "tpt_guess": {
+            "taxon_id": "tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae:oncorhynchus:nerka",
+            "part_id": "part:fillet",
+            "transforms": [],
+            "confidence": 0.85
+        },
+        "needs_review": false
+    },
+    {
+        "fdc_id": 2646170,
+        "description": "Chicken, breast, boneless, skinless, raw",
+        "category": "Poultry Products",
+        "skip": false,
+        "t_guess": {
+            "taxon_id": "tx:animalia:chordata:aves:galliformes:phasianidae:gallus:gallus:domesticus",
+            "confidence": 0.9
+        },
+        "tp_guess": {
+            "taxon_id": "tx:animalia:chordata:aves:galliformes:phasianidae:gallus:gallus:domesticus",
+            "part_id": "part:breast",
+            "confidence": 0.94
+        },
+        "tpt_guess": {
+            "taxon_id": "tx:animalia:chordata:aves:galliformes:phasianidae:gallus:gallus:domesticus",
+            "part_id": "part:breast",
+            "transforms": [],
+            "confidence": 0.94
+        },
+        "needs_review": false
+    },
+    {
+        "fdc_id": 2346401,
+        "description": "Potatoes, russet, without skin, raw",
+        "category": "Vegetables and Vegetable Products",
+        "skip": false,
+        "t_guess": {
+            "taxon_id": "tx:plantae:solanaceae:solanum:tuberosum",
+            "confidence": 0.88
+        },
+        "tp_guess": {
+            "taxon_id": "tx:plantae:solanaceae:solanum:tuberosum",
+            "part_id": "part:tuber",
+            "confidence": 0.9
+        },
+        "tpt_guess": {
+            "taxon_id": "tx:plantae:solanaceae:solanum:tuberosum",
+            "part_id": "part:tuber",
+            "transforms": [],
+            "confidence": 0.9
+        },
+        "needs_review": true,
+        "review_notes": "‘russet’ is market class; could map to cultivar if your registry models it."
+    },
+    {
+        "fdc_id": 2346392,
+        "description": "Nuts, pine nuts, raw",
+        "category": "Nut and Seed Products",
+        "skip": false,
+        "t_guess": {
+            "taxon_id": "tx:plantae:pinaceae:pinus:pinus_spp",
+            "confidence": 0.72
+        },
+        "tp_guess": {
+            "taxon_id": "tx:plantae:pinaceae:pinus:pinus_spp",
+            "part_id": "part:seed",
+            "confidence": 0.8
+        },
+        "tpt_guess": {
+            "taxon_id": "tx:plantae:pinaceae:pinus:pinus_spp",
+            "part_id": "part:seed",
+            "transforms": [],
+            "confidence": 0.8
+        },
+        "needs_review": true,
+        "review_notes": "Species varies (P. pinea, P. koraiensis, etc.); keep genus-level or commodity node if available."
+    }
+]

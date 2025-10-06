@@ -1,7 +1,9 @@
 from __future__ import annotations
 import argparse, json, os, sys, re, time
+# Ensure .env is loaded once via centralized module (no-op if missing)
+from .lib.env import *  # type: ignore  # noqa: F401,F403
 from pathlib import Path
-from typing import Dict, Any, List, Iterable
+from typing import Dict, Any, List, Iterable, Optional
 from datetime import datetime
 from jsonschema import validate, ValidationError
 
@@ -12,7 +14,7 @@ from .db import GraphDB
 
 MAPPING_SCHEMA = {
     "type": "object",
-    "required": ["food_id", "name", "node_kind", "identity_json", "confidence", "rejected"],
+    "required": ["food_id", "name", "node_kind", "identity_json", "confidence", "disposition", "reason_short"],
     "properties": {
         "food_id": {"type":"string"},
         "name": {"type":"string"},
@@ -22,8 +24,8 @@ MAPPING_SCHEMA = {
             "type":"object",
             "required":["taxon_id","part_id","transforms"],
             "properties": {
-                "taxon_id": {"type":"string"},
-                "part_id": {"type":"string"},
+                "taxon_id": {"type":["string","null"]},
+                "part_id": {"type":["string","null"]},
                 "transforms": {
                     "type":"array",
                     "items": {
@@ -38,66 +40,131 @@ MAPPING_SCHEMA = {
             }
         },
         "confidence":{"type":"number","minimum":0,"maximum":1},
+        "disposition":{"enum":["map","skip","ambiguous"]},
+        "reason_short":{"type":"string"},
         "rationales":{"type":"array","items":{"type":"string"}},
-        "rejected":{"type":"boolean"},
         "new":{"type":"object"}
     },
     "additionalProperties": True
 }
 
-def _fmt_registry(parts: List[Dict[str,Any]], transforms: List[Dict[str,Any]]) -> str:
-    def short_params(p):
-        keys = []
-        for item in (p or []):
-            k = item.get("key"); kind = item.get("kind")
-            if not k: continue
-            keys.append(f"{k}:{kind}")
-        return ", ".join(keys) if keys else "none"
-    lines = ["# Parts (id → name/synonyms)"]
-    for p in parts:
-        syn = ", ".join(p.get("synonyms", [])[:4])
-        lines.append(f"- {p['id']} → {p['name']}" + (f" (aka: {syn})" if syn else ""))
-    lines.append("")
-    lines.append("# Transforms (id → name; params)")
+
+def _soft_validate_and_log(obj: Dict[str, Any], gdb: GraphDB, log_file_path: Path) -> None:
+    """Soft validation: log missing taxa/parts/transforms but don't fail the mapping."""
+    identity = obj.get("identity_json", {})
+    fid = obj.get("food_id", "unknown")
+    
+    # Check taxon_id (with error handling for missing table)
+    taxon_id = identity.get("taxon_id")
+    if taxon_id:
+        try:
+            if not gdb.id_exists("nodes", "id", taxon_id):
+                with log_file_path.open("a", encoding="utf-8") as f:
+                    f.write(f"[MISSING_TAXON] {fid} | {taxon_id}\n")
+        except Exception as e:
+            with log_file_path.open("a", encoding="utf-8") as f:
+                f.write(f"[VALIDATION_ERROR] {fid} | nodes table check failed: {e}\n")
+    
+    # Check part_id (with error handling for missing table)
+    part_id = identity.get("part_id")
+    if part_id:
+        try:
+            if not gdb.id_exists("part_def", "id", part_id):
+                with log_file_path.open("a", encoding="utf-8") as f:
+                    f.write(f"[MISSING_PART] {fid} | {part_id}\n")
+        except Exception as e:
+            with log_file_path.open("a", encoding="utf-8") as f:
+                f.write(f"[VALIDATION_ERROR] {fid} | part_def table check failed: {e}\n")
+    
+    # Check transform IDs and params (with error handling for missing table)
+    for transform in identity.get("transforms", []):
+        tf_id = transform.get("id")
+        if tf_id:
+            try:
+                if not gdb.id_exists("transform_def", "id", tf_id):
+                    with log_file_path.open("a", encoding="utf-8") as f:
+                        f.write(f"[MISSING_TRANSFORM] {fid} | {tf_id}\n")
+            except Exception as e:
+                with log_file_path.open("a", encoding="utf-8") as f:
+                    f.write(f"[VALIDATION_ERROR] {fid} | transform_def table check failed: {e}\n")
+        
+        # Log unknown params (but don't fail)
+        params = transform.get("params", {})
+        if params:
+            try:
+                # Get allowed params for this transform
+                allowed_params = set()
+                for t in gdb.transforms():
+                    if t.id == tf_id and t.params:
+                        allowed_params.update(p.key for p in t.params if p.get("identity_param"))
+                
+                for param_key in params.keys():
+                    if param_key not in allowed_params:
+                        with log_file_path.open("a", encoding="utf-8") as f:
+                            f.write(f"[UNKNOWN_PARAM] {fid} | {tf_id}.{param_key}\n")
+            except Exception as e:
+                with log_file_path.open("a", encoding="utf-8") as f:
+                    f.write(f"[VALIDATION_ERROR] {fid} | param validation failed: {e}\n")
+
+def _prompt(food: Dict[str,Any], parts: List[Dict[str,Any]], transforms: List[Dict[str,Any]]) -> str:
+    # Create compact registry format to reduce tokens
+    parts_ids = [p["id"] for p in parts]
+    transforms_data = []
+    tf_params = {}
+    
     for t in transforms:
-        lines.append(f"- {t['id']} → {t['name']} ; params: {short_params(t.get('params'))}")
-    return "\n".join(lines)
+        transforms_data.append({"id": t["id"]})
+        if t.get("params"):
+            # Only include identity params
+            identity_params = [p["key"] for p in t["params"] if p.get("identity_param")]
+            if identity_params:
+                tf_params[t["id"]] = identity_params
+    
+    input_data = {
+        "label": food.get('name', ''),
+        "category": food.get("category", ""),
+        "registries": {
+            "parts": parts_ids,
+            "tf": [t["id"] for t in transforms],
+            "tf_params": tf_params
+        }
+    }
+    
+    return f"""Map this FDC food record to a canonical FoodState.
 
-def _prompt(food: Dict[str,Any], candidates: List[Dict[str,Any]], registry_text: str) -> str:
-    cand_lines = []
-    for c in candidates[:5]:  # Limit to top 5 candidates to reduce tokens
-        rid = c.get("ref_id"); nm = c.get("name"); rt = c.get("ref_type")
-        pr = c.get("entity_rank"); fam = c.get("family") or ""
-        cand_lines.append(f"- [{rt}] {rid} :: {nm} (rank={pr}{', family='+fam if fam else ''})")
-    cand_block = "\n".join(cand_lines) or "(no candidates)"
-    cat = food.get("category","")
-    brand = food.get("brand","")
-    return f"""Map FDC food to FoodState identity.
+Input:
+{json.dumps(input_data, separators=(',',':'))}
 
-Food: {food.get('name','')} | {cat} | {brand}
-Candidates: {cand_block}
-
-Registry: {registry_text[:1000]}...
-
-Rules:
-- REJECT if this is a base food state (raw ingredient without processing)
-- Only use provided registry IDs
-- Prefer 'tp' over 'tpt' when uncertain about transforms
-- Return null node_id if not certain
-
-JSON: {{"node_kind":"tp","node_id":null,"identity_json":{{"taxon_id":"","part_id":"","transforms":[]}},"confidence":0.0,"rationales":[],"rejected":false}}"""
+Output the JSON response as specified in the system prompt."""
 
 def main():
     ap = argparse.ArgumentParser(prog="evidence-map", description="Map FDC FOUNDATION foods to FoodState identity (JSONL only).")
     ap.add_argument("--graph", default="etl/build/database/graph.dev.sqlite", help="Path to graph database")
     ap.add_argument("--fdc", default="data/sources/fdc", help="Folder containing FDC data")
     ap.add_argument("--out", dest="out_dir", default="data/evidence/fdc-foundation")
-    ap.add_argument("--model", default=os.environ.get("EVIDENCE_LLM_MODEL","gpt-4o-mini"))
+    ap.add_argument("--model", default=os.environ.get("EVIDENCE_LLM_MODEL","gpt-5-mini"))
+    # Default temperature based on model (gpt-5-mini only supports 1.0)
+    env_temperature = os.environ.get("EVIDENCE_LLM_TEMPERATURE")
+    temperature: Optional[float] = 1.0  # Default for gpt-5-mini
+    try:
+        if env_temperature is not None:
+            temperature = float(env_temperature)
+    except Exception:
+        temperature = 1.0
+    
     ap.add_argument("--min-conf", type=float, default=0.7)
     ap.add_argument("--topk", type=int, default=15)
     ap.add_argument("--limit", type=int, default=5, help="Limit number of foods processed (default: 5)")
+    ap.add_argument("--prompt-only", action="store_true", help="Generate and log the full prompt, then exit without calling LLM")
+    ap.add_argument("--registry-limit", type=int, default=0, help="If >0, cap number of parts/transforms included in registries to reduce tokens")
     ap.add_argument("--overwrite", action="store_true", help="Rewrite mapping.jsonl instead of appending/resuming")
+    ap.add_argument("--debug-prompts", action="store_true", help="Save prompts and responses to debug directories")
     args = ap.parse_args()
+    
+    # Ensure gpt-5-mini uses temperature=1 (it only supports 1)
+    if "gpt-5-mini" in args.model and temperature != 1.0:
+        print(f"WARNING: gpt-5-mini only supports temperature=1, but got {temperature}. Setting to 1.")
+        temperature = 1.0
 
     start_time = time.time()
     
@@ -108,6 +175,11 @@ def main():
             break
         project_root = project_root.parent
     
+    # Fail fast if required API key is missing
+    if not os.environ.get("OPENAI_API_KEY"):
+        print("ERROR: OPENAI_API_KEY environment variable is required but not set. Set it in your shell or .env.")
+        sys.exit(1)
+
     # Resolve all paths relative to project root
     out_dir = (project_root / args.out_dir).resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -117,6 +189,15 @@ def main():
     proposals_dir = out_dir / "_proposals"
     logs_dir = out_dir / "logs"
     logs_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Debug directories for prompts and responses
+    if args.debug_prompts:
+        debug_prompts_dir = logs_dir / "prompts"
+        debug_raw_dir = logs_dir / "raw"
+        debug_bad_dir = logs_dir / "bad"
+        debug_prompts_dir.mkdir(parents=True, exist_ok=True)
+        debug_raw_dir.mkdir(parents=True, exist_ok=True)
+        debug_bad_dir.mkdir(parents=True, exist_ok=True)
     
     # Track timing and tokens
     timing_stats = {"total_time": 0, "per_food_times": [], "total_tokens": 0, "input_tokens": 0, "output_tokens": 0}
@@ -132,21 +213,75 @@ def main():
     else:
         db_path = Path(args.graph)
     gdb = GraphDB(str(db_path))
-    parts = [ { "id": p.id, "name": p.name, "synonyms": p.synonyms } for p in gdb.parts() ]
-    transforms = [ { "id": t.id, "name": t.name, "params": t.params } for t in gdb.transforms() ]
-    registry_text = _fmt_registry(parts, transforms)
+    def _min_part(p) -> Dict[str, Any]:
+        obj = {"id": p.id}
+        # Only include name if it adds information beyond id's last segment
+        name = getattr(p, "name", None)
+        last_seg = (p.id or "").split(":")[-1]
+        if name and name.lower() != last_seg.replace("_"," "):
+            obj["name"] = name
+        syns = getattr(p, "synonyms", None) or []
+        if syns:
+            obj["synonyms"] = syns
+        return obj
+    parts = [ _min_part(p) for p in gdb.parts() ]
+    def _only_identity_params(param_defs: Any) -> Any:
+        out = []
+        for pd in (param_defs or []):
+            if pd.get("identity_param"):
+                out.append({
+                    "key": pd.get("key"),
+                    "kind": pd.get("kind"),
+                    "enum": pd.get("enum") if pd.get("enum") is not None else None,
+                    "identity_param": True,
+                })
+        return out
+    def _min_transform(t) -> Dict[str, Any]:
+        obj: Dict[str, Any] = {"id": t.id}
+        name = getattr(t, "name", None)
+        if name:
+            obj["name"] = name
+        order_val = getattr(t, "order", None)
+        if order_val is not None:
+            obj["order"] = order_val
+        params_val = _only_identity_params(getattr(t, "params", None))
+        if params_val:
+            obj["params"] = params_val
+        return obj
+    transforms = [ _min_transform(t) for t in gdb.transforms() ]
+    if args.registry_limit and args.registry_limit > 0:
+        parts = parts[:args.registry_limit]
+        transforms = transforms[:args.registry_limit]
 
-    # 2) Extract FDC → foods.jsonl (FOUNDATION only) + nutrients.jsonl restricted to those foods
+    # 2) Load existing foods.jsonl to create exclusion map for resume
+    existing_foods = set()
+    if foods_path.exists():
+        for row in read_jsonl(foods_path) or []:
+            existing_foods.add(row.get("food_id", ""))
+    
+    # 3) Extract FDC → foods.jsonl (FOUNDATION only) + nutrients.jsonl restricted to those foods
     fdc_dir = (project_root / args.fdc).resolve()
-    categories_skip = [  # tweak freely
-        "mixed dishes", "fast foods", "baby foods", "snacks", "beverages", "soups, sauces, and gravies"
+    # Normalize and expand category skip list
+    categories_skip = [
+        "mixed dishes", "fast foods", "baby foods", "snacks", "beverages", 
+        "soups, sauces, and gravies", "restaurant foods", "sausages and luncheon meats",
+        "baked products", "sweets", "fats and oils", "breakfast cereals",
+        "cereal grains and pasta", "meals, entrees, and side dishes"
     ]
-    foods = load_foundation_foods_json(fdc_dir, categories_skip=categories_skip, limit=args.limit)
-    # Normalize and write foods.jsonl
+    # Normalize to lowercase for comparison
+    categories_skip = [cat.lower() for cat in categories_skip]
+    # Load all foundation foods (only ~400 total)
+    foods = load_foundation_foods_json(fdc_dir, categories_skip=categories_skip, limit=None)  # Load all foundation foods
+    # Normalize foods and filter out already processed ones, respecting limit for new foods
     norm_foods: List[Dict[str, Any]] = []
     for r in foods:
+        fid = f"fdc:{r.get('fdc_id')}"
+        if fid in existing_foods:
+            continue  # Skip already processed
+        if len(norm_foods) >= args.limit:
+            break  # Stop when we have enough new foods to process
         norm_foods.append({
-            "food_id": f"fdc:{r.get('fdc_id')}",
+            "food_id": fid,
             "fdc_id": r.get("fdc_id"),
             "name": r.get("description"),
             "brand": "",  # Not available in foundation-foods.json
@@ -156,7 +291,6 @@ def main():
             "lang": "en",
             "country": "US"
         })
-    write_jsonl(foods_path, norm_foods)
 
     keep_ids = [r["fdc_id"] for r in foods if r.get("fdc_id")]
     fn_rows = filter_nutrients_for_foods(fdc_dir, keep_ids)
@@ -216,7 +350,7 @@ def main():
         })
     write_jsonl(nutrients_path, norm_nutrients)
 
-    # 3) LLM mapping per food
+    # 4) LLM mapping per food (write foods.jsonl per item for sync)
     # Resume support
     existing = { row.get("food_id"): True for row in read_jsonl(mapping_path) or [] } if mapping_path.exists() and not args.overwrite else {}
     if args.overwrite and mapping_path.exists():
@@ -231,21 +365,63 @@ def main():
             
         food_start = time.time()
         name = food.get("name","")
-        cands = gdb.search_candidates(name, topk=args.topk)
-        prompt = _prompt(food, cands, registry_text)
+        
+        # Write food to foods.jsonl immediately for sync
+        append_jsonl(foods_path, food)
+        
+        # Log food start
+        with log_file_path.open("a", encoding="utf-8") as f:
+            f.write(f"[FOOD] {fid} | {name}\n")
+        print(f"[FOOD] {fid} | {name}")
+        
+        prompt = _prompt(food, parts, transforms)
+        
+        # Debug logging for prompts
+        if args.debug_prompts:
+            prompt_data = {
+                "food_id": fid,
+                "food_name": name,
+                "system": DEFAULT_SYSTEM,
+                "user_prompt": prompt
+            }
+            with (debug_prompts_dir / f"{fid.replace(':', '_')}.json").open("w", encoding="utf-8") as f:
+                json.dump(prompt_data, f, ensure_ascii=False, indent=2)
+        
+        if args.prompt_only:
+            from .lib.llm import DEFAULT_SYSTEM as SYS
+            with log_file_path.open("a", encoding="utf-8") as f:
+                f.write("\n=== SYSTEM INSTRUCTIONS BEGIN ===\n")
+                f.write(SYS)
+                f.write("\n=== SYSTEM INSTRUCTIONS END ===\n")
+                f.write("\n--- PROMPT BEGIN ---\n")
+                f.write(prompt)
+                f.write("\n--- PROMPT END ---\n")
+            processed += 1
+            continue
         
         try:
+            llm_start = time.time()
             # Call LLM with token tracking
-            response = call_llm(model=args.model, system=DEFAULT_SYSTEM, user=prompt, max_retries=3, temperature=0.1)
+            response = call_llm(model=args.model, system=DEFAULT_SYSTEM, user=prompt, max_retries=1, temperature=temperature)
+            llm_time_ms = int((time.time() - llm_start) * 1000)
             
             # Extract token usage if available
+            input_tokens = 0
+            output_tokens = 0
             if isinstance(response, dict) and '_token_usage' in response:
                 usage = response['_token_usage']
-                timing_stats["input_tokens"] += usage['prompt_tokens']
-                timing_stats["output_tokens"] += usage['completion_tokens']
+                input_tokens = usage['prompt_tokens']
+                output_tokens = usage['completion_tokens']
+                timing_stats["input_tokens"] += input_tokens
+                timing_stats["output_tokens"] += output_tokens
                 timing_stats["total_tokens"] += usage['total_tokens']
                 # Remove token usage from the response object
                 del response['_token_usage']
+            
+            # Debug logging for raw responses
+            if args.debug_prompts:
+                with (debug_raw_dir / f"{fid.replace(':', '_')}.json").open("w", encoding="utf-8") as f:
+                    json.dump(response, f, ensure_ascii=False, indent=2)
             
             # Decorate with food_id/name
             obj = response
@@ -253,10 +429,35 @@ def main():
             obj["name"] = name
             
             # Strict validation - fail on schema errors
-            validate(instance=obj, schema=MAPPING_SCHEMA)
+            try:
+                validate(instance=obj, schema=MAPPING_SCHEMA)
+            except ValidationError as ve:
+                # Debug logging for validation errors
+                if args.debug_prompts:
+                    error_data = {
+                        "food_id": fid,
+                        "food_name": name,
+                        "validation_error": str(ve),
+                        "response": response
+                    }
+                    with (debug_bad_dir / f"{fid.replace(':', '_')}.json").open("w", encoding="utf-8") as f:
+                        json.dump(error_data, f, ensure_ascii=False, indent=2)
+                raise
             
-            # Track rejections
-            if obj.get("rejected", False):
+            # Sort transforms by their order for consistency
+            identity = obj.get("identity_json", {})
+            transforms_list = identity.get("transforms", [])
+            if transforms_list:
+                # Create order map from transforms registry
+                order_map = {t["id"]: t.get("order", 999) for t in transforms}
+                transforms_list.sort(key=lambda x: order_map.get(x.get("id"), 999))
+                identity["transforms"] = transforms_list
+            
+            # Soft validation - log missing ontology items but don't fail
+            _soft_validate_and_log(obj, gdb, log_file_path)
+            
+            # Track rejections (now disposition-based)
+            if obj.get("disposition") == "skip":
                 rejected_count += 1
             
             append_jsonl(mapping_path, obj)
@@ -268,42 +469,44 @@ def main():
                 with (proposals_dir / f"{fid.replace(':','_')}.json").open("w", encoding="utf-8") as f:
                     json.dump({"food": food, "proposals": new}, f, ensure_ascii=False, indent=2)
             
-            processed += 1
+            # Log per-food metrics
             food_time = time.time() - food_start
+            with log_file_path.open("a", encoding="utf-8") as f:
+                f.write(f"[METRICS] {fid} | llm={llm_time_ms}ms | tokens={input_tokens}+{output_tokens} | total={food_time:.1f}s\n")
+            print(f"[METRICS] {fid} | llm={llm_time_ms}ms | tokens={input_tokens}+{output_tokens} | total={food_time:.1f}s")
+            
+            processed += 1
             timing_stats["per_food_times"].append(food_time)
             
             if processed % 5 == 0:
+                avg_time = sum(timing_stats['per_food_times'])/len(timing_stats['per_food_times'])
                 with log_file_path.open("a", encoding="utf-8") as f:
-                    f.write(f"  processed={processed} rejected={rejected_count} avg_time={sum(timing_stats['per_food_times'])/len(timing_stats['per_food_times']):.2f}s\n")
+                    f.write(f"[BATCH] processed={processed} rejected={rejected_count} avg_time={avg_time:.2f}s\n")
+                print(f"[BATCH] processed={processed} rejected={rejected_count} avg_time={avg_time:.2f}s")
                 
         except ValidationError as ve:
+            # Log only; do not persist error rows in mapping.jsonl
             with log_file_path.open("a", encoding="utf-8") as f:
-                f.write(f"[VALIDATION_ERROR] {fid} {name}: {ve}\n")
-            append_jsonl(mapping_path, {
-                "food_id": fid, "name": name, "validation_error": str(ve)[:300], "node_kind": "tp",
-                "node_id": None, "identity_json": {"taxon_id":"", "part_id":"", "transforms":[]},
-                "confidence": 0.0, "rationales": ["Validation error"], "rejected": True
-            })
-            processed += 1
+                f.write(f"[VALIDATION_ERROR] {fid} | {name}: {ve}\n")
+            print(f"[VALIDATION_ERROR] {fid} | {name}: {ve}")
             rejected_count += 1
         except Exception as e:
+            # Log only; do not persist error rows in mapping.jsonl
             with log_file_path.open("a", encoding="utf-8") as f:
-                f.write(f"[ERR] {fid} {name}: {e}\n")
-            append_jsonl(mapping_path, {
-                "food_id": fid, "name": name, "error": str(e), "node_kind": "tp",
-                "node_id": None, "identity_json": {"taxon_id":"", "part_id":"", "transforms":[]},
-                "confidence": 0.0, "rationales": ["LLM error"], "rejected": True
-            })
-            processed += 1
+                f.write(f"[ERR] {fid} | {name}: {e}\n")
+            print(f"[ERR] {fid} | {name}: {e}")
             rejected_count += 1
     
     # Final timing summary
     timing_stats["total_time"] = time.time() - start_time
     avg_time_per_food = sum(timing_stats["per_food_times"]) / len(timing_stats["per_food_times"]) if timing_stats["per_food_times"] else 0
+    num_items = len(timing_stats["per_food_times"]) or 1
+    avg_input_tokens = timing_stats["input_tokens"] / num_items
+    avg_output_tokens = timing_stats["output_tokens"] / num_items
     
     with log_file_path.open("a", encoding="utf-8") as f:
         f.write(f"[done] processed={processed} rejected={rejected_count} total_time={timing_stats['total_time']:.2f}s avg_per_food={avg_time_per_food:.2f}s\n")
-        f.write(f"[tokens] input={timing_stats['input_tokens']} output={timing_stats['output_tokens']} total={timing_stats['total_tokens']}\n")
+        f.write(f"[tokens] input={timing_stats['input_tokens']} output={timing_stats['output_tokens']} total={timing_stats['total_tokens']} avg_input={avg_input_tokens:.1f} avg_output={avg_output_tokens:.1f}\n")
     
     # Print summary to console
     print(f"\n=== Evidence Mapping Complete ===")
@@ -312,6 +515,7 @@ def main():
     print(f"Total time: {timing_stats['total_time']:.2f}s")
     print(f"Avg per food: {avg_time_per_food:.2f}s")
     print(f"Tokens used: {timing_stats['total_tokens']} (input: {timing_stats['input_tokens']}, output: {timing_stats['output_tokens']})")
+    print(f"Avg tokens per item: input {avg_input_tokens:.1f}, output {avg_output_tokens:.1f}")
     print(f"Output: {out_dir}")
 
 if __name__ == "__main__":

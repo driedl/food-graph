@@ -8,6 +8,7 @@ dependencies = [
   "rich>=13.7.0",
   "PyYAML>=6.0",
   "jsonschema>=4.22",
+  "python-dotenv>=1.0.1",
 ]
 
 [project.optional-dependencies]

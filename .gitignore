@@ -26,3 +26,6 @@ coverage/
 # Environment files
 .env.local
 .env.*.local
+
+# Evidence logs from any data source
+data/evidence/*/logs/
