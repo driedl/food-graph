@@ -2,7 +2,7 @@
 
 **Milestone 1 (foundation)**
 - Stages A, B, E online
-- Minimal DB (T + TP) produced from mise
+- Minimal DB (T + TP) produced from graph
 - Golden tests for transforms canon + substrates
 
 **Milestone 2 (TPT core)**
@@ -12,7 +12,7 @@
 
 **Milestone 3 (graph + API)**
 - Stages H, I, J
-- API points at mise deliverables in dev
+- API points at graph deliverables in dev
 
 **Milestone 4 (polish)**
 - Stage K parity with legacy (FTS, indices, meta)

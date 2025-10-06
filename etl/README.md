@@ -1,8 +1,8 @@
-# mise — the new ETL for the Food Graph
+# graph — the new ETL for the Food Graph
 
 Last reviewed: 2025-10-05
 
-**mise** (as in *mise en place*) is a Python-first, deterministic build system for the Food Graph.
+**graph** (as in *graph en place*) is a Python-first, deterministic build system for the Food Graph.
 It replaces ad‑hoc, monolithic scripts with **small, testable stages** and **clear artifacts**.
 This is the primary ETL pipeline for the food graph.
 
@@ -16,10 +16,10 @@ This is the primary ETL pipeline for the food graph.
 python -m pip install -e ./etl
 
 # run the pipeline with tests
-python -m mise run build --with-tests
+python -m graph run build --with-tests
 
 # run the pipeline
-python -m mise run build
+python -m graph run build
 ```
 
 ## Inputs & Outputs
@@ -42,7 +42,7 @@ python -m mise run build
 - `stage_e` — Canonical IDs
 - `stage_f` — Pack SQLite (`sqlite_pack.py`)
 
-Contracts per stage live in `mise/stages/*/contract.yml` and are validated during runs.
+Contracts per stage live in `graph/stages/*/contract.yml` and are validated during runs.
 
 ## API Integration
 
@@ -74,7 +74,7 @@ GRAPH_BUILD_ROOT=etl/build
 - Schemas: `etl/docs/04-schemas.md`
 - Decision log: `etl/docs/09-decision-log/`
 
-### Switch API to use mise outputs
+### Switch API to use graph outputs
 
 Expose the DB (or other artifacts) to the API via envs:
 

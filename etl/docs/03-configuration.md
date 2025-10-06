@@ -1,6 +1,6 @@
 # Configuration
 
-`mise` is env‑first. Sensible defaults keep local dev simple.
+`graph` is env‑first. Sensible defaults keep local dev simple.
 
 | Env | Default | Purpose |
 |-----|---------|---------|

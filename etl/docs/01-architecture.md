@@ -4,7 +4,7 @@
 sources/ (repo)
   └─ data/ontology/{taxa,parts,transforms,rules,...}
 
-mise (runner)
+graph (runner)
   ├─ cli.py        # CLI commands: run, test
   ├─ io.py         # JSON/JSONL IO, atomic writes, hashing, glob helpers
   ├─ config.py     # Path resolution from envs

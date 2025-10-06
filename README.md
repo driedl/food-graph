@@ -103,7 +103,7 @@ data/
     └── schema/        # JSON schema files for validation
 
 etl/                   # Data compilation pipeline (Python)
-  └── mise/           # Python ETL framework
+  └── graph/           # Python ETL framework
       └── stages/     # Pipeline stages
 
 scripts/               # Development & maintenance utilities

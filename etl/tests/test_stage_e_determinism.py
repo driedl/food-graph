@@ -51,14 +51,14 @@ def test_stage_e_hash_is_deterministic(tmp_path):
     (in_dir / "rules").mkdir(parents=True, exist_ok=True)
 
     # first run
-    rc, out, err = _run([sys.executable, "-m", "mise", "run", "E", "--in", str(in_dir), "--build", str(build)])
+    rc, out, err = _run([sys.executable, "-m", "graph", "run", "E", "--in", str(in_dir), "--build", str(build)])
     assert rc == 0, err
     out1 = _read_jsonl(build / "tmp" / "tpt_canon.jsonl")
     assert len(out1) == 1
     id1 = out1[0]["id"]; h1 = out1[0]["identity_hash"]
 
     # run again (no changes)
-    rc, out, err = _run([sys.executable, "-m", "mise", "run", "E", "--in", str(in_dir), "--build", str(build)])
+    rc, out, err = _run([sys.executable, "-m", "graph", "run", "E", "--in", str(in_dir), "--build", str(build)])
     assert rc == 0, err
     out2 = _read_jsonl(build / "tmp" / "tpt_canon.jsonl")
     assert len(out2) == 1
@@ -100,7 +100,7 @@ def test_param_buckets_same_bucket_same_hash(tmp_path):
     ]
     _write_jsonl(build / "tmp" / "tpt_seed.jsonl", seed)
 
-    rc, out, err = _run([sys.executable, "-m", "mise", "run", "E", "--in", str(in_dir), "--build", str(build)])
+    rc, out, err = _run([sys.executable, "-m", "graph", "run", "E", "--in", str(in_dir), "--build", str(build)])
     assert rc == 0, err
     rows = _read_jsonl(build / "tmp" / "tpt_canon.jsonl")
     # After bucketing, both records should have the same identity signature and be deduplicated
@@ -141,7 +141,7 @@ def test_param_buckets_cross_boundary_changes_hash(tmp_path):
     ]
     _write_jsonl(build / "tmp" / "tpt_seed.jsonl", seed)
 
-    rc, out, err = _run([sys.executable, "-m", "mise", "run", "E", "--in", str(in_dir), "--build", str(build)])
+    rc, out, err = _run([sys.executable, "-m", "graph", "run", "E", "--in", str(in_dir), "--build", str(build)])
     assert rc == 0, err
     rows = _read_jsonl(build / "tmp" / "tpt_canon.jsonl")
     assert len(rows) == 2

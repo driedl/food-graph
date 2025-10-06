@@ -44,7 +44,7 @@
         },
         "etl": {
             "name": "ETL Processing",
-            "description": "ETL Python pipeline with Mise framework and documentation",
+            "description": "ETL Python pipeline with Graph framework and documentation",
             "patterns": [
                 "etl/**/*.py",
                 "etl/**/*.md",
@@ -76,11 +76,11 @@
         },
         "ontology_core": {
             "name": "Ontology - Core",
-            "description": "Core ontology data (attributes, nutrients, parts, rules, transforms) - excludes taxa",
+            "description": "(attributes, nutrients, parts, rules, transforms) - excludes taxa",
             "patterns": [
                 "data/ontology/**/*.json",
                 "data/ontology/**/*.jsonl",
-                "data/sql/**/*.json",
+                "data/sql/**/*.json"
             ],
             "ignore": [
                 "data/ontology/compiled/**",
@@ -161,8 +161,8 @@
                 "packages/api-contract/src/index.ts",
                 "packages/config/src/index.ts",
                 "etl/pyproject.toml",
-                "etl/mise/config.py",
-                "etl/mise/cli.py",
+                "etl/graph/config.py",
+                "etl/graph/cli.py",
                 "data/sql/schema/*.schema.json"
             ],
             "ignore": [

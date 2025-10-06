@@ -44,13 +44,13 @@ This guide helps AI agents understand and work with the ETL system effectively.
 ### ETL Pipeline
 ```bash
 # Run specific stage
-python3 -m mise run F --verbose
+python3 -m graph run F --verbose
 
 # Run full pipeline
-python3 -m mise run build --verbose
+python3 -m graph run build --verbose
 
 # Check stage verification
-python3 -c "from mise.contracts.engine import verify; verify('stage_f', Path('etl'), Path('etl/build'), verbose=True)"
+python3 -c "from graph.contracts.engine import verify; verify('stage_f', Path('etl'), Path('etl/build'), verbose=True)"
 ```
 
 ### Database Inspection
@@ -83,7 +83,7 @@ curl "http://localhost:3000/api/entities/get?id=tx:plantae"
 
 ### Stage F Verification Fails
 - **Problem**: Contract expects wrong database filename
-- **Check**: `etl/mise/stages/stage_f/contract.yml` should have `database/graph.dev.sqlite`
+- **Check**: `etl/graph/stages/stage_f/contract.yml` should have `database/graph.dev.sqlite`
 - **Fix**: Update contract path to match actual database location
 
 ### API Can't Find Database
@@ -105,7 +105,7 @@ lsof -ti:3000 | xargs kill -9
 
 ## File Locations
 
-- **ETL source**: `etl/mise/stages/`
+- **ETL source**: `etl/graph/stages/`
 - **Database output**: `etl/build/database/graph.dev.sqlite`
 - **API source**: `apps/api/src/`
 - **Config**: `packages/config/src/index.ts` (uses `ETL_DB_PATH` env var)
@@ -114,8 +114,8 @@ lsof -ti:3000 | xargs kill -9
 ## Schema Changes
 
 When adding new tables to ETL:
-1. Update `etl/mise/stages/stage_f/sqlite_pack.py` DDL
+1. Update `etl/graph/stages/stage_f/sqlite_pack.py` DDL
 2. Add population logic in `build_sqlite()` function
-3. Update `etl/mise/stages/stage_f/contract.yml` validators
+3. Update `etl/graph/stages/stage_f/contract.yml` validators
 4. Update `apps/api/src/db.ts` required tables list
-5. Test with `python3 -m mise run F --verbose`
+5. Test with `python3 -m graph run F --verbose`

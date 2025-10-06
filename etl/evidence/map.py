@@ -1,16 +1,19 @@
 from __future__ import annotations
 import argparse, json, os, sys, re, time
-# Ensure .env is loaded once via centralized module (no-op if missing)
-from .lib.env import *  # type: ignore  # noqa: F401,F403
 from pathlib import Path
 from typing import Dict, Any, List, Iterable, Optional
 from datetime import datetime
 from jsonschema import validate, ValidationError
 
-from .lib.jsonl import write_jsonl, append_jsonl, read_jsonl, index_jsonl_by
+from lib.io import write_jsonl, append_jsonl, read_jsonl
+from lib.logging import setup_logger, ProgressTracker, MetricsCollector
+from lib.config import find_project_root, load_env, resolve_path
 from .lib.fdc import load_foundation_foods_json, filter_nutrients_for_foods, load_nutrient_index, filter_base_foods
 from .lib.llm import call_llm, DEFAULT_SYSTEM
 from .db import GraphDB
+
+# Load environment variables
+load_env()
 
 MAPPING_SCHEMA = {
     "type": "object",
@@ -98,7 +101,14 @@ def _soft_validate_and_log(obj: Dict[str, Any], gdb: GraphDB, log_file_path: Pat
                 allowed_params = set()
                 for t in gdb.transforms():
                     if t.id == tf_id and t.params:
-                        allowed_params.update(p.key for p in t.params if p.get("identity_param"))
+                        for pd in t.params:
+                            if isinstance(pd, dict):
+                                k = pd.get("key")
+                                if not k:
+                                    continue
+                                # If identity flag present, honor it; if absent, allow (avoid false positives)
+                                if pd.get("identity_param") or "identity_param" not in pd:
+                                    allowed_params.add(k)
                 
                 for param_key in params.keys():
                     if param_key not in allowed_params:
@@ -167,12 +177,8 @@ def main():
 
     start_time = time.time()
     
-    # Find project root (where pnpm-workspace.yaml exists)
-    project_root = Path(__file__).parent
-    while project_root.parent != project_root:
-        if (project_root / "pnpm-workspace.yaml").exists():
-            break
-        project_root = project_root.parent
+    # Find project root
+    project_root = find_project_root()
     
     # Fail fast if required API key is missing
     if not os.environ.get("OPENAI_API_KEY"):
@@ -180,7 +186,7 @@ def main():
         sys.exit(1)
 
     # Resolve all paths relative to project root
-    out_dir = (project_root / args.out_dir).resolve()
+    out_dir = resolve_path(args.out_dir, project_root)
     out_dir.mkdir(parents=True, exist_ok=True)
     foods_path = out_dir / "foods.jsonl"
     nutrients_path = out_dir / "nutrients.jsonl"
@@ -207,10 +213,7 @@ def main():
 
     # 1) Load graph registries (parts, transforms) and prep candidate search
     # Resolve database path relative to project root
-    if not Path(args.graph).is_absolute():
-        db_path = (project_root / args.graph).resolve()
-    else:
-        db_path = Path(args.graph)
+    db_path = resolve_path(args.graph, project_root)
     gdb = GraphDB(str(db_path))
     def _min_part(p) -> Dict[str, Any]:
         obj = {"id": p.id}
@@ -259,13 +262,13 @@ def main():
             existing_foods.add(row.get("food_id", ""))
     
     # 3) Extract FDC → foods.jsonl (FOUNDATION only) + nutrients.jsonl restricted to those foods
-    fdc_dir = (project_root / args.fdc).resolve()
+    fdc_dir = resolve_path(args.fdc, project_root)
     # Normalize and expand category skip list
     categories_skip = [
-        "mixed dishes", "fast foods", "baby foods", "snacks", "beverages", 
-        "soups, sauces, and gravies", "restaurant foods", "sausages and luncheon meats",
-        "baked products", "sweets", "fats and oils", "breakfast cereals",
-        "cereal grains and pasta", "meals, entrees, and side dishes"
+        "mixed dishes", "fast foods", "baby foods", "beverages",
+        "soups, sauces, and gravies", "restaurant foods",
+        "sausages and luncheon meats", "baked products",
+        "sweets", "breakfast cereals", "meals, entrees, and side dishes"
     ]
     # Normalize to lowercase for comparison
     categories_skip = [cat.lower() for cat in categories_skip]
@@ -359,7 +362,7 @@ def main():
                             except: pass
         return fdc_to_tag, tag_to_unit
 
-    nr_path = (project_root / args.nutrient_registry).resolve()
+    nr_path = resolve_path(args.nutrient_registry, project_root)
     fdc_to_infoods, infoods_units = _load_infoods_aliases(nr_path)
 
     # fallback minimal map if registry lacks a code (kept tiny on purpose)
@@ -392,7 +395,10 @@ def main():
     if args.overwrite and mapping_path.exists():
         mapping_path.unlink()
     processed = 0
-    rejected_count = 0
+    accepted_count = 0
+    skipped_count = 0
+    ambiguous_count = 0
+    error_count = 0
     
     for food in norm_foods:
         fid = food["food_id"]
@@ -501,18 +507,30 @@ def main():
             # Soft validation - log missing ontology items but don't fail
             _soft_validate_and_log(obj, gdb, log_file_path)
             
-            # Track rejections (now disposition-based)
-            if obj.get("disposition") == "skip":
-                rejected_count += 1
+            # Outcome counters
+            disp = (obj.get("disposition") or "").lower()
+            conf = float(obj.get("confidence") or 0)
+            if disp == "map" and conf >= args.min_conf:
+                accepted_count += 1
+            elif disp == "skip":
+                skipped_count += 1
+            elif disp == "ambiguous":
+                ambiguous_count += 1
             
             append_jsonl(mapping_path, obj)
             
             # Optional: dump proposals for human triage
-            new = obj.get("new") or {}
-            if any(new.get(k) for k in ("taxa","parts","transforms")):
+            if any(obj.get(k) for k in ("new_taxa","new_parts","new_transforms")):
                 proposals_dir.mkdir(parents=True, exist_ok=True)
                 with (proposals_dir / f"{fid.replace(':','_')}.json").open("w", encoding="utf-8") as f:
-                    json.dump({"food": food, "proposals": new}, f, ensure_ascii=False, indent=2)
+                    json.dump({
+                        "food": food,
+                        "proposals": {
+                            "taxa": obj.get("new_taxa") or [],
+                            "parts": obj.get("new_parts") or [],
+                            "transforms": obj.get("new_transforms") or []
+                        }
+                    }, f, ensure_ascii=False, indent=2)
             
             # Log per-food metrics
             food_time = time.time() - food_start
@@ -526,21 +544,21 @@ def main():
             if processed % 5 == 0:
                 avg_time = sum(timing_stats['per_food_times'])/len(timing_stats['per_food_times'])
                 with log_file_path.open("a", encoding="utf-8") as f:
-                    f.write(f"[BATCH] processed={processed} rejected={rejected_count} avg_time={avg_time:.2f}s\n")
-                print(f"[BATCH] processed={processed} rejected={rejected_count} avg_time={avg_time:.2f}s")
+                    f.write(f"[BATCH] processed={processed} accepted={accepted_count} skipped={skipped_count} ambiguous={ambiguous_count} errors={error_count} avg_time={avg_time:.2f}s\n")
+                print(f"[BATCH] processed={processed} accepted={accepted_count} skipped={skipped_count} ambiguous={ambiguous_count} errors={error_count} avg_time={avg_time:.2f}s")
                 
         except ValidationError as ve:
             # Log only; do not persist error rows in mapping.jsonl
             with log_file_path.open("a", encoding="utf-8") as f:
                 f.write(f"[VALIDATION_ERROR] {fid} | {name}: {ve}\n")
             print(f"[VALIDATION_ERROR] {fid} | {name}: {ve}")
-            rejected_count += 1
+            error_count += 1
         except Exception as e:
             # Log only; do not persist error rows in mapping.jsonl
             with log_file_path.open("a", encoding="utf-8") as f:
                 f.write(f"[ERR] {fid} | {name}: {e}\n")
             print(f"[ERR] {fid} | {name}: {e}")
-            rejected_count += 1
+            error_count += 1
     
     # Final timing summary
     timing_stats["total_time"] = time.time() - start_time
@@ -550,15 +568,18 @@ def main():
     avg_output_tokens = timing_stats["output_tokens"] / num_items
     
     with log_file_path.open("a", encoding="utf-8") as f:
-        f.write(f"[done] processed={processed} rejected={rejected_count} total_time={timing_stats['total_time']:.2f}s avg_per_food={avg_time_per_food:.2f}s\n")
+        f.write(f"[done] processed={processed} accepted={accepted_count} skipped={skipped_count} ambiguous={ambiguous_count} errors={error_count} total_time={timing_stats['total_time']:.2f}s avg_per_food={avg_time_per_food:.2f}s\n")
         f.write(f"[tokens] input={timing_stats['input_tokens']} output={timing_stats['output_tokens']} total={timing_stats['total_tokens']} avg_input={avg_input_tokens:.1f} avg_output={avg_output_tokens:.1f}\n")
 
     # Acceptance summary (Phase-1)
     accept = {
         "model": args.model,
         "processed": processed,
-        "rejected": rejected_count,
-        "yield_pct": (0 if processed==0 else round(100.0*(processed-rejected_count)/processed,1)),
+        "accepted": accepted_count,
+        "skipped": skipped_count,
+        "ambiguous": ambiguous_count,
+        "errors": error_count,
+        "yield_pct": (0 if processed==0 else round(100.0*accepted_count/processed,1)),
         "total_time_s": round(timing_stats["total_time"],2),
         "avg_tokens_in": round(avg_input_tokens,1),
         "avg_tokens_out": round(avg_output_tokens,1),
@@ -570,7 +591,10 @@ def main():
     # Print summary to console
     print(f"\n=== Evidence Mapping Complete ===")
     print(f"Processed: {processed} foods")
-    print(f"Rejected: {rejected_count} foods")
+    print(f"Accepted: {accepted_count} foods")
+    print(f"Skipped: {skipped_count} foods")
+    print(f"Ambiguous: {ambiguous_count} foods")
+    print(f"Errors: {error_count} foods")
     print(f"Total time: {timing_stats['total_time']:.2f}s")
     print(f"Avg per food: {avg_time_per_food:.2f}s")
     print(f"Tokens used: {timing_stats['total_tokens']} (input: {timing_stats['input_tokens']}, output: {timing_stats['output_tokens']})")

@@ -1,7 +1,7 @@
 from __future__ import annotations
-import sqlite3
 from dataclasses import dataclass
 from typing import List, Dict, Any, Tuple, Optional
+from lib.db import DatabaseConnection
 
 @dataclass
 class Part:
@@ -13,12 +13,13 @@ class Part:
 class Transform:
     id: str
     name: str
+    order: Optional[int]
     params: List[Dict[str, Any]]  # as defined in transform_def.param_keys
 
 class GraphDB:
     def __init__(self, path: str):
-        self.con = sqlite3.connect(path)
-        self.con.row_factory = sqlite3.Row
+        self.db = DatabaseConnection(path)
+        self.con = self.db.con
 
     def parts(self) -> List[Part]:
         q = """
@@ -36,7 +37,7 @@ class GraphDB:
 
     def transforms(self) -> List[Transform]:
         q = """
-          SELECT id, name, param_keys
+          SELECT id, name, "order", param_keys
           FROM transform_def
           ORDER BY "order", id
         """
@@ -48,7 +49,7 @@ class GraphDB:
                 params = json.loads(r["param_keys"] or "[]")
             except Exception:
                 params = []
-            out.append(Transform(id=r["id"], name=r["name"], params=params))
+            out.append(Transform(id=r["id"], name=r["name"], order=r["order"], params=params))
         return out
 
     def search_candidates(self, text: str, topk: int = 15) -> List[Dict[str, Any]]:
@@ -83,6 +84,4 @@ class GraphDB:
             return [dict(r) for r in cur.fetchall()]
 
     def id_exists(self, table: str, id_col: str, id_val: str) -> bool:
-        q = f"SELECT 1 FROM {table} WHERE {id_col}=? LIMIT 1"
-        cur = self.con.execute(q, (id_val,))
-        return cur.fetchone() is not None
+        return self.db.id_exists(table, id_col, id_val)

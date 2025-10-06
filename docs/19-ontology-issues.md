@@ -557,7 +557,7 @@ part:egg (kind: "animal", category: "egg", applies_to: [all egg-laying animals])
 ### **Stage F Patch (Python + SQL)**
 
 #### A. DDL Additions
-Add to `etl/mise/stages/stage_f/sqlite_pack.py` in the main DDL string:
+Add to `etl/graph/stages/stage_f/sqlite_pack.py` in the main DDL string:
 
 ```sql
 -- Part closure (mirror of taxon_ancestors)
@@ -756,14 +756,14 @@ finally:
 
 ### **Lint Pack (Stage F post-pack checks)**
 
-#### Create `etl/mise/stages/stage_f/validate_sqlite.py`:
+#### Create `etl/graph/stages/stage_f/validate_sqlite.py`:
 
 ```python
 from __future__ import annotations
 import json, sys
 from pathlib import Path
 import sqlite3
-from mise.config import BuildConfig
+from graph.config import BuildConfig
 
 CRITICAL = []
 WARN = []
@@ -935,7 +935,7 @@ if __name__ == "__main__":
 
 Add to CI pipeline after `pnpm etl:run`:
 ```bash
-python3 etl/mise/stages/stage_f/validate_sqlite.py
+python3 etl/graph/stages/stage_f/validate_sqlite.py
 ```
 
 This comprehensive plan addresses all identified issues with clear solutions and justifications. The phased approach allows for systematic implementation while maintaining system stability.
@@ -1116,7 +1116,7 @@ Parts that could benefit from notes for clarity:
 4. **Hierarchy validation** - Parent-child relationship validation
 
 ### Implementation Details
-- **Location**: `etl/mise/contracts/validators.py` - New validator functions added
+- **Location**: `etl/graph/contracts/validators.py` - New validator functions added
 - **Contracts**: Updated `stage_0/contract.yml` and `stage_a/contract.yml`
 - **Execution**: Runs automatically with `pnpm etl:run --with-tests`
 - **Reports**: Structured JSON reports in `etl/build/report/verify_stage_*.json`
@@ -1139,7 +1139,7 @@ Parts that could benefit from notes for clarity:
 pnpm etl:run
 
 # Run specific stage with validation
-cd etl && python3 -m mise run A --with-tests
+cd etl && python3 -m graph run A --with-tests
 
 # Check validation reports
 cat etl/build/report/verify_stage_0.json

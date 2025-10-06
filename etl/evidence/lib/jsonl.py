@@ -1,32 +1,17 @@
 from __future__ import annotations
-import json
 from pathlib import Path
-from typing import Dict, Iterable, Iterator, Any, Optional
+from typing import Dict, Iterator, Any
+from lib.io import write_jsonl as _write_jsonl, append_jsonl as _append_jsonl, read_jsonl as _read_jsonl, index_jsonl_by as _index_jsonl_by
 
-def write_jsonl(path: Path, rows: Iterable[Dict]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8") as f:
-        for r in rows:
-            f.write(json.dumps(r, ensure_ascii=False, separators=(",", ":")) + "\n")
+# Re-export shared utilities for backward compatibility
+def write_jsonl(path: Path, rows) -> None:
+    _write_jsonl(path, rows)
 
 def append_jsonl(path: Path, row: Dict) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("a", encoding="utf-8") as f:
-        f.write(json.dumps(row, ensure_ascii=False, separators=(",", ":")) + "\n")
+    _append_jsonl(path, row)
 
 def read_jsonl(path: Path) -> Iterator[Dict[str, Any]]:
-    if not path.exists():
-        return
-    for line in path.read_text(encoding="utf-8").splitlines():
-        line = line.strip()
-        if not line or line.startswith("//"):
-            continue
-        yield json.loads(line)
+    return _read_jsonl(path)
 
 def index_jsonl_by(path: Path, key: str) -> Dict[str, Dict[str, Any]]:
-    out: Dict[str, Dict[str, Any]] = {}
-    for row in read_jsonl(path) or []:
-        k = row.get(key)
-        if isinstance(k, str):
-            out[k] = row
-    return out
+    return _index_jsonl_by(path, key)

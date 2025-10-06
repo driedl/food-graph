@@ -77,7 +77,7 @@
 
 ### C. Contracts & Tooling
 
-* **Contract engine + validators** wired to run per‑stage (`mise test` or `mise run … --with-tests`).
+* **Contract engine + validators** wired to run per‑stage (`graph test` or `graph run … --with-tests`).
 * **CLI UX**: Colored stage headers, timings, optional verification, pipeline presets (e.g., `0ABCDEF`).
 * **Config**: `BuildConfig.from_env()` (override build root/db path/profile), directories auto‑created.
 
@@ -141,7 +141,7 @@ A) **Contracts** (lightweight)
 
   * **Stage D**: `tpt_generated.jsonl` exists; optional `max_lines` guard to prevent explosion.
   * **Stage E**: `tpt_canon.jsonl` exists; add validator `path_transform_ids_in` (already supported) to ensure transform IDs are canonical; optionally require `min_lines ≥ curated+generated > 0` when allowlist/families present.
-* **Acceptance**: `mise run 0ABCDEF --with-tests` passes on a clean workspace.
+* **Acceptance**: `graph run 0ABCDEF --with-tests` passes on a clean workspace.
 
 B) **Docs (inline)**
 
@@ -151,7 +151,7 @@ B) **Docs (inline)**
 
 ### Phase 3 — Build & Verification
 
-1. **Clean build**: `rm -rf etl/build && mise run build --with-tests`
+1. **Clean build**: `rm -rf etl/build && graph run build --with-tests`
    *Expected*: all stages 0→F succeed; `graph.dev.sqlite` contains:
 
    * `search_fts` entries for taxa, TP (with synonyms), and TPT.
@@ -252,7 +252,7 @@ B) **Docs (inline)**
 * ✅ **Stage F updated** to honor TP synonyms and name overrides in search materialization.
 * ✅ **Flag & cuisine evaluation** implemented in Stage F.
 * ✅ **Contracts** added/updated for D & E.
-* ✅ **Green pipeline**: `mise run build --with-tests` completes with ✓ Verify on all stages.
+* ✅ **Green pipeline**: `graph run build --with-tests` completes with ✓ Verify on all stages.
 * ✅ **API Implementation**: Complete tRPC-based API with all core endpoints
 * ✅ **Database Configuration**: ETL2 integration with auto-copy functionality
 * ✅ **Core Functionality**: Search, browse, validation, and navigation working

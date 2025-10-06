@@ -1,6 +1,6 @@
 # Overview
 
-**mise** is a stage‑based ETL that compiles the Food Graph into build artifacts for the API and UI.
+**graph** is a stage‑based ETL that compiles the Food Graph into build artifacts for the API and UI.
 It follows the TPT vision (Taxon, Taxon+Part, Taxon+Part+Transform) and the expanded 11‑stage compiler.
 
 Guiding principles:

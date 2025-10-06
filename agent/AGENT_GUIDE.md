@@ -64,7 +64,7 @@ food-graph/
 │   ├── config/           # Environment and path configuration
 │   └── api-contract/     # API type definitions
 ├── etl/                  # ETL pipeline (Python)
-│   └── mise/             # Python ETL framework
+│   └── graph/             # Python ETL framework
 │       └── stages/       # Pipeline stages
 ├── data/
 │   ├── ontology/         # Source of truth (Git)
@@ -270,7 +270,7 @@ pnpm api:routes
 
 ```bash
 # View ETL pipeline config
-cat etl/mise/config.py
+cat etl/graph/config.py
 
 # Check database stats
 pnpm sql "SELECT

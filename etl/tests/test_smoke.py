@@ -53,7 +53,7 @@ def test_smoke_build(tmp_path, monkeypatch):
 ]''')
 
     result = subprocess.run(
-        [sys.executable, "-m", "mise", "run", "build", "--in", str(in_dir), "--build", str(build_dir), "--with-tests"],
+        [sys.executable, "-m", "graph", "run", "build", "--in", str(in_dir), "--build", str(build_dir), "--with-tests"],
         capture_output=True, text=True
     )
     assert result.returncode == 0, result.stderr

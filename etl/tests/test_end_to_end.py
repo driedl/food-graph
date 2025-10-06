@@ -7,7 +7,7 @@ def test_full_pipeline_smoke(temp_ontology_dir, temp_build_dir):
     """Test that the full pipeline runs without errors on minimal data"""
     # Run the full pipeline
     result = subprocess.run([
-        sys.executable, "-m", "mise", "run", "build",
+        sys.executable, "-m", "graph", "run", "build",
         "--in", str(temp_ontology_dir),
         "--build", str(temp_build_dir),
         "--verbose"
@@ -27,7 +27,7 @@ def test_pipeline_with_tests(temp_ontology_dir, temp_build_dir):
     """Test that the pipeline with contract verification works"""
     # Run the full pipeline with tests
     result = subprocess.run([
-        sys.executable, "-m", "mise", "run", "build",
+        sys.executable, "-m", "graph", "run", "build",
         "--in", str(temp_ontology_dir),
         "--build", str(temp_build_dir),
         "--with-tests",
@@ -47,7 +47,7 @@ def test_individual_stage_testing(temp_ontology_dir, temp_build_dir):
     """Test that individual stage testing works"""
     # First run stage 0 to create artifacts
     result = subprocess.run([
-        sys.executable, "-m", "mise", "run", "0",
+        sys.executable, "-m", "graph", "run", "0",
         "--in", str(temp_ontology_dir),
         "--build", str(temp_build_dir),
         "--verbose"
@@ -57,7 +57,7 @@ def test_individual_stage_testing(temp_ontology_dir, temp_build_dir):
     
     # Then test stage 0
     result = subprocess.run([
-        sys.executable, "-m", "mise", "test", "0",
+        sys.executable, "-m", "graph", "test", "0",
         "--in", str(temp_ontology_dir),
         "--build", str(temp_build_dir),
         "--verbose"

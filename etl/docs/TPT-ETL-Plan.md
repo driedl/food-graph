@@ -1,6 +1,6 @@
 # TPT ETL Plan (condensed, actionable)
 
-This document maps the TPT implementation vision into concrete mise stages and artifacts.
+This document maps the TPT implementation vision into concrete graph stages and artifacts.
 
 ## Goals
 - T, TP, and TPT are first‑class in search and navigation.

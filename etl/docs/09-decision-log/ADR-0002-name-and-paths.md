@@ -4,7 +4,7 @@
 **Date:** 2025-10-02
 
 ## Decision
-Name the new ETL package **mise**. Default build root at `etl/build` with the following subdirs:
+Name the new ETL package **graph**. Default build root at `etl/build` with the following subdirs:
 
 - `tmp/` intermediates
 - `out/` API-ready
@@ -13,4 +13,4 @@ Name the new ETL package **mise**. Default build root at `etl/build` with the fo
 - `report/` lints and stage reports
 
 ## Rationale
-Short, memorable; “mise en place” captures the philosophy: prep, order, repeatability.
+Short, memorable; “graph en place” captures the philosophy: prep, order, repeatability.
