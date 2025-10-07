@@ -11,73 +11,45 @@ except Exception as e:
 class LLMError(Exception): ...
 
 DEFAULT_SYSTEM = """
-You map FDC food names to a canonical FoodState for a nutrition graph. Output STRICT JSON only.
-
-RULES
-- Reject mixtures/processed foods (e.g., hummus, sauces, soups, deli meats, breads, cookies): disposition="skip".
-- Use ONLY allowed ids from registries: parts:[...] and transforms:[{id, param_keys[]}].
-- If transforms are uncertain: node_kind="tp" and transforms=[].
-- Prefer the most specific taxon you can justify; if uncertain, back off (lower confidence) or mark "ambiguous".
-- Include ONLY identity-bearing params; omit unknowns.
-
-INPUT
-{"label":"...","category":"...","registries":{"parts":["part:..."],"transforms":[{"id":"tf:...","param_keys":["..."]}]}}
-
-OUTPUT
-{
-  "disposition": "map" | "skip" | "ambiguous",
-  "node_kind": "taxon" | "tp" | "tpt",
-  "identity_json": {
-    "taxon_id": "tx:..." | null,
-    "part_id": "part:..." | null,
-    "transforms": [ { "id":"tf:...", "params": { /* only identity params */ } } ]
-  },
-  "confidence": 0.0-1.0,
-  "reason_short": "≤20 words",
-  "new_taxa": [],
-  "new_parts": [],
-  "new_transforms": []
-}
-
-HEURISTICS
-- Fruits/vegetables: choose botanical part; raw ⇒ "tp".
-- Cereals/legumes (raw): seeds/grain; milling only if name implies it.
-- Animal muscle cuts: part=muscle/cut if indicated.
-- Dairy/yogurt/cheese/sauces/spreads: skip (processed) unless obviously plain milk (not in this pass).
-- Do not map branded or composite names.
-
-MICRO-EXAMPLES
-Input:
-{"label":"Hummus, commercial","category":"Legumes and Legume Products","registries":{"parts":[],"transforms":[]}}
-Output:
-{"disposition":"skip","node_kind":"taxon","identity_json":{"taxon_id":null,"part_id":null,"transforms":[]},"confidence":0.98,"reason_short":"processed mixture","new_taxa":[],"new_parts":[],"new_transforms":[]}
-
-Input:
-{"label":"Apple, raw","category":"Fruits and Fruit Juices","registries":{"parts":["part:fruit"],"transforms":[]}}
-Output:
-{"disposition":"map","node_kind":"tp","identity_json":{"taxon_id":"tx:plantae:rosaceae:malus:domestica","part_id":"part:fruit","transforms":[]},"confidence":0.88,"reason_short":"raw edible fruit","new_taxa":[],"new_parts":[],"new_transforms":[]}
+You will receive a STATIC BLOCK followed by one ITEM per request.
+Return STRICT JSON for that item only—no prose, no markdown, no extra keys.
+If uncertain, choose node_kind="tp" (no transforms) or "ambiguous". Keep params to identity-bearing ones.
 """.strip()
 
-def call_llm(*, model: str, system: str, user: str, max_retries: int = 3, temperature: Optional[float] = None) -> Dict[str, Any]:
+def call_llm(*, model: str, system: str, user: str = None, user_messages: List[str] = None, max_retries: int = 3, temperature: Optional[float] = None, client: OpenAI = None) -> Dict[str, Any]:
     if OpenAI is None:
         raise LLMError("openai SDK not installed. pip install openai>=1.0.0")
     
-    # Check for OpenAI API key
-    api_key = os.environ.get("OPENAI_API_KEY")
-    if not api_key:
-        raise LLMError("OPENAI_API_KEY environment variable is required but not set. Please set it with your OpenAI API key.")
+    # Validate input parameters
+    if user is None and user_messages is None:
+        raise ValueError("Either 'user' or 'user_messages' must be provided")
+    if user is not None and user_messages is not None:
+        raise ValueError("Cannot provide both 'user' and 'user_messages'")
     
-    client = OpenAI(api_key=api_key)
+    # Use provided client or create new one
+    if client is None:
+        api_key = os.environ.get("OPENAI_API_KEY")
+        if not api_key:
+            raise LLMError("OPENAI_API_KEY environment variable is required but not set. Please set it with your OpenAI API key.")
+        client = OpenAI(api_key=api_key)
     last_err: Optional[Exception] = None
     for attempt in range(1, max_retries+1):
         try:
+            # Build messages list
+            messages = [{"role": "system", "content": system or DEFAULT_SYSTEM}]
+            
+            if user is not None:
+                # Single user message (backward compatibility)
+                messages.append({"role": "user", "content": user})
+            else:
+                # Multiple user messages (new multi-message pattern)
+                for user_msg in user_messages:
+                    messages.append({"role": "user", "content": user_msg})
+            
             create_args = {
                 "model": model,
                 "response_format": {"type": "json_object"},
-                "messages": [
-                    {"role": "system", "content": system or DEFAULT_SYSTEM},
-                    {"role": "user", "content": user},
-                ],
+                "messages": messages,
             }
             # gpt-5-mini only supports temperature=1
             if "gpt-5-mini" in (model or "").lower():
@@ -90,11 +62,21 @@ def call_llm(*, model: str, system: str, user: str, max_retries: int = 3, temper
             
             # Add token usage to result for tracking
             if hasattr(resp, 'usage') and resp.usage:
-                result['_token_usage'] = {
-                    'prompt_tokens': resp.usage.prompt_tokens,
-                    'completion_tokens': resp.usage.completion_tokens,
-                    'total_tokens': resp.usage.total_tokens
+                usage = resp.usage
+                token_usage = {
+                    'prompt_tokens': getattr(usage, 'prompt_tokens', 0),
+                    'completion_tokens': getattr(usage, 'completion_tokens', 0),
+                    'total_tokens': getattr(usage, 'total_tokens', 0),
                 }
+                # Add cached tokens if available (for cached input optimization)
+                cached = 0
+                details = getattr(usage, "prompt_tokens_details", None)
+                if isinstance(details, dict):
+                    cached = details.get("cached_tokens", 0)
+                elif details is not None:
+                    cached = getattr(details, "cached_tokens", 0)
+                token_usage['cached_tokens'] = cached
+                result['_token_usage'] = token_usage
             
             return result
         except Exception as e:

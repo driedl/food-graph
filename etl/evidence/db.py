@@ -28,6 +28,7 @@ class GraphDB:
           FROM part_def p
           LEFT JOIN part_synonym ps ON ps.part_id = p.id
           GROUP BY p.id, p.name
+          ORDER BY p.id
         """
         out: List[Part] = []
         for r in self.con.execute(q):

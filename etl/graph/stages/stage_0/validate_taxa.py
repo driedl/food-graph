@@ -14,6 +14,9 @@ data/ontology/taxa/
   fungi/fungi.jsonl
   animalia/animals.jsonl
 
+Validates taxon IDs according to Ontology Bible specifications.
+See /docs/Ontology-bible.md section 1.1-1.3 for complete ID format rules.
+
 Rules (high-level):
 - Strict, contiguous ID paths (no parent skipping). Parent must exist for every node except tx:life.
 - No 'tags' field anywhere.

@@ -66,12 +66,18 @@ def is_base_food_record(rec: Dict[str, Any], include_derived: bool = False) -> b
     if _MIXTURE_RE.search(name):
         return False
 
-    # dairy derived products (cheese, yogurt, cottage, cream) are excluded in base pass
+    # dairy and egg products: allow plain/unsweetened dairy; reject obvious composites/sweetened mixes
     if "dairy and egg products" in cat:
         # eggs may be raw whole/white/yolk only
         if "egg" in name and _RAW_HINT.search(name) and not _CANNED_RE.search(name):
             return True
-        return False
+        # Reject obvious mixes/sweetened/flavored composites
+        if re.search(r"(?i)\b(spread|dip|sauce|dessert|pudding)\b", name):
+            return False
+        if re.search(r"(?i)\b(sweeten|sugar|honey|chocolate|strawberry|vanilla|blueberry|fruit)\b", name):
+            return False
+        # Otherwise allow (milk, cream, butter, plain yogurt, plain cheese, etc.) for TPT mapping
+        return True
 
     # vegetables/fruits: prefer raw fresh whole parts; exclude canned/pickled/juiced/sauced/dried by default
     if "vegetables and vegetable products" in cat or "fruits and fruit juices" in cat:

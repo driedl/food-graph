@@ -86,14 +86,17 @@
         },
         "evidence": {
             "name": "Evidence Toolkit",
-            "description": "Evidence mapping toolkit for FDC FOUNDATION foods using LLM to create FoodState identity proposals",
+            "description": "all logic related to evidence processing",
             "patterns": [
                 "etl/evidence/**/*.py",
-                "etl/evidence/**/*.md"
+                "etl/evidence/**/*.md",
+                "etl/lib/**/*.py"
             ],
             "ignore": [
                 "etl/evidence/**/__pycache__/**",
-                "etl/evidence/**/*.pyc"
+                "etl/evidence/**/*.pyc",
+                "etl/lib/**/__pycache__/**",
+                "etl/lib/**/*.pyc"
             ],
             "includeExtensions": [
                 ".py",

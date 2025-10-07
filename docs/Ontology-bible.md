@@ -6,7 +6,7 @@
 
 We model foods via three building blocks:
 
-* **T (Taxon)**: biological source (e.g., `tx:plantae:oleaceae:olea:europaea`)
+* **T (Taxon)**: biological source (e.g., `tx:plantae:eudicots:oleales:oleaceae:olea:europaea`)
 * **P (Part)**: anatomical or process-derived component (e.g., `part:fillet`, `part:butter`)
 * **TPT (Transformed Product)**: a concrete product of a (T, P) undergoing transforms (e.g., “Cold-smoked salmon”)
 
@@ -18,15 +18,139 @@ Everything downstream (search facets, families, cuisine hints, safety flags) is 
 
 ## 1) IDs & casing
 
-* **Taxa (`tx:*`)**: `tx:segment:segment[: ...]`. A **full ID has no trailing colon**; a **prefix ends with `:`**.
-* **Parts (`part:*`)**: anatomical parts use `part:{specific}` with `category` field; hierarchical parts use `part:{parent}:{child}` only when child is truly a component of parent.
+### 1.1) ID Format Specifications (Technical Reference)
 
-  * `id`: lower_snake
+#### Taxon IDs (`tx:*`)
+* **Format**: `tx:[segment][:segment...]`
+* **Segment Pattern**: `[a-z0-9_]+` (lowercase letters, digits, underscores only)
+* **Minimum Segments**: 2 (e.g., `tx:life`, `tx:plantae`)
+* **Maximum Segments**: No hard limit (practical limit ~10 for readability)
+* **Full ID**: No trailing colon (e.g., `tx:plantae:eudicots:brassicales:brassicaceae:brassica:oleracea`)
+* **Prefix**: Ends with colon for hierarchical queries (e.g., `tx:plantae:eudicots:brassicales:brassicaceae:`)
+* **Examples**:
+  - `tx:life` (root)
+  - `tx:plantae:eudicots:brassicales:brassicaceae:brassica:oleracea:italica` (variety)
+  - `tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus` (species)
+
+#### Part IDs (`part:*`)
+* **Format**: `part:[segment][:segment...]`
+* **Segment Pattern**: `[a-z0-9_]+`
+* **Hierarchical**: Use `part:parent:child` only for true component relationships
+* **Simple**: Use `part:{specific}` with `category` field for most cases
+* **Examples**:
+  - `part:fruit` (simple)
+  - `part:egg:white` (hierarchical - white is component of egg)
+  - `part:muscle:ribeye` (hierarchical - ribeye is cut of muscle)
+
+#### Transform IDs (`tf:*`)
+* **Format**: `tf:[segment]`
+* **Segment Pattern**: `[a-z0-9_]+`
+* **No Hierarchy**: Transforms are flat namespace
+* **One ID → one schema**: Each transform has single definition with stable params
+* **Examples**: `tf:cook`, `tf:ferment`, `tf:clarify_butter`
+
+#### TPT IDs (`tpt:*`)
+* **Format**: `tpt:{taxon_id}:{part_id}:{family}:{identity_hash}`
+* **Identity Hash**: First 12 characters of SHA1 of canonical identity
+* **Family**: Product family ID or "unknown"
+* **Examples**: `tpt:tx:plantae:eudicots:brassicales:brassicaceae:brassica:oleracea:part:fruit:unknown:abc123def456`
+
+#### Attribute IDs (`attr:*`)
+* **Format**: `attr:[segment]`
+* **Segment Pattern**: `[a-z0-9_]+`
+* **Examples**: `attr:salt_level`, `attr:ripeness_bucket`
+
+### 1.2) Validation Rules
+
+* **Contiguous Paths**: No skipping intermediate ranks in taxon hierarchy
+* **Parent Existence**: Every node must have valid parent (except `tx:life`)
+* **Uniqueness**: All IDs must be globally unique within their namespace
+* **File Alignment**: Items in family files must start with that family's ID
+* **Banned Names**: No product names masquerading as taxa (e.g., "Brown Sugar", "Powdered Sugar")
+* **Segment Format**: All segments must match `[a-z0-9_]+` pattern
+* **Hierarchy Acyclicity**: No circular references in parent-child relationships
+
+### 1.3) Rank ladders (kingdom-specific)
+We use kingdom-specific patterns to maximize stability and LLM predictability *without forcing uniform depth*.
+
+**Animal (keep phylum):**  
+`kingdom → phylum → class → order → family → genus → species → [breed]`
+
+**Plant:**  
+`kingdom → major_clade → order → family → genus → species → [cultivar] → [variety]`
+
+**Fungus:**  
+`kingdom → class → order → family → genus → species`
+
+Rationale:
+- Animal phylum (e.g., **Chordata**, **Arthropoda**, **Mollusca**) is stable and widely used in existing data.
+- Plant "division" is de-emphasized in APG; we standardize on a small, stable clade enum at tier2.
+- Fungal phylum adds little practical value for foods; class-level identities are sufficient and more stable across sources.
+
+#### 1.3.1) Plants (major_clade)
+Use the restricted enum for `major_clade`:
+
+`eudicots | monocots | gymnosperms`
+
+Do **not** use deeper APG subclades at tier2 (e.g., `rosids`, `asterids`, `superrosids`, `superasterids`, `magnoliids`).  
+Do **not** use synonyms like `eudicotyledons`/`monocotyledons`; use `eudicots`/`monocots` exactly.
+
+#### 1.3.2) Animals
+Include **phylum** (e.g., `chordata`, `arthropoda`, `mollusca`) before class. Example:
+`tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus`
+
+#### 1.3.3) Fungi
+Tier2 is **class** (e.g., `agaricomycetes`, `saccharomycetes`). Do **not** include division/phylum for fungi.
+
+### 1.4) Kingdom-Specific Rank Terminologies
+
+#### Plants (`tx:plantae`)
+* **Allowed Ranks**: `kingdom`, `family`, `genus`, `species`, `variety`, `cultivar`, `form`
+* **Special Rules**:
+  - No `order` rank - families live directly under kingdom
+  - `variety` for botanical varieties (e.g., `Brassica oleracea var. italica`)
+  - `cultivar` for cultivated varieties (e.g., `Solanum lycopersicum 'Roma'`)
+  - `form` for processing variants (e.g., rice forms)
+
+#### Animals (`tx:animalia`)
+* **Allowed Ranks**: `kingdom`, `phylum`, `class`, `order`, `suborder`, `infraorder`, `family`, `subfamily`, `tribe`, `subtribe`, `genus`, `species`
+* **Special Rules**:
+  - Full biological hierarchy supported
+  - `breed` mentioned in documentation but not implemented as explicit rank
+  - Focus on species-level identification
+
+#### Fungi (`tx:fungi`)
+* **Allowed Ranks**: `kingdom`, `genus`, `species`, `variety`, `form`
+* **Special Rules**:
+  - Simplified hierarchy
+  - `variety` for fungal varieties
+  - `form` for processing variants
+
+### 1.4) Part System Details
+
+* **Core Parts**: Biological/anatomical + primary process parts (e.g., milk, cream, muscle, fruit)
+  * `id`: lower_snake_case
   * `kind`: `"plant" | "animal" | "fungus" | "derived"`
   * `category` (required): clarifies role and enables filtering (e.g., `organ`, `cut`, `egg`, `grain`, `fruit`, `dairy`, `oil`, `muscle`, `fat`, `bone`)
-  * `parent_id`: explicit; hierarchy must be acyclic.
-* **Transforms (`tf:*`)**: `tf:[a-z0-9_]+`. One ID → one schema, one `order`, stable params.
-* **Names**: `display_name` Title Case; synonyms are plain strings (no qualifiers like `(salted)`).
+  * `parent_id`: explicit; hierarchy must be acyclic
+* **Derived Parts**: Product parts (butter, yogurt, hard cheese, lard, ghee, oil:virgin/refined, fillet)
+  * Same schema as core parts
+  * MUST set `kind:"derived"` and `parent_id` pointing to core part
+* **Names**: `display_name` Title Case; synonyms are plain strings (no qualifiers like `(salted)`)
+
+### 1.5) Implementation Guidelines for 3rd Parties
+
+#### ID Generation Algorithm
+1. **Validate Segment Format**: Ensure each segment matches `[a-z0-9_]+`
+2. **Check Parent Existence**: Verify parent ID exists in hierarchy
+3. **Enforce Contiguity**: No skipping intermediate ranks
+4. **Validate Kingdom Rules**: Apply kingdom-specific rank constraints
+5. **Ensure Uniqueness**: Check against existing ID registry
+
+#### File Organization
+* **Taxa Files**: Group by family, use family ID as file prefix
+* **Naming Convention**: `{Family}--{description}.jsonl`
+
 
 ---
 

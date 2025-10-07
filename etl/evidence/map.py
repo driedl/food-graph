@@ -12,6 +12,127 @@ from .lib.fdc import load_foundation_foods_json, filter_nutrients_for_foods, loa
 from .lib.llm import call_llm, DEFAULT_SYSTEM
 from .db import GraphDB
 
+
+def build_static_header(parts: List[Dict[str, Any]], transforms: List[Dict[str, Any]]) -> str:
+    """
+    Stable, cache-friendly header placed BEFORE per-item JSON.
+    - Includes full registries (no count trimming).
+    - Encodes your Bible rules for IDs and dairy policy.
+    - JSON is minified and sorted to keep a stable byte prefix across calls.
+    """
+    # Sort registries by id to keep stable ordering
+    parts_sorted = sorted(parts, key=lambda p: p.get("id",""))
+    tfs_sorted = sorted(transforms, key=lambda t: (t.get("order", 999), t.get("id","")))
+
+    # We include names to aid the LLM; synonyms are optional (can add later if helpful).
+    # For transforms, include id, name, order, and full param schema (identity_param flag included).
+    header = {
+      "version": "static-v2a",
+      "id_rules": {
+        "notes": [
+          "Taxon IDs start at kingdom (never domain). Use lowercase snake segments.",
+          "Kingdom-specific tier2 for stability and predictability:",
+          "- Animal: phylum then class (e.g., chordata → mammalia/aves/actinopterygii).",
+          "- Plant: major clade (restricted enum: eudicots | monocots | gymnosperms).",
+          "- Fungus: class (e.g., agaricomycetes, saccharomycetes).",
+          "Do not include division/phylum for plants/fungi.",
+          "Ranks are plain segments (no cv:/var: prefixes). If known, append after species in this order: [:<cultivar>][:<variety>][:<breed>].",
+          "Back off progressively on uncertainty: species→genus→family (lower confidence). Do not invent placeholders."
+        ],
+        "preferred_ladders": {
+          "animal": "tx:animalia:<phylum>:<class>:<order>:<family>:<genus>:<species>[:<breed>]",
+          "plant":  "tx:plantae:<clade>:<order>:<family>:<genus>:<species>[:<cultivar>][:<variety>]",
+          "fungus": "tx:fungi:<class>:<order>:<family>:<genus>:<species>"
+        },
+        "enums": {
+          "plant_clade": ["eudicots","monocots","gymnosperms"]
+        },
+        "forbid_by_kingdom": {
+          "animalia": {
+            "ranks": []
+          },
+          "plantae": {
+            "ranks": ["division","subdivision","phylum","subphylum"],
+            "plant_tier2_values": ["rosids","asterids","superrosids","superasterids","magnoliids","eudicotyledons","monocotyledons"]
+          },
+          "fungi": {
+            "ranks": ["division","subdivision","phylum","subphylum"]
+          }
+        }
+      },
+      "mapping_policies": {
+        "mixtures": "Reject true multi-ingredient composites that cannot be expressed as transforms on a single (taxon,part).",
+        "dairy": "Allowed. Many FDC foundation items are TPT: e.g., ferment/strain/pasteurize/clarify. Use transforms with identity params.",
+        "single_ingredient_derivatives": "Allowed as TP (derived parts) or TPT when the process must be explicit (e.g., virgin/refined oil).",
+        "when_uncertain": "Choose tp and omit transforms, or mark ambiguous when even taxon/part is unsafe."
+      },
+      "output_contract": {
+        "disposition": ["map","skip","ambiguous"],
+        "node_kind": ["taxon","tp","tpt"],
+        "identity_json": {
+          "taxon_id": "tx:... or null",
+          "part_id": "part:... or null",
+          "transforms": [{"id":"tf:...","params":"only identity params"}]
+        },
+        "confidence": "0..1",
+        "reason_short": "≤20 words",
+        "new_taxa": [],
+        "new_parts": [],
+        "new_transforms": []
+      },
+      "registries": {
+        "parts": [
+          {"id": p.get("id"), "name": p.get("name"), "synonyms": p.get("synonyms", [])} for p in parts_sorted
+        ],
+        "transforms": [
+          {
+            "id": t.get("id"),
+            "name": t.get("name"),
+            "order": t.get("order", 999),
+            "params": t.get("params", [])
+          } for t in tfs_sorted
+        ]
+      },
+      "micro_examples": [
+        {
+          "input": {"label":"Greek yogurt, plain","category":"Dairy and Egg Products"},
+          "output": {
+            "disposition":"map",
+            "node_kind":"tpt",
+            "identity_json":{
+              "taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus",
+              "part_id":"part:milk",
+              "transforms":[
+                {"id":"tf:ferment","params":{"starter":"yogurt_thermo"}},
+                {"id":"tf:strain","params":{"strain_level":6}}
+              ]
+            },
+            "confidence":0.85,
+            "reason_short":"cultured then strained dairy",
+            "new_taxa":[],"new_parts":[],"new_transforms":[]
+          }
+        },
+        {
+          "input": {"label":"Apple, raw","category":"Fruits and Fruit Juices"},
+          "output": {
+            "disposition":"map",
+            "node_kind":"tp",
+            "identity_json":{
+              "taxon_id":"tx:plantae:eudicots:rosales:rosaceae:malus:domestica",
+              "part_id":"part:fruit",
+              "transforms":[]
+            },
+            "confidence":0.88,
+            "reason_short":"raw edible fruit",
+            "new_taxa":[],"new_parts":[],"new_transforms":[]
+          }
+        }
+      ]
+    }
+
+    # Minified JSON string (stable separators) + a simple sentinel header
+    return "### STATIC\n" + json.dumps(header, ensure_ascii=False, separators=(",",":"), sort_keys=True) + "\n### END_STATIC"
+
 # Load environment variables
 load_env()
 
@@ -118,30 +239,6 @@ def _soft_validate_and_log(obj: Dict[str, Any], gdb: GraphDB, log_file_path: Pat
                 with log_file_path.open("a", encoding="utf-8") as f:
                     f.write(f"[VALIDATION_ERROR] {fid} | param validation failed: {e}\n")
 
-def _prompt(food: Dict[str,Any], parts: List[Dict[str,Any]], transforms: List[Dict[str,Any]]) -> str:
-    # Token-lean registries: only IDs, and param key lists (no types/names)
-    parts_ids = [p.get("id") for p in parts if p.get("id")]
-    tf_compact = []
-    for t in transforms:
-        tf_compact.append({
-            "id": t.get("id"),
-            "param_keys": [p.get("key") for p in (t.get("params") or []) if p.get("key")]
-        })
-    input_data = {
-        "label": food.get('name', ''),
-        "category": food.get("category", ""),
-        "registries": {
-            "parts": parts_ids,
-            "transforms": tf_compact
-        }
-    }
-    
-    return f"""Map this FDC food record to a canonical FoodState.
-
-Input:
-{json.dumps(input_data, separators=(',',':'))}
-
-Output the JSON response as specified in the system prompt."""
 
 def main():
     ap = argparse.ArgumentParser(prog="evidence-map", description="Map FDC FOUNDATION foods to FoodState identity (JSONL only).")
@@ -162,7 +259,6 @@ def main():
     ap.add_argument("--topk", type=int, default=15)
     ap.add_argument("--limit", type=int, default=5, help="Limit number of foods processed (default: 5)")
     ap.add_argument("--prompt-only", action="store_true", help="Generate and log the full prompt, then exit without calling LLM")
-    ap.add_argument("--registry-limit", type=int, default=0, help="If >0, cap number of parts/transforms included in registries to reduce tokens")
     ap.add_argument("--include-derived", action="store_true", help="Include single-ingredient derivatives (oils, flours, salt/sugar, tahini).")
     ap.add_argument("--use-candidates", action="store_true", help="(Phase 2) inject search candidates; off by default.")
     ap.add_argument("--nutrient-registry", default="data/ontology/nutrients-infoods.json", help="Path to INFOODS registry.")
@@ -205,7 +301,7 @@ def main():
         debug_bad_dir.mkdir(parents=True, exist_ok=True)
     
     # Track timing and tokens
-    timing_stats = {"total_time": 0, "per_food_times": [], "total_tokens": 0, "input_tokens": 0, "output_tokens": 0}
+    timing_stats = {"total_time": 0, "per_food_times": [], "total_tokens": 0, "input_tokens": 0, "output_tokens": 0, "cached_tokens": 0}
     
     log_file_path = logs_dir / "map.log"
     with log_file_path.open("a", encoding="utf-8") as log_file:
@@ -246,14 +342,15 @@ def main():
         order_val = getattr(t, "order", None)
         if order_val is not None:
             obj["order"] = order_val
-        params_val = _only_identity_params(getattr(t, "params", None))
-        if params_val:
+        # Use the full param schema; don't trim to identity only
+        params_val = getattr(t, "params", None)
+        if params_val is not None:
             obj["params"] = params_val
         return obj
     transforms = [ _min_transform(t) for t in gdb.transforms() ]
-    if args.registry_limit and args.registry_limit > 0:
-        parts = parts[:args.registry_limit]
-        transforms = transforms[:args.registry_limit]
+
+    # Build the cache-friendly static header once (no timestamps, no dynamic fields)
+    static_header = build_static_header(parts, transforms)
 
     # 2) Load existing foods.jsonl to create exclusion map for resume
     existing_foods = set()
@@ -400,6 +497,13 @@ def main():
     ambiguous_count = 0
     error_count = 0
     
+    # Create OpenAI client once for session continuity
+    from openai import OpenAI
+    api_key = os.environ.get("OPENAI_API_KEY")
+    if not api_key:
+        raise RuntimeError("OPENAI_API_KEY environment variable is required but not set.")
+    openai_client = OpenAI(api_key=api_key)
+    
     for food in norm_foods:
         fid = food["food_id"]
         if fid in existing:
@@ -419,7 +523,27 @@ def main():
         # Phase-2: cands optional
         if args.use_candidates:
             _ = gdb.search_candidates(name, topk=args.topk)  # not injected yet
-        prompt = _prompt(food, parts, transforms)
+        
+        # Build per-item prompt with static header
+        item = {
+            "label": food.get("name",""),
+            "category": food.get("category",""),
+        }
+        
+        prompt = (
+            static_header
+            + "\n### ITEM\n"
+            + json.dumps(item, ensure_ascii=False, separators=(",",":"))
+            + "\n### RESPOND_WITH_JSON_ONLY"
+        )
+        
+        # Debug: Check if static header is long enough for caching (>1024 tokens)
+        if args.debug_prompts:
+            # Rough token estimation (4 chars per token)
+            header_tokens = len(static_header) // 4
+            print(f"[DEBUG] Static header length: {len(static_header)} chars (~{header_tokens} tokens)")
+            if header_tokens < 1024:
+                print(f"[DEBUG] WARNING: Static header too short for caching (need >1024 tokens)")
         
         # Debug logging for prompts
         if args.debug_prompts:
@@ -427,7 +551,7 @@ def main():
                 "food_id": fid,
                 "food_name": name,
                 "system": DEFAULT_SYSTEM,
-                "user_prompt": prompt
+                "prompt": prompt
             }
             with (debug_prompts_dir / f"{fid.replace(':', '_')}.json").open("w", encoding="utf-8") as f:
                 json.dump(prompt_data, f, ensure_ascii=False, indent=2)
@@ -446,19 +570,22 @@ def main():
         
         try:
             llm_start = time.time()
-            # Call LLM with token tracking
-            response = call_llm(model=args.model, system=DEFAULT_SYSTEM, user=prompt, max_retries=1, temperature=temperature)
+            # Call LLM with single user message for cached input optimization
+            response = call_llm(model=args.model, system=DEFAULT_SYSTEM, user=prompt, max_retries=1, temperature=temperature, client=openai_client)
             llm_time_ms = int((time.time() - llm_start) * 1000)
             
             # Extract token usage if available
             input_tokens = 0
             output_tokens = 0
+            cached_tokens = 0
             if isinstance(response, dict) and '_token_usage' in response:
                 usage = response['_token_usage']
                 input_tokens = usage['prompt_tokens']
                 output_tokens = usage['completion_tokens']
+                cached_tokens = usage.get('cached_tokens', 0)
                 timing_stats["input_tokens"] += input_tokens
                 timing_stats["output_tokens"] += output_tokens
+                timing_stats["cached_tokens"] += cached_tokens
                 timing_stats["total_tokens"] += usage['total_tokens']
                 # Remove token usage from the response object
                 del response['_token_usage']
@@ -535,8 +662,8 @@ def main():
             # Log per-food metrics
             food_time = time.time() - food_start
             with log_file_path.open("a", encoding="utf-8") as f:
-                f.write(f"[METRICS] {fid} | llm={llm_time_ms}ms | tokens={input_tokens}+{output_tokens} | total={food_time:.1f}s\n")
-            print(f"[METRICS] {fid} | llm={llm_time_ms}ms | tokens={input_tokens}+{output_tokens} | total={food_time:.1f}s")
+                f.write(f"[METRICS] {fid} | llm={llm_time_ms}ms | tokens={input_tokens}+{cached_tokens}+{output_tokens} | total={food_time:.1f}s\n")
+            print(f"[METRICS] {fid} | llm={llm_time_ms}ms | tokens={input_tokens}+{cached_tokens}+{output_tokens} | total={food_time:.1f}s")
             
             processed += 1
             timing_stats["per_food_times"].append(food_time)
@@ -566,10 +693,11 @@ def main():
     num_items = len(timing_stats["per_food_times"]) or 1
     avg_input_tokens = timing_stats["input_tokens"] / num_items
     avg_output_tokens = timing_stats["output_tokens"] / num_items
+    avg_cached_tokens = timing_stats["cached_tokens"] / num_items
     
     with log_file_path.open("a", encoding="utf-8") as f:
         f.write(f"[done] processed={processed} accepted={accepted_count} skipped={skipped_count} ambiguous={ambiguous_count} errors={error_count} total_time={timing_stats['total_time']:.2f}s avg_per_food={avg_time_per_food:.2f}s\n")
-        f.write(f"[tokens] input={timing_stats['input_tokens']} output={timing_stats['output_tokens']} total={timing_stats['total_tokens']} avg_input={avg_input_tokens:.1f} avg_output={avg_output_tokens:.1f}\n")
+        f.write(f"[tokens] input={timing_stats['input_tokens']} cached={timing_stats['cached_tokens']} output={timing_stats['output_tokens']} total={timing_stats['total_tokens']} avg_input={avg_input_tokens:.1f} avg_cached={avg_cached_tokens:.1f} avg_output={avg_output_tokens:.1f}\n")
 
     # Acceptance summary (Phase-1)
     accept = {

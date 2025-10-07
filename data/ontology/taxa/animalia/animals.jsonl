@@ -9,7 +9,7 @@
 
 // Bovidae (cattle, sheep, goats, etc.)
 {"id": "tx:animalia:chordata:mammalia:artiodactyla:bovidae", "parent": "tx:animalia:chordata:mammalia:artiodactyla", "rank": "family", "display_name": "Bovidae", "latin_name": "Bovidae", "aliases": []}
-{"id": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos", "parent": "tx:animalia:chordata:mammalia:artiodactyla:bovidae", "rank": "genus", "display_name": "Cattle (genus)", "latin_name": "Bos", "aliases": []}
+{"id": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos", "parent": "tx:animalia:chordata:mammalia:artiodactyla:bovidae", "rank": "genus", "display_name": "Cattle", "latin_name": "Bos", "aliases": []}
 {"id": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus", "parent": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos", "rank": "species", "display_name": "Cow", "latin_name": "Bos taurus", "aliases": ["cow"]}
 {"id": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:ovis", "parent": "tx:animalia:chordata:mammalia:artiodactyla:bovidae", "rank": "genus", "display_name": "Ovis", "latin_name": "Ovis", "aliases": []}
 {"id": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:ovis:aries", "parent": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:ovis", "rank": "species", "display_name": "Sheep (lamb)", "latin_name": "Ovis aries", "aliases": ["lamb", "mutton"]}

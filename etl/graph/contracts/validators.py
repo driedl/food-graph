@@ -608,10 +608,13 @@ def _validate_parameter_consistency_json(path: Path, obj: Any, validator: Dict[s
 # ============================================================================
 
 def _validate_id_format_consistency(path: Path, lines: List[dict], validator: Dict[str, Any]) -> List[str]:
-    """Validate ID format consistency using regex patterns - no data maintenance needed"""
+    """Validate ID format consistency using regex patterns - no data maintenance needed
+    
+    Patterns based on Ontology Bible specifications (/docs/Ontology-bible.md section 1.1)
+    """
     errs: List[str] = []
     
-    # Define ID patterns programmatically
+    # Define ID patterns programmatically based on Ontology Bible
     patterns = {
         "part": r"^part:[a-z0-9_]+(:[a-z0-9_]+)*$",
         "transform": r"^tf:[a-z0-9_]+$", 

@@ -1,216 +1,57 @@
-
-=== SYSTEM INSTRUCTIONS BEGIN ===
-You map FDC food names to a canonical FoodState for a nutrition graph. Output STRICT JSON only.
-
-RULES
-- Reject mixtures/processed foods (e.g., hummus, sauces, soups, deli meats, breads, cookies): disposition="skip".
-- Use ONLY allowed ids from registries: parts:[...] and transforms:[{id, param_keys[]}].
-- If transforms are uncertain: node_kind="tp" and transforms=[].
-- Prefer the most specific taxon you can justify; if uncertain, back off (lower confidence) or mark "ambiguous".
-- Include ONLY identity-bearing params; omit unknowns.
-
-INPUT
-{"label":"...","category":"...","registries":{"parts":["part:..."],"transforms":[{"id":"tf:...","param_keys":["..."]}]}}
-
-OUTPUT
-{
-  "disposition": "map" | "skip" | "ambiguous",
-  "node_kind": "taxon" | "tp" | "tpt",
-  "identity_json": {
-    "taxon_id": "tx:..." | null,
-    "part_id": "part:..." | null,
-    "transforms": [ { "id":"tf:...", "params": { /* only identity params */ } } ]
-  },
-  "confidence": 0.0-1.0,
-  "reason_short": "≤20 words",
-  "new_taxa": [],
-  "new_parts": [],
-  "new_transforms": []
-}
-
-HEURISTICS
-- Fruits/vegetables: choose botanical part; raw ⇒ "tp".
-- Cereals/legumes (raw): seeds/grain; milling only if name implies it.
-- Animal muscle cuts: part=muscle/cut if indicated.
-- Dairy/yogurt/cheese/sauces/spreads: skip (processed) unless obviously plain milk (not in this pass).
-- Do not map branded or composite names.
-
-MICRO-EXAMPLES
-Input:
-{"label":"Hummus, commercial","category":"Legumes and Legume Products","registries":{"parts":[],"transforms":[]}}
-Output:
-{"disposition":"skip","node_kind":"taxon","identity_json":{"taxon_id":null,"part_id":null,"transforms":[]},"confidence":0.98,"reason_short":"processed mixture","new_taxa":[],"new_parts":[],"new_transforms":[]}
-
-Input:
-{"label":"Apple, raw","category":"Fruits and Fruit Juices","registries":{"parts":["part:fruit"],"transforms":[]}}
-Output:
-{"disposition":"map","node_kind":"tp","identity_json":{"taxon_id":"tx:plantae:rosaceae:malus:domestica","part_id":"part:fruit","transforms":[]},"confidence":0.88,"reason_short":"raw edible fruit","new_taxa":[],"new_parts":[],"new_transforms":[]}
-=== SYSTEM INSTRUCTIONS END ===
-
---- PROMPT BEGIN ---
-Map this FDC food record to a canonical FoodState.
-
-Input:
-{"label":"Peaches, yellow, raw","category":"Fruits and Fruit Juices","registries":{"parts":["part:belly","part:bone","part:bran","part:breast","part:brisket","part:bulb","part:butter","part:buttermilk","part:cheese","part:cheese:hard","part:cheese:soft","part:cream","part:curd","part:egg","part:egg:white","part:egg:yolk","part:endosperm","part:expressed_juice","part:expressed_oil","part:fat","part:fat:leaf","part:fat:subcutaneous","part:fermented_milk","part:fillet","part:flower","part:fruit","part:fruit:peel","part:fruit:peel:albedo","part:fruit:peel:flavedo","part:fruiting_body","part:fruiting_body:cap","part:fruiting_body:stipe","part:germ","part:ghee","part:grain","part:heart","part:hull","part:kernel","part:kidney","part:lard","part:leaf","part:leg","part:liver","part:loin","part:marrow","part:milk","part:muscle","part:oil","part:oil:refined","part:oil:virgin","part:okara","part:plant_milk","part:rhizome","part:roe","part:root","part:round","part:seed","part:skin","part:stem","part:tofu","part:tofu_serum","part:tuber","part:whey","part:yogurt"],"transforms":[{"id":"tf:pasteurize","param_keys":[]},{"id":"tf:skim","param_keys":[]},{"id":"tf:homogenize","param_keys":[]},{"id":"tf:standardize_fat","param_keys":[]},{"id":"tf:soak","param_keys":[]},{"id":"tf:separate","param_keys":[]},{"id":"tf:trim","param_keys":[]},{"id":"tf:sprout","param_keys":[]},{"id":"tf:brine","param_keys":[]},{"id":"tf:coagulate","param_keys":[]},{"id":"tf:ferment","param_keys":[]},{"id":"tf:strain","param_keys":[]},{"id":"tf:blanch","param_keys":[]},{"id":"tf:cook_curd","param_keys":[]},{"id":"tf:press","param_keys":[]},{"id":"tf:dry","param_keys":[]},{"id":"tf:stretch","param_keys":[]},{"id":"tf:churn","param_keys":[]},{"id":"tf:dehull","param_keys":[]},{"id":"tf:split","param_keys":[]},{"id":"tf:clarify_butter","param_keys":[]},{"id":"tf:mill","param_keys":[]},{"id":"tf:salt","param_keys":["salt_pct"]},{"id":"tf:polish","param_keys":[]},{"id":"tf:cure","param_keys":["style","nitrite_ppm"]},{"id":"tf:enrich","param_keys":[]},{"id":"tf:evaporate","param_keys":[]},{"id":"tf:roast","param_keys":[]},{"id":"tf:smoke","param_keys":["mode"]},{"id":"tf:add_sugar","param_keys":[]},{"id":"tf:cook","param_keys":[]},{"id":"tf:age","param_keys":[]},{"id":"tf:can","param_keys":[]},{"id":"tf:refine_oil","param_keys":[]}]}}
-
-Output the JSON response as specified in the system prompt.
---- PROMPT END ---
-[done] processed=5 rejected=0 total_time=1.13s avg_per_food=0.00s
-[tokens] input=0 output=0 total=0 avg_input=0.0 avg_output=0.0
-[2025-10-06T20:30:01.766982] run start model=gpt-5-mini min_conf=0.7 topk=15 limit=10
+[2025-10-07T23:14:11.994924] run start model=gpt-5-mini min_conf=0.7 topk=15 limit=20
+[FOOD] fdc:321359 | Milk, reduced fat, fluid, 2% milkfat, with added vitamin A and vitamin D
+[METRICS] fdc:321359 | llm=30974ms | tokens=3709+0+1920 | total=31.0s
+[FOOD] fdc:321360 | Tomatoes, grape, raw
+[MISSING_TAXON] fdc:321360 | tx:plantae:eudicots:solanales:solanaceae:solanum:lycopersicum:grape
+[METRICS] fdc:321360 | llm=11300ms | tokens=3695+0+675 | total=11.3s
+[FOOD] fdc:321505 | Salt, table, iodized
+[METRICS] fdc:321505 | llm=17729ms | tokens=3694+0+1035 | total=17.7s
+[FOOD] fdc:321900 | Broccoli, raw
+[MISSING_TAXON] fdc:321900 | tx:plantae:eudicots:brassicales:brassicaceae:brassica:oleracea:italica
+[METRICS] fdc:321900 | llm=16155ms | tokens=3693+0+1036 | total=16.2s
+[FOOD] fdc:322228 | Milk, lowfat, fluid, 1% milkfat, with added vitamin A and vitamin D
+[METRICS] fdc:322228 | llm=15389ms | tokens=3709+0+1564 | total=15.4s
+[BATCH] processed=5 accepted=4 skipped=1 ambiguous=0 errors=0 avg_time=18.33s
+[FOOD] fdc:322559 | Milk, nonfat, fluid, with added vitamin A and vitamin D (fat free or skim)
+[METRICS] fdc:322559 | llm=17325ms | tokens=3709+3584+1351 | total=17.3s
+[FOOD] fdc:322892 | Milk, whole, 3.25% milkfat, with added vitamin D
+[METRICS] fdc:322892 | llm=9732ms | tokens=3705+0+709 | total=9.8s
+[FOOD] fdc:323444 | Cheese, ricotta, whole milk
+[METRICS] fdc:323444 | llm=24087ms | tokens=3697+0+1427 | total=24.1s
+[FOOD] fdc:323505 | Kale, raw
+[MISSING_TAXON] fdc:323505 | tx:plantae:eudicots:brassicales:brassicaceae:brassica:oleracea:sabellica
+[METRICS] fdc:323505 | llm=13759ms | tokens=3693+3584+746 | total=13.8s
+[FOOD] fdc:323604 | Egg, whole, raw, frozen, pasteurized
+[MISSING_TAXON] fdc:323604 | tx:animalia:chordata:aves:galliformes:phasianidae:gallus:gallus_gallus:domesticus
+[METRICS] fdc:323604 | llm=29415ms | tokens=3699+0+1529 | total=29.4s
+[BATCH] processed=10 accepted=9 skipped=1 ambiguous=0 errors=0 avg_time=18.60s
+[FOOD] fdc:323697 | Egg, white, raw, frozen, pasteurized
+[MISSING_TAXON] fdc:323697 | tx:animalia:chordata:mammalia:galliformes:phasianidae:gallus:domesticus
+[METRICS] fdc:323697 | llm=22149ms | tokens=3699+0+1653 | total=22.2s
+[FOOD] fdc:323793 | Egg, white, dried
+[METRICS] fdc:323793 | llm=23366ms | tokens=3694+0+1459 | total=23.4s
+[FOOD] fdc:325036 | Cheese, parmesan, grated
+[METRICS] fdc:325036 | llm=22027ms | tokens=3695+0+1503 | total=22.0s
+[FOOD] fdc:325198 | Cheese, pasteurized process, American, vitamin D fortified
+[METRICS] fdc:325198 | llm=28049ms | tokens=3701+0+1769 | total=28.1s
+[FOOD] fdc:325430 | Peaches, yellow, raw
+[MISSING_TAXON] fdc:325430 | tx:plantae:eudicots:rosales:rosaceae:prunus:persica
+[METRICS] fdc:325430 | llm=8060ms | tokens=3696+0+474 | total=8.1s
+[BATCH] processed=15 accepted=14 skipped=1 ambiguous=0 errors=0 avg_time=19.32s
+[FOOD] fdc:326135 | Cheese, swiss
+[METRICS] fdc:326135 | llm=33190ms | tokens=3693+3584+1378 | total=33.2s
 [FOOD] fdc:327046 | Kiwifruit, green, raw
-[METRICS] fdc:327046 | llm=15352ms | tokens=1387+827 | total=15.4s
+[MISSING_TAXON] fdc:327046 | tx:plantae:eudicots:ericales:actinidiaceae:actinidia:deliciosa
+[METRICS] fdc:327046 | llm=10562ms | tokens=3698+0+552 | total=10.6s
 [FOOD] fdc:327198 | Melons, cantaloupe, raw
-[METRICS] fdc:327198 | llm=12605ms | tokens=1387+697 | total=12.6s
+[MISSING_TAXON] fdc:327198 | tx:plantae:eudicots:cucurbitales:cucurbitaceae:cucumis:melo
+[METRICS] fdc:327198 | llm=11462ms | tokens=3698+0+545 | total=11.5s
 [FOOD] fdc:327357 | Nectarines, raw
-[MISSING_TAXON] fdc:327357 | tx:plantae:rosaceae:prunus:persica:var:nucipersica
-[METRICS] fdc:327357 | llm=14273ms | tokens=1384+963 | total=14.3s
+[MISSING_TAXON] fdc:327357 | tx:plantae:eudicots:rosales:rosaceae:prunus:persica:nucipersica
+[METRICS] fdc:327357 | llm=17712ms | tokens=3695+3584+1250 | total=17.7s
 [FOOD] fdc:327501 | Oranges, raw, navels (Includes foods for USDA's Food Distribution Program)
-[METRICS] fdc:327501 | llm=10258ms | tokens=1396+756 | total=10.3s
-[FOOD] fdc:327699 | Strawberries, raw
-[MISSING_TAXON] fdc:327699 | tx:plantae:rosaceae:fragaria:ananassa
-[METRICS] fdc:327699 | llm=11615ms | tokens=1384+501 | total=11.6s
-[BATCH] processed=5 rejected=0 avg_time=12.84s
-[FOOD] fdc:327923 | Lettuce, cos or romaine, raw
-[METRICS] fdc:327923 | llm=9800ms | tokens=1388+500 | total=9.8s
-[FOOD] fdc:329596 | Egg, yolk, raw, frozen, pasteurized
-[MISSING_TAXON] fdc:329596 | tx:animalia:chordata:aves:gallus:gallus
-[METRICS] fdc:329596 | llm=17975ms | tokens=1389+1298 | total=18.0s
-[FOOD] fdc:330869 | Turkey, ground, 93% lean, 7% fat, pan-broiled crumbles
-[MISSING_TAXON] fdc:330869 | tx:animalia:aves:phasianidae:meleagris:gallopavo
-[METRICS] fdc:330869 | llm=19520ms | tokens=1397+1319 | total=19.5s
-[FOOD] fdc:332597 | Pears, raw, bartlett (Includes foods for USDA's Food Distribution Program)
-[METRICS] fdc:332597 | llm=8511ms | tokens=1396+499 | total=8.5s
-[FOOD] fdc:332791 | Olives, green, Manzanilla, stuffed with pimiento
-[METRICS] fdc:332791 | llm=8060ms | tokens=1392+487 | total=8.1s
-[BATCH] processed=10 rejected=1 avg_time=12.82s
-[done] processed=10 rejected=1 total_time=128.90s avg_per_food=12.82s
-[tokens] input=13900 output=7847 total=21747 avg_input=1390.0 avg_output=784.7
-[2025-10-06T20:41:01.031889] run start model=gpt-5-mini min_conf=0.7 topk=15 limit=30
-[FOOD] fdc:333374 | Fish, haddock, raw
-[MISSING_TAXON] fdc:333374 | tx:animalia:gadidae:melanogrammus:aeglefinus
-[METRICS] fdc:333374 | llm=13961ms | tokens=1385+889 | total=14.0s
-[FOOD] fdc:333476 | Fish, pollock, raw
-[MISSING_TAXON] fdc:333476 | tx:animalia:chordata:gadus:chalcogrammus
-[METRICS] fdc:333476 | llm=14076ms | tokens=1385+1209 | total=14.1s
-[FOOD] fdc:334849 | Beef, loin, top loin steak, boneless, lip-on, separable lean only, trimmed to 1/8" fat, choice, raw
-[MISSING_TAXON] fdc:334849 | tx:animalia:mammalia:bovidae:bos:taurus
-[METRICS] fdc:334849 | llm=20470ms | tokens=1408+1258 | total=20.5s
-[FOOD] fdc:334898 | Beef, round, eye of round roast, boneless, separable lean only, trimmed to 0" fat, select, raw
-[METRICS] fdc:334898 | llm=16030ms | tokens=1404+1263 | total=16.1s
-[FOOD] fdc:334963 | Beef, round, top round roast, boneless, separable lean only, trimmed to 0" fat, select, raw
-[MISSING_TAXON] fdc:334963 | tx:animalia:chordata:mammalia:cetartiodactyla:bovidae:bos:taurus
-[METRICS] fdc:334963 | llm=22305ms | tokens=1403+1520 | total=22.3s
-[BATCH] processed=5 rejected=0 avg_time=17.39s
-[FOOD] fdc:335109 | Beef, short loin, porterhouse steak, separable lean only, trimmed to 1/8" fat, select, raw
-[METRICS] fdc:335109 | llm=26767ms | tokens=1403+1322 | total=26.8s
-[FOOD] fdc:746759 | Beef, loin, top loin steak, boneless, lip-on, separable lean only, trimmed to 1/8" fat, choice, raw
-[METRICS] fdc:746759 | llm=24550ms | tokens=1408+1324 | total=24.6s
-[FOOD] fdc:746760 | Beef, round, eye of round roast, boneless, separable lean only, trimmed to 0" fat, select, raw
-[METRICS] fdc:746760 | llm=17009ms | tokens=1404+1202 | total=17.0s
-[FOOD] fdc:746761 | Beef, round, top round roast, boneless, separable lean only, trimmed to 0" fat, select, raw
-[METRICS] fdc:746761 | llm=30882ms | tokens=1403+1775 | total=30.9s
-[FOOD] fdc:746762 | Beef, short loin, porterhouse steak, separable lean only, trimmed to 1/8" fat, select, raw
-[MISSING_TAXON] fdc:746762 | tx:animalia:chordata:mammalia:bovidae:bos:taurus
-[METRICS] fdc:746762 | llm=25611ms | tokens=1403+1452 | total=25.6s
-[BATCH] processed=10 rejected=0 avg_time=21.18s
-[FOOD] fdc:746769 | Lettuce, cos or romaine, raw
-[METRICS] fdc:746769 | llm=7950ms | tokens=1388+504 | total=8.0s
-[FOOD] fdc:746770 | Melons, cantaloupe, raw
-[METRICS] fdc:746770 | llm=8601ms | tokens=1387+500 | total=8.6s
-[FOOD] fdc:746771 | Oranges, raw, navels
-[METRICS] fdc:746771 | llm=11244ms | tokens=1386+754 | total=11.3s
-[FOOD] fdc:746773 | Pears, raw, bartlett
-[METRICS] fdc:746773 | llm=11648ms | tokens=1386+758 | total=11.7s
-[FOOD] fdc:746785 | Turkey, ground, 93% lean, 7% fat, pan-broiled crumbles
-[MISSING_TAXON] fdc:746785 | tx:animalia:aves:phasianidae:meleagris:gallopavo
-[METRICS] fdc:746785 | llm=23481ms | tokens=1397+1467 | total=23.5s
-[BATCH] processed=15 rejected=0 avg_time=18.32s
-[FOOD] fdc:747447 | Broccoli, raw
-[METRICS] fdc:747447 | llm=9273ms | tokens=1382+507 | total=9.3s
-[FOOD] fdc:747448 | Strawberries, raw
-[MISSING_TAXON] fdc:747448 | tx:plantae:rosaceae:fragaria:ananassa
-[METRICS] fdc:747448 | llm=10411ms | tokens=1384+628 | total=10.4s
-[FOOD] fdc:790577 | Onions, red, raw
-[METRICS] fdc:790577 | llm=10623ms | tokens=1384+628 | total=10.6s
-[FOOD] fdc:790646 | Onions, yellow, raw
-[METRICS] fdc:790646 | llm=9224ms | tokens=1384+692 | total=9.2s
-[FOOD] fdc:790774 | Bananas, overripe, raw
-[METRICS] fdc:790774 | llm=13790ms | tokens=1387+883 | total=13.8s
-[BATCH] processed=20 rejected=0 avg_time=16.41s
-[FOOD] fdc:790991 | Bananas, ripe and slightly ripe, raw
-[METRICS] fdc:790991 | llm=11560ms | tokens=1388+752 | total=11.6s
-[FOOD] fdc:1104647 | Garlic, raw
-[METRICS] fdc:1104647 | llm=11128ms | tokens=1382+693 | total=11.1s
-[FOOD] fdc:1104962 | Onions, white, raw
-[METRICS] fdc:1104962 | llm=8269ms | tokens=1384+440 | total=8.3s
-[FOOD] fdc:1105073 | Bananas, overripe, raw
-[METRICS] fdc:1105073 | llm=14126ms | tokens=1387+947 | total=14.1s
-[FOOD] fdc:1105314 | Bananas, ripe and slightly ripe, raw
-[METRICS] fdc:1105314 | llm=12631ms | tokens=1388+821 | total=12.6s
-[BATCH] processed=25 rejected=0 avg_time=15.44s
-[FOOD] fdc:1105430 | Apples, red delicious, with skin, raw
-[METRICS] fdc:1105430 | llm=7002ms | tokens=1389+435 | total=7.0s
-[FOOD] fdc:1105547 | Apples, honeycrisp, with skin, raw
-[METRICS] fdc:1105547 | llm=12257ms | tokens=1390+691 | total=12.3s
-[FOOD] fdc:1105664 | Apples, granny smith, with skin, raw
-[METRICS] fdc:1105664 | llm=14343ms | tokens=1389+692 | total=14.4s
-[FOOD] fdc:1105781 | Apples, gala, with skin, raw
-[METRICS] fdc:1105781 | llm=8668ms | tokens=1388+568 | total=8.7s
-[FOOD] fdc:1105897 | Apples, fuji, with skin, raw
-[METRICS] fdc:1105897 | llm=10735ms | tokens=1389+691 | total=10.8s
-[BATCH] processed=30 rejected=0 avg_time=14.64s
-[done] processed=30 rejected=0 total_time=439.89s avg_per_food=14.64s
-[tokens] input=41745 output=27265 total=69010 avg_input=1391.5 avg_output=908.8
-[2025-10-06T22:05:44.982536] run start model=gpt-5-mini min_conf=0.7 topk=15 limit=3
-[FOOD] fdc:330458 | Oil, coconut
-[METRICS] fdc:330458 | llm=20904ms | tokens=1380+954 | total=20.9s
-[FOOD] fdc:746775 | Salt, table, iodized
-[MISSING_TAXON] fdc:746775 | tx:chemical:sodium_chloride
-[METRICS] fdc:746775 | llm=21943ms | tokens=1383+1326 | total=22.0s
-[FOOD] fdc:748278 | Oil, canola
-[METRICS] fdc:748278 | llm=21413ms | tokens=1381+1085 | total=21.4s
-[done] processed=3 accepted=3 skipped=0 ambiguous=0 errors=0 total_time=65.49s avg_per_food=21.45s
-[tokens] input=4144 output=3365 total=7509 avg_input=1381.3 avg_output=1121.7
-[2025-10-06T22:13:03.535982] run start model=gpt-5-mini min_conf=0.7 topk=15 limit=5
-[FOOD] fdc:748323 | Oil, corn
-[METRICS] fdc:748323 | llm=14492ms | tokens=1380+758 | total=14.5s
-[FOOD] fdc:748366 | Oil, soybean
-[METRICS] fdc:748366 | llm=19026ms | tokens=1380+1205 | total=19.0s
-[FOOD] fdc:748608 | Oil, olive, extra virgin
-[METRICS] fdc:748608 | llm=23373ms | tokens=1383+1232 | total=23.4s
-[FOOD] fdc:789890 | Flour, wheat, all-purpose, enriched, bleached
-[METRICS] fdc:789890 | llm=22256ms | tokens=1391+1252 | total=22.3s
-[FOOD] fdc:789951 | Flour, wheat, all-purpose, enriched, unbleached
-[METRICS] fdc:789951 | llm=16446ms | tokens=1392+932 | total=16.5s
-[BATCH] processed=5 accepted=5 skipped=0 ambiguous=0 errors=0 avg_time=19.14s
-[done] processed=5 accepted=5 skipped=0 ambiguous=0 errors=0 total_time=96.44s avg_per_food=19.14s
-[tokens] input=6926 output=5379 total=12305 avg_input=1385.2 avg_output=1075.8
-[2025-10-06T22:55:06.247254] run start model=gpt-5-mini min_conf=0.7 topk=15 limit=5
-[FOOD] fdc:790018 | Flour, wheat, all-purpose, unenriched, unbleached
-[METRICS] fdc:790018 | llm=17676ms | tokens=1393+1104 | total=17.7s
-[FOOD] fdc:790085 | Flour, whole wheat, unenriched
-[METRICS] fdc:790085 | llm=11354ms | tokens=1387+847 | total=11.4s
-[FOOD] fdc:790146 | Flour, bread, white, enriched, unbleached
-[METRICS] fdc:790146 | llm=20883ms | tokens=1391+1509 | total=21.0s
-[FOOD] fdc:790214 | Flour, rice, white, unenriched
-[METRICS] fdc:790214 | llm=12993ms | tokens=1388+948 | total=13.0s
-[FOOD] fdc:790276 | Flour, corn, yellow, fine meal, enriched
-[METRICS] fdc:790276 | llm=16177ms | tokens=1390+1187 | total=16.2s
-[BATCH] processed=5 accepted=5 skipped=0 ambiguous=0 errors=0 avg_time=15.85s
-[done] processed=5 accepted=5 skipped=0 ambiguous=0 errors=0 total_time=80.33s avg_per_food=15.85s
-[tokens] input=6949 output=5595 total=12544 avg_input=1389.8 avg_output=1119.0
-[2025-10-06T22:57:31.194258] run start model=gpt-5-mini min_conf=0.7 topk=15 limit=5
-[FOOD] fdc:1104812 | Flour, rice, brown
-[METRICS] fdc:1104812 | llm=15497ms | tokens=1385+907 | total=15.5s
-[FOOD] fdc:1104867 | Flour, rice, glutinous
-[METRICS] fdc:1104867 | llm=18793ms | tokens=1387+1295 | total=18.8s
-[FOOD] fdc:1750339 | Apples, red delicious, with skin, raw
-[METRICS] fdc:1750339 | llm=10876ms | tokens=1389+503 | total=10.9s
-[FOOD] fdc:1750340 | Apples, fuji, with skin, raw
-[METRICS] fdc:1750340 | llm=9364ms | tokens=1389+567 | total=9.4s
-[FOOD] fdc:1750341 | Apples, gala, with skin, raw
-[METRICS] fdc:1750341 | llm=10842ms | tokens=1388+631 | total=10.9s
-[BATCH] processed=5 accepted=5 skipped=0 ambiguous=0 errors=0 avg_time=13.09s
-[done] processed=5 accepted=5 skipped=0 ambiguous=0 errors=0 total_time=66.75s avg_per_food=13.09s
-[tokens] input=6938 output=3903 total=10841 avg_input=1387.6 avg_output=780.6
+[MISSING_TAXON] fdc:327501 | tx:plantae:eudicots:sapindales:rutaceae:citrus:sinensis:navel
+[METRICS] fdc:327501 | llm=10618ms | tokens=3707+0+670 | total=10.6s
+[BATCH] processed=20 accepted=19 skipped=1 ambiguous=0 errors=0 avg_time=18.67s
+[done] processed=20 accepted=19 skipped=1 ambiguous=0 errors=0 total_time=374.27s avg_per_food=18.67s
+[tokens] input=73979 cached=14336 output=23245 total=97224 avg_input=3698.9 avg_cached=716.8 avg_output=1162.2
