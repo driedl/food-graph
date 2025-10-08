@@ -62,3 +62,19 @@
 {"food_id":"fdc:748236","fdc_id":748236,"name":"Eggs, Grade A, Large, egg yolk","brand":"","data_type":"Foundation","category_id":"","category":"Dairy and Egg Products","lang":"en","country":"US"}
 {"food_id":"fdc:748278","fdc_id":748278,"name":"Oil, canola","brand":"","data_type":"Foundation","category_id":"","category":"Fats and Oils","lang":"en","country":"US"}
 {"food_id":"fdc:748323","fdc_id":748323,"name":"Oil, corn","brand":"","data_type":"Foundation","category_id":"","category":"Fats and Oils","lang":"en","country":"US"}
+{"food_id":"fdc:748366","fdc_id":748366,"name":"Oil, soybean","brand":"","data_type":"Foundation","category_id":"","category":"Fats and Oils","lang":"en","country":"US"}
+{"food_id":"fdc:748608","fdc_id":748608,"name":"Oil, olive, extra virgin","brand":"","data_type":"Foundation","category_id":"","category":"Fats and Oils","lang":"en","country":"US"}
+{"food_id":"fdc:748967","fdc_id":748967,"name":"Eggs, Grade A, Large, egg whole","brand":"","data_type":"Foundation","category_id":"","category":"Dairy and Egg Products","lang":"en","country":"US"}
+{"food_id":"fdc:789828","fdc_id":789828,"name":"Butter, stick, unsalted","brand":"","data_type":"Foundation","category_id":"","category":"Dairy and Egg Products","lang":"en","country":"US"}
+{"food_id":"fdc:789890","fdc_id":789890,"name":"Flour, wheat, all-purpose, enriched, bleached","brand":"","data_type":"Foundation","category_id":"","category":"Cereal Grains and Pasta","lang":"en","country":"US"}
+{"food_id":"fdc:789951","fdc_id":789951,"name":"Flour, wheat, all-purpose, enriched, unbleached","brand":"","data_type":"Foundation","category_id":"","category":"Cereal Grains and Pasta","lang":"en","country":"US"}
+{"food_id":"fdc:790018","fdc_id":790018,"name":"Flour, wheat, all-purpose, unenriched, unbleached","brand":"","data_type":"Foundation","category_id":"","category":"Cereal Grains and Pasta","lang":"en","country":"US"}
+{"food_id":"fdc:790085","fdc_id":790085,"name":"Flour, whole wheat, unenriched","brand":"","data_type":"Foundation","category_id":"","category":"Cereal Grains and Pasta","lang":"en","country":"US"}
+{"food_id":"fdc:790146","fdc_id":790146,"name":"Flour, bread, white, enriched, unbleached","brand":"","data_type":"Foundation","category_id":"","category":"Cereal Grains and Pasta","lang":"en","country":"US"}
+{"food_id":"fdc:790214","fdc_id":790214,"name":"Flour, rice, white, unenriched","brand":"","data_type":"Foundation","category_id":"","category":"Cereal Grains and Pasta","lang":"en","country":"US"}
+{"food_id":"fdc:790276","fdc_id":790276,"name":"Flour, corn, yellow, fine meal, enriched","brand":"","data_type":"Foundation","category_id":"","category":"Cereal Grains and Pasta","lang":"en","country":"US"}
+{"food_id":"fdc:790508","fdc_id":790508,"name":"Butter, stick, salted","brand":"","data_type":"Foundation","category_id":"","category":"Dairy and Egg Products","lang":"en","country":"US"}
+{"food_id":"fdc:790577","fdc_id":790577,"name":"Onions, red, raw","brand":"","data_type":"Foundation","category_id":"","category":"Vegetables and Vegetable Products","lang":"en","country":"US"}
+{"food_id":"fdc:790646","fdc_id":790646,"name":"Onions, yellow, raw","brand":"","data_type":"Foundation","category_id":"","category":"Vegetables and Vegetable Products","lang":"en","country":"US"}
+{"food_id":"fdc:790774","fdc_id":790774,"name":"Bananas, overripe, raw","brand":"","data_type":"Foundation","category_id":"","category":"Fruits and Fruit Juices","lang":"en","country":"US"}
+{"food_id":"fdc:790991","fdc_id":790991,"name":"Bananas, ripe and slightly ripe, raw","brand":"","data_type":"Foundation","category_id":"","category":"Fruits and Fruit Juices","lang":"en","country":"US"}

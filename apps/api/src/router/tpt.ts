@@ -5,9 +5,14 @@ import { t } from './_t'
 import { safeParseJSON, asString } from './_util'
 
 export const tptRouter = t.router({
-    /** Fetch a single canonical TPT node by id */
+    /** Fetch a single canonical TPT node by id with flags, cuisines, and related TPTs */
     get: t.procedure
-        .input(z.object({ id: z.string() }))
+        .input(z.object({
+            id: z.string(),
+            includeFlags: z.boolean().default(true),
+            includeCuisines: z.boolean().default(true),
+            includeRelated: z.boolean().default(true)
+        }))
         .query(({ input }) => {
             const row = db.prepare(`
         SELECT t.id, t.taxon_id, t.part_id, t.family, t.identity_hash,
@@ -22,6 +27,77 @@ export const tptRouter = t.router({
             if (!row) throw new TRPCError({ code: 'NOT_FOUND' })
             const path = safeParseJSON<Array<{ id: string; params?: Record<string, any> }>>(row.path_json, [])
             const synonyms = safeParseJSON<string[]>(row.synonyms, [])
+
+            // Get flags if requested
+            let flags: string[] = []
+            if (input.includeFlags) {
+                try {
+                    const flagRows = db.prepare(`
+                        SELECT tf.flag
+                        FROM tpt_flags tf
+                        WHERE tf.tpt_id = ?
+                    `).all(input.id) as Array<{ flag: string }>
+                    flags = flagRows.map(r => r.flag)
+                } catch {
+                    flags = []
+                }
+            }
+
+            // Get cuisines if requested
+            let cuisines: string[] = []
+            if (input.includeCuisines) {
+                try {
+                    const cuisineRows = db.prepare(`
+                        SELECT tc.cuisine
+                        FROM tpt_cuisines tc
+                        WHERE tc.tpt_id = ?
+                    `).all(input.id) as Array<{ cuisine: string }>
+                    cuisines = cuisineRows.map(r => r.cuisine)
+                } catch {
+                    cuisines = []
+                }
+            }
+
+            // Get related TPTs if requested
+            let related = { siblings: [], variants: [] }
+            if (input.includeRelated) {
+                try {
+                    // Get related TPTs (same taxon+part, different transforms)
+                    const relatedRows = db.prepare(`
+                        SELECT id, name, family, path_json
+                        FROM tpt_nodes
+                        WHERE taxon_id = ? AND part_id = ? AND id != ?
+                        ORDER BY name ASC
+                        LIMIT 10
+                    `).all(row.taxon_id, row.part_id, input.id) as any[]
+
+                    // Get sibling TPTs (same part+family, different taxon)
+                    const siblingRows = db.prepare(`
+                        SELECT id, name, family, taxon_id
+                        FROM tpt_nodes
+                        WHERE part_id = ? AND family = ? AND id != ?
+                        ORDER BY name ASC
+                        LIMIT 10
+                    `).all(row.part_id, row.family, input.id) as any[]
+
+                    related = {
+                        siblings: siblingRows.map(r => ({
+                            id: r.id,
+                            name: r.name,
+                            family: r.family,
+                            taxonId: r.taxon_id
+                        })),
+                        variants: relatedRows.map(r => ({
+                            id: r.id,
+                            name: r.name,
+                            family: r.family
+                        }))
+                    }
+                } catch {
+                    related = { siblings: [], variants: [] }
+                }
+            }
+
             return {
                 id: row.id,
                 taxonId: row.taxon_id,
@@ -32,7 +108,10 @@ export const tptRouter = t.router({
                 synonyms,
                 identity: path,              // identity-only path (ordered)
                 taxon: { id: row.taxon_id, name: row.taxon_name, rank: row.taxon_rank },
-                part: { id: row.part_id, name: row.part_name }
+                part: { id: row.part_id, name: row.part_name },
+                flags,
+                cuisines,
+                related
             }
         }),
 

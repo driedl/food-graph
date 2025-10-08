@@ -179,3 +179,43 @@ On instance['node_kind']:
 [MISSING_TAXON] fdc:748278 | tx:plantae:eudicots:brassicales:brassicaceae:brassica:napus:canola
 [METRICS] fdc:748278 | llm=18209ms | tokens=3692+0+1132 | total=18.2s
 [FOOD] fdc:748323 | Oil, corn
+[METRICS] fdc:748323 | llm=12679ms | tokens=3691+0+605 | total=12.7s
+[FOOD] fdc:748366 | Oil, soybean
+[METRICS] fdc:748366 | llm=9305ms | tokens=3691+0+542 | total=9.3s
+[BATCH] processed=5 accepted=5 skipped=0 ambiguous=0 errors=0 avg_time=16.49s
+[FOOD] fdc:748608 | Oil, olive, extra virgin
+[METRICS] fdc:748608 | llm=13802ms | tokens=3694+0+1002 | total=13.8s
+[FOOD] fdc:748967 | Eggs, Grade A, Large, egg whole
+[MISSING_TAXON] fdc:748967 | tx:animalia:chordata:aves:galliformes:phasianidae:gallus:gallus_gallus_domesticus
+[METRICS] fdc:748967 | llm=12168ms | tokens=3699+0+744 | total=12.2s
+[FOOD] fdc:789828 | Butter, stick, unsalted
+[METRICS] fdc:789828 | llm=16354ms | tokens=3695+0+1021 | total=16.4s
+[FOOD] fdc:789890 | Flour, wheat, all-purpose, enriched, bleached
+[METRICS] fdc:789890 | llm=20369ms | tokens=3702+0+1224 | total=20.4s
+[FOOD] fdc:789951 | Flour, wheat, all-purpose, enriched, unbleached
+[METRICS] fdc:789951 | llm=27838ms | tokens=3703+0+1681 | total=27.9s
+[BATCH] processed=10 accepted=10 skipped=0 ambiguous=0 errors=0 avg_time=17.31s
+[FOOD] fdc:790018 | Flour, wheat, all-purpose, unenriched, unbleached
+[METRICS] fdc:790018 | llm=22873ms | tokens=3704+0+1143 | total=22.9s
+[FOOD] fdc:790085 | Flour, whole wheat, unenriched
+[METRICS] fdc:790085 | llm=32273ms | tokens=3698+0+1017 | total=32.3s
+[FOOD] fdc:790146 | Flour, bread, white, enriched, unbleached
+[METRICS] fdc:790146 | llm=28971ms | tokens=3702+3584+1421 | total=29.0s
+[FOOD] fdc:790214 | Flour, rice, white, unenriched
+[METRICS] fdc:790214 | llm=23199ms | tokens=3699+0+1071 | total=23.2s
+[FOOD] fdc:790276 | Flour, corn, yellow, fine meal, enriched
+[METRICS] fdc:790276 | llm=26771ms | tokens=3701+0+1340 | total=26.8s
+[BATCH] processed=15 accepted=15 skipped=0 ambiguous=0 errors=0 avg_time=20.48s
+[FOOD] fdc:790508 | Butter, stick, salted
+[METRICS] fdc:790508 | llm=15486ms | tokens=3694+3584+892 | total=15.5s
+[FOOD] fdc:790577 | Onions, red, raw
+[METRICS] fdc:790577 | llm=10329ms | tokens=3695+3584+551 | total=10.4s
+[FOOD] fdc:790646 | Onions, yellow, raw
+[METRICS] fdc:790646 | llm=9025ms | tokens=3695+0+542 | total=9.0s
+[FOOD] fdc:790774 | Bananas, overripe, raw
+[METRICS] fdc:790774 | llm=12586ms | tokens=3698+3584+740 | total=12.6s
+[FOOD] fdc:790991 | Bananas, ripe and slightly ripe, raw
+[METRICS] fdc:790991 | llm=13248ms | tokens=3699+0+737 | total=13.3s
+[BATCH] processed=20 accepted=20 skipped=0 ambiguous=0 errors=0 avg_time=18.40s
+[done] processed=20 accepted=20 skipped=0 ambiguous=0 errors=0 total_time=368.85s avg_per_food=18.40s
+[tokens] input=73951 cached=14336 output=20042 total=93993 avg_input=3697.6 avg_cached=716.8 avg_output=1002.1

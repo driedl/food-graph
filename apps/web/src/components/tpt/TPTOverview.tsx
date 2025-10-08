@@ -11,16 +11,18 @@ export function TPTOverview({
     onOpenTP: (taxonId: string, partId: string) => void
     onOpenTPT: (id: string) => void
 }) {
-    const getQ = (trpc as any).tpt?.get?.useQuery({ id })
-    const meta: TPTDetail | undefined = getQ?.data
-    const flagsQ = (trpc as any).tpt?.flags?.useQuery({ id }, { enabled: !!id && !meta?.flags })
-    const cuisinesQ = (trpc as any).tpt?.cuisines?.useQuery({ id }, { enabled: !!id && !meta?.cuisines })
-    const relatedQ = (trpc as any).tpt?.related?.useQuery({ id })
+    const getQ = (trpc as any).tpt?.get?.useQuery({
+        id,
+        includeFlags: true,
+        includeCuisines: true,
+        includeRelated: true
+    })
+    const meta = getQ?.data
 
-    const steps = meta?.identity ?? meta?.path ?? []
-    const flags: string[] = meta?.flags ?? flagsQ?.data ?? []
-    const cuisines: string[] = meta?.cuisines ?? cuisinesQ?.data ?? []
-    const related = relatedQ?.data ?? { siblings: [], variants: [] }
+    const steps = meta?.identity ?? []
+    const flags: string[] = meta?.flags ?? []
+    const cuisines: string[] = meta?.cuisines ?? []
+    const related = meta?.related ?? { siblings: [], variants: [] }
 
     if (getQ?.isLoading) return <div className="text-sm text-muted-foreground">Loading TPT…</div>
     if (!meta) return <div className="text-sm text-muted-foreground">TPT not found.</div>

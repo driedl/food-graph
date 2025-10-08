@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
-import { TanStackRouterDevtools } from '@tanstack/router-devtools'
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import { routeTree } from './routeTree.gen'
 import { trpc } from './lib/trpc'
 import { httpBatchLink, httpLink } from '@trpc/client'
@@ -13,7 +13,8 @@ const client = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
-      staleTime: 30_000
+      staleTime: 30_000,
+      retry: false
     }
   }
 })

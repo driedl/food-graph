@@ -10,7 +10,7 @@ export function TPTExplain({ id }: { id: string }) {
     if (explainQ?.isLoading || detailQ?.isLoading) {
         return <div className="text-sm text-muted-foreground">Loading…</div>
     }
-    const text: string | undefined = explainQ?.data?.text ?? explainQ?.data
+    const text: string | undefined = explainQ?.data?.summary
     const raw = detailQ?.data
 
     return (

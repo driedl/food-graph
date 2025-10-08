@@ -33,15 +33,18 @@
     "check": "pnpm typecheck && pnpm lint"
   },
   "devDependencies": {
-    "turbo": "^2.1.0",
-    "tsx": "^4.20.6",
-    "inquirer": "^9.2.12",
-    "glob": "^10.3.10",
-    "eslint": "^8.57.0",
+    "@types/archiver": "^6.0.2",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
-    "prettier": "^3.2.5",
     "archiver": "^7.0.1",
-    "@types/archiver": "^6.0.2"
+    "eslint": "^8.57.0",
+    "glob": "^10.3.10",
+    "inquirer": "^9.2.12",
+    "prettier": "^3.2.5",
+    "tsx": "^4.20.6",
+    "turbo": "^2.1.0"
+  },
+  "dependencies": {
+    "@tanstack/react-router-devtools": "^1.132.50"
   }
 }

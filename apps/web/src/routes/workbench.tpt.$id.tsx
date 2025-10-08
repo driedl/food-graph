@@ -74,13 +74,21 @@ function TPTPage() {
     }
 
     const openTP = (taxonId: string, partId: string) =>
-        router.navigate({ to: '/workbench/tp/$taxonId/$partId', params: { taxonId, partId } })
+        router.navigate({
+            to: '/workbench/tp/$taxonId/$partId',
+            params: { taxonId, partId },
+            search: { tab: 'overview', family: '', limit: 50, offset: 0, compare: '' }
+        })
 
     const openTPT = (tid: string) =>
-        router.navigate({ to: '/workbench/tpt/$id', params: { id: tid } })
+        router.navigate({
+            to: '/workbench/tpt/$id',
+            params: { id: tid },
+            search: { tab: 'overview' }
+        })
 
     // Suggestions (right inspector)
-    const suggestQ = (trpc as any).tptAdvanced?.suggest?.useQuery({ id }, { enabled: !!id })
+    const suggestQ = (trpc as any).tptAdvanced?.suggest?.useQuery({ seedId: id }, { enabled: !!id })
 
     return (
         <div className="grid grid-cols-[1fr,360px] gap-3 min-h-0">
@@ -130,11 +138,11 @@ function TPTPage() {
 
                 {suggestQ?.isLoading ? (
                     <div className="text-sm text-muted-foreground">Loading…</div>
-                ) : (suggestQ?.data ?? []).length === 0 ? (
+                ) : (suggestQ?.data?.suggestions ?? []).length === 0 ? (
                     <div className="text-sm text-muted-foreground">No suggestions.</div>
                 ) : (
                     <ul className="space-y-1">
-                        {(suggestQ?.data ?? []).map((s: any) => (
+                        {(suggestQ?.data?.suggestions ?? []).map((s: any) => (
                             <li key={s.id}>
                                 <button
                                     className="w-full text-left px-2 py-1 rounded border hover:bg-muted/40"
@@ -165,8 +173,16 @@ function TPTPage() {
                                     if (taxonPath.length >= 1) {
                                         const txid = 'tx:' + taxonPath.join(':')
                                         const pid = (part ?? '').replace(/^part:/, '')
-                                        if (pid) router.navigate({ to: '/workbench/tp/$taxonId/$partId', params: { taxonId: txid, partId: pid } })
-                                        else router.navigate({ to: '/workbench/taxon/$id', params: { id: txid } })
+                                        if (pid) router.navigate({
+                                            to: '/workbench/tp/$taxonId/$partId',
+                                            params: { taxonId: txid, partId: pid },
+                                            search: { tab: 'overview', family: '', limit: 50, offset: 0, compare: '' }
+                                        })
+                                        else router.navigate({
+                                            to: '/workbench/taxon/$id',
+                                            params: { id: txid },
+                                            search: { tab: 'overview', limit: 50 }
+                                        })
                                     }
                                 })()
                         }}
