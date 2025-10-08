@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:oleaceae
+id: tx:plantae:eudicots:lamiales:oleaceae
 rank: family
 latin_name: Oleaceae
 display_name: olive family

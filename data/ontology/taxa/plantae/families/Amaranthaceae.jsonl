@@ -1,7 +1,0 @@
-{"id": "tx:plantae:amaranthaceae", "parent": "tx:plantae", "rank": "family", "display_name": "Amaranthaceae", "latin_name": "Amaranthaceae", "aliases": []}
-{"id": "tx:plantae:amaranthaceae:chenopodium", "parent": "tx:plantae:amaranthaceae", "rank": "genus", "display_name": "Chenopodium", "latin_name": "Chenopodium", "aliases": []}
-{"id": "tx:plantae:amaranthaceae:chenopodium:quinoa", "parent": "tx:plantae:amaranthaceae:chenopodium", "rank": "species", "display_name": "Quinoa", "latin_name": "Chenopodium quinoa", "aliases": ["quinoa"]}
-{"id": "tx:plantae:amaranthaceae:beta", "parent": "tx:plantae:amaranthaceae", "rank": "genus", "display_name": "Beta", "latin_name": "Beta", "aliases": []}
-{"id": "tx:plantae:amaranthaceae:beta:vulgaris", "parent": "tx:plantae:amaranthaceae:beta", "rank": "species", "display_name": "Beet", "latin_name": "Beta vulgaris", "aliases": ["beet", "beets"]}
-{"id": "tx:plantae:amaranthaceae:spinacia", "parent": "tx:plantae:amaranthaceae", "rank": "genus", "display_name": "Spinach (genus)", "latin_name": "Spinacia", "aliases": []}
-{"id": "tx:plantae:amaranthaceae:spinacia:oleracea", "parent": "tx:plantae:amaranthaceae:spinacia", "rank": "species", "display_name": "Spinach", "latin_name": "Spinacia oleracea", "aliases": ["spinach"]}

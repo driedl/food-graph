@@ -1,3 +1,0 @@
-{"id": "tx:plantae:arecaceae", "parent": "tx:plantae", "rank": "family", "display_name": "Arecaceae", "latin_name": "Arecaceae", "aliases": []}
-{"id": "tx:plantae:arecaceae:cocos", "parent": "tx:plantae:arecaceae", "rank": "genus", "display_name": "Cocos", "latin_name": "Cocos", "aliases": []}
-{"id": "tx:plantae:arecaceae:cocos:nucifera", "parent": "tx:plantae:arecaceae:cocos", "rank": "species", "display_name": "Coconut", "latin_name": "Cocos nucifera", "aliases": ["coconut"]}

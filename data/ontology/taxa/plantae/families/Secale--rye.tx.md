@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:poaceae:secale
+id: tx:plantae:monocots:poales:poaceae:secale
 rank: genus
 latin_name: Secale
 display_name: Rye

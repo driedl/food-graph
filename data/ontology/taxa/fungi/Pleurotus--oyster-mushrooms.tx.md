@@ -1,5 +1,5 @@
 ---
-id: tx:fungi:pleurotus
+id: tx:fungi:agaricomycetes:agaricales:pleurotaceae:pleurotus
 rank: genus
 latin_name: Pleurotus
 display_name: Pleurotus (oyster mushrooms)

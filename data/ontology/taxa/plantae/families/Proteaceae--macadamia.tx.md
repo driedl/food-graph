@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:proteaceae
+id: tx:plantae:eudicots:proteales:proteaceae
 rank: family
 latin_name: Proteaceae
 display_name: macadamia

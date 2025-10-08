@@ -1,5 +1,5 @@
 ---
-id: tx:fungi:agaricus
+id: tx:fungi:agaricomycetes:agaricales:agaricaceae:agaricus
 rank: genus
 latin_name: Agaricus
 display_name: button mushrooms

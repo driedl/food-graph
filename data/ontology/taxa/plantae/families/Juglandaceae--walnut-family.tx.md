@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:juglandaceae
+id: tx:plantae:eudicots:fagales:juglandaceae
 rank: family
 latin_name: Juglandaceae
 display_name: walnut family

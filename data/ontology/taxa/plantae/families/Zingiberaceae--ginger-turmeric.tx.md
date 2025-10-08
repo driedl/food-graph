@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:zingiberaceae
+id: tx:plantae:monocots:zingiberales:zingiberaceae
 rank: family
 latin_name: Zingiberaceae
 display_name: ginger, turmeric, cardamom

@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:brassicaceae:eruca
+id: tx:plantae:eudicots:brassicales:brassicaceae:eruca
 rank: genus
 latin_name: Eruca
 display_name: Eruca (arugula/rocket)

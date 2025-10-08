@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:asparagaceae:asparagus
+id: tx:plantae:monocots:asparagales:asparagaceae:asparagus
 rank: genus
 latin_name: Asparagus
 display_name: Asparagus (asparagus)

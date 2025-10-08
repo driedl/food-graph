@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:pedaliaceae
+id: tx:plantae:eudicots:lamiales:pedaliaceae
 rank: family
 latin_name: Pedaliaceae
 display_name: sesame family

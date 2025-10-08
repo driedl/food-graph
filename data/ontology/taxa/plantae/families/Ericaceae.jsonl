@@ -1,3 +1,0 @@
-{"id": "tx:plantae:ericaceae", "parent": "tx:plantae", "rank": "family", "display_name": "Ericaceae", "latin_name": "Ericaceae", "aliases": []}
-{"id": "tx:plantae:ericaceae:vaccinium", "parent": "tx:plantae:ericaceae", "rank": "genus", "display_name": "Vaccinium", "latin_name": "Vaccinium", "aliases": []}
-{"id": "tx:plantae:ericaceae:vaccinium:corymbosum", "parent": "tx:plantae:ericaceae:vaccinium", "rank": "species", "display_name": "Blueberry", "latin_name": "Vaccinium corymbosum", "aliases": ["blueberry", "blueberries"]}

@@ -1,5 +1,8 @@
 {"id": "tx:life", "rank": "root", "display_name": "Life", "latin_name": "Life", "aliases": []}
 {"id": "tx:eukaryota", "parent": "tx:life", "rank": "domain", "display_name": "Eukaryota", "latin_name": "Eukaryota", "aliases": []}
 {"id": "tx:plantae", "parent": "tx:eukaryota", "rank": "kingdom", "display_name": "Plants", "latin_name": "Plantae", "aliases": []}
+{"id":"tx:plantae:eudicots","parent":"tx:plantae","rank":"clade","display_name":"Eudicots","latin_name":"Eudicotyledoneae","aliases":[],"description":"The largest clade of flowering plants, characterized by tricolpate pollen"}
+{"id":"tx:plantae:monocots","parent":"tx:plantae","rank":"clade","display_name":"Monocots","latin_name":"Monocotyledoneae","aliases":[],"description":"Flowering plants with a single cotyledon, including grasses, lilies, and orchids"}
+{"id":"tx:plantae:gymnosperms","parent":"tx:plantae","rank":"clade","display_name":"Gymnosperms","latin_name":"Gymnospermae","aliases":[],"description":"Seed plants that do not produce flowers, including conifers and cycads"}
 {"id": "tx:fungi", "parent": "tx:eukaryota", "rank": "kingdom", "display_name": "Fungi", "latin_name": "Fungi", "aliases": []}
 {"id": "tx:animalia", "parent": "tx:eukaryota", "rank": "kingdom", "display_name": "Animals", "latin_name": "Animalia", "aliases": []}

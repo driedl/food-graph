@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:annonaceae:asimina
+id: tx:plantae:eudicots:magnoliales:annonaceae:asimina
 rank: genus
 latin_name: Asimina
 display_name: Asimina (pawpaw)

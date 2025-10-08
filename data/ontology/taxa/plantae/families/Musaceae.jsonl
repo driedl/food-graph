@@ -1,3 +1,0 @@
-{"id": "tx:plantae:musaceae", "parent": "tx:plantae", "rank": "family", "display_name": "Musaceae", "latin_name": "Musaceae", "aliases": []}
-{"id": "tx:plantae:musaceae:musa", "parent": "tx:plantae:musaceae", "rank": "genus", "display_name": "Banana (genus)", "latin_name": "Musa", "aliases": []}
-{"id": "tx:plantae:musaceae:musa:acuminata", "parent": "tx:plantae:musaceae:musa", "rank": "species", "display_name": "Banana", "latin_name": "Musa acuminata", "aliases": ["banana"]}

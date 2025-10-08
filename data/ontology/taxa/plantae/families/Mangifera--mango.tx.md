@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:anacardiaceae:mangifera
+id: tx:plantae:eudicots:sapindales:anacardiaceae:mangifera
 rank: genus
 latin_name: Mangifera
 display_name: Mangifera (mango)

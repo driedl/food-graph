@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:solanaceae:solanum
+id: tx:plantae:eudicots:solanales:solanaceae:solanum
 rank: genus
 latin_name: Solanum
 display_name: Tomatoes, potatoes & eggplants

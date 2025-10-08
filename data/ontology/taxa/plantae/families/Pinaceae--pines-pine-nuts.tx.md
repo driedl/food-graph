@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:pinaceae:pinus
+id: tx:plantae:gymnosperms:pinales:pinaceae:pinus
 rank: genus
 latin_name: Pinus
 display_name: Pinus (pines & pine nuts)

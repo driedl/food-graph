@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:asparagaceae
+id: tx:plantae:monocots:asparagales:asparagaceae
 rank: family
 latin_name: Asparagaceae
 display_name: asparagus family

@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:arecaceae:cocos
+id: tx:plantae:monocots:arecales:arecaceae:cocos
 rank: genus
 latin_name: Cocos
 display_name: Cocos (coconut)

@@ -1,32 +1,32 @@
 {
-    "default": {
-        "animalia": [
-            "species",
-            "breed"
-        ],
-        "plantae": [
-            "species",
-            "variety",
-            "cultivar"
-        ],
-        "fungi": [
-            "species"
-        ]
-    },
-    "allowlist": [
-        {
-            "taxon_id": "tx:plantae:rutaceae:citrus",
-            "parts": [
-                "part:peel",
-                "part:fruit"
-            ]
-        },
-        {
-            "taxon_id": "tx:plantae:poaceae:triticum",
-            "parts": [
-                "part:grain"
-            ]
-        }
+  "default": {
+    "animalia": [
+      "species",
+      "breed"
     ],
-    "blocklist": []
+    "plantae": [
+      "species",
+      "variety",
+      "cultivar"
+    ],
+    "fungi": [
+      "species"
+    ]
+  },
+  "allowlist": [
+    {
+      "taxon_id": "tx:plantae:eudicots:sapindales:citrus",
+      "parts": [
+        "part:peel",
+        "part:fruit"
+      ]
+    },
+    {
+      "taxon_id": "tx:plantae:monocots:poales:triticum",
+      "parts": [
+        "part:grain"
+      ]
+    }
+  ],
+  "blocklist": []
 }

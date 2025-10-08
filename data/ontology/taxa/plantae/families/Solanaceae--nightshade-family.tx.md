@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:solanaceae
+id: tx:plantae:eudicots:solanales:solanaceae
 rank: family
 latin_name: Solanaceae
 display_name: nightshade family

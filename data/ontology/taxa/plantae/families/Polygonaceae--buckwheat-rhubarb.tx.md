@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:polygonaceae
+id: tx:plantae:eudicots:caryophyllales:polygonaceae
 rank: family
 latin_name: Polygonaceae
 display_name: buckwheat, rhubarb

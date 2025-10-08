@@ -1,3 +1,0 @@
-{"id": "tx:plantae:linaceae", "parent": "tx:plantae", "rank": "family", "display_name": "Linaceae", "latin_name": "Linaceae", "aliases": []}
-{"id": "tx:plantae:linaceae:linum", "parent": "tx:plantae:linaceae", "rank": "genus", "display_name": "Linum", "latin_name": "Linum", "aliases": []}
-{"id": "tx:plantae:linaceae:linum:usitatissimum", "parent": "tx:plantae:linaceae:linum", "rank": "species", "display_name": "Flax", "latin_name": "Linum usitatissimum", "aliases": ["flax", "flaxseed"]}

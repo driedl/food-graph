@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:cucurbitaceae:cucurbita
+id: tx:plantae:eudicots:cucurbitales:cucurbitaceae:cucurbita
 rank: genus
 latin_name: Cucurbita
 display_name: Cucurbita (squashes & pumpkins)

@@ -1,5 +1,0 @@
-{"id": "tx:plantae:myrtaceae", "parent": "tx:plantae", "rank": "family", "display_name": "Myrtaceae", "latin_name": "Myrtaceae", "aliases": []}
-{"id": "tx:plantae:myrtaceae:syzygium", "parent": "tx:plantae:myrtaceae", "rank": "genus", "display_name": "Syzygium", "latin_name": "Syzygium", "aliases": []}
-{"id": "tx:plantae:myrtaceae:syzygium:aromaticum", "parent": "tx:plantae:myrtaceae:syzygium", "rank": "species", "display_name": "Clove", "latin_name": "Syzygium aromaticum", "aliases": ["clove"]}
-{"id": "tx:plantae:myrtaceae:pimenta", "parent": "tx:plantae:myrtaceae", "rank": "genus", "display_name": "Pimenta", "latin_name": "Pimenta", "aliases": []}
-{"id": "tx:plantae:myrtaceae:pimenta:dioica", "parent": "tx:plantae:myrtaceae:pimenta", "rank": "species", "display_name": "Allspice", "latin_name": "Pimenta dioica", "aliases": ["allspice"]}

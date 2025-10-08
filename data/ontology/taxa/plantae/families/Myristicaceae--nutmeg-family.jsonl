@@ -1,3 +1,0 @@
-{"id": "tx:plantae:myristicaceae", "parent": "tx:plantae", "rank": "family", "display_name": "Myristicaceae", "latin_name": "Myristicaceae", "aliases": []}
-{"id": "tx:plantae:myristicaceae:myristica", "parent": "tx:plantae:myristicaceae", "rank": "genus", "display_name": "Myristica", "latin_name": "Myristica", "aliases": []}
-{"id": "tx:plantae:myristicaceae:myristica:fragrans", "parent": "tx:plantae:myristicaceae:myristica", "rank": "species", "display_name": "Nutmeg", "latin_name": "Myristica fragrans", "aliases": ["nutmeg"]}

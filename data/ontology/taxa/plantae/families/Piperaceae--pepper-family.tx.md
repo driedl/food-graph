@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:piperaceae
+id: tx:plantae:eudicots:piperales:piperaceae
 rank: family
 latin_name: Piperaceae
 display_name: pepper family

@@ -1,3 +1,0 @@
-{"id": "tx:plantae:lamiaceae", "parent": "tx:plantae", "rank": "family", "display_name": "Lamiaceae", "latin_name": "Lamiaceae", "aliases": []}
-{"id": "tx:plantae:lamiaceae:salvia", "parent": "tx:plantae:lamiaceae", "rank": "genus", "display_name": "Salvia", "latin_name": "Salvia", "aliases": []}
-{"id": "tx:plantae:lamiaceae:salvia:hispanica", "parent": "tx:plantae:lamiaceae:salvia", "rank": "species", "display_name": "Chia", "latin_name": "Salvia hispanica", "aliases": ["chia", "chia seed", "chia seeds"]}

@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:poaceae:zea
+id: tx:plantae:monocots:poales:poaceae:zea
 rank: genus
 latin_name: Zea
 display_name: Maize/corn

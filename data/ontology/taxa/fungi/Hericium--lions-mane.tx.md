@@ -1,5 +1,5 @@
 ---
-id: tx:fungi:hericium
+id: tx:fungi:agaricomycetes:russulales:hericiaceae:hericium
 rank: genus
 latin_name: Hericium
 display_name: Hericium (lion's mane)

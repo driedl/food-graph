@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:asteraceae:helianthus
+id: tx:plantae:eudicots:asterales:asteraceae:helianthus
 rank: genus
 latin_name: Helianthus
 display_name: Helianthus (sunflower)

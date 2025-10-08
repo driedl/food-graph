@@ -1,3 +1,0 @@
-{"id": "tx:plantae:piperaceae", "parent": "tx:plantae", "rank": "family", "display_name": "Piperaceae", "latin_name": "Piperaceae", "aliases": []}
-{"id": "tx:plantae:piperaceae:piper", "parent": "tx:plantae:piperaceae", "rank": "genus", "display_name": "Piper", "latin_name": "Piper", "aliases": []}
-{"id": "tx:plantae:piperaceae:piper:nigrum", "parent": "tx:plantae:piperaceae:piper", "rank": "species", "display_name": "Black Pepper", "latin_name": "Piper nigrum", "aliases": ["black pepper"]}

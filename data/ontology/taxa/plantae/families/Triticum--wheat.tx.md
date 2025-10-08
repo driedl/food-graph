@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:poaceae:triticum
+id: tx:plantae:monocots:poales:poaceae:triticum
 rank: genus
 latin_name: Triticum
 display_name: Wheat

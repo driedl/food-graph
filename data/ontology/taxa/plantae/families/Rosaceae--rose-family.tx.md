@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:rosaceae
+id: tx:plantae:eudicots:rosales:rosaceae
 rank: family
 latin_name: Rosaceae
 display_name: rose family

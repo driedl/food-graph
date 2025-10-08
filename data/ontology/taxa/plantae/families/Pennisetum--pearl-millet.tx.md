@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:poaceae:pennisetum
+id: tx:plantae:monocots:poales:poaceae:pennisetum
 rank: genus
 latin_name: Pennisetum
 display_name: Pearl millet

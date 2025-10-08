@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:poaceae:sorghum
+id: tx:plantae:monocots:poales:poaceae:sorghum
 rank: genus
 latin_name: Sorghum
 display_name: Sorghum

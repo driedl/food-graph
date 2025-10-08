@@ -1,0 +1,45 @@
+artifacts:
+  # Main evidence mapping file - this is the primary focus
+  - path: mapping.jsonl
+    type: jsonl
+    must_exist: true
+    validators:
+      - kind: field_presence
+        fields: ["food_id", "name", "node_kind", "identity_json", "confidence", "disposition", "reason_short"]
+      - kind: unique
+        field: "food_id"
+      - kind: evidence_mapping_schema
+      - kind: evidence_ontology_consistency
+        graph_db_path: "database/graph.dev.sqlite"
+      - kind: evidence_confidence_ranges
+      - kind: evidence_disposition_logic
+      - kind: fdc_id_format
+        field: "food_id"
+  
+  # Optional files - don't fail if missing/empty for now
+  - path: foods.jsonl
+    type: jsonl
+    must_exist: false
+    validators:
+      - kind: field_presence
+        fields: ["food_id", "fdc_id", "name", "data_type"]
+      - kind: unique
+        field: "food_id"
+      - kind: fdc_id_format
+        field: "fdc_id"
+      - kind: schema_enum_compliance
+        field: "data_type"
+        allowed_values: ["Foundation"]
+  
+  - path: nutrients.jsonl
+    type: jsonl
+    must_exist: false
+    validators:
+      - kind: field_presence
+        fields: ["food_id", "nutrient_id", "amount"]
+      - kind: crossref_jsonl
+        this_field: "food_id"
+        other_path: "foods.jsonl"
+        other_field: "food_id"
+      - kind: nutrient_id_format
+        field: "nutrient_id"

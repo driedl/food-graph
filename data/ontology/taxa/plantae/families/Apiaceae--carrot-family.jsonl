@@ -1,9 +1,0 @@
-{"id": "tx:plantae:apiaceae", "parent": "tx:plantae", "rank": "family", "display_name": "Apiaceae", "latin_name": "Apiaceae", "aliases": ["Umbelliferae"]}
-{"id": "tx:plantae:apiaceae:daucus", "parent": "tx:plantae:apiaceae", "rank": "genus", "display_name": "Daucus", "latin_name": "Daucus", "aliases": []}
-{"id": "tx:plantae:apiaceae:daucus:carota", "parent": "tx:plantae:apiaceae:daucus", "rank": "species", "display_name": "Carrot", "latin_name": "Daucus carota", "aliases": ["carrot", "carrots"]}
-{"id": "tx:plantae:apiaceae:apium", "parent": "tx:plantae:apiaceae", "rank": "genus", "display_name": "Apium", "latin_name": "Apium", "aliases": []}
-{"id": "tx:plantae:apiaceae:apium:graveolens", "parent": "tx:plantae:apiaceae:apium", "rank": "species", "display_name": "Celery", "latin_name": "Apium graveolens", "aliases": ["celery"]}
-{"id": "tx:plantae:apiaceae:cuminum", "parent": "tx:plantae:apiaceae", "rank": "genus", "display_name": "Cuminum", "latin_name": "Cuminum", "aliases": []}
-{"id": "tx:plantae:apiaceae:cuminum:cyminum", "parent": "tx:plantae:apiaceae:cuminum", "rank": "species", "display_name": "Cumin", "latin_name": "Cuminum cyminum", "aliases": ["cumin"]}
-{"id": "tx:plantae:apiaceae:coriandrum", "parent": "tx:plantae:apiaceae", "rank": "genus", "display_name": "Coriandrum", "latin_name": "Coriandrum", "aliases": []}
-{"id": "tx:plantae:apiaceae:coriandrum:sativum", "parent": "tx:plantae:apiaceae:coriandrum", "rank": "species", "display_name": "Coriander Seed", "latin_name": "Coriandrum sativum", "aliases": ["coriander seed"]}

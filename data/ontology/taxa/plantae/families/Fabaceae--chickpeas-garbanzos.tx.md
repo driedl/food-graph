@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:fabaceae:cicer
+id: tx:plantae:eudicots:fabales:fabaceae:cicer
 rank: genus
 latin_name: Cicer
 display_name: Cicer (chickpeas/garbanzos)

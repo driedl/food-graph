@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:actinidiaceae:actinidia
+id: tx:plantae:eudicots:ericales:actinidiaceae:actinidia
 rank: genus
 latin_name: Actinidia
 display_name: Actinidia (kiwifruit)

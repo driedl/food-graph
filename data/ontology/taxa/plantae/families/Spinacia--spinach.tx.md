@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:amaranthaceae:spinacia
+id: tx:plantae:eudicots:caryophyllales:amaranthaceae:spinacia
 rank: genus
 latin_name: Spinacia
 display_name: Spinacia (spinach)

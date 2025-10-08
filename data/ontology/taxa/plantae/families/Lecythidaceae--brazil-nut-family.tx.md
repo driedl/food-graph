@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:lecythidaceae
+id: tx:plantae:eudicots:ericales:lecythidaceae
 rank: family
 latin_name: Lecythidaceae
 display_name: Brazil nut family

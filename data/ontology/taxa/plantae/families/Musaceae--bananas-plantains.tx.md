@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:musaceae:musa
+id: tx:plantae:monocots:zingiberales:musaceae:musa
 rank: genus
 latin_name: Musa
 display_name: Musa (bananas & plantains)

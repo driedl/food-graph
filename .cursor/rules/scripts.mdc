@@ -1,0 +1,7 @@
+---
+alwaysApply: true
+---
+Use the following:
+pnpm for package management and script execution
+python3 for python script evaluation
+"pnpm sql" to run sql against the etl graph db

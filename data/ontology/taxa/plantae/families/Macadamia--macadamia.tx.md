@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:proteaceae:macadamia
+id: tx:plantae:eudicots:proteales:proteaceae:macadamia
 rank: genus
 latin_name: Macadamia
 display_name: Macadamia

@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:actinidiaceae
+id: tx:plantae:eudicots:ericales:actinidiaceae
 rank: family
 latin_name: Actinidiaceae
 display_name: kiwifruit

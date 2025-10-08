@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:betulaceae
+id: tx:plantae:eudicots:fagales:betulaceae
 rank: family
 latin_name: Betulaceae
 display_name: birch family

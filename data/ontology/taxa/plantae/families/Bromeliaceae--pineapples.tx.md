@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:bromeliaceae:ananas
+id: tx:plantae:monocots:poales:bromeliaceae:ananas
 rank: genus
 latin_name: Ananas
 display_name: Ananas (pineapples)

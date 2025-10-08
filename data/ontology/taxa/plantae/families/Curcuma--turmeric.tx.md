@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:zingiberaceae:curcuma
+id: tx:plantae:monocots:zingiberales:zingiberaceae:curcuma
 rank: genus
 latin_name: Curcuma
 display_name: Turmeric

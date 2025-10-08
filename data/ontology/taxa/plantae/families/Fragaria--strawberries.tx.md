@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:rosaceae:fragaria
+id: tx:plantae:eudicots:rosales:rosaceae:fragaria
 rank: genus
 latin_name: Fragaria
 display_name: Strawberries

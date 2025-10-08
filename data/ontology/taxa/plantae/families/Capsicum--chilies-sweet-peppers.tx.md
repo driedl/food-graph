@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:solanaceae:capsicum
+id: tx:plantae:eudicots:solanales:solanaceae:capsicum
 rank: genus
 latin_name: Capsicum
 display_name: Chilies & sweet peppers

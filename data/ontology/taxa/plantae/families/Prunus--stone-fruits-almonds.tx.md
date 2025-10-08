@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:rosaceae:prunus
+id: tx:plantae:eudicots:rosales:rosaceae:prunus
 rank: genus
 latin_name: Prunus
 display_name: Stone fruits & almonds

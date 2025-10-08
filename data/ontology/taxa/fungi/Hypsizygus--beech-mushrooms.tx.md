@@ -1,5 +1,5 @@
 ---
-id: tx:fungi:hypsizygus
+id: tx:fungi:agaricomycetes:agaricales:lyophyllaceae:hypsizygus
 rank: genus
 latin_name: Hypsizygus
 display_name: Hypsizygus (beech/clam shell mushrooms)

@@ -1,5 +1,5 @@
 ---
-id: tx:fungi:flammulina
+id: tx:fungi:agaricomycetes:agaricales:physalacriaceae:flammulina
 rank: genus
 latin_name: Flammulina
 display_name: Flammulina (enoki/enokitake)

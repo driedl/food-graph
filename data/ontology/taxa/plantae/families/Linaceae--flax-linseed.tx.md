@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:linaceae:linum
+id: tx:plantae:eudicots:malpighiales:linaceae:linum
 rank: genus
 latin_name: Linum
 display_name: Linum (flax/linseed)

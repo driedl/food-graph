@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:amaranthaceae:chenopodium
+id: tx:plantae:eudicots:caryophyllales:amaranthaceae:chenopodium
 rank: genus
 latin_name: Chenopodium
 display_name: Chenopodium (goosefoot)

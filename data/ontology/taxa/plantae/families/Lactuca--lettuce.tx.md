@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:asteraceae:lactuca
+id: tx:plantae:eudicots:asterales:asteraceae:lactuca
 rank: genus
 latin_name: Lactuca
 display_name: Lactuca (lettuce)

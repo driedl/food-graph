@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:amaranthaceae
+id: tx:plantae:eudicots:caryophyllales:amaranthaceae
 rank: family
 latin_name: Amaranthaceae
 display_name: amaranth, quinoa, spinach

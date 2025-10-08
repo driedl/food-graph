@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:zingiberaceae:elettaria
+id: tx:plantae:monocots:zingiberales:zingiberaceae:elettaria
 rank: genus
 latin_name: Elettaria
 display_name: Green cardamom

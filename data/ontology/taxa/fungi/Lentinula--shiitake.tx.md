@@ -1,5 +1,5 @@
 ---
-id: tx:fungi:lentinula
+id: tx:fungi:agaricomycetes:agaricales:omphalotaceae:lentinula
 rank: genus
 latin_name: Lentinula
 display_name: Lentinula (shiitake)

@@ -25,7 +25,7 @@
 {"taxon_id":"tx:animalia:chordata:aves:galliformes:meleagrididae:meleagris:gallopavo_domesticus","part_id":"part:egg","name":"Turkey Egg","display_name":"Turkey Egg"}
 {"taxon_id":"tx:animalia:chordata:aves:galliformes:phasianidae:coturnix:japonica","part_id":"part:egg","name":"Quail Egg","display_name":"Quail Egg"}
 
-{"taxon_id":"tx:plantae:poaceae:zea:mays","part_id":"part:grain","name":"Corn","display_name":"Corn"}
+{"taxon_id":"tx:plantae:monocots:poales:zea:mays","part_id":"part:grain","name":"Corn","display_name":"Corn"}
 
 {"taxon_id":"tx:animalia:chordata:aves:struthioniformes:struthionidae:struthio:camelus","part_id":"part:muscle","name":"Ostrich","display_name":"Ostrich"}
 {"taxon_id":"tx:animalia:chordata:aves:casuariiformes:dromaiidae:dromaius:novaehollandiae","part_id":"part:muscle","name":"Emu","display_name":"Emu"}
@@ -100,5 +100,5 @@
 {"taxon_id":"tx:animalia:chordata:actinopterygii:polyodontiformes:polyodontidae:polyodon:spathula","part_id":"part:roe","name":"Caviar","display_name":"Caviar (Paddlefish)"}
 {"taxon_id":"tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae:salmo:salar","part_id":"part:roe","name":"Salmon Roe","display_name":"Salmon Roe"}
 {"taxon_id":"tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae:oncorhynchus:keta","part_id":"part:roe","name":"Salmon Roe","display_name":"Salmon Roe"}
-{"taxon_id":"tx:plantae:oleaceae:olea:europaea","part_id":"part:expressed_oil","name":"Olive Oil","display_name":"Olive Oil"}
+{"taxon_id":"tx:plantae:eudicots:lamiales:olea:europaea","part_id":"part:expressed_oil","name":"Olive Oil","display_name":"Olive Oil"}
 {"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:suidae:sus:scrofa_domesticus","part_id":"part:belly","name":"Pork Belly","display_name":"Pork Belly"}

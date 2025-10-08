@@ -1,5 +1,5 @@
 ---
-id: tx:fungi:agrocybe
+id: tx:fungi:agaricomycetes:agaricales:strophariaceae:cyclocybe
 rank: genus
 latin_name: Agrocybe
 display_name: Agrocybe (pioppino)

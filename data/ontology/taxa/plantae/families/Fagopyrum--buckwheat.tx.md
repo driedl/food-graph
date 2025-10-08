@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:polygonaceae:fagopyrum
+id: tx:plantae:eudicots:caryophyllales:polygonaceae:fagopyrum
 rank: genus
 latin_name: Fagopyrum
 display_name: Buckwheat

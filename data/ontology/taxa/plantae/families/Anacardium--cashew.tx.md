@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:anacardiaceae:anacardium
+id: tx:plantae:eudicots:sapindales:anacardiaceae:anacardium
 rank: genus
 latin_name: Anacardium
 display_name: Anacardium (cashew)

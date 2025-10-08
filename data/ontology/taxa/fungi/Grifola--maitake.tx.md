@@ -1,5 +1,5 @@
 ---
-id: tx:fungi:grifola
+id: tx:fungi:agaricomycetes:polyporales:meripilaceae:grifola
 rank: genus
 latin_name: Grifola
 display_name: Grifola (maitake/hen of the woods)

@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:amaryllidaceae:allium
+id: tx:plantae:monocots:asparagales:amaryllidaceae:allium
 rank: genus
 latin_name: Allium
 display_name: Allium (onion)

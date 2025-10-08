@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:lauraceae:cinnamomum
+id: tx:plantae:eudicots:laurales:lauraceae:cinnamomum
 rank: genus
 latin_name: Cinnamomum
 display_name: Cinnamomum (cinnamon & cassia)

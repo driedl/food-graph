@@ -1,7 +1,12 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Dict, Any, Tuple, Optional
-from lib.db import DatabaseConnection
+# Try absolute imports first, fall back to relative
+try:
+    from etl.lib.db import DatabaseConnection
+except ImportError:
+    # Fall back to relative imports when running from etl directory
+    from lib.db import DatabaseConnection
 
 @dataclass
 class Part:

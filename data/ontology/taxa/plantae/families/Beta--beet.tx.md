@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:amaranthaceae:beta
+id: tx:plantae:eudicots:caryophyllales:amaranthaceae:beta
 rank: genus
 latin_name: Beta
 display_name: Beta (beet)

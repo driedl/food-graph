@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:asteraceae
+id: tx:plantae:eudicots:asterales:asteraceae
 rank: family
 latin_name: Asteraceae
 display_name: asters

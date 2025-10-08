@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:apiaceae:cuminum
+id: tx:plantae:eudicots:apiales:apiaceae:cuminum
 rank: genus
 latin_name: Cuminum
 display_name: Cuminum (cumin)

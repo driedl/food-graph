@@ -55,3 +55,67 @@
 [BATCH] processed=20 accepted=19 skipped=1 ambiguous=0 errors=0 avg_time=18.67s
 [done] processed=20 accepted=19 skipped=1 ambiguous=0 errors=0 total_time=374.27s avg_per_food=18.67s
 [tokens] input=73979 cached=14336 output=23245 total=97224 avg_input=3698.9 avg_cached=716.8 avg_output=1162.2
+[2025-10-07T23:28:33.280344] run start model=gpt-5-mini min_conf=0.7 topk=15 limit=20
+[FOOD] fdc:327699 | Strawberries, raw
+[MISSING_TAXON] fdc:327699 | tx:plantae:eudicots:rosales:rosaceae:fragaria:ananassa
+[METRICS] fdc:327699 | llm=7799ms | tokens=3695+3584+536 | total=7.8s
+[FOOD] fdc:327923 | Lettuce, cos or romaine, raw
+[MISSING_TAXON] fdc:327923 | tx:plantae:eudicots:asterales:asteraceae:lactuca:sativa
+[METRICS] fdc:327923 | llm=8201ms | tokens=3699+3584+476 | total=8.2s
+[FOOD] fdc:328637 | Cheese, cheddar
+[METRICS] fdc:328637 | llm=29874ms | tokens=3693+0+1515 | total=29.9s
+[FOOD] fdc:328841 | Cheese, cottage, lowfat, 2% milkfat
+[METRICS] fdc:328841 | llm=24658ms | tokens=3702+0+1777 | total=24.7s
+[FOOD] fdc:329370 | Cheese, mozzarella, low moisture, part-skim
+[VALIDATION_ERROR] fdc:329370 | Cheese, mozzarella, low moisture, part-skim: [] is not of type 'object', 'null'
+
+Failed validating 'type' in schema['properties']['identity_json']['properties']['transforms']['items']['properties']['params']:
+    {'type': ['object', 'null']}
+
+On instance['identity_json']['transforms'][4]['params']:
+    []
+[FOOD] fdc:329490 | Egg, whole, dried
+[METRICS] fdc:329490 | llm=20483ms | tokens=3694+3584+1391 | total=20.5s
+[BATCH] processed=5 accepted=5 skipped=0 ambiguous=0 errors=1 avg_time=18.22s
+[FOOD] fdc:329596 | Egg, yolk, raw, frozen, pasteurized
+[MISSING_TAXON] fdc:329596 | tx:animalia:chordata:aves:galliformes:phasianidae:gallus:gallus
+[METRICS] fdc:329596 | llm=36083ms | tokens=3700+3584+1903 | total=36.1s
+[FOOD] fdc:329716 | Egg, yolk, dried
+[METRICS] fdc:329716 | llm=19400ms | tokens=3695+0+1330 | total=19.4s
+[FOOD] fdc:329830 | Cheese, dry white, queso seco
+[METRICS] fdc:329830 | llm=19812ms | tokens=3697+3584+1560 | total=19.8s
+[FOOD] fdc:330137 | Yogurt, Greek, plain, nonfat
+[METRICS] fdc:330137 | llm=23938ms | tokens=3699+0+1608 | total=24.0s
+[FOOD] fdc:330458 | Oil, coconut
+[MISSING_TAXON] fdc:330458 | tx:plantae:monocots:arecales:arecaceae:cocos:nucifera
+[METRICS] fdc:330458 | llm=10090ms | tokens=3691+0+674 | total=10.1s
+[BATCH] processed=10 accepted=10 skipped=0 ambiguous=0 errors=1 avg_time=20.05s
+[FOOD] fdc:330869 | Turkey, ground, 93% lean, 7% fat, pan-broiled crumbles
+[MISSING_TAXON] fdc:330869 | tx:animalia:chordata:aves:galliformes:phasianidae:meleagris:gallopavo
+[METRICS] fdc:330869 | llm=19003ms | tokens=3708+0+1191 | total=19.0s
+[FOOD] fdc:332597 | Pears, raw, bartlett (Includes foods for USDA's Food Distribution Program)
+[MISSING_TAXON] fdc:332597 | tx:plantae:eudicots:rosales:rosaceae:pyrus:communis
+[METRICS] fdc:332597 | llm=9556ms | tokens=3707+0+603 | total=9.6s
+[FOOD] fdc:332791 | Olives, green, Manzanilla, stuffed with pimiento
+[VALIDATION_ERROR] fdc:332791 | Olives, green, Manzanilla, stuffed with pimiento: 'ambiguous' is not one of ['taxon', 'tp', 'tpt']
+
+Failed validating 'enum' in schema['properties']['node_kind']:
+    {'enum': ['taxon', 'tp', 'tpt']}
+
+On instance['node_kind']:
+    'ambiguous'
+[FOOD] fdc:333374 | Fish, haddock, raw
+[METRICS] fdc:333374 | llm=8695ms | tokens=3696+0+676 | total=8.7s
+[FOOD] fdc:333476 | Fish, pollock, raw
+[METRICS] fdc:333476 | llm=14139ms | tokens=3696+3584+942 | total=14.2s
+[FOOD] fdc:334849 | Beef, loin, top loin steak, boneless, lip-on, separable lean only, trimmed to 1/8" fat, choice, raw
+[METRICS] fdc:334849 | llm=14153ms | tokens=3719+3584+876 | total=14.2s
+[BATCH] processed=15 accepted=15 skipped=0 ambiguous=0 errors=2 avg_time=17.75s
+[FOOD] fdc:334898 | Beef, round, eye of round roast, boneless, separable lean only, trimmed to 0" fat, select, raw
+[METRICS] fdc:334898 | llm=14319ms | tokens=3715+0+1079 | total=14.3s
+[FOOD] fdc:334963 | Beef, round, top round roast, boneless, separable lean only, trimmed to 0" fat, select, raw
+[METRICS] fdc:334963 | llm=22129ms | tokens=3714+0+1138 | total=22.2s
+[FOOD] fdc:335109 | Beef, short loin, porterhouse steak, separable lean only, trimmed to 1/8" fat, select, raw
+[METRICS] fdc:335109 | llm=14691ms | tokens=3714+3584+1006 | total=14.7s
+[done] processed=18 accepted=18 skipped=0 ambiguous=0 errors=2 total_time=362.12s avg_per_food=17.63s
+[tokens] input=74037 cached=28672 output=23798 total=97835 avg_input=4113.2 avg_cached=1592.9 avg_output=1322.1

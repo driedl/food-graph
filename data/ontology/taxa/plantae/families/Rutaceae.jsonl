@@ -1,5 +1,0 @@
-{"id": "tx:plantae:rutaceae", "parent": "tx:plantae", "rank": "family", "display_name": "Rutaceae", "latin_name": "Rutaceae", "aliases": []}
-{"id": "tx:plantae:rutaceae:citrus", "parent": "tx:plantae:rutaceae", "rank": "genus", "display_name": "Citrus", "latin_name": "Citrus", "aliases": []}
-{"id": "tx:plantae:rutaceae:citrus:sinensis", "parent": "tx:plantae:rutaceae:citrus", "rank": "species", "display_name": "Orange", "latin_name": "Citrus sinensis", "aliases": ["orange", "navel orange"]}
-{"id": "tx:plantae:rutaceae:citrus:paradisi", "parent": "tx:plantae:rutaceae:citrus", "rank": "species", "display_name": "Grapefruit", "latin_name": "Citrus paradisi", "aliases": ["grapefruit"]}
-{"id": "tx:plantae:rutaceae:citrus:reticulata", "parent": "tx:plantae:rutaceae:citrus", "rank": "species", "display_name": "Mandarin", "latin_name": "Citrus reticulata", "aliases": ["mandarin", "tangerine"]}

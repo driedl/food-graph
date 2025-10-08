@@ -37,7 +37,7 @@
 {"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus","part_id":"part:milk","synonyms":["dairy","whole milk","raw milk"]}
 {"taxon_id":"tx:animalia:chordata:aves:galliformes:phasianidae:gallus:gallus_domesticus","part_id":"part:egg","synonyms":["chicken eggs","farm eggs","free range eggs"]}
 {"taxon_id":"tx:plantae:rosaceae:malus:","part_id":"part:fruit","synonyms":["apples","apple fruit","fresh apples"]}
-{"taxon_id":"tx:plantae:poaceae:oryza:sativa","part_id":"part:grain","synonyms":["rice grain","white rice","brown rice","jasmine rice","basmati rice"]}
+{"taxon_id":"tx:plantae:monocots:poales:oryza:sativa","part_id":"part:grain","synonyms":["rice grain","white rice","brown rice","jasmine rice","basmati rice"]}
 {"taxon_id":"tx:animalia:mollusca:bivalvia:ostreida:ostreidae:crassostrea:gigas","part_id":"part:muscle","synonyms":["oyster","pacific oyster"]}
 {"taxon_id":"tx:animalia:chordata:actinopterygii:acipenseriformes:acipenseridae:acipenser:baerii","part_id":"part:roe","synonyms":["black caviar","sturgeon caviar"]}
 {"taxon_id":"tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae:salmo:salar","part_id":"part:roe","synonyms":["ikura","red caviar"]}

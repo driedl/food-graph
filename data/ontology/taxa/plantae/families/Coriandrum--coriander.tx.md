@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:apiaceae:coriandrum
+id: tx:plantae:eudicots:apiales:apiaceae:coriandrum
 rank: genus
 latin_name: Coriandrum
 display_name: Coriandrum (coriander)

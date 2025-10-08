@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:rosaceae:pyrus
+id: tx:plantae:eudicots:rosales:rosaceae:pyrus
 rank: genus
 latin_name: Pyrus
 display_name: Pears

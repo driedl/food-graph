@@ -29,6 +29,7 @@
     "evidence:map": "cd etl && python3 -m evidence.map",
     "evidence:map:limit": "cd etl && python3 -m evidence.map --limit",
     "evidence:profiles": "cd etl && python3 -m evidence.profiles",
+    "evidence:validate": "cd etl && python3 -m evidence.validation.validate --evidence ../data/evidence/fdc-foundation --build ./build --verbose",
     "check": "pnpm typecheck && pnpm lint"
   },
   "devDependencies": {

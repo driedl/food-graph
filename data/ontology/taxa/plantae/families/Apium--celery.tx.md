@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:apiaceae:apium
+id: tx:plantae:eudicots:apiales:apiaceae:apium
 rank: genus
 latin_name: Apium
 display_name: Apium (celery)

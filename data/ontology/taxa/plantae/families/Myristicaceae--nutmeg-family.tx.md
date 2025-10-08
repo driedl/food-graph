@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:myristicaceae
+id: tx:plantae:eudicots:magnoliales:myristicaceae
 rank: family
 latin_name: Myristicaceae
 display_name: nutmeg family

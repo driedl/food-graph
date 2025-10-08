@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:fagaceae
+id: tx:plantae:eudicots:fagales:fagaceae
 rank: family
 latin_name: Fagaceae
 display_name: beeches

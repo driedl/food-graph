@@ -1,3 +1,0 @@
-{"id": "tx:plantae:annonaceae", "parent": "tx:plantae", "rank": "family", "display_name": "Annonaceae", "latin_name": "Annonaceae", "aliases": []}
-{"id": "tx:plantae:annonaceae:asimina", "parent": "tx:plantae:annonaceae", "rank": "genus", "display_name": "Asimina", "latin_name": "Asimina", "aliases": []}
-{"id": "tx:plantae:annonaceae:asimina:triloba", "parent": "tx:plantae:annonaceae:asimina", "rank": "species", "display_name": "Pawpaw", "latin_name": "Asimina triloba", "aliases": ["pawpaw"]}

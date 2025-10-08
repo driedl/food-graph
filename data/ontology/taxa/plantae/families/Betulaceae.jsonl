@@ -1,3 +1,0 @@
-{"id": "tx:plantae:betulaceae", "parent": "tx:plantae", "rank": "family", "display_name": "Betulaceae", "latin_name": "Betulaceae", "aliases": []}
-{"id": "tx:plantae:betulaceae:corylus", "parent": "tx:plantae:betulaceae", "rank": "genus", "display_name": "Hazelnut (genus)", "latin_name": "Corylus", "aliases": []}
-{"id": "tx:plantae:betulaceae:corylus:avellana", "parent": "tx:plantae:betulaceae:corylus", "rank": "species", "display_name": "Hazelnut", "latin_name": "Corylus avellana", "aliases": ["hazelnut", "filbert"]}

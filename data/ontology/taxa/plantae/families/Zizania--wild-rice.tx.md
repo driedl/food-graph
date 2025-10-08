@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:poaceae:zizania
+id: tx:plantae:monocots:poales:poaceae:zizania
 rank: genus
 latin_name: Zizania
 display_name: Wild rice

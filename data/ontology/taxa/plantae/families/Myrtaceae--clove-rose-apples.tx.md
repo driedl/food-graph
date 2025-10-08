@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:myrtaceae:syzygium
+id: tx:plantae:eudicots:myrtales:myrtaceae:syzygium
 rank: genus
 latin_name: Syzygium
 display_name: Syzygium (clove & rose apples)

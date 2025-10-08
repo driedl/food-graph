@@ -102,30 +102,6 @@ Include **phylum** (e.g., `chordata`, `arthropoda`, `mollusca`) before class. Ex
 #### 1.3.3) Fungi
 Tier2 is **class** (e.g., `agaricomycetes`, `saccharomycetes`). Do **not** include division/phylum for fungi.
 
-### 1.4) Kingdom-Specific Rank Terminologies
-
-#### Plants (`tx:plantae`)
-* **Allowed Ranks**: `kingdom`, `family`, `genus`, `species`, `variety`, `cultivar`, `form`
-* **Special Rules**:
-  - No `order` rank - families live directly under kingdom
-  - `variety` for botanical varieties (e.g., `Brassica oleracea var. italica`)
-  - `cultivar` for cultivated varieties (e.g., `Solanum lycopersicum 'Roma'`)
-  - `form` for processing variants (e.g., rice forms)
-
-#### Animals (`tx:animalia`)
-* **Allowed Ranks**: `kingdom`, `phylum`, `class`, `order`, `suborder`, `infraorder`, `family`, `subfamily`, `tribe`, `subtribe`, `genus`, `species`
-* **Special Rules**:
-  - Full biological hierarchy supported
-  - `breed` mentioned in documentation but not implemented as explicit rank
-  - Focus on species-level identification
-
-#### Fungi (`tx:fungi`)
-* **Allowed Ranks**: `kingdom`, `genus`, `species`, `variety`, `form`
-* **Special Rules**:
-  - Simplified hierarchy
-  - `variety` for fungal varieties
-  - `form` for processing variants
-
 ### 1.4) Part System Details
 
 * **Core Parts**: Biological/anatomical + primary process parts (e.g., milk, cream, muscle, fruit)

@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:anacardiaceae:pistacia
+id: tx:plantae:eudicots:sapindales:anacardiaceae:pistacia
 rank: genus
 latin_name: Pistacia
 display_name: Pistacia (pistachio)

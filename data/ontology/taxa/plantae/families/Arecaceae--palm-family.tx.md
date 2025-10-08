@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:arecaceae
+id: tx:plantae:monocots:arecales:arecaceae
 rank: family
 latin_name: Arecaceae
 display_name: palm family

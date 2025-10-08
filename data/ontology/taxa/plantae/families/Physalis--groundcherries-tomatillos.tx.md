@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:solanaceae:physalis
+id: tx:plantae:eudicots:solanales:solanaceae:physalis
 rank: genus
 latin_name: Physalis
 display_name: Groundcherries & tomatillos

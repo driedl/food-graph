@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:amaryllidaceae
+id: tx:plantae:monocots:asparagales:amaryllidaceae
 rank: family
 latin_name: Amaryllidaceae
 display_name: onion family

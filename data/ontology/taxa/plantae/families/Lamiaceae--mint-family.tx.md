@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:lamiaceae
+id: tx:plantae:eudicots:lamiales:lamiaceae
 rank: family
 latin_name: Lamiaceae
 display_name: mint family

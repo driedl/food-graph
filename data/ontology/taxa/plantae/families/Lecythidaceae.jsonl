@@ -1,3 +1,0 @@
-{"id": "tx:plantae:lecythidaceae", "parent": "tx:plantae", "rank": "family", "display_name": "Lecythidaceae", "latin_name": "Lecythidaceae", "aliases": []}
-{"id": "tx:plantae:lecythidaceae:bertholletia", "parent": "tx:plantae:lecythidaceae", "rank": "genus", "display_name": "Bertholletia", "latin_name": "Bertholletia", "aliases": []}
-{"id": "tx:plantae:lecythidaceae:bertholletia:excelsa", "parent": "tx:plantae:lecythidaceae:bertholletia", "rank": "species", "display_name": "Brazil nut", "latin_name": "Bertholletia excelsa", "aliases": ["brazil nut", "brazil nuts"]}

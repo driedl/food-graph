@@ -1,5 +1,5 @@
 ---
-id: tx:plantae:rosaceae:rubus
+id: tx:plantae:eudicots:rosales:rosaceae:rubus
 rank: genus
 latin_name: Rubus
 display_name: Brambles (raspberries & blackberries)
