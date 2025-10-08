@@ -11,6 +11,7 @@ import { TransformsPanel } from '@/components/inspector/TransformsPanel'
 import { FoodStatePanel } from '@/components/inspector/FoodStatePanel'
 import { TPCompare } from '@/components/tp/TPCompare'
 import { TPTComparePanel } from '@/components/tp/TPTComparePanel'
+import { PartKindBadge } from '@/components/ui/PartKindBadge'
 import ErrorBoundary from '@/components/ErrorBoundary'
 
 export const Route = createFileRoute('/workbench/tp/$taxonId/$partId')({
@@ -44,7 +45,7 @@ function TPPage() {
 
     // Queries
     const taxonQ = trpc.taxonomy.getNode.useQuery({ id: taxonId }, { enabled: !!taxonId })
-    const partQ = trpc.taxonomy.getTaxonPart.useQuery({ id: partId }, { enabled: !!partId })
+    const partQ = trpc.taxonomy.getTaxonPart.useQuery({ id: `${taxonId}:${partId}` }, { enabled: !!taxonId && !!partId })
     const familiesQ = (trpc as any).facets?.familiesForTaxonPart?.useQuery(
         { taxonId, partId },
         { enabled: !!taxonId && !!partId }
@@ -132,6 +133,7 @@ function TPPage() {
                         <div className="text-lg font-semibold">{taxon.name}</div>
                         <div className="text-muted-foreground">·</div>
                         <div className="text-lg font-semibold">{part.name}</div>
+                        {part.part_kind && <PartKindBadge kind={part.part_kind} />}
                     </div>
                     <div className="text-sm text-muted-foreground">
                         {taxonId} · {partId}

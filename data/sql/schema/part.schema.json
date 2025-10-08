@@ -20,10 +20,9 @@
         "plant",
         "animal",
         "fungus",
-        "derived",
-        "any"
+        "derived"
       ],
-      "description": "Biological kind: plant|animal|fungus|derived|any"
+      "description": "Biological kind: plant|animal|fungus|derived"
     },
     "category": {
       "type": "string",

@@ -272,3 +272,6 @@
 {"id": "tx:plantae:monocots:zingiberales:zingiberaceae:curcuma:longa", "parent": "tx:plantae:monocots:zingiberales:zingiberaceae:curcuma", "rank": "species", "display_name": "Turmeric", "latin_name": "Curcuma longa", "aliases": ["turmeric"]}
 {"id": "tx:plantae:monocots:zingiberales:zingiberaceae:elettaria", "parent": "tx:plantae:monocots:zingiberales:zingiberaceae", "rank": "genus", "display_name": "Elettaria", "latin_name": "Elettaria", "aliases": []}
 {"id": "tx:plantae:monocots:zingiberales:zingiberaceae:elettaria:cardamomum", "parent": "tx:plantae:monocots:zingiberales:zingiberaceae:elettaria", "rank": "species", "display_name": "Cardamom", "latin_name": "Elettaria cardamomum", "aliases": ["cardamom"]}
+{"id": "tx:plantae:eudicots:brassicales:brassicaceae:brassica:oleracea:sabellica", "parent": "tx:plantae:eudicots:brassicales:brassicaceae:brassica:oleracea", "rank": "variety", "display_name": "Kale", "latin_name": "Brassica oleracea var. sabellica", "aliases": ["kale"]}
+{"id": "tx:plantae:eudicots:sapindales:rutaceae:citrus:sinensis:navel", "parent": "tx:plantae:eudicots:sapindales:rutaceae:citrus:sinensis", "rank": "cultivar", "display_name": "Navel Orange", "latin_name": "Citrus sinensis 'Navel'", "aliases": ["navel orange"]}
+

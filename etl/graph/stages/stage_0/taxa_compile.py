@@ -15,7 +15,7 @@ def _collect_taxa(root: Path) -> List[Tuple[Path, int, dict]]:
     index = root / "index.jsonl"
     if index.exists():
         for ln, obj in _iter_jsonl(index): items.append((index, ln, obj))
-    for f in sorted((root / "plantae" / "families").rglob("*.jsonl")):
+    for f in sorted((root / "plantae").rglob("*.jsonl")):
         for ln, obj in _iter_jsonl(f): items.append((f, ln, obj))
     fungi = root / "fungi" / "fungi.jsonl"
     if fungi.exists():

@@ -317,7 +317,7 @@ Confirm that `part:cream` exists in `parts.core.json` and that the merged regist
 * **Uniqueness**: No duplicate `id` across core + derived.
 * **No orphan parents**: Every `parent_id` must resolve AFTER the union.
 * **No cycles** across the combined hierarchy.
-* **Kind vocabulary**: `plant|animal|fungus|derived|any` (schema-enforced).
+* **Kind vocabulary**: `plant|animal|fungus|derived` (schema-enforced).
 * **Category required**: every part must have a `category` field for filtering and organization.
 * **Biological ancestry for derived**: every `kind:"derived"` must trace to at least one biological ancestor (`plant|animal|fungus`) via `parent_id` links.
 * **Depth**: hierarchy depth ≤ 5 (configurable).

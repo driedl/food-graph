@@ -30,6 +30,10 @@
 {"id": "tx:animalia:chordata:aves:galliformes:phasianidae:gallus", "parent": "tx:animalia:chordata:aves:galliformes:phasianidae", "rank": "genus", "display_name": "Gallus", "latin_name": "Gallus", "aliases": []}
 {"id": "tx:animalia:chordata:aves:galliformes:phasianidae:gallus:gallus_domesticus", "parent": "tx:animalia:chordata:aves:galliformes:phasianidae:gallus", "rank": "species", "display_name": "Chicken", "latin_name": "Gallus gallus domesticus", "aliases": ["chicken"]}
 
+// Meleagris under Phasianidae (for evidence validation compatibility)
+{"id": "tx:animalia:chordata:aves:galliformes:phasianidae:meleagris", "parent": "tx:animalia:chordata:aves:galliformes:phasianidae", "rank": "genus", "display_name": "Meleagris", "latin_name": "Meleagris", "aliases": []}
+{"id": "tx:animalia:chordata:aves:galliformes:phasianidae:meleagris:gallopavo", "parent": "tx:animalia:chordata:aves:galliformes:phasianidae:meleagris", "rank": "species", "display_name": "Turkey", "latin_name": "Meleagris gallopavo", "aliases": ["turkey"]}
+
 // Meleagrididae (turkeys)
 {"id": "tx:animalia:chordata:aves:galliformes:meleagrididae", "parent": "tx:animalia:chordata:aves:galliformes", "rank": "family", "display_name": "Meleagrididae", "latin_name": "Meleagrididae", "aliases": []}
 {"id": "tx:animalia:chordata:aves:galliformes:meleagrididae:meleagris", "parent": "tx:animalia:chordata:aves:galliformes:meleagrididae", "rank": "genus", "display_name": "Meleagris", "latin_name": "Meleagris", "aliases": []}

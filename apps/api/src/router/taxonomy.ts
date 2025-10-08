@@ -260,10 +260,10 @@ export const taxonomyRouter = t.router({
         .query(({ input }) => {
             const row = db.prepare(`
         SELECT 
-          tp.id, tp.name, tp.display_name, tp.slug, tp.rank, tp.kind,
+          tp.id, tp.name, tp.display_name, tp.slug, tp.rank,
           tp.taxon_id, tp.part_id,
           n.name as taxon_name, n.rank as taxon_rank,
-          p.name as part_name
+          p.name as part_name, p.kind as part_kind
         FROM taxon_part_nodes tp
         JOIN nodes n ON n.id = tp.taxon_id
         JOIN part_def p ON p.id = tp.part_id

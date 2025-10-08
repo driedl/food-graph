@@ -119,3 +119,63 @@ On instance['node_kind']:
 [METRICS] fdc:335109 | llm=14691ms | tokens=3714+3584+1006 | total=14.7s
 [done] processed=18 accepted=18 skipped=0 ambiguous=0 errors=2 total_time=362.12s avg_per_food=17.63s
 [tokens] input=74037 cached=28672 output=23798 total=97835 avg_input=4113.2 avg_cached=1592.9 avg_output=1322.1
+[2025-10-08T14:12:13.638906] run start model=gpt-5-mini min_conf=0.7 topk=15 limit=20
+[FOOD] fdc:746759 | Beef, loin, top loin steak, boneless, lip-on, separable lean only, trimmed to 1/8" fat, choice, raw
+[METRICS] fdc:746759 | llm=34496ms | tokens=3719+0+1388 | total=34.5s
+[FOOD] fdc:746760 | Beef, round, eye of round roast, boneless, separable lean only, trimmed to 0" fat, select, raw
+[METRICS] fdc:746760 | llm=18206ms | tokens=3715+0+680 | total=18.2s
+[FOOD] fdc:746761 | Beef, round, top round roast, boneless, separable lean only, trimmed to 0" fat, select, raw
+[METRICS] fdc:746761 | llm=20752ms | tokens=3714+0+999 | total=20.8s
+[FOOD] fdc:746762 | Beef, short loin, porterhouse steak, separable lean only, trimmed to 1/8" fat, select, raw
+[METRICS] fdc:746762 | llm=33106ms | tokens=3714+0+1189 | total=33.1s
+[FOOD] fdc:746765 | Cheese, dry white, queso seco
+[METRICS] fdc:746765 | llm=54923ms | tokens=3697+0+1897 | total=54.9s
+[BATCH] processed=5 accepted=5 skipped=0 ambiguous=0 errors=0 avg_time=32.31s
+[FOOD] fdc:746766 | Cheese, ricotta, whole milk
+[METRICS] fdc:746766 | llm=12064ms | tokens=3697+0+1159 | total=12.1s
+[FOOD] fdc:746767 | Cheese, swiss
+[METRICS] fdc:746767 | llm=27938ms | tokens=3693+0+1449 | total=28.0s
+[FOOD] fdc:746769 | Lettuce, cos or romaine, raw
+[METRICS] fdc:746769 | llm=10415ms | tokens=3699+0+476 | total=10.4s
+[FOOD] fdc:746770 | Melons, cantaloupe, raw
+[METRICS] fdc:746770 | llm=11770ms | tokens=3698+3584+512 | total=11.8s
+[FOOD] fdc:746771 | Oranges, raw, navels
+[METRICS] fdc:746771 | llm=10820ms | tokens=3697+0+606 | total=10.8s
+[BATCH] processed=10 accepted=10 skipped=0 ambiguous=0 errors=0 avg_time=23.47s
+[FOOD] fdc:746772 | Milk, lowfat, fluid, 1% milkfat, with added vitamin A and vitamin D
+[METRICS] fdc:746772 | llm=28774ms | tokens=3709+0+1100 | total=28.8s
+[FOOD] fdc:746773 | Pears, raw, bartlett
+[METRICS] fdc:746773 | llm=18121ms | tokens=3697+0+671 | total=18.1s
+[FOOD] fdc:746775 | Salt, table, iodized
+[MISSING_PART] fdc:746775 | part:salt
+[METRICS] fdc:746775 | llm=14090ms | tokens=3694+0+1003 | total=14.1s
+[FOOD] fdc:746776 | Milk, nonfat, fluid, with added vitamin A and vitamin D (fat free or skim)
+[METRICS] fdc:746776 | llm=17475ms | tokens=3709+3584+788 | total=17.5s
+[FOOD] fdc:746778 | Milk, reduced fat, fluid, 2% milkfat, with added vitamin A and vitamin D
+[METRICS] fdc:746778 | llm=16078ms | tokens=3709+0+1369 | total=16.1s
+[BATCH] processed=15 accepted=15 skipped=0 ambiguous=0 errors=0 avg_time=21.95s
+[FOOD] fdc:746782 | Milk, whole, 3.25% milkfat, with added vitamin D
+[METRICS] fdc:746782 | llm=27211ms | tokens=3705+0+1162 | total=27.2s
+[FOOD] fdc:746785 | Turkey, ground, 93% lean, 7% fat, pan-broiled crumbles
+[METRICS] fdc:746785 | llm=30502ms | tokens=3708+0+1733 | total=30.5s
+[FOOD] fdc:747429 | Cheese, American, restaurant
+[METRICS] fdc:747429 | llm=27635ms | tokens=3695+3584+1059 | total=27.7s
+[FOOD] fdc:747447 | Broccoli, raw
+[METRICS] fdc:747447 | llm=14728ms | tokens=3693+0+872 | total=14.7s
+[FOOD] fdc:747448 | Strawberries, raw
+[MISSING_TAXON] fdc:747448 | tx:plantae:eudicots:rosales:rosaceae:fragaria:ananassa
+[METRICS] fdc:747448 | llm=14222ms | tokens=3695+3584+759 | total=14.2s
+[BATCH] processed=20 accepted=20 skipped=0 ambiguous=0 errors=0 avg_time=22.18s
+[done] processed=20 accepted=20 skipped=0 ambiguous=0 errors=0 total_time=444.49s avg_per_food=22.18s
+[tokens] input=74057 cached=14336 output=20871 total=94928 avg_input=3702.8 avg_cached=716.8 avg_output=1043.5
+[2025-10-08T15:14:24.066313] run start model=gpt-5-mini min_conf=0.7 topk=15 limit=20
+[FOOD] fdc:747997 | Eggs, Grade A, Large, egg white
+[MISSING_TAXON] fdc:747997 | tx:animalia:chordata:aves:galliformes:phasianidae:gallus:gallus_gallus_domesticus
+[METRICS] fdc:747997 | llm=24370ms | tokens=3699+0+1509 | total=24.4s
+[FOOD] fdc:748236 | Eggs, Grade A, Large, egg yolk
+[MISSING_TAXON] fdc:748236 | tx:animalia:chordata:aves:galliformes:phasianidae:gallus:gallus_gallus:domesticus
+[METRICS] fdc:748236 | llm=17782ms | tokens=3700+0+1128 | total=17.8s
+[FOOD] fdc:748278 | Oil, canola
+[MISSING_TAXON] fdc:748278 | tx:plantae:eudicots:brassicales:brassicaceae:brassica:napus:canola
+[METRICS] fdc:748278 | llm=18209ms | tokens=3692+0+1132 | total=18.2s
+[FOOD] fdc:748323 | Oil, corn
