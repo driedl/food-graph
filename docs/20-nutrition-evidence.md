@@ -79,11 +79,95 @@ etl2/
 
 ---
 
+## Nutrient ID Strategy: INFOODS/EuroFIR as Canonical Standard
+
+> **Critical Decision Point**: This is exactly where picking the "right" IDs will save you years of churn.
+
+### Recommendation
+
+Use **INFOODS/EuroFIR component tagnames** as your **primary nutrient IDs**, and treat everything else (USDA FDC numeric IDs, SR-Legacy nutrient numbers, CNF/UK codes, label fields) as **aliases** in a cross-walk.
+
+**Why:**
+
+* **International + long-lived.** EuroFIR's component identifiers are explicitly **based on INFOODS tagnames** and have been harmonized; this is the closest thing our field has to a neutral, cross-database standard.
+* **Cross-walks already exist (or are easy).** FDC exposes `nutrient_nbr` values that line up with SR-Legacy nutrient numbers; EuroFIR has published SR-to-EuroFIR component mappings—so you can bridge **FDC → SR-Legacy → INFOODS/EuroFIR** with high coverage.
+* **Many national FCDBs align around INFOODS/EuroFIR.** That makes it easier to add the UK dataset (McCance & Widdowson), Canada's CNF, AUSNUT, etc., without inventing one-off keys.
+
+### What Others Use (Practically)
+
+* **USDA FDC**: internal `nutrient.id` plus `nutrient_nbr` (the SR-Legacy code many tools still recognize). This makes FDC→SR mapping straightforward.
+* **SR-Legacy**: the classic **nutrient numbers** (e.g., 203 protein, 204 fat, 208 energy), still referenced widely.
+* **EuroFIR member datasets (e.g., UK)**: local codes but curated with **EuroFIR component identifiers** that tie back to INFOODS.
+* **CNF (Canada)**: national codes; per-food coverage up to **~152 nutrients**—roughly on par with SR-Legacy breadth.
+
+### "Greatest Depth?" (Who Has the Most Nutrients)
+
+No single general-purpose database wins across all foods. **FDC/SR-Legacy** tops out around **~150 components** per food; **CNF** similarly reports **up to ~152**; the **UK** dataset varies by food; and specialized resources (e.g., EuroFIR partners, phytochemical databases) can be deeper for specific compound classes. In short: **FDC is broad and current for the U.S., but not uniquely deepest** across every nutrient class.
+
+### Implementation Strategy for Our Stack
+
+1. **Canon = INFOODS/EuroFIR tag**
+   Keep our current INFOODS IDs (e.g., `ENERC_KCAL`, `PROT`, `FAT`, etc.) as the primary key in our ontology.
+
+2. **Alias columns for cross-walks**
+   For each tag, store:
+   ```json
+   "aliases": { 
+     "sr_legacy": [203], 
+     "fdc_nutrient_ids": [1003], 
+     "eurofir_id": "PROT", 
+     "label_name": "Protein" 
+   }
+   ```
+   This future-proofs joins and keeps our UI/ETL clean.
+
+3. **Build the automatic bridge**
+   * From **FDC nutrient.csv**, use `nutrient_nbr` → **SR-Legacy**
+   * Map **SR-Legacy** → **INFOODS/EuroFIR** using:
+     * Our current tag list (high-confidence core)
+     * EuroFIR SR reports (to catch long tail)
+   * Flag leftovers for manual curation (polyphenols, rare lipids, added/intrinsic split nutrients, etc.)
+
+4. **Units & expression**
+   Follow INFOODS/EuroFIR guidance: tags are identifiers; **units are separate** and standardized (kcal vs kJ, g/mg/µg), which simplifies normalization.
+
+5. **Coverage plan**
+   Our current INFOODS set is strong for macro + label + common micros. Expect to **add tails** for: amino acid detail, full FA isomers, sugar alcohols, bioactives. INFOODS/EuroFIR provide canonical identifiers for most of these when we need them.
+
+### Next Steps
+
+1. **Auto-generate FDC→INFOODS cross-walk** using the SR-Legacy hop
+2. **Update nutrient registry** to include comprehensive alias mappings
+3. **Implement automatic nutrient mapping** in the evidence pipeline
+4. **Flag gaps/duplicates** for manual curation
+
+### Immediate Implementation Plan
+
+**Phase 1: Fix Current Nutrient Loading (Immediate)**
+- ✅ Fix data type mismatch in FDC ID comparison (completed)
+- 🔄 Test nutrient loading with current fallback map
+- 📝 Document current nutrient coverage
+
+**Phase 2: Build Comprehensive Mapping (Next Sprint)**
+- 🔧 Create script to parse FDC `nutrient.csv` and extract `nutrient_nbr` mappings
+- 🔧 Map SR-Legacy numbers to INFOODS tags using existing registry + EuroFIR reports
+- 🔧 Update `nutrients-infoods.json` with comprehensive alias mappings
+- 🔧 Remove hardcoded fallback map from evidence mapping script
+
+**Phase 3: Enhanced Coverage (Future)**
+- 🔧 Add missing nutrients from EuroFIR SR reports
+- 🔧 Implement manual curation workflow for unmapped nutrients
+- 🔧 Add support for specialized nutrient classes (amino acids, fatty acids, etc.)
+
+**Expected Outcome**: Move from ~8 nutrients per food to ~50-100+ nutrients per food with proper international standardization.
+
+---
+
 ## Evidence File Contracts (POC JSONL/JSON)
 
 ### `nutrient_def.json` (global)
 
-INFOODS-first registry.
+INFOODS-first registry with comprehensive alias mappings.
 
 ```json
 [
@@ -94,30 +178,68 @@ INFOODS-first registry.
     "canonical_unit": "g",
     "precision": 1,
     "is_energy": false,
-    "notes": "Total protein"
+    "notes": "Total protein",
+    "aliases": {
+      "sr_legacy": [203],
+      "fdc_nutrient_ids": [1003],
+      "eurofir_id": "PROT",
+      "label_name": "Protein"
+    }
   },
   {
     "nutrient_id": "ENERC_KCAL",
-    "name": "Energy",
+    "name": "Energy (kcal)",
     "category": "macro",
     "canonical_unit": "kcal",
     "precision": 0,
-    "is_energy": true
+    "is_energy": true,
+    "aliases": {
+      "sr_legacy": [208],
+      "fdc_nutrient_ids": [1008],
+      "eurofir_id": "ENERC_KCAL",
+      "label_name": "Calories"
+    }
+  },
+  {
+    "nutrient_id": "FAT",
+    "name": "Total lipid (fat)",
+    "category": "macro",
+    "canonical_unit": "g",
+    "precision": 1,
+    "is_energy": false,
+    "aliases": {
+      "sr_legacy": [204],
+      "fdc_nutrient_ids": [1004],
+      "eurofir_id": "FAT",
+      "label_name": "Total Fat"
+    }
   }
 ]
 ```
 
 ### `nutrient_alias_map.json` (global)
 
-Maps source codes → INFOODS.
+**DEPRECATED** - Alias mappings are now embedded in `nutrient_def.json` for better maintainability and single source of truth.
+
+This file can be auto-generated from `nutrient_def.json` if needed for backward compatibility:
 
 ```json
 {
   "fdc": {
     "1003": "PROCNT",
-    "1004": "FAT",
+    "1004": "FAT", 
     "1005": "CHOCDF",
-    "1008": "ENERC_KCAL"
+    "1008": "ENERC_KCAL",
+    "1051": "WATER",
+    "1079": "FIBTG",
+    "1093": "NA",
+    "1087": "CA"
+  },
+  "sr_legacy": {
+    "203": "PROCNT",
+    "204": "FAT",
+    "205": "CHOCDF", 
+    "208": "ENERC_KCAL"
   },
   "ciqual": { "PROCNT": "PROCNT", "...": "..." }
 }

@@ -110,6 +110,8 @@ def _apply_json_validators(path: Path, obj: Any, validators: List[Dict[str, Any]
             errs.extend(_validate_json_pointer_equals(path, obj, validator))
         elif kind == "no_duplicates":
             errs.extend(_validate_no_duplicates_json(path, obj, validator))
+        elif kind == "nutrients_structure":
+            errs.extend(_validate_nutrients_structure(path, obj, validator))
         elif kind == "hierarchy_consistency":
             errs.extend(_validate_hierarchy_consistency_json(path, obj, validator))
         elif kind == "schema_enum_compliance":
@@ -923,4 +925,41 @@ def _validate_part_hierarchy_integrity(path: Path, lines: List[dict], validator:
     """Validate part hierarchy integrity"""
     errs: List[str] = []
     # This is a placeholder - would need specific implementation based on requirements
+    return errs
+
+def _validate_nutrients_structure(path: Path, obj: Any, validator: Dict[str, Any]) -> List[str]:
+    """Validate nutrients.json structure - can be either array or object with nutrients array"""
+    errs: List[str] = []
+    
+    if isinstance(obj, list):
+        # Direct array format (old format)
+        if not obj:
+            errs.append(f"{path}: nutrients array is empty")
+        else:
+            # Validate each nutrient object
+            for i, nutrient in enumerate(obj):
+                if not isinstance(nutrient, dict):
+                    errs.append(f"{path}[{i}]: expected object, got {type(nutrient).__name__}")
+                elif "id" not in nutrient:
+                    errs.append(f"{path}[{i}]: missing required field 'id'")
+    elif isinstance(obj, dict):
+        # Object format with nutrients array (new format)
+        if "nutrients" not in obj:
+            errs.append(f"{path}: missing required field 'nutrients'")
+        elif not isinstance(obj["nutrients"], list):
+            errs.append(f"{path}.nutrients: expected array, got {type(obj['nutrients']).__name__}")
+        else:
+            # Validate each nutrient object
+            nutrients = obj["nutrients"]
+            if not nutrients:
+                errs.append(f"{path}.nutrients: nutrients array is empty")
+            else:
+                for i, nutrient in enumerate(nutrients):
+                    if not isinstance(nutrient, dict):
+                        errs.append(f"{path}.nutrients[{i}]: expected object, got {type(nutrient).__name__}")
+                    elif "id" not in nutrient:
+                        errs.append(f"{path}.nutrients[{i}]: missing required field 'id'")
+    else:
+        errs.append(f"{path}: expected array or object, got {type(obj).__name__}")
+    
     return errs

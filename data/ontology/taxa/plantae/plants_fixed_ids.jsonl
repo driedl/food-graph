@@ -12,6 +12,8 @@
 {"id": "tx:plantae:eudicots:asterales:asteraceae", "parent": "tx:plantae:eudicots:asterales", "rank": "family", "display_name": "Asteraceae", "latin_name": "Asteraceae", "aliases": ["Compositae"]}
 {"id": "tx:plantae:eudicots:asterales:asteraceae:helianthus", "parent": "tx:plantae:eudicots:asterales:asteraceae", "rank": "genus", "display_name": "Helianthus", "latin_name": "Helianthus", "aliases": []}
 {"id": "tx:plantae:eudicots:asterales:asteraceae:helianthus:annuus", "parent": "tx:plantae:eudicots:asterales:asteraceae:helianthus", "rank": "species", "display_name": "Sunflower", "latin_name": "Helianthus annuus", "aliases": ["sunflower"]}
+{"id": "tx:plantae:eudicots:asterales:asteraceae:carthamus", "parent": "tx:plantae:eudicots:asterales:asteraceae", "rank": "genus", "display_name": "Carthamus", "latin_name": "Carthamus", "aliases": []}
+{"id": "tx:plantae:eudicots:asterales:asteraceae:carthamus:tinctorius", "parent": "tx:plantae:eudicots:asterales:asteraceae:carthamus", "rank": "species", "display_name": "Safflower", "latin_name": "Carthamus tinctorius", "aliases": ["safflower"]}
 {"id": "tx:plantae:eudicots:asterales:asteraceae:lactuca", "parent": "tx:plantae:eudicots:asterales:asteraceae", "rank": "genus", "display_name": "Lactuca", "latin_name": "Lactuca", "aliases": []}
 {"id": "tx:plantae:eudicots:asterales:asteraceae:lactuca:sativa", "parent": "tx:plantae:eudicots:asterales:asteraceae:lactuca", "rank": "species", "display_name": "Lettuce", "latin_name": "Lactuca sativa", "aliases": ["lettuce"]}
 {"id": "tx:plantae:eudicots:asterales:asteraceae:lactuca:sativa:iceberg", "parent": "tx:plantae:eudicots:asterales:asteraceae:lactuca:sativa", "rank": "variety", "display_name": "Lettuce (Iceberg)", "latin_name": "Lactuca sativa var. capitata", "aliases": ["iceberg lettuce"]}
@@ -259,6 +261,8 @@
 {"id": "tx:plantae:monocots:poales:poaceae:sorghum:bicolor", "parent": "tx:plantae:monocots:poales:poaceae:sorghum", "rank": "species", "display_name": "Sorghum", "latin_name": "Sorghum bicolor", "aliases": ["sorghum"]}
 {"id": "tx:plantae:monocots:poales:poaceae:triticum", "parent": "tx:plantae:monocots:poales:poaceae", "rank": "genus", "display_name": "Wheat (genus)", "latin_name": "Triticum", "aliases": []}
 {"id": "tx:plantae:monocots:poales:poaceae:triticum:aestivum", "parent": "tx:plantae:monocots:poales:poaceae:triticum", "rank": "species", "display_name": "Wheat", "latin_name": "Triticum aestivum", "aliases": ["wheat"]}
+{"id": "tx:plantae:monocots:poales:poaceae:triticum:spelta", "parent": "tx:plantae:monocots:poales:poaceae:triticum", "rank": "species", "display_name": "Spelt", "latin_name": "Triticum spelta", "aliases": ["spelt"]}
+{"id": "tx:plantae:monocots:poales:poaceae:triticum:durum", "parent": "tx:plantae:monocots:poales:poaceae:triticum", "rank": "species", "display_name": "Durum wheat", "latin_name": "Triticum durum", "aliases": ["durum wheat", "durum"]}
 {"id": "tx:plantae:monocots:poales:poaceae:zea", "parent": "tx:plantae:monocots:poales:poaceae", "rank": "genus", "display_name": "Maize (genus)", "latin_name": "Zea", "aliases": []}
 {"id": "tx:plantae:monocots:poales:poaceae:zea:mays", "parent": "tx:plantae:monocots:poales:poaceae:zea", "rank": "species", "display_name": "Maize (corn)", "latin_name": "Zea mays", "aliases": ["corn", "maize", "sweet corn"]}
 {"id": "tx:plantae:monocots:poales:poaceae:zizania", "parent": "tx:plantae:monocots:poales:poaceae", "rank": "genus", "display_name": "Wild rice (genus)", "latin_name": "Zizania", "aliases": []}

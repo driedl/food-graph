@@ -8,11 +8,27 @@
     "notes": "Fleshy fruit tissue"
   },
   {
+    "id": "part:pod",
+    "name": "Pod",
+    "kind": "plant",
+    "category": "fruit",
+    "applies_to": ["tx:plantae:eudicots:fabales:fabaceae"],
+    "notes": "Legume fruit/pod (edible when immature)"
+  },
+  {
     "id": "part:seed",
     "name": "Seed",
     "kind": "plant",
     "category": "seed",
     "applies_to": []
+  },
+  {
+    "id": "part:nut",
+    "name": "Nut",
+    "kind": "plant",
+    "category": "seed",
+    "applies_to": [],
+    "notes": "Hard-shelled seed/fruit (tree nuts)"
   },
   {
     "id": "part:leaf",
@@ -30,6 +46,15 @@
       "tx:plantae:poaceae"
     ],
     "notes": "Grass family grains"
+  },
+  {
+    "id": "part:flour",
+    "name": "Flour",
+    "kind": "derived",
+    "category": "grain",
+    "parent_id": "part:grain",
+    "applies_to": [],
+    "notes": "Milled grain product"
   },
   {
     "id": "part:muscle",

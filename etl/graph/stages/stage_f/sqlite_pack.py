@@ -196,6 +196,26 @@ CREATE TABLE IF NOT EXISTS tp_tf_counts (
   count INTEGER NOT NULL,
   PRIMARY KEY (taxon_id, part_id, tf_id)
 );
+
+-- 6) Nutrients table (canonical nutrient definitions)
+CREATE TABLE IF NOT EXISTS nutrients (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  class TEXT NOT NULL,
+  unit TEXT NOT NULL,
+  confidence TEXT NOT NULL,
+  sr_legacy_num TEXT,
+  fdc_candidates TEXT,  -- JSON array of FDC nutrient numbers
+  fdc_unit TEXT,
+  unit_factor_from_fdc REAL DEFAULT 1.0,
+  fdc_alt_units TEXT,   -- JSON array of alternative units
+  aliases TEXT,         -- JSON array of aliases
+  is_sum_or_derived INTEGER DEFAULT 0,
+  computed_from TEXT,   -- JSON array of computed nutrient relationships
+  label_priority INTEGER DEFAULT 0,
+  rounding TEXT,        -- JSON object with decimals
+  notes_method TEXT
+);
 """
 
 def _last(seg: str) -> str:
@@ -406,6 +426,56 @@ def build_sqlite(*, in_dir: Path, build_dir: Path, db_path: Path, verbose: bool 
 
     # Commit categories before inserting parts (foreign key constraint)
     con.commit()
+
+    # Load and insert nutrients
+    nutrients_data = read_json(build_dir / "compiled" / "nutrients.json")
+    if isinstance(nutrients_data, dict) and "nutrients" in nutrients_data:
+        nutrients_list = nutrients_data["nutrients"]
+    elif isinstance(nutrients_data, list):
+        nutrients_list = nutrients_data
+    else:
+        nutrients_list = []
+    
+    cur.execute("DELETE FROM nutrients")
+    for nutrient in nutrients_list:
+        if not isinstance(nutrient, dict) or "id" not in nutrient:
+            continue
+        
+        # Convert lists to JSON strings for storage
+        fdc_candidates = json.dumps(nutrient.get("fdc_candidates", []))
+        fdc_alt_units = json.dumps(nutrient.get("fdc_alt_units", []))
+        aliases = json.dumps(nutrient.get("aliases", []))
+        computed_from = json.dumps(nutrient.get("computed_from", []))
+        rounding = json.dumps(nutrient.get("rounding", {}))
+        
+        cur.execute("""
+            INSERT INTO nutrients (
+                id, name, class, unit, confidence, sr_legacy_num,
+                fdc_candidates, fdc_unit, unit_factor_from_fdc, fdc_alt_units,
+                aliases, is_sum_or_derived, computed_from, label_priority,
+                rounding, notes_method
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            nutrient.get("id"),
+            nutrient.get("name"),
+            nutrient.get("class"),
+            nutrient.get("unit"),
+            nutrient.get("confidence"),
+            nutrient.get("sr_legacy_num"),
+            fdc_candidates,
+            nutrient.get("fdc_unit"),
+            nutrient.get("unit_factor_from_fdc", 1.0),
+            fdc_alt_units,
+            aliases,
+            1 if nutrient.get("is_sum_or_derived") else 0,
+            computed_from,
+            1 if nutrient.get("label_priority") else 0,
+            rounding,
+            nutrient.get("notes_method")
+        ))
+    
+    if verbose and nutrients_list:
+        print(f"✓ Loaded {len(nutrients_list)} nutrients")
 
     # Insert nodes + synonyms (+collect synonyms for FTS)
     _syn_by_node: Dict[str, List[str]] = {}

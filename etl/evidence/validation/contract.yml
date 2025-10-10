@@ -13,6 +13,7 @@ artifacts:
         graph_db_path: "database/graph.dev.sqlite"
       - kind: evidence_confidence_ranges
       - kind: evidence_disposition_logic
+      - kind: evidence_label_implied_transforms
       - kind: fdc_id_format
         field: "food_id"
   

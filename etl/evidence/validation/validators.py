@@ -14,6 +14,17 @@ except ImportError:
     from .ontology_checker import OntologyChecker
 
 
+def _add_fdc_fields(structured_error: dict, line: dict, fdc_data: dict) -> None:
+    """Add FDC fields to structured error if available"""
+    food_id = line.get("food_id")
+    if food_id and food_id in fdc_data:
+        fdc_row = fdc_data[food_id]
+        structured_error["fdc_category"] = fdc_row.get("category", "")
+        structured_error["fdc_data_type"] = fdc_row.get("data_type", "")
+        structured_error["fdc_brand"] = fdc_row.get("brand", "")
+        structured_error["fdc_fdc_id"] = fdc_row.get("fdc_id", "")
+
+
 def _validate_evidence_ontology_consistency(path: Path, lines: List[dict], validator: Dict[str, Any], build_dir: Path) -> List[str]:
     """Validate that all referenced IDs in evidence mapping exist in compiled ontology"""
     errs: List[str] = []
@@ -27,6 +38,17 @@ def _validate_evidence_ontology_consistency(path: Path, lines: List[dict], valid
         errs.append(f"Graph database not found: {graph_db_path}")
         return errs
     
+    # Load FDC data for cross-reference
+    fdc_data = {}
+    try:
+        from etl.lib.validators import _read_jsonl
+        fdc_path = path.parent / "foods.jsonl"
+        if fdc_path.exists():
+            fdc_lines = _read_jsonl(fdc_path)
+            fdc_data = {row.get("food_id"): row for row in fdc_lines}
+    except Exception:
+        pass  # Continue without FDC data if not available
+    
     try:
         checker = OntologyChecker(str(graph_db_path))
         
@@ -38,7 +60,14 @@ def _validate_evidence_ontology_consistency(path: Path, lines: List[dict], valid
             # Validate the complete identity_json
             identity_errors = checker.validate_identity_json(identity_json)
             for error in identity_errors:
-                errs.append(f"{path}:{i}: {error}")
+                # Create structured error with full mapping record
+                structured_error = dict(line)
+                structured_error["validation_error"] = error
+                structured_error["line_number"] = i
+                
+                # Add FDC fields if available
+                _add_fdc_fields(structured_error, line, fdc_data)
+                errs.append(structured_error)
     
     except Exception as e:
         errs.append(f"{path}: ontology validation failed: {e}")
@@ -50,29 +79,60 @@ def _validate_evidence_confidence_ranges(path: Path, lines: List[dict], validato
     """Validate confidence scores are within expected ranges and correlate with disposition"""
     errs: List[str] = []
     
+    # Load FDC data for cross-reference
+    fdc_data = {}
+    try:
+        from etl.lib.validators import _read_jsonl
+        fdc_path = path.parent / "foods.jsonl"
+        if fdc_path.exists():
+            fdc_lines = _read_jsonl(fdc_path)
+            fdc_data = {row.get("food_id"): row for row in fdc_lines}
+    except Exception:
+        pass  # Continue without FDC data if not available
+    
     for i, line in enumerate(lines, 1):
         confidence = line.get("confidence")
         disposition = line.get("disposition", "").lower()
         
         if confidence is None:
-            errs.append(f"{path}:{i}: missing confidence field")
+            structured_error = dict(line)
+            structured_error["validation_error"] = "missing confidence field"
+            structured_error["line_number"] = i
+            _add_fdc_fields(structured_error, line, fdc_data)
+            errs.append(structured_error)
             continue
         
         try:
             conf_val = float(confidence)
         except (ValueError, TypeError):
-            errs.append(f"{path}:{i}: confidence must be a number, got {type(confidence).__name__}")
+            structured_error = dict(line)
+            structured_error["validation_error"] = f"confidence must be a number, got {type(confidence).__name__}"
+            structured_error["line_number"] = i
+            _add_fdc_fields(structured_error, line, fdc_data)
+            errs.append(structured_error)
             continue
         
         # Check range
         if not (0.0 <= conf_val <= 1.0):
-            errs.append(f"{path}:{i}: confidence {conf_val} must be between 0.0 and 1.0")
+            structured_error = dict(line)
+            structured_error["validation_error"] = f"confidence {conf_val} must be between 0.0 and 1.0"
+            structured_error["line_number"] = i
+            _add_fdc_fields(structured_error, line, fdc_data)
+            errs.append(structured_error)
         
         # Check disposition logic
         if disposition == "skip" and conf_val > 0.5:
-            errs.append(f"{path}:{i}: skip disposition with high confidence {conf_val} seems suspicious")
+            structured_error = dict(line)
+            structured_error["validation_error"] = f"skip disposition with high confidence {conf_val} seems suspicious"
+            structured_error["line_number"] = i
+            _add_fdc_fields(structured_error, line, fdc_data)
+            errs.append(structured_error)
         elif disposition == "map" and conf_val < 0.3:
-            errs.append(f"{path}:{i}: map disposition with low confidence {conf_val} seems suspicious")
+            structured_error = dict(line)
+            structured_error["validation_error"] = f"map disposition with low confidence {conf_val} seems suspicious"
+            structured_error["line_number"] = i
+            _add_fdc_fields(structured_error, line, fdc_data)
+            errs.append(structured_error)
     
     return errs
 
@@ -223,6 +283,73 @@ def _validate_evidence_mapping_schema(path: Path, lines: List[dict], validator: 
 
 
 # Register evidence-specific validators
+def _validate_evidence_label_implied_transforms(path: Path, lines: List[dict], validator: Dict[str, Any]) -> List[str]:
+    """Validate that labels implying processes have appropriate transforms and node_kind"""
+    errs: List[str] = []
+    
+    # Load transform registry to check available transforms
+    transform_registry = set()
+    try:
+        from etl.lib.validators import _read_jsonl
+        # Try to load from build directory first, then fallback
+        transform_paths = [
+            build_dir / "database" / "transform_def.jsonl",
+            Path("etl/build/database/transform_def.jsonl"),
+            Path("etl/database/transform_def.jsonl")
+        ]
+        for tf_path in transform_paths:
+            if tf_path.exists():
+                tf_lines = _read_jsonl(tf_path)
+                transform_registry = {row.get("id") for row in tf_lines if row.get("id")}
+                break
+    except Exception:
+        pass  # Continue without transform registry if not available
+    
+    # Keywords that imply processing
+    process_keywords = {
+        "frozen", "pasteurized", "pasteurised", "cooked", "roasted", "broiled", 
+        "grilled", "baked", "ground", "minced", "dried", "dehydrated", "fermented",
+        "cultured", "aged", "smoked", "cured", "pickled", "canned", "juiced"
+    }
+    
+    for i, line in enumerate(lines, 1):
+        name = line.get("name", "").lower()
+        node_kind = line.get("node_kind", "")
+        identity_json = line.get("identity_json", {})
+        transforms = identity_json.get("transforms", [])
+        
+        # Check if name contains process keywords
+        has_process_keyword = any(keyword in name for keyword in process_keywords)
+        
+        if has_process_keyword:
+            # Should be TPT with transforms
+            if node_kind != "tpt":
+                structured_error = dict(line)
+                structured_error["validation_error"] = f"Label implies processing but node_kind is '{node_kind}', should be 'tpt'"
+                structured_error["line_number"] = i
+                errs.append(structured_error)
+            elif not transforms:
+                structured_error = dict(line)
+                structured_error["validation_error"] = "Label implies processing but no transforms specified"
+                structured_error["line_number"] = i
+                errs.append(structured_error)
+            elif transform_registry:
+                # Check if required transforms exist in registry
+                missing_transforms = []
+                for transform in transforms:
+                    transform_id = transform.get("id")
+                    if transform_id and transform_id not in transform_registry:
+                        missing_transforms.append(transform_id)
+                
+                if missing_transforms:
+                    structured_error = dict(line)
+                    structured_error["validation_error"] = f"Transforms not found in registry: {', '.join(missing_transforms)}"
+                    structured_error["line_number"] = i
+                    errs.append(structured_error)
+    
+    return errs
+
+
 def _apply_evidence_jsonl_validators(path: Path, lines: List[dict], validators: List[Dict[str, Any]], build_dir: Path) -> List[str]:
     """Apply evidence-specific validators to JSONL data"""
     errs: List[str] = []
@@ -241,6 +368,8 @@ def _apply_evidence_jsonl_validators(path: Path, lines: List[dict], validators: 
             errs.extend(_validate_nutrient_id_format(path, lines, validator))
         elif kind == "evidence_mapping_schema":
             errs.extend(_validate_evidence_mapping_schema(path, lines, validator))
+        elif kind == "evidence_label_implied_transforms":
+            errs.extend(_validate_evidence_label_implied_transforms(path, lines, validator))
         else:
             # Fall back to standard validators
             errs.extend(_apply_jsonl_validators(path, lines, [validator], build_dir))

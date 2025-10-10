@@ -13,7 +13,15 @@ class LLMError(Exception): ...
 DEFAULT_SYSTEM = """
 You will receive a STATIC BLOCK followed by one ITEM per request.
 Return STRICT JSON for that item only—no prose, no markdown, no extra keys.
-If uncertain, choose node_kind="tp" (no transforms) or "ambiguous". Keep params to identity-bearing ones.
+
+Rules (critical):
+- Prefer existing taxon_id from the graph; only emit new_taxa if none fits (with full contiguous parents).
+- Follow the kingdom-specific ladders exactly; do not skip intermediate ranks.
+- Hybrids: use x_ prefix in the species segment (e.g., x_ananassa).
+- Only cultivar/variety are permitted in plant suffixes; animals may append [breed]. Otherwise, back off rank.
+- Ignore marketing tokens (colors/grades/size) in taxon_id.
+- Non-biological items (minerals/water) => disposition="skip" with null IDs.
+- If label implies process (frozen, pasteurized, cooked, ground), you MUST include those transforms (if present in the registry) and set node_kind="tpt"; if missing, return disposition="ambiguous".
 """.strip()
 
 def call_llm(*, model: str, system: str, user: str = None, user_messages: List[str] = None, max_retries: int = 3, temperature: Optional[float] = None, client: OpenAI = None) -> Dict[str, Any]:

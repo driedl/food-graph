@@ -17,8 +17,8 @@ python -m etl2.evidence.profiles \    --graph etl2/build/database/graph.dev.sqli
 - `foods.jsonl` — FOUNDATION foods (filtered)
 - `nutrients.jsonl` — per-food nutrient rows (restricted to selected foods)
 - `mapping.jsonl` — LLM-produced identity proposals per food
-- `_proposals/` — optional “new taxon/part/transform” suggestions (not applied)
-- `logs/map.log` — run log
+- `_proposals/` — optional "new taxon/part/transform" suggestions (not applied)
+- `etl/build/report/evidence/logs/map.log` — run log
 
 ## Notes
 - We **only** map FDC foods where `data_type == "Foundation"` and we try to **skip obviously processed** items

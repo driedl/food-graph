@@ -37,7 +37,13 @@ def build_static_header(parts: List[Dict[str, Any]], transforms: List[Dict[str, 
           "- Fungus: class (e.g., agaricomycetes, saccharomycetes).",
           "Do not include division/phylum for plants/fungi.",
           "Ranks are plain segments (no cv:/var: prefixes). If known, append after species in this order: [:<cultivar>][:<variety>][:<breed>].",
-          "Back off progressively on uncertainty: species→genus→family (lower confidence). Do not invent placeholders."
+          "Back off progressively on uncertainty: species→genus→family (lower confidence). Do not invent placeholders.",
+          "Contiguity required: For the chosen ladder, include all intermediate ranks (no skipping).",
+          "Use existing nodes: Prefer an existing taxon_id from the graph; only emit new_taxa when nothing matches (and include full contiguous parents).",
+          "Hybrids: Encode nothospecies with leading 'x_' in the species segment (e.g., 'x_ananassa').",
+          "Infraspecific ranks: Only 'cultivar' and 'variety' are allowed suffixes unless an exact existing node uses another rank.",
+          "Ignore marketing tokens: Colors/grades/size (e.g., 'yellow', 'Grade A', 'large') are NOT cultivar/variety—do not encode them in taxon_id.",
+          "Never output 'tx:life' for food items."
         ],
         "preferred_ladders": {
           "animal": "tx:animalia:<phylum>:<class>:<order>:<family>:<genus>:<species>[:<breed>]",
@@ -62,9 +68,11 @@ def build_static_header(parts: List[Dict[str, Any]], transforms: List[Dict[str, 
       },
       "mapping_policies": {
         "mixtures": "Reject true multi-ingredient composites that cannot be expressed as transforms on a single (taxon,part).",
-        "dairy": "Allowed. Many FDC foundation items are TPT: e.g., ferment/strain/pasteurize/clarify. Use transforms with identity params.",
-        "single_ingredient_derivatives": "Allowed as TP (derived parts) or TPT when the process must be explicit (e.g., virgin/refined oil).",
-        "when_uncertain": "Choose tp and omit transforms, or mark ambiguous when even taxon/part is unsafe."
+        "non_biological": "Minerals/water (e.g., table salt, iodized salt) have no biological taxon: always disposition='skip'; do not propose new parts.",
+        "label_implied_transforms": "If the label implies a process (frozen, pasteurized, cooked/roasted/broiled/grilled, ground/minced), you MUST include those transforms if present in the registry and set node_kind='tpt'. If a required transform is missing from the registry, return disposition='ambiguous'.",
+        "dairy": "Allowed (TPT). Use transforms (e.g., ferment/strain/pasteurize) with identity params when applicable.",
+        "single_ingredient_derivatives": "Oils/flours/salt/sugar/tahini are derivatives. Oils/flours MUST be TPT with identity transforms (press/refine/grind). Do NOT encode marketing terms (e.g., 'canola') into taxon IDs.",
+        "when_uncertain": "Back off rank depth without skipping: species→genus→family. Prefer existing graph IDs; otherwise return 'ambiguous'."
       },
       "output_contract": {
         "disposition": ["map","skip","ambiguous"],
@@ -124,6 +132,77 @@ def build_static_header(parts: List[Dict[str, Any]], transforms: List[Dict[str, 
             },
             "confidence":0.88,
             "reason_short":"raw edible fruit",
+            "new_taxa":[],"new_parts":[],"new_transforms":[]
+          }
+        },
+        {
+          "input": {"label":"Salt, table, iodized","category":"Spices and Herbs"},
+          "output": {
+            "disposition":"skip",
+            "node_kind":"tp",
+            "identity_json":{"taxon_id":None,"part_id":None,"transforms":[]},
+            "confidence":0.99,
+            "reason_short":"non-biological mineral",
+            "new_taxa":[],"new_parts":[],"new_transforms":[]
+          }
+        },
+        {
+          "input": {"label":"Egg white, raw, frozen, pasteurized","category":"Dairy and Egg Products"},
+          "output": {
+            "disposition":"map",
+            "node_kind":"tpt",
+            "identity_json":{
+              "taxon_id":"tx:animalia:chordata:aves:galliformes:phasianidae:gallus:gallus_domesticus",
+              "part_id":"part:egg:white",
+              "transforms":[{"id":"tf:pasteurize","params":{}},{"id":"tf:freeze","params":{}}]
+            },
+            "confidence":0.88,
+            "reason_short":"pasteurized and frozen egg white",
+            "new_taxa":[],"new_parts":[],"new_transforms":[]
+          }
+        },
+        {
+          "input": {"label":"Strawberries, raw","category":"Fruits and Fruit Juices"},
+          "output": {
+            "disposition":"map",
+            "node_kind":"tp",
+            "identity_json":{
+              "taxon_id":"tx:plantae:eudicots:rosales:rosaceae:fragaria:x_ananassa",
+              "part_id":"part:fruit",
+              "transforms":[]
+            },
+            "confidence":0.9,
+            "reason_short":"hybrid garden strawberry fruit",
+            "new_taxa":[],"new_parts":[],"new_transforms":[]
+          }
+        },
+        {
+          "input": {"label":"Mushroom, lion's mane","category":"Vegetables and Vegetable Products"},
+          "output": {
+            "disposition":"map",
+            "node_kind":"tp",
+            "identity_json":{
+              "taxon_id":"tx:fungi:agaricomycetes:russulales:hericiaceae:hericium:erinaceus",
+              "part_id":"part:fruiting_body",
+              "transforms":[]
+            },
+            "confidence":0.85,
+            "reason_short":"edible mushroom fruiting body",
+            "new_taxa":[],"new_parts":[],"new_transforms":[]
+          }
+        },
+        {
+          "input": {"label":"Oil, canola","category":"Fats and Oils"},
+          "output": {
+            "disposition":"map",
+            "node_kind":"tpt",
+            "identity_json":{
+              "taxon_id":"tx:plantae:eudicots:brassicales:brassicaceae:brassica:napus",
+              "part_id":"part:oil",
+              "transforms":[{"id":"tf:press","params":{}},{"id":"tf:refine","params":{}}]
+            },
+            "confidence":0.85,
+            "reason_short":"pressed and refined Brassica napus oil",
             "new_taxa":[],"new_parts":[],"new_transforms":[]
           }
         }
@@ -261,7 +340,7 @@ def main():
     ap.add_argument("--prompt-only", action="store_true", help="Generate and log the full prompt, then exit without calling LLM")
     ap.add_argument("--include-derived", action="store_true", help="Include single-ingredient derivatives (oils, flours, salt/sugar, tahini).")
     ap.add_argument("--use-candidates", action="store_true", help="(Phase 2) inject search candidates; off by default.")
-    ap.add_argument("--nutrient-registry", default="data/ontology/nutrients-infoods.json", help="Path to INFOODS registry.")
+    ap.add_argument("--nutrient-registry", default="data/ontology/nutrients.json", help="Path to INFOODS registry.")
     ap.add_argument("--overwrite", action="store_true", help="Rewrite mapping.jsonl instead of appending/resuming")
     ap.add_argument("--debug-prompts", action="store_true", help="Save prompts and responses to debug directories")
     args = ap.parse_args()
@@ -288,7 +367,9 @@ def main():
     nutrients_path = out_dir / "nutrients.jsonl"
     mapping_path = out_dir / "mapping.jsonl"
     proposals_dir = out_dir / "_proposals"
-    logs_dir = out_dir / "logs"
+    
+    # Logs go to build directory, not with evidence data
+    logs_dir = resolve_path("etl/build/report/evidence", project_root)
     logs_dir.mkdir(parents=True, exist_ok=True)
     
     # Debug directories for prompts and responses
@@ -392,38 +473,49 @@ def main():
             "country": "US"
         })
 
-    keep_ids = [r["fdc_id"] for r in foods if r.get("fdc_id")]
+    keep_ids = [str(r["fdc_id"]) for r in foods if r.get("fdc_id")]
     fn_rows = filter_nutrients_for_foods(fdc_dir, keep_ids)
     nutrient_index = load_nutrient_index(fdc_dir)
     
     # 3a) Load INFOODS registry mapping (fdc nutrient id -> INFOODS tag) and canonical units
     def _load_infoods_aliases(path: Path):
         import json
-        fdc_to_tag: Dict[int, str] = {}
+        sr_to_infoods: Dict[str, str] = {}
         tag_to_unit: Dict[str, str] = {}
+        tag_to_unit_factor: Dict[str, float] = {}
+        tag_to_alt_units: Dict[str, List[Dict[str, Any]]] = {}
+        
         if path.exists():
             data = json.loads(path.read_text(encoding="utf-8"))
-            # Handle the specific structure of nutrients-infoods.json
+            # Handle the specific structure of nutrients.json
             if isinstance(data, dict) and "nutrients" in data:
                 nutrients = data["nutrients"]
                 for it in nutrients:
                     tag = it.get("id")  # e.g., "PROCNT"
                     if not tag:
                         continue
+                    
+                    # Extract canonical unit
                     unit = it.get("unit") or ""
                     if unit:
                         tag_to_unit[tag] = unit
-                    # Look for FDC aliases in the aliases array
-                    aliases = it.get("aliases", [])
-                    if isinstance(aliases, list):
-                        for alias in aliases:
-                            # Check if this looks like an FDC nutrient ID (numeric)
-                            try:
-                                fdc_id = int(str(alias))
-                                fdc_to_tag[fdc_id] = tag
-                            except:
-                                pass
-            # Fallback for other structures
+                    
+                    # Extract unit conversion factor from FDC
+                    unit_factor = it.get("unit_factor_from_fdc")
+                    if unit_factor is not None:
+                        tag_to_unit_factor[tag] = float(unit_factor)
+                    
+                    # Extract alternative units (e.g., Vitamin D IU -> µg)
+                    alt_units = it.get("fdc_alt_units", [])
+                    if alt_units:
+                        tag_to_alt_units[tag] = alt_units
+                    
+                    # Extract SR Legacy number mapping
+                    sr_legacy_num = it.get("sr_legacy_num")
+                    if sr_legacy_num:
+                        sr_to_infoods[str(sr_legacy_num)] = tag
+                    
+            # Fallback for other structures (keep for compatibility)
             elif isinstance(data, list):
                 for it in data:
                     tag = it.get("nutrient_id") or it.get("id") or it.get("tag")
@@ -432,59 +524,89 @@ def main():
                     unit = it.get("canonical_unit") or it.get("unit") or ""
                     if unit:
                         tag_to_unit[tag] = unit
-                    # aliases: support shapes like {"aliases":{"fdc":["1003","1004"]}}
-                    aliases = (it.get("aliases") or {})
-                    fdc_alias = aliases.get("fdc") if isinstance(aliases, dict) else None
-                    if isinstance(fdc_alias, list):
-                        for a in fdc_alias:
-                            try: fdc_to_tag[int(str(a))] = tag
-                            except: pass
-                    elif isinstance(fdc_alias, (str,int)):
-                        try: fdc_to_tag[int(str(fdc_alias))] = tag
-                        except: pass
+                    # Extract SR Legacy number if present
+                    sr_legacy_num = it.get("sr_legacy_num")
+                    if sr_legacy_num:
+                        sr_to_infoods[str(sr_legacy_num)] = tag
             elif isinstance(data, dict):
                 for tag, it in data.items():
                     if isinstance(it, dict):
                         unit = it.get("canonical_unit") or it.get("unit") or ""
                         if unit:
                             tag_to_unit[tag] = unit
-                        aliases = it.get("aliases") or {}
-                        fdc_alias = aliases.get("fdc")
-                        if isinstance(fdc_alias, list):
-                            for a in fdc_alias:
-                                try: fdc_to_tag[int(str(a))] = tag
-                                except: pass
-                        elif isinstance(fdc_alias, (str,int)):
-                            try: fdc_to_tag[int(str(fdc_alias))] = tag
-                            except: pass
-        return fdc_to_tag, tag_to_unit
+                        # Extract SR Legacy number if present
+                        sr_legacy_num = it.get("sr_legacy_num")
+                        if sr_legacy_num:
+                            sr_to_infoods[str(sr_legacy_num)] = tag
+                            
+        return sr_to_infoods, tag_to_unit, tag_to_unit_factor, tag_to_alt_units
 
     nr_path = resolve_path(args.nutrient_registry, project_root)
-    fdc_to_infoods, infoods_units = _load_infoods_aliases(nr_path)
+    sr_to_infoods, infoods_units, infoods_unit_factors, infoods_alt_units = _load_infoods_aliases(nr_path)
 
-    # fallback minimal map if registry lacks a code (kept tiny on purpose)
-    _fallback = {1003:"PROCNT",1004:"FAT",1005:"CHOCDF",1008:"ENERC_KCAL",1051:"WATER",1079:"FIBTG",1093:"NA",1087:"CA"}
+    # Build FDC ID → SR Legacy mapping from nutrient.csv
+    fdc_to_sr: Dict[int, str] = {}
+    for fdc_id, row in nutrient_index.items():
+        sr_num = row.get("nutrient_nbr", "")
+        if sr_num:
+            fdc_to_sr[int(fdc_id)] = sr_num
     
     # UCUM-ish unit normalization for simple FDC unit names
     _UNIT_MAP = {"G":"g","MG":"mg","UG":"µg","KCAL":"kcal","KJ":"kJ","IU":"IU"}
     norm_nutrients: List[Dict[str, Any]] = []
+    total_fdc_nutrients = 0
+    mapped_count = 0
+    unmapped_fdc_ids = set()
+    
     for r in fn_rows:
         fdc_nutr_id = int(r.get("nutrient_id", 0))
-        tag = fdc_to_infoods.get(fdc_nutr_id) or _fallback.get(fdc_nutr_id)
+        total_fdc_nutrients += 1
+        
+        # Chain the mappings: FDC → SR Legacy → INFOODS
+        sr_legacy = fdc_to_sr.get(fdc_nutr_id)
+        tag = sr_to_infoods.get(sr_legacy) if sr_legacy else None
+        
         if not tag:
+            unmapped_fdc_ids.add(fdc_nutr_id)
             continue  # Skip unmapped nutrients
+            
+        mapped_count += 1
         nutr = nutrient_index.get(str(fdc_nutr_id), {})
+        
+        # Apply unit conversions
+        value = r.get("amount")
+        unit_factor = infoods_unit_factors.get(tag, 1.0)
+        if unit_factor != 1.0 and value:
+            try:
+                value = str(float(value) * unit_factor)
+            except (ValueError, TypeError):
+                pass  # Keep original value if conversion fails
+        
+        # Use canonical unit from nutrients.json
+        canonical_unit = infoods_units.get(tag)
+        if not canonical_unit:
+            # Fallback to FDC unit with basic normalization
+            fdc_unit = nutr.get("unit_name", "").upper()
+            canonical_unit = _UNIT_MAP.get(fdc_unit, fdc_unit)
+        
         norm_nutrients.append({
             "food_id": f"fdc:{r.get('fdc_id')}",
             "fdc_nutrient_id": fdc_nutr_id,
             "nutrient_id": tag,  # INFOODS tag
             "nutrient_name": nutr.get("name") or nutr.get("description") or "",
-            "unit": infoods_units.get(tag) or _UNIT_MAP.get((nutr.get("unit_name") or "").upper(), nutr.get("unit_name") or ""),
-            "value": r.get("amount"),
+            "unit": canonical_unit,
+            "value": value,
             "basis": "per_100g",
             "method": "FDC",
         })
+    
     write_jsonl(nutrients_path, norm_nutrients)
+    
+    # Log mapping statistics
+    with log_file_path.open("a", encoding="utf-8") as f:
+        f.write(f"[NUTRIENT_MAPPING] total={total_fdc_nutrients} mapped={mapped_count} unmapped_count={len(unmapped_fdc_ids)}\n")
+        if unmapped_fdc_ids:
+            f.write(f"[NUTRIENT_MAPPING] unmapped_fdc_ids={sorted(list(unmapped_fdc_ids))}\n")
 
     # 4) LLM mapping per food (write foods.jsonl per item for sync)
     # Resume support

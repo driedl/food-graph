@@ -518,3 +518,39 @@ Confirm that `part:cream` exists in `parts.core.json` and that the merged regist
 - **UI integration** - categories include display names and descriptions
 - **Database integration** - categories are loaded into database for queries
 
+---
+
+## 10) Nutrition Ontology
+
+### 10.1) Nutrient Classification System
+
+* **`nutrients.json`**: Canonical nutrient vocabulary and metadata
+  * **Format**: INFOODS tagnames as canonical IDs
+  * **Required fields**: `id`, `name`, `class`, `unit`, `confidence`
+  * **Optional fields**: `fdc_candidates`, `unit_factor_from_fdc`, `aliases`, `computed_from`
+  * **Derived nutrients**: Use `computed_from` array for calculated nutrients (e.g., total energy, n-3 fatty acids)
+  * **Unit standardization**: All nutrients use canonical units with conversion factors from external sources
+  * **Confidence levels**: `high`, `medium`, `low` based on measurement reliability
+  * **FDC integration**: Maps to USDA FoodData Central nutrient numbers for evidence linking
+
+### 10.2) Nutrition Data Architecture
+
+* **Evidence layer**: Raw nutritional measurements in `data/evidence/`
+* **Ontology layer**: Canonical nutrient definitions in `data/ontology/nutrients.json`
+* **Integration**: ETL processes map evidence to canonical nutrients using FDC candidates and unit conversions
+
+### 10.3) Nutrient Schema
+
+Each nutrient definition includes:
+- **`id`**: INFOODS tagname (e.g., `ENERC_KCAL`, `PROT`, `FAT`)
+- **`name`**: Human-readable name (e.g., "Energy (kcal)", "Protein")
+- **`class`**: Nutrient category (`proximate`, `vitamin`, `mineral`, `fatty_acid`, `sugar`, `other`)
+- **`unit`**: Canonical unit (`g`, `mg`, `µg`, `kcal`, `kJ`)
+- **`confidence`**: Data quality level (`high`, `medium`, `low`)
+- **`fdc_candidates`**: Array of FDC nutrient numbers for evidence mapping
+- **`unit_factor_from_fdc`**: Conversion factor from FDC units to canonical units
+- **`computed_from`**: For derived nutrients, array of component nutrients and factors
+- **`aliases`**: Alternative names and identifiers
+- **`label_priority`**: Whether to show on nutrition labels by default
+- **`rounding`**: Decimal places for display
+

@@ -59,7 +59,7 @@ artifacts:
     type: json
     must_exist: true
     validators:
-      - kind: array_of_objects
+      - kind: nutrients_structure
       - kind: no_duplicate_definitions
   
   - path: compiled/categories.json

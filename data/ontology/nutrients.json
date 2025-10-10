@@ -1,56 +1,1682 @@
-[
-  {
-    "id": "nutr:energy_kcal",
-    "name": "Energy",
-    "unit": "kcal/100g",
-    "short_name": "kcal"
+{
+  "canonical_scheme": "INFOODS_tagnames",
+  "version": "v1.1",
+  "notes": "Canonical IDs use INFOODS tagnames. Adds per-nutrient FDC candidate IDs, unit conversions, and a few optional nutrients. Keep INFOODS units as canonical; convert FDC as needed.",
+  "metadata": {
+    "added_nutrients": [
+      "FIBSOL",
+      "FIBINS",
+      "FAPUN3",
+      "FAPUN6",
+      "RS"
+    ],
+    "rounding_defaults": {
+      "g": 1,
+      "mg": 0,
+      "µg": 0,
+      "kcal": 0,
+      "kJ": 0
+    }
   },
-  {
-    "id": "nutr:protein_g",
-    "name": "Protein",
-    "unit": "g/100g",
-    "short_name": "Protein"
-  },
-  {
-    "id": "nutr:fat_g",
-    "name": "Fat",
-    "unit": "g/100g",
-    "short_name": "Fat"
-  },
-  {
-    "id": "nutr:carb_g",
-    "name": "Carbohydrate",
-    "unit": "g/100g",
-    "short_name": "Carb"
-  },
-  {
-    "id": "nutr:fiber_g",
-    "name": "Fiber",
-    "unit": "g/100g",
-    "short_name": "Fiber"
-  },
-  {
-    "id": "nutr:sugar_g",
-    "name": "Sugars",
-    "unit": "g/100g",
-    "short_name": "Sugar"
-  },
-  {
-    "id": "nutr:water_g",
-    "name": "Water",
-    "unit": "g/100g",
-    "short_name": "Water"
-  },
-  {
-    "id": "nutr:sodium_mg",
-    "name": "Sodium",
-    "unit": "mg/100g",
-    "short_name": "Na"
-  },
-  {
-    "id": "nutr:potassium_mg",
-    "name": "Potassium",
-    "unit": "mg/100g",
-    "short_name": "K"
-  }
-]
+  "nutrients": [
+    {
+      "id": "ENERC_KCAL",
+      "name": "Energy (kcal)",
+      "class": "proximate",
+      "unit": "kcal",
+      "sr_legacy_num": "208",
+      "fdc_candidates": [
+        "208",
+        "957",
+        "958"
+      ],
+      "fdc_unit": "KCAL",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "energy_kcal",
+        "calories"
+      ],
+      "is_sum_or_derived": true,
+      "computed_from": [
+        {
+          "id": "PROT",
+          "factor_per_g": 4
+        },
+        {
+          "id": "FAT",
+          "factor_per_g": 9
+        },
+        {
+          "id": "CHOCDF",
+          "factor_per_g": 4
+        },
+        {
+          "id": "ALC",
+          "factor_per_g": 7
+        }
+      ],
+      "label_priority": true,
+      "rounding": {
+        "decimals": 0
+      },
+      "confidence": "high",
+      "notes_method": "Atwater general factors"
+    },
+    {
+      "id": "ENERC",
+      "name": "Energy (kJ)",
+      "class": "proximate",
+      "unit": "kJ",
+      "sr_legacy_num": "268",
+      "fdc_candidates": [
+        "268"
+      ],
+      "fdc_unit": "KJ",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "energy_kj"
+      ],
+      "is_sum_or_derived": true,
+      "computed_from": [
+        {
+          "id": "ENERC_KCAL",
+          "factor_per_kcal": 4.184
+        }
+      ],
+      "label_priority": false,
+      "rounding": {
+        "decimals": 0
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "WATER",
+      "name": "Water",
+      "class": "proximate",
+      "unit": "g",
+      "sr_legacy_num": "255",
+      "fdc_candidates": [
+        "255"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "moisture"
+      ],
+      "is_sum_or_derived": false,
+      "label_priority": false,
+      "rounding": {
+        "decimals": 1
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "ASH",
+      "name": "Ash",
+      "class": "proximate",
+      "unit": "g",
+      "sr_legacy_num": "207",
+      "fdc_candidates": [
+        "207"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": false,
+      "rounding": {
+        "decimals": 2
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "PROT",
+      "name": "Protein",
+      "class": "proximate",
+      "unit": "g",
+      "sr_legacy_num": "203",
+      "fdc_candidates": [
+        "203"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": true,
+      "rounding": {
+        "decimals": 1
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "FAT",
+      "name": "Total lipid (fat)",
+      "class": "proximate",
+      "unit": "g",
+      "sr_legacy_num": "204",
+      "fdc_candidates": [
+        "204",
+        "298"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "total_fat"
+      ],
+      "is_sum_or_derived": false,
+      "label_priority": true,
+      "rounding": {
+        "decimals": 1
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "CHOCDF",
+      "name": "Carbohydrate, by difference",
+      "class": "proximate",
+      "unit": "g",
+      "sr_legacy_num": "205",
+      "fdc_candidates": [
+        "205",
+        "205.2"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "carbohydrate"
+      ],
+      "is_sum_or_derived": true,
+      "computed_from": [
+        {
+          "id": "WATER",
+          "factor_per_g": -1
+        },
+        {
+          "id": "PROT",
+          "factor_per_g": -1
+        },
+        {
+          "id": "FAT",
+          "factor_per_g": -1
+        },
+        {
+          "id": "ASH",
+          "factor_per_g": -1
+        },
+        {
+          "id": "ALC",
+          "factor_per_g": -1
+        }
+      ],
+      "label_priority": true,
+      "rounding": {
+        "decimals": 1
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "FIBTG",
+      "name": "Dietary fiber, total",
+      "class": "proximate",
+      "unit": "g",
+      "sr_legacy_num": "291",
+      "fdc_candidates": [
+        "291",
+        "293"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "fiber"
+      ],
+      "is_sum_or_derived": false,
+      "label_priority": true,
+      "rounding": {
+        "decimals": 1
+      },
+      "confidence": "high",
+      "notes_method": "Accept legacy 291 or AOAC 2011.25 (293) as total fiber"
+    },
+    {
+      "id": "SUGAR",
+      "name": "Sugars, total",
+      "class": "sugar",
+      "unit": "g",
+      "sr_legacy_num": "269",
+      "fdc_candidates": [
+        "269",
+        "269.3"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "sugars_total"
+      ],
+      "is_sum_or_derived": false,
+      "label_priority": true,
+      "rounding": {
+        "decimals": 1
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "STARCH",
+      "name": "Starch",
+      "class": "proximate",
+      "unit": "g",
+      "sr_legacy_num": "209",
+      "fdc_candidates": [
+        "209"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": false,
+      "rounding": {
+        "decimals": 1
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "ALC",
+      "name": "Alcohol (ethanol)",
+      "class": "other",
+      "unit": "g",
+      "sr_legacy_num": "221",
+      "fdc_candidates": [
+        "221"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "ETOH"
+      ],
+      "is_sum_or_derived": false,
+      "label_priority": false,
+      "rounding": {
+        "decimals": 1
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "CHOL",
+      "name": "Cholesterol",
+      "class": "lipid",
+      "unit": "mg",
+      "sr_legacy_num": "601",
+      "fdc_candidates": [
+        "601"
+      ],
+      "fdc_unit": "MG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": true,
+      "rounding": {
+        "decimals": 0
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "NA",
+      "name": "Sodium",
+      "class": "mineral",
+      "unit": "mg",
+      "sr_legacy_num": "307",
+      "fdc_candidates": [
+        "307"
+      ],
+      "fdc_unit": "MG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": true,
+      "rounding": {
+        "decimals": 0
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "K",
+      "name": "Potassium",
+      "class": "mineral",
+      "unit": "mg",
+      "sr_legacy_num": "306",
+      "fdc_candidates": [
+        "306"
+      ],
+      "fdc_unit": "MG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": true,
+      "rounding": {
+        "decimals": 0
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "CA",
+      "name": "Calcium",
+      "class": "mineral",
+      "unit": "mg",
+      "sr_legacy_num": "301",
+      "fdc_candidates": [
+        "301"
+      ],
+      "fdc_unit": "MG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": true,
+      "rounding": {
+        "decimals": 0
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "P",
+      "name": "Phosphorus",
+      "class": "mineral",
+      "unit": "mg",
+      "sr_legacy_num": "305",
+      "fdc_candidates": [
+        "305"
+      ],
+      "fdc_unit": "MG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": true,
+      "rounding": {
+        "decimals": 0
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "MG",
+      "name": "Magnesium",
+      "class": "mineral",
+      "unit": "mg",
+      "sr_legacy_num": "304",
+      "fdc_candidates": [
+        "304"
+      ],
+      "fdc_unit": "MG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": true,
+      "rounding": {
+        "decimals": 0
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "FE",
+      "name": "Iron",
+      "class": "mineral",
+      "unit": "mg",
+      "sr_legacy_num": "303",
+      "fdc_candidates": [
+        "303"
+      ],
+      "fdc_unit": "MG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": true,
+      "rounding": {
+        "decimals": 1
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "ZN",
+      "name": "Zinc",
+      "class": "mineral",
+      "unit": "mg",
+      "sr_legacy_num": "309",
+      "fdc_candidates": [
+        "309"
+      ],
+      "fdc_unit": "MG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": true,
+      "rounding": {
+        "decimals": 1
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "CU",
+      "name": "Copper",
+      "class": "mineral",
+      "unit": "mg",
+      "sr_legacy_num": "312",
+      "fdc_candidates": [
+        "312"
+      ],
+      "fdc_unit": "MG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": true,
+      "rounding": {
+        "decimals": 2
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "MN",
+      "name": "Manganese",
+      "class": "mineral",
+      "unit": "mg",
+      "sr_legacy_num": "315",
+      "fdc_candidates": [
+        "315"
+      ],
+      "fdc_unit": "MG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": false,
+      "rounding": {
+        "decimals": 2
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "SE",
+      "name": "Selenium",
+      "class": "mineral",
+      "unit": "µg",
+      "sr_legacy_num": "317",
+      "fdc_candidates": [
+        "317"
+      ],
+      "fdc_unit": "UG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": false,
+      "rounding": {
+        "decimals": 0
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "CLD",
+      "name": "Chloride",
+      "class": "mineral",
+      "unit": "mg",
+      "sr_legacy_num": "302",
+      "fdc_candidates": [
+        "302"
+      ],
+      "fdc_unit": "MG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "chloride"
+      ],
+      "is_sum_or_derived": false,
+      "label_priority": false,
+      "rounding": {
+        "decimals": 0
+      },
+      "confidence": "medium",
+      "notes_method": "No true chloride measure in FDC/SR; mapped to 'Chlorine, Cl' (302) as a proxy for chloride. Treat values with caution.",
+      "deprecated_aliases": [
+        "chlorine"
+      ]
+    },
+    {
+      "id": "CR",
+      "name": "Chromium",
+      "class": "mineral",
+      "unit": "µg",
+      "sr_legacy_num": "310",
+      "fdc_candidates": [
+        "310"
+      ],
+      "fdc_unit": "UG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": false,
+      "rounding": {
+        "decimals": 0
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "MO",
+      "name": "Molybdenum",
+      "class": "mineral",
+      "unit": "µg",
+      "sr_legacy_num": "316",
+      "fdc_candidates": [
+        "316"
+      ],
+      "fdc_unit": "UG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": false,
+      "rounding": {
+        "decimals": 0
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "I",
+      "name": "Iodine",
+      "class": "mineral",
+      "unit": "µg",
+      "sr_legacy_num": "314",
+      "fdc_candidates": [
+        "314"
+      ],
+      "fdc_unit": "UG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": false,
+      "rounding": {
+        "decimals": 0
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "F",
+      "name": "Fluoride",
+      "class": "mineral",
+      "unit": "mg",
+      "sr_legacy_num": "313",
+      "fdc_candidates": [
+        "313"
+      ],
+      "fdc_unit": "UG",
+      "unit_factor_from_fdc": 0.001,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": false,
+      "rounding": {
+        "decimals": 2
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "VITA_RAE",
+      "name": "Vitamin A (RAE)",
+      "class": "vitamin",
+      "unit": "µg",
+      "sr_legacy_num": "320",
+      "fdc_candidates": [
+        "320"
+      ],
+      "fdc_unit": "UG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [
+        {
+          "nutrient_nbr": "318",
+          "unit": "IU",
+          "factor_to_canonical": 0.3
+        }
+      ],
+      "aliases": [
+        "vitamin_a_rae"
+      ],
+      "is_sum_or_derived": true,
+      "computed_from": [
+        {
+          "id": "RETOL",
+          "factor_per_µg": 1
+        },
+        {
+          "id": "CARTB",
+          "factor_per_µg": 0.0833333333
+        },
+        {
+          "id": "CARTA",
+          "factor_per_µg": 0.0416666667
+        },
+        {
+          "id": "CRYPX",
+          "factor_per_µg": 0.0416666667
+        }
+      ],
+      "label_priority": true,
+      "rounding": {
+        "decimals": 0
+      },
+      "confidence": "high",
+      "notes_method": "If only IU is available (FDC 318), convert IU→µg as 0.3 µg/IU only for retinol-only entries; otherwise compute RAE from retinol and provitamin A carotenoids."
+    },
+    {
+      "id": "RETOL",
+      "name": "Retinol",
+      "class": "vitamin",
+      "unit": "µg",
+      "sr_legacy_num": "319",
+      "fdc_candidates": [
+        "319"
+      ],
+      "fdc_unit": "UG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": false,
+      "rounding": {
+        "decimals": 0
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "CARTA",
+      "name": "Alpha-carotene",
+      "class": "carotenoid",
+      "unit": "µg",
+      "sr_legacy_num": "322",
+      "fdc_candidates": [
+        "322"
+      ],
+      "fdc_unit": "UG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": false,
+      "rounding": {
+        "decimals": 0
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "CARTB",
+      "name": "Beta-carotene",
+      "class": "carotenoid",
+      "unit": "µg",
+      "sr_legacy_num": "321",
+      "fdc_candidates": [
+        "321"
+      ],
+      "fdc_unit": "UG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": false,
+      "rounding": {
+        "decimals": 0
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "CRYPX",
+      "name": "Beta-cryptoxanthin",
+      "class": "carotenoid",
+      "unit": "µg",
+      "sr_legacy_num": "334",
+      "fdc_candidates": [
+        "334"
+      ],
+      "fdc_unit": "UG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": false,
+      "rounding": {
+        "decimals": 0
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "VITD",
+      "name": "Vitamin D (D2 + D3)",
+      "class": "vitamin",
+      "unit": "µg",
+      "sr_legacy_num": "328",
+      "fdc_candidates": [
+        "328",
+        "324",
+        "325",
+        "326"
+      ],
+      "fdc_unit": "UG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [
+        {
+          "nutrient_nbr": "324",
+          "unit": "IU",
+          "factor_to_canonical": 0.025
+        }
+      ],
+      "aliases": [
+        "cholecalciferol_equiv"
+      ],
+      "is_sum_or_derived": true,
+      "computed_from": [
+        {
+          "id": "VITD2",
+          "factor_per_µg": 1
+        },
+        {
+          "id": "VITD3",
+          "factor_per_µg": 1
+        }
+      ],
+      "label_priority": true,
+      "rounding": {
+        "decimals": 1
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "TOCPHA",
+      "name": "Vitamin E (alpha-tocopherol)",
+      "class": "vitamin",
+      "unit": "mg",
+      "sr_legacy_num": "323",
+      "fdc_candidates": [
+        "323"
+      ],
+      "fdc_unit": "MG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": true,
+      "rounding": {
+        "decimals": 1
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "VITK1",
+      "name": "Vitamin K (phylloquinone)",
+      "class": "vitamin",
+      "unit": "µg",
+      "sr_legacy_num": "430",
+      "fdc_candidates": [
+        "430"
+      ],
+      "fdc_unit": "UG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": true,
+      "rounding": {
+        "decimals": 0
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "THIA",
+      "name": "Thiamin (B1)",
+      "class": "vitamin",
+      "unit": "mg",
+      "sr_legacy_num": "404",
+      "fdc_candidates": [
+        "404"
+      ],
+      "fdc_unit": "MG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": true,
+      "rounding": {
+        "decimals": 2
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "RIBF",
+      "name": "Riboflavin (B2)",
+      "class": "vitamin",
+      "unit": "mg",
+      "sr_legacy_num": "405",
+      "fdc_candidates": [
+        "405"
+      ],
+      "fdc_unit": "MG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": true,
+      "rounding": {
+        "decimals": 2
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "NIA",
+      "name": "Niacin (B3)",
+      "class": "vitamin",
+      "unit": "mg",
+      "sr_legacy_num": "406",
+      "fdc_candidates": [
+        "406"
+      ],
+      "fdc_unit": "MG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": true,
+      "rounding": {
+        "decimals": 2
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "PANTAC",
+      "name": "Pantothenic acid (B5)",
+      "class": "vitamin",
+      "unit": "mg",
+      "sr_legacy_num": "410",
+      "fdc_candidates": [
+        "410"
+      ],
+      "fdc_unit": "MG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": false,
+      "rounding": {
+        "decimals": 2
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "VITB6A",
+      "name": "Vitamin B6",
+      "class": "vitamin",
+      "unit": "mg",
+      "sr_legacy_num": "415",
+      "fdc_candidates": [
+        "415"
+      ],
+      "fdc_unit": "MG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": true,
+      "rounding": {
+        "decimals": 2
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "FOL",
+      "name": "Folate, total",
+      "class": "vitamin",
+      "unit": "µg",
+      "sr_legacy_num": "417",
+      "fdc_candidates": [
+        "417",
+        "432"
+      ],
+      "fdc_unit": "UG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": true,
+      "rounding": {
+        "decimals": 0
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "FOLAC",
+      "name": "Folic acid",
+      "class": "vitamin",
+      "unit": "µg",
+      "sr_legacy_num": "431",
+      "fdc_candidates": [
+        "431"
+      ],
+      "fdc_unit": "UG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": false,
+      "rounding": {
+        "decimals": 0
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "FOLDFE",
+      "name": "Folate, DFE",
+      "class": "vitamin",
+      "unit": "µg",
+      "sr_legacy_num": "435",
+      "fdc_candidates": [
+        "435"
+      ],
+      "fdc_unit": "UG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "dietary_folate_equivalents"
+      ],
+      "is_sum_or_derived": true,
+      "computed_from": [
+        {
+          "id": "FOL",
+          "factor_per_µg": 1
+        },
+        {
+          "id": "FOLAC",
+          "factor_per_µg": 1.7
+        }
+      ],
+      "label_priority": true,
+      "rounding": {
+        "decimals": 0
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "VITB12",
+      "name": "Vitamin B12",
+      "class": "vitamin",
+      "unit": "µg",
+      "sr_legacy_num": "418",
+      "fdc_candidates": [
+        "418"
+      ],
+      "fdc_unit": "UG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "cobalamin"
+      ],
+      "is_sum_or_derived": false,
+      "label_priority": true,
+      "rounding": {
+        "decimals": 2
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "BIOTN",
+      "name": "Biotin (B7)",
+      "class": "vitamin",
+      "unit": "µg",
+      "sr_legacy_num": "416",
+      "fdc_candidates": [
+        "416"
+      ],
+      "fdc_unit": "UG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": false,
+      "rounding": {
+        "decimals": 0
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "CHOLN",
+      "name": "Choline, total",
+      "class": "vitamin",
+      "unit": "mg",
+      "sr_legacy_num": "421",
+      "fdc_candidates": [
+        "421"
+      ],
+      "fdc_unit": "MG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": false,
+      "rounding": {
+        "decimals": 0
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "VITC",
+      "name": "Vitamin C (ascorbic acid)",
+      "class": "vitamin",
+      "unit": "mg",
+      "sr_legacy_num": "401",
+      "fdc_candidates": [
+        "401"
+      ],
+      "fdc_unit": "MG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": true,
+      "rounding": {
+        "decimals": 0
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "FASAT",
+      "name": "Fatty acids, total saturated",
+      "class": "fatty_acid",
+      "unit": "g",
+      "sr_legacy_num": "606",
+      "fdc_candidates": [
+        "606",
+        "690"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": true,
+      "rounding": {
+        "decimals": 2
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "FAMS",
+      "name": "Fatty acids, total monounsaturated",
+      "class": "fatty_acid",
+      "unit": "g",
+      "sr_legacy_num": "645",
+      "fdc_candidates": [
+        "645",
+        "691"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": true,
+      "rounding": {
+        "decimals": 2
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "FAPU",
+      "name": "Fatty acids, total polyunsaturated",
+      "class": "fatty_acid",
+      "unit": "g",
+      "sr_legacy_num": "646",
+      "fdc_candidates": [
+        "646",
+        "692"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": true,
+      "rounding": {
+        "decimals": 2
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "FATRN",
+      "name": "Fatty acids, total trans",
+      "class": "fatty_acid",
+      "unit": "g",
+      "sr_legacy_num": "605",
+      "fdc_candidates": [
+        "605"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": false,
+      "rounding": {
+        "decimals": 2
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "ALA",
+      "name": "Alpha-linolenic acid (18:3 n-3)",
+      "class": "fatty_acid",
+      "unit": "g",
+      "sr_legacy_num": "851",
+      "fdc_candidates": [
+        "851"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "C18:3n-3"
+      ],
+      "is_sum_or_derived": false,
+      "label_priority": true,
+      "rounding": {
+        "decimals": 3
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "LINO",
+      "name": "Linoleic acid (18:2 n-6)",
+      "class": "fatty_acid",
+      "unit": "g",
+      "sr_legacy_num": "675",
+      "fdc_candidates": [
+        "675"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "C18:2n-6"
+      ],
+      "is_sum_or_derived": false,
+      "label_priority": true,
+      "rounding": {
+        "decimals": 3
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "EPA",
+      "name": "Eicosapentaenoic acid (20:5 n-3)",
+      "class": "fatty_acid",
+      "unit": "g",
+      "sr_legacy_num": "629",
+      "fdc_candidates": [
+        "629"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "C20:5n-3"
+      ],
+      "is_sum_or_derived": false,
+      "label_priority": true,
+      "rounding": {
+        "decimals": 3
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "DPA",
+      "name": "Docosapentaenoic acid (22:5 n-3)",
+      "class": "fatty_acid",
+      "unit": "g",
+      "sr_legacy_num": "631",
+      "fdc_candidates": [
+        "631"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "C22:5n-3"
+      ],
+      "is_sum_or_derived": false,
+      "label_priority": false,
+      "rounding": {
+        "decimals": 3
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "DHA",
+      "name": "Docosahexaenoic acid (22:6 n-3)",
+      "class": "fatty_acid",
+      "unit": "g",
+      "sr_legacy_num": "621",
+      "fdc_candidates": [
+        "621"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "C22:6n-3"
+      ],
+      "is_sum_or_derived": false,
+      "label_priority": true,
+      "rounding": {
+        "decimals": 3
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "SUCR",
+      "name": "Sucrose",
+      "class": "sugar",
+      "unit": "g",
+      "sr_legacy_num": "210",
+      "fdc_candidates": [
+        "210"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": false,
+      "rounding": {
+        "decimals": 2
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "GLC",
+      "name": "Glucose (dextrose)",
+      "class": "sugar",
+      "unit": "g",
+      "sr_legacy_num": "211",
+      "fdc_candidates": [
+        "211"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "glucose"
+      ],
+      "is_sum_or_derived": false,
+      "label_priority": false,
+      "rounding": {
+        "decimals": 2
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "FRU",
+      "name": "Fructose",
+      "class": "sugar",
+      "unit": "g",
+      "sr_legacy_num": "212",
+      "fdc_candidates": [
+        "212"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": false,
+      "rounding": {
+        "decimals": 2
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "LAC",
+      "name": "Lactose",
+      "class": "sugar",
+      "unit": "g",
+      "sr_legacy_num": "213",
+      "fdc_candidates": [
+        "213"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": false,
+      "rounding": {
+        "decimals": 2
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "MAL",
+      "name": "Maltose",
+      "class": "sugar",
+      "unit": "g",
+      "sr_legacy_num": "214",
+      "fdc_candidates": [
+        "214"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": false,
+      "rounding": {
+        "decimals": 2
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "SUGAR_ADD",
+      "name": "Sugars, added",
+      "class": "sugar",
+      "unit": "g",
+      "sr_legacy_num": "539",
+      "fdc_candidates": [
+        "539"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "added_sugars"
+      ],
+      "is_sum_or_derived": false,
+      "label_priority": true,
+      "rounding": {
+        "decimals": 1
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "CAFFN",
+      "name": "Caffeine",
+      "class": "other",
+      "unit": "mg",
+      "sr_legacy_num": "262",
+      "fdc_candidates": [
+        "262"
+      ],
+      "fdc_unit": "MG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": false,
+      "rounding": {
+        "decimals": 0
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "THEO",
+      "name": "Theobromine",
+      "class": "other",
+      "unit": "mg",
+      "sr_legacy_num": "263",
+      "fdc_candidates": [
+        "263"
+      ],
+      "fdc_unit": "MG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": false,
+      "rounding": {
+        "decimals": 0
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "BETN",
+      "name": "Betaine",
+      "class": "other",
+      "unit": "mg",
+      "sr_legacy_num": "454",
+      "fdc_candidates": [
+        "454"
+      ],
+      "fdc_unit": "MG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": false,
+      "rounding": {
+        "decimals": 0
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "FIBSOL",
+      "name": "Dietary fiber, soluble",
+      "class": "proximate",
+      "unit": "g",
+      "sr_legacy_num": "295",
+      "fdc_candidates": [
+        "295",
+        "293.2",
+        "953",
+        "954"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "soluble_fiber"
+      ],
+      "is_sum_or_derived": false,
+      "label_priority": false,
+      "rounding": {
+        "decimals": 1
+      },
+      "confidence": "medium",
+      "notes_method": "Prefer AOAC 2011.25 SDFP+SDFS (293.2). If unavailable, sum SDFP (954) + SDFS (953); otherwise fall back to legacy soluble (295)."
+    },
+    {
+      "id": "FIBINS",
+      "name": "Dietary fiber, insoluble",
+      "class": "proximate",
+      "unit": "g",
+      "sr_legacy_num": "297",
+      "fdc_candidates": [
+        "297",
+        "293.1"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "insoluble_fiber"
+      ],
+      "is_sum_or_derived": false,
+      "label_priority": false,
+      "rounding": {
+        "decimals": 1
+      },
+      "confidence": "medium"
+    },
+    {
+      "id": "FAPUN3",
+      "name": "n-3 fatty acids, total",
+      "class": "fatty_acid",
+      "unit": "g",
+      "sr_legacy_num": null,
+      "fdc_candidates": [],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "omega_3_total"
+      ],
+      "is_sum_or_derived": true,
+      "computed_from": [
+        {
+          "id": "ALA",
+          "factor_per_g": 1
+        },
+        {
+          "id": "EPA",
+          "factor_per_g": 1
+        },
+        {
+          "id": "DPA",
+          "factor_per_g": 1
+        },
+        {
+          "id": "DHA",
+          "factor_per_g": 1
+        }
+      ],
+      "label_priority": false,
+      "rounding": {
+        "decimals": 2
+      },
+      "confidence": "medium"
+    },
+    {
+      "id": "FAPUN6",
+      "name": "n-6 fatty acids, total",
+      "class": "fatty_acid",
+      "unit": "g",
+      "sr_legacy_num": null,
+      "fdc_candidates": [],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "omega_6_total"
+      ],
+      "is_sum_or_derived": true,
+      "computed_from": [
+        {
+          "id": "LINO",
+          "factor_per_g": 1
+        },
+        {
+          "id": "ARA",
+          "factor_per_g": 1
+        }
+      ],
+      "label_priority": false,
+      "rounding": {
+        "decimals": 2
+      },
+      "confidence": "medium"
+    },
+    {
+      "id": "RS",
+      "name": "Resistant starch",
+      "class": "carbohydrate",
+      "unit": "g",
+      "sr_legacy_num": "283",
+      "fdc_candidates": [
+        "283"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "resistant_starch"
+      ],
+      "is_sum_or_derived": false,
+      "label_priority": false,
+      "rounding": {
+        "decimals": 1
+      },
+      "confidence": "medium"
+    },
+    {
+      "id": "VITD2",
+      "name": "Vitamin D2 (ergocalciferol)",
+      "class": "vitamin",
+      "unit": "µg",
+      "sr_legacy_num": "325",
+      "fdc_candidates": [
+        "325"
+      ],
+      "fdc_unit": "UG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": false,
+      "rounding": {
+        "decimals": 1
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "VITD3",
+      "name": "Vitamin D3 (cholecalciferol)",
+      "class": "vitamin",
+      "unit": "µg",
+      "sr_legacy_num": "326",
+      "fdc_candidates": [
+        "326"
+      ],
+      "fdc_unit": "UG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [],
+      "is_sum_or_derived": false,
+      "label_priority": false,
+      "rounding": {
+        "decimals": 1
+      },
+      "confidence": "high"
+    },
+    {
+      "id": "ARA",
+      "name": "Arachidonic acid (20:4 n-6)",
+      "class": "fatty_acid",
+      "unit": "g",
+      "sr_legacy_num": "855",
+      "fdc_candidates": [
+        "855"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "C20:4n-6",
+        "arachidonic"
+      ],
+      "is_sum_or_derived": false,
+      "label_priority": false,
+      "rounding": {
+        "decimals": 3
+      },
+      "confidence": "high"
+    }
+  ]
+}

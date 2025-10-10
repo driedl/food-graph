@@ -47,11 +47,12 @@ def validate_evidence(evidence_dir: Path, build_dir: Path, verbose: bool = False
     
     # Create report directory
     report_dir = build_dir / "report"
-    report_dir.mkdir(parents=True, exist_ok=True)
-    report_path = report_dir / "evidence_validation.json"
+    evidence_report_dir = report_dir / "evidence"
+    evidence_report_dir.mkdir(parents=True, exist_ok=True)
+    report_path = evidence_report_dir / "evidence_validation.json"
     
     # Run validation
-    errors: List[str] = []
+    errors: List[Any] = []
     
     # Use evidence-specific validators for JSONL files
     for art in spec.get("artifacts", []):
@@ -103,7 +104,10 @@ def validate_evidence(evidence_dir: Path, build_dir: Path, verbose: bool = False
         print(f"✗ Evidence validation failed: {len(errors)} issue(s) — see {report_path}")
         if verbose:
             for error in errors:
-                print("  -", error)
+                if isinstance(error, dict):
+                    print(f"  - {error.get('food_id', 'unknown')}: {error.get('validation_error', 'unknown error')}")
+                else:
+                    print("  -", error)
         return 1
     else:
         print(f"✓ Evidence validation passed — see {report_path}")
