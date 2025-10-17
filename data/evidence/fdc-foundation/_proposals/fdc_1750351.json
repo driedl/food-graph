@@ -1,0 +1,39 @@
+{
+  "food": {
+    "food_id": "fdc:1750351",
+    "fdc_id": 1750351,
+    "name": "Oil, olive, extra light",
+    "brand": "",
+    "data_type": "Foundation",
+    "category_id": "",
+    "category": "Fats and Oils",
+    "lang": "en",
+    "country": "US"
+  },
+  "proposals": {
+    "taxa": [
+      {
+        "taxon_id": "tx:plantae:eudicots:lamiales",
+        "rank": "order",
+        "scientific_name": "Lamiales"
+      },
+      {
+        "taxon_id": "tx:plantae:eudicots:lamiales:oleaceae",
+        "rank": "family",
+        "scientific_name": "Oleaceae"
+      },
+      {
+        "taxon_id": "tx:plantae:eudicots:lamiales:oleaceae:olea",
+        "rank": "genus",
+        "scientific_name": "Olea"
+      },
+      {
+        "taxon_id": "tx:plantae:eudicots:lamiales:oleaceae:olea:europaea",
+        "rank": "species",
+        "scientific_name": "Olea europaea"
+      }
+    ],
+    "parts": [],
+    "transforms": []
+  }
+}

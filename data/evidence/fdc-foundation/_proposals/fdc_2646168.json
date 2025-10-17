@@ -1,0 +1,61 @@
+{
+  "food": {
+    "food_id": "fdc:2646168",
+    "fdc_id": 2646168,
+    "name": "Pork, loin, boneless, raw",
+    "brand": "",
+    "data_type": "Foundation",
+    "category_id": "",
+    "category": "Pork Products",
+    "lang": "en",
+    "country": "US"
+  },
+  "proposals": {
+    "taxa": [
+      {
+        "taxon_id": "tx:animalia",
+        "rank": "kingdom",
+        "scientific_name": "Animalia",
+        "parent_id": null
+      },
+      {
+        "taxon_id": "tx:animalia:chordata",
+        "rank": "phylum",
+        "scientific_name": "Chordata",
+        "parent_id": "tx:animalia"
+      },
+      {
+        "taxon_id": "tx:animalia:chordata:mammalia",
+        "rank": "class",
+        "scientific_name": "Mammalia",
+        "parent_id": "tx:animalia:chordata"
+      },
+      {
+        "taxon_id": "tx:animalia:chordata:mammalia:artiodactyla",
+        "rank": "order",
+        "scientific_name": "Artiodactyla",
+        "parent_id": "tx:animalia:chordata:mammalia"
+      },
+      {
+        "taxon_id": "tx:animalia:chordata:mammalia:artiodactyla:suidae",
+        "rank": "family",
+        "scientific_name": "Suidae",
+        "parent_id": "tx:animalia:chordata:mammalia:artiodactyla"
+      },
+      {
+        "taxon_id": "tx:animalia:chordata:mammalia:artiodactyla:suidae:sus",
+        "rank": "genus",
+        "scientific_name": "Sus",
+        "parent_id": "tx:animalia:chordata:mammalia:artiodactyla:suidae"
+      },
+      {
+        "taxon_id": "tx:animalia:chordata:mammalia:artiodactyla:suidae:sus:scrofa_domesticus",
+        "rank": "species",
+        "scientific_name": "Sus scrofa domesticus",
+        "parent_id": "tx:animalia:chordata:mammalia:artiodactyla:suidae:sus"
+      }
+    ],
+    "parts": [],
+    "transforms": []
+  }
+}

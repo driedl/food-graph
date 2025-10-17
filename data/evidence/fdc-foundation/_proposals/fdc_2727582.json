@@ -1,0 +1,39 @@
+{
+  "food": {
+    "food_id": "fdc:2727582",
+    "fdc_id": 2727582,
+    "name": "Tomatillos, dehusked, raw",
+    "brand": "",
+    "data_type": "Foundation",
+    "category_id": "",
+    "category": "Vegetables and Vegetable Products",
+    "lang": "en",
+    "country": "US"
+  },
+  "proposals": {
+    "taxa": [
+      {
+        "taxon_id": "tx:plantae:eudicots",
+        "name": "Eudicots"
+      },
+      {
+        "taxon_id": "tx:plantae:eudicots:solanales",
+        "name": "Solanales"
+      },
+      {
+        "taxon_id": "tx:plantae:eudicots:solanales:solanaceae",
+        "name": "Solanaceae"
+      },
+      {
+        "taxon_id": "tx:plantae:eudicots:solanales:solanaceae:physalis",
+        "name": "Physalis"
+      },
+      {
+        "taxon_id": "tx:plantae:eudicots:solanales:solanaceae:physalis:physalis_philadelphica",
+        "name": "Physalis philadelphica"
+      }
+    ],
+    "parts": [],
+    "transforms": []
+  }
+}
