@@ -4,7 +4,6 @@
   "type": "object",
   "required": [
     "id",
-    "parent",
     "rank",
     "display_name",
     "latin_name"
@@ -12,15 +11,15 @@
   "properties": {
     "id": {
       "type": "string",
-      "description": "Stable taxon ID, e.g., tx:plantae:rosaceae:malus:domestica"
-    },
-    "parent": {
-      "type": "string",
-      "description": "Parent taxon ID or null for root"
+      "description": "Stable taxon ID in kingdom-genus-species format, e.g., tx:p:lactuca:sativa:romaine"
     },
     "rank": {
       "type": "string",
-      "description": "Taxonomic rank or domain-level bucket (kingdom, family, genus, species, cultivar, etc.)"
+      "description": "Taxonomic rank (kingdom, genus, species, cultivar, variety, breed, etc.)"
+    },
+    "ncbi_taxid": {
+      "type": "integer",
+      "description": "NCBI taxonomy ID for species/genus level verification (optional)"
     },
     "display_name": {
       "type": "string"
