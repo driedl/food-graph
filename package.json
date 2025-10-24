@@ -14,6 +14,7 @@
     "etl:plan": "cd etl && python3 -m graph run --help",
     "etl:run": "cd etl && python3 -m graph run build --verbose --with-tests --in ../data/ontology --build ./build",
     "etl:clean": "cd etl && python3 -m graph clean --hard",
+    "etl:ncbi": "cd etl && python3 graph/external/ncbi_loader.py --output build/database/ncbi.sqlite",
     "db:open": "sqlite3 etl/build/database/graph.dev.sqlite",
     "sql": "tsx scripts/run-sql.ts",
     "sql:repl": "tsx scripts/run-sql.ts --repl",

@@ -1,105 +1,105 @@
-{"id": "tx:p:apium:graveolens", "rank": "species", "display_name": "Celery", "latin_name": "Apium graveolens", "aliases": ["celery"]}
-{"id": "tx:p:coriandrum:sativum", "rank": "species", "display_name": "Coriander / Cilantro", "latin_name": "Coriandrum sativum", "aliases": ["coriander", "cilantro", "Chinese parsley", "coriander seed"]}
-{"id": "tx:p:cuminum:cyminum", "rank": "species", "display_name": "Cumin", "latin_name": "Cuminum cyminum", "aliases": ["cumin"]}
-{"id": "tx:p:daucus:carota", "rank": "species", "display_name": "Carrot", "latin_name": "Daucus carota subsp. sativus", "aliases": ["carrot", "carrots"]}
-{"id": "tx:p:helianthus:annuus", "rank": "species", "display_name": "Sunflower", "latin_name": "Helianthus annuus", "aliases": ["sunflower"]}
-{"id": "tx:p:carthamus:tinctorius", "rank": "species", "display_name": "Safflower", "latin_name": "Carthamus tinctorius", "aliases": ["safflower"]}
-{"id": "tx:p:lactuca:sativa", "rank": "species", "display_name": "Lettuce (Lactuca sativa)", "latin_name": "Lactuca sativa", "aliases": ["lettuce"]}
-{"id": "tx:p:lactuca:sativa:capitata", "rank": "variety", "display_name": "Lettuce (Iceberg)", "latin_name": "Lactuca sativa var. capitata", "aliases": ["iceberg lettuce"]}
-{"id": "tx:p:lactuca:sativa:longifolia", "rank": "variety", "display_name": "Lettuce (Romaine)", "latin_name": "Lactuca sativa var. longifolia", "aliases": ["romaine lettuce", "cos lettuce"]}
-{"id": "tx:p:brassica:napus", "rank": "species", "display_name": "Rapeseed / Canola", "latin_name": "Brassica napus", "aliases": ["rapeseed", "canola"]}
-{"id": "tx:p:brassica:napus:napobrassica", "rank": "variety", "display_name": "Rutabaga", "latin_name": "Brassica napus var. napobrassica", "aliases": ["rutabaga", "swede"]}
-{"id": "tx:p:brassica:oleracea", "rank": "species", "display_name": "Cole crops (Brassica oleracea)", "latin_name": "Brassica oleracea", "aliases": []}
-{"id": "tx:p:brassica:oleracea:botrytis", "rank": "variety", "display_name": "Cauliflower", "latin_name": "Brassica oleracea var. botrytis", "aliases": ["cauliflower"]}
-{"id": "tx:p:brassica:oleracea:gemmifera", "rank": "variety", "display_name": "Brussels sprouts", "latin_name": "Brassica oleracea var. gemmifera", "aliases": ["brussels sprouts"]}
-{"id": "tx:p:brassica:oleracea:capitata", "rank": "variety", "display_name": "Cabbage (green)", "latin_name": "Brassica oleracea var. capitata", "aliases": ["green cabbage"]}
-{"id": "tx:p:brassica:oleracea:italica", "rank": "variety", "display_name": "Broccoli", "latin_name": "Brassica oleracea var. italica", "aliases": ["broccoli"]}
-{"id": "tx:p:brassica:oleracea:acephala", "rank": "variety", "display_name": "Kale", "latin_name": "Brassica oleracea var. acephala", "aliases": ["kale"]}
-{"id": "tx:p:brassica:rapa", "rank": "species", "display_name": "Field mustard / Asian brassicas (Brassica rapa)", "latin_name": "Brassica rapa", "aliases": ["turnip"]}
-{"id": "tx:p:brassica:rapa:chinensis", "rank": "variety", "display_name": "Bok choy", "latin_name": "Brassica rapa var. chinensis", "aliases": ["pak choi", "bok choy"]}
-{"id": "tx:p:brassica:rapa:pekinensis", "rank": "variety", "display_name": "Napa cabbage", "latin_name": "Brassica rapa var. pekinensis", "aliases": ["napa", "Chinese cabbage"]}
-{"id": "tx:p:eruca:sativa", "rank": "species", "display_name": "Arugula", "latin_name": "Eruca sativa", "aliases": ["rocket", "rucola"]}
-{"id": "tx:p:beta:vulgaris", "rank": "species", "display_name": "Beet & chard (Beta vulgaris groups)", "latin_name": "Beta vulgaris", "aliases": ["beet", "beets", "Swiss chard", "sugar beet"]}
-{"id": "tx:p:chenopodium:quinoa", "rank": "species", "display_name": "Quinoa", "latin_name": "Chenopodium quinoa", "aliases": ["quinoa"]}
-{"id": "tx:p:spinacia:oleracea", "rank": "species", "display_name": "Spinach", "latin_name": "Spinacia oleracea", "aliases": ["spinach"]}
-{"id": "tx:p:fagopyrum:esculentum", "rank": "species", "display_name": "Buckwheat", "latin_name": "Fagopyrum esculentum", "aliases": ["buckwheat"]}
-{"id": "tx:p:cucumis:melo", "rank": "species", "display_name": "Melon", "latin_name": "Cucumis melo", "aliases": ["melon"]}
-{"id": "tx:p:cucumis:melo:cantalupensis", "rank": "variety", "display_name": "Cantaloupe (European; var. cantalupensis)", "latin_name": "Cucumis melo var. cantalupensis", "aliases": ["cantaloupe", "European cantaloupe"]}
-{"id": "tx:p:cucumis:melo:inodorus", "rank": "variety", "display_name": "Honeydew", "latin_name": "Cucumis melo var. inodorus", "aliases": ["honeydew"]}
-{"id": "tx:p:cucumis:sativus", "rank": "species", "display_name": "Cucumber", "latin_name": "Cucumis sativus", "aliases": ["cucumber"]}
-{"id": "tx:p:cucurbita:moschata", "rank": "species", "display_name": "Squash (C. moschata)", "latin_name": "Cucurbita moschata", "aliases": ["butternut squash"]}
-{"id": "tx:p:cucurbita:pepo", "rank": "species", "display_name": "Squash (C. pepo)", "latin_name": "Cucurbita pepo", "aliases": ["zucchini", "summer squash", "acorn squash", "spaghetti squash"]}
-{"id": "tx:p:actinidia:deliciosa", "rank": "species", "display_name": "Kiwifruit (green)", "latin_name": "Actinidia deliciosa", "aliases": ["kiwifruit", "kiwi", "Chinese gooseberry"]}
-{"id": "tx:p:vaccinium:corymbosum", "rank": "species", "display_name": "Blueberry", "latin_name": "Vaccinium corymbosum", "aliases": ["blueberry", "blueberries"]}
-{"id": "tx:p:bertholletia:excelsa", "rank": "species", "display_name": "Brazil nut", "latin_name": "Bertholletia excelsa", "aliases": ["brazil nut", "brazil nuts"]}
-{"id": "tx:p:arachis:hypogaea", "rank": "species", "display_name": "Peanut", "latin_name": "Arachis hypogaea", "aliases": ["peanut", "groundnut"]}
-{"id": "tx:p:cicer:arietinum", "rank": "species", "display_name": "Chickpea", "latin_name": "Cicer arietinum", "aliases": ["chickpea", "garbanzo"]}
-{"id": "tx:p:glycine:max", "rank": "species", "display_name": "Soybean", "latin_name": "Glycine max", "aliases": ["soybean", "soy", "edamame"]}
-{"id": "tx:p:lens:culinaris", "rank": "species", "display_name": "Lentil", "latin_name": "Lens culinaris", "aliases": ["lentil", "lentils"]}
-{"id": "tx:p:phaseolus:vulgaris", "rank": "species", "display_name": "Common bean", "latin_name": "Phaseolus vulgaris", "aliases": ["dry bean", "green bean", "snap bean"]}
-{"id": "tx:p:vigna:unguiculata", "rank": "species", "display_name": "Cowpea (black-eyed pea)", "latin_name": "Vigna unguiculata", "aliases": ["black-eyed pea", "cowpea", "southern pea"]}
-{"id": "tx:p:corylus:avellana", "rank": "species", "display_name": "Hazelnut", "latin_name": "Corylus avellana", "aliases": ["hazelnut", "filbert"]}
-{"id": "tx:p:castanea:sativa", "rank": "species", "display_name": "Chestnut", "latin_name": "Castanea sativa", "aliases": ["chestnut", "chestnuts"]}
-{"id": "tx:p:carya:illinoinensis", "rank": "species", "display_name": "Pecan", "latin_name": "Carya illinoinensis", "aliases": ["pecan", "pecans"]}
-{"id": "tx:p:juglans:regia", "rank": "species", "display_name": "Walnut (English)", "latin_name": "Juglans regia", "aliases": ["walnut", "english walnut"]}
-{"id": "tx:p:salvia:hispanica", "rank": "species", "display_name": "Chia", "latin_name": "Salvia hispanica", "aliases": ["chia", "chia seed", "chia seeds"]}
-{"id": "tx:p:olea:europaea", "rank": "species", "display_name": "Olive", "latin_name": "Olea europaea", "aliases": ["olive", "olives"]}
-{"id": "tx:p:sesamum:indicum", "rank": "species", "display_name": "Sesame", "latin_name": "Sesamum indicum", "aliases": ["sesame", "sesame seeds"]}
-{"id": "tx:p:cinnamomum:cassia", "rank": "species", "display_name": "Cinnamon (cassia)", "latin_name": "Cinnamomum cassia", "aliases": ["cinnamon (cassia)", "Chinese cinnamon", "cassia cinnamon"]}
-{"id": "tx:p:laurus:nobilis", "rank": "species", "display_name": "Bay Leaf", "latin_name": "Laurus nobilis", "aliases": ["bay leaf"]}
-{"id": "tx:p:persea:americana", "rank": "species", "display_name": "Avocado", "latin_name": "Persea americana", "aliases": ["avocado"]}
-{"id": "tx:p:asimina:triloba", "rank": "species", "display_name": "Pawpaw", "latin_name": "Asimina triloba", "aliases": ["pawpaw"]}
-{"id": "tx:p:myristica:fragrans", "rank": "species", "display_name": "Nutmeg", "latin_name": "Myristica fragrans", "aliases": ["nutmeg"]}
-{"id": "tx:p:manihot:esculenta", "rank": "species", "display_name": "Cassava", "latin_name": "Manihot esculenta", "aliases": ["cassava", "yuca", "manioc"]}
-{"id": "tx:p:linum:usitatissimum", "rank": "species", "display_name": "Flax", "latin_name": "Linum usitatissimum", "aliases": ["flax", "flaxseed", "linseed"]}
-{"id": "tx:p:pimenta:dioica", "rank": "species", "display_name": "Allspice", "latin_name": "Pimenta dioica", "aliases": ["allspice"]}
-{"id": "tx:p:syzygium:aromaticum", "rank": "species", "display_name": "Clove", "latin_name": "Syzygium aromaticum", "aliases": ["clove"]}
-{"id": "tx:p:piper:nigrum", "rank": "species", "display_name": "Black Pepper", "latin_name": "Piper nigrum", "aliases": ["black pepper"]}
-{"id": "tx:p:macadamia:integrifolia", "rank": "species", "display_name": "Macadamia", "latin_name": "Macadamia integrifolia", "aliases": ["macadamia", "macadamia nuts"]}
-{"id": "tx:p:malus:domestica", "rank": "species", "display_name": "Apple", "latin_name": "Malus domestica", "aliases": ["apple"]}
-{"id": "tx:p:prunus:avium", "rank": "species", "display_name": "Sweet cherry", "latin_name": "Prunus avium", "aliases": ["cherry", "sweet cherry"]}
-{"id": "tx:p:prunus:domestica", "rank": "species", "display_name": "Plum", "latin_name": "Prunus domestica", "aliases": ["plum", "European plum"]}
-{"id": "tx:p:prunus:dulcis", "rank": "species", "display_name": "Almond", "latin_name": "Prunus dulcis", "aliases": ["almond", "almonds"]}
-{"id": "tx:p:prunus:persica", "rank": "species", "display_name": "Peach", "latin_name": "Prunus persica", "aliases": ["peach", "peaches"]}
-{"id": "tx:p:prunus:persica:nucipersica", "rank": "variety", "display_name": "Nectarine", "latin_name": "Prunus persica var. nucipersica", "aliases": ["nectarine"]}
-{"id": "tx:p:pyrus:communis", "rank": "species", "display_name": "Pear", "latin_name": "Pyrus communis", "aliases": ["pear", "pears", "European pear"]}
-{"id": "tx:p:rubus:fruticosus", "rank": "species", "display_name": "Blackberry", "latin_name": "Rubus fruticosus agg.", "aliases": ["blackberry", "blackberries"]}
-{"id": "tx:p:rubus:idaeus", "rank": "species", "display_name": "Raspberry", "latin_name": "Rubus idaeus", "aliases": ["raspberry", "raspberries"]}
-{"id": "tx:p:anacardium:occidentale", "rank": "species", "display_name": "Cashew", "latin_name": "Anacardium occidentale", "aliases": ["cashew", "cashews"]}
-{"id": "tx:p:mangifera:indica", "rank": "species", "display_name": "Mango", "latin_name": "Mangifera indica", "aliases": ["mango"]}
-{"id": "tx:p:pistacia:vera", "rank": "species", "display_name": "Pistachio", "latin_name": "Pistacia vera", "aliases": ["pistachio", "pistachios"]}
-{"id": "tx:p:citrus:paradisi", "rank": "species", "display_name": "Grapefruit", "latin_name": "Citrus × paradisi", "aliases": ["grapefruit"]}
-{"id": "tx:p:citrus:reticulata", "rank": "species", "display_name": "Mandarin", "latin_name": "Citrus reticulata", "aliases": ["mandarin", "tangerine"]}
-{"id": "tx:p:citrus:sinensis", "rank": "species", "display_name": "Orange", "latin_name": "Citrus sinensis", "aliases": ["orange", "navel orange"]}
-{"id": "tx:p:ipomoea:batatas", "rank": "species", "display_name": "Sweet potato", "latin_name": "Ipomoea batatas", "aliases": ["sweet potato", "yams (market)"]}
-{"id": "tx:p:capsicum:annuum", "rank": "species", "display_name": "Bell pepper", "latin_name": "Capsicum annuum", "aliases": ["bell pepper", "capsicum", "sweet pepper", "red/green pepper"]}
-{"id": "tx:p:physalis:philadelphica", "rank": "species", "display_name": "Tomatillo", "latin_name": "Physalis philadelphica", "aliases": ["tomatillo", "Physalis ixocarpa"]}
-{"id": "tx:p:solanum:lycopersicum", "rank": "species", "display_name": "Tomato", "latin_name": "Solanum lycopersicum", "aliases": ["tomato", "tomatoes"]}
-{"id": "tx:p:solanum:melongena", "rank": "species", "display_name": "Eggplant", "latin_name": "Solanum melongena", "aliases": ["eggplant"]}
-{"id": "tx:p:solanum:tuberosum", "rank": "species", "display_name": "Potato", "latin_name": "Solanum tuberosum", "aliases": ["potato", "potatoes"]}
-{"id": "tx:p:vitis:vinifera", "rank": "species", "display_name": "Grape", "latin_name": "Vitis vinifera", "aliases": ["grape", "table grape", "wine grape"]}
-{"id": "tx:p:pinus:pinea", "rank": "species", "display_name": "Pine nut (stone pine)", "latin_name": "Pinus pinea", "aliases": ["pine nut", "pignoli", "pignolia"]}
-{"id": "tx:p:cocos:nucifera", "rank": "species", "display_name": "Coconut", "latin_name": "Cocos nucifera", "aliases": ["coconut"]}
-{"id": "tx:p:allium:cepa", "rank": "species", "display_name": "Onion", "latin_name": "Allium cepa", "aliases": ["onion", "onions", "bulb onion", "yellow onion"]}
-{"id": "tx:p:allium:fistulosum", "rank": "species", "display_name": "Scallion (green onion)", "latin_name": "Allium fistulosum", "aliases": ["scallion", "green onion", "Welsh onion", "bunching onion"]}
-{"id": "tx:p:allium:porrum", "rank": "species", "display_name": "Leek", "latin_name": "Allium porrum", "aliases": ["leek", "leeks"]}
-{"id": "tx:p:allium:sativum", "rank": "species", "display_name": "Garlic", "latin_name": "Allium sativum", "aliases": ["garlic"]}
-{"id": "tx:p:asparagus:officinalis", "rank": "species", "display_name": "Asparagus", "latin_name": "Asparagus officinalis", "aliases": ["asparagus"]}
-{"id": "tx:p:ananas:comosus", "rank": "species", "display_name": "Pineapple", "latin_name": "Ananas comosus", "aliases": ["pineapple"]}
-{"id": "tx:p:avena:sativa", "rank": "species", "display_name": "Oat", "latin_name": "Avena sativa", "aliases": ["oat"]}
-{"id": "tx:p:digitaria:exilis", "rank": "species", "display_name": "Fonio", "latin_name": "Digitaria exilis", "aliases": ["fonio"]}
-{"id": "tx:p:hordeum:vulgare", "rank": "species", "display_name": "Barley", "latin_name": "Hordeum vulgare", "aliases": ["barley"]}
-{"id": "tx:p:oryza:sativa", "rank": "species", "display_name": "Rice", "latin_name": "Oryza sativa", "aliases": ["rice"]}
-{"id": "tx:p:oryza:sativa:glutinosa", "rank": "variety", "display_name": "Rice (glutinous)", "latin_name": "Oryza sativa var. glutinosa", "aliases": ["sticky rice", "sweet rice", "glutinous rice"]}
-{"id": "tx:p:pennisetum:glaucum", "rank": "species", "display_name": "Millet (pearl)", "latin_name": "Cenchrus americanus", "aliases": ["pearl millet", "millet", "Pennisetum glaucum"]}
-{"id": "tx:p:secale:cereale", "rank": "species", "display_name": "Rye", "latin_name": "Secale cereale", "aliases": ["rye"]}
-{"id": "tx:p:sorghum:bicolor", "rank": "species", "display_name": "Sorghum", "latin_name": "Sorghum bicolor", "aliases": ["sorghum"]}
-{"id": "tx:p:triticum:aestivum", "rank": "species", "display_name": "Wheat", "latin_name": "Triticum aestivum", "aliases": ["wheat"]}
-{"id": "tx:p:triticum:spelta", "rank": "species", "display_name": "Spelt", "latin_name": "Triticum spelta", "aliases": ["spelt"]}
-{"id": "tx:p:triticum:durum", "rank": "species", "display_name": "Durum wheat", "latin_name": "Triticum durum", "aliases": ["durum wheat", "durum"]}
-{"id": "tx:p:zea:mays", "rank": "species", "display_name": "Maize (corn)", "latin_name": "Zea mays", "aliases": ["corn", "maize", "sweet corn"]}
-{"id": "tx:p:zizania:palustris", "rank": "species", "display_name": "Wild rice", "latin_name": "Zizania palustris", "aliases": ["wild rice", "manoomin"]}
-{"id": "tx:p:musa:acuminata", "rank": "species", "display_name": "Banana", "latin_name": "Musa (cultivar groups: AAA/AAB/ABB)", "aliases": ["banana", "Musa × paradisiaca"]}
-{"id": "tx:p:curcuma:longa", "rank": "species", "display_name": "Turmeric", "latin_name": "Curcuma longa", "aliases": ["turmeric"]}
-{"id": "tx:p:elettaria:cardamomum", "rank": "species", "display_name": "Cardamom", "latin_name": "Elettaria cardamomum", "aliases": ["cardamom"]}
-{"id": "tx:p:brassica:oleracea:sabellica", "rank": "variety", "display_name": "Curly kale (group within var. acephala)", "latin_name": "Brassica oleracea var. sabellica", "aliases": ["curly kale"]}
+{"id": "tx:p:apium:graveolens", "rank": "species", "display_name": "Celery", "latin_name": "Apium graveolens", "aliases": ["celery"], "ncbi_taxid": 4045}
+{"id": "tx:p:coriandrum:sativum", "rank": "species", "display_name": "Coriander / Cilantro", "latin_name": "Coriandrum sativum", "aliases": ["coriander", "cilantro", "Chinese parsley", "coriander seed"], "ncbi_taxid": 4047}
+{"id": "tx:p:cuminum:cyminum", "rank": "species", "display_name": "Cumin", "latin_name": "Cuminum cyminum", "aliases": ["cumin"], "ncbi_taxid": 52462}
+{"id": "tx:p:daucus:carota", "rank": "species", "display_name": "Carrot", "latin_name": "Daucus carota subsp. sativus", "aliases": ["carrot", "carrots"], "ncbi_taxid": 4039}
+{"id": "tx:p:helianthus:annuus", "rank": "species", "display_name": "Sunflower", "latin_name": "Helianthus annuus", "aliases": ["sunflower"], "ncbi_taxid": 4232}
+{"id": "tx:p:carthamus:tinctorius", "rank": "species", "display_name": "Safflower", "latin_name": "Carthamus tinctorius", "aliases": ["safflower"], "ncbi_taxid": 4222}
+{"id": "tx:p:lactuca:sativa", "rank": "species", "display_name": "Lettuce (Lactuca sativa)", "latin_name": "Lactuca sativa", "aliases": ["lettuce"], "ncbi_taxid": 4236}
+{"id": "tx:p:lactuca:sativa:capitata", "rank": "variety", "display_name": "Lettuce (Iceberg)", "latin_name": "Lactuca sativa var. capitata", "aliases": ["iceberg lettuce"], "ncbi_taxid": 1049369}
+{"id": "tx:p:lactuca:sativa:longifolia", "rank": "variety", "display_name": "Lettuce (Romaine)", "latin_name": "Lactuca sativa var. longifolia", "aliases": ["romaine lettuce", "cos lettuce"], "ncbi_taxid": 1759395}
+{"id": "tx:p:brassica:napus", "rank": "species", "display_name": "Rapeseed / Canola", "latin_name": "Brassica napus", "aliases": ["rapeseed", "canola"], "ncbi_taxid": 3708}
+{"id": "tx:p:brassica:napus:napobrassica", "rank": "variety", "display_name": "Rutabaga", "latin_name": "Brassica napus var. napobrassica", "aliases": ["rutabaga", "swede"], "ncbi_taxid": 3709}
+{"id": "tx:p:brassica:oleracea", "rank": "species", "display_name": "Cole crops (Brassica oleracea)", "latin_name": "Brassica oleracea", "aliases": [], "ncbi_taxid": 3712}
+{"id": "tx:p:brassica:oleracea:botrytis", "rank": "variety", "display_name": "Cauliflower", "latin_name": "Brassica oleracea var. botrytis", "aliases": ["cauliflower"], "ncbi_taxid": 3715}
+{"id": "tx:p:brassica:oleracea:gemmifera", "rank": "variety", "display_name": "Brussels sprouts", "latin_name": "Brassica oleracea var. gemmifera", "aliases": ["brussels sprouts"], "ncbi_taxid": 178616}
+{"id": "tx:p:brassica:oleracea:capitata", "rank": "variety", "display_name": "Cabbage (green)", "latin_name": "Brassica oleracea var. capitata", "aliases": ["green cabbage"], "ncbi_taxid": 3716}
+{"id": "tx:p:brassica:oleracea:italica", "rank": "variety", "display_name": "Broccoli", "latin_name": "Brassica oleracea var. italica", "aliases": ["broccoli"], "ncbi_taxid": 36774}
+{"id": "tx:p:brassica:oleracea:acephala", "rank": "variety", "display_name": "Kale", "latin_name": "Brassica oleracea var. acephala", "aliases": ["kale"], "ncbi_taxid": 3713}
+{"id": "tx:p:brassica:rapa", "rank": "species", "display_name": "Field mustard / Asian brassicas (Brassica rapa)", "latin_name": "Brassica rapa", "aliases": ["turnip"], "ncbi_taxid": 3711}
+{"id": "tx:p:brassica:rapa:chinensis", "rank": "variety", "display_name": "Bok choy", "latin_name": "Brassica rapa var. chinensis", "aliases": ["pak choi", "bok choy"], "ncbi_taxid": 93385}
+{"id": "tx:p:brassica:rapa:pekinensis", "rank": "variety", "display_name": "Napa cabbage", "latin_name": "Brassica rapa var. pekinensis", "aliases": ["napa", "Chinese cabbage"], "ncbi_taxid": 51351}
+{"id": "tx:p:eruca:sativa", "rank": "species", "display_name": "Arugula", "latin_name": "Eruca sativa", "aliases": ["rocket", "rucola"], "ncbi_taxid": 29727}
+{"id": "tx:p:beta:vulgaris", "rank": "species", "display_name": "Beet & chard (Beta vulgaris groups)", "latin_name": "Beta vulgaris", "aliases": ["beet", "beets", "Swiss chard", "sugar beet"], "ncbi_taxid": 161934}
+{"id": "tx:p:chenopodium:quinoa", "rank": "species", "display_name": "Quinoa", "latin_name": "Chenopodium quinoa", "aliases": ["quinoa"], "ncbi_taxid": 63459}
+{"id": "tx:p:spinacia:oleracea", "rank": "species", "display_name": "Spinach", "latin_name": "Spinacia oleracea", "aliases": ["spinach"], "ncbi_taxid": 3562}
+{"id": "tx:p:fagopyrum:esculentum", "rank": "species", "display_name": "Buckwheat", "latin_name": "Fagopyrum esculentum", "aliases": ["buckwheat"], "ncbi_taxid": 3617}
+{"id": "tx:p:cucumis:melo", "rank": "species", "display_name": "Melon", "latin_name": "Cucumis melo", "aliases": ["melon"], "ncbi_taxid": 3656}
+{"id": "tx:p:cucumis:melo:cantalupensis", "rank": "variety", "display_name": "Cantaloupe (European; var. cantalupensis)", "latin_name": "Cucumis melo var. cantalupensis", "aliases": ["cantaloupe", "European cantaloupe"], "ncbi_taxid": 3658}
+{"id": "tx:p:cucumis:melo:inodorus", "rank": "variety", "display_name": "Honeydew", "latin_name": "Cucumis melo var. inodorus", "aliases": ["honeydew"], "ncbi_taxid": 357961}
+{"id": "tx:p:cucumis:sativus", "rank": "species", "display_name": "Cucumber", "latin_name": "Cucumis sativus", "aliases": ["cucumber"], "ncbi_taxid": 3659}
+{"id": "tx:p:cucurbita:moschata", "rank": "species", "display_name": "Squash (C. moschata)", "latin_name": "Cucurbita moschata", "aliases": ["butternut squash"], "ncbi_taxid": 3662}
+{"id": "tx:p:cucurbita:pepo", "rank": "species", "display_name": "Squash (C. pepo)", "latin_name": "Cucurbita pepo", "aliases": ["zucchini", "summer squash", "acorn squash", "spaghetti squash"], "ncbi_taxid": 3663}
+{"id": "tx:p:actinidia:deliciosa", "rank": "species", "display_name": "Kiwifruit (green)", "latin_name": "Actinidia deliciosa", "aliases": ["kiwifruit", "kiwi", "Chinese gooseberry"], "ncbi_taxid": 3627}
+{"id": "tx:p:vaccinium:corymbosum", "rank": "species", "display_name": "Blueberry", "latin_name": "Vaccinium corymbosum", "aliases": ["blueberry", "blueberries"], "ncbi_taxid": 69266}
+{"id": "tx:p:bertholletia:excelsa", "rank": "species", "display_name": "Brazil nut", "latin_name": "Bertholletia excelsa", "aliases": ["brazil nut", "brazil nuts"], "ncbi_taxid": 3645}
+{"id": "tx:p:arachis:hypogaea", "rank": "species", "display_name": "Peanut", "latin_name": "Arachis hypogaea", "aliases": ["peanut", "groundnut"], "ncbi_taxid": 3818}
+{"id": "tx:p:cicer:arietinum", "rank": "species", "display_name": "Chickpea", "latin_name": "Cicer arietinum", "aliases": ["chickpea", "garbanzo"], "ncbi_taxid": 3827}
+{"id": "tx:p:glycine:max", "rank": "species", "display_name": "Soybean", "latin_name": "Glycine max", "aliases": ["soybean", "soy", "edamame"], "ncbi_taxid": 3847}
+{"id": "tx:p:lens:culinaris", "rank": "species", "display_name": "Lentil", "latin_name": "Lens culinaris", "aliases": ["lentil", "lentils"], "ncbi_taxid": 3864}
+{"id": "tx:p:phaseolus:vulgaris", "rank": "species", "display_name": "Common bean", "latin_name": "Phaseolus vulgaris", "aliases": ["dry bean", "green bean", "snap bean"], "ncbi_taxid": 3885}
+{"id": "tx:p:vigna:unguiculata", "rank": "species", "display_name": "Cowpea (black-eyed pea)", "latin_name": "Vigna unguiculata", "aliases": ["black-eyed pea", "cowpea", "southern pea"], "ncbi_taxid": 3917}
+{"id": "tx:p:corylus:avellana", "rank": "species", "display_name": "Hazelnut", "latin_name": "Corylus avellana", "aliases": ["hazelnut", "filbert"], "ncbi_taxid": 13451}
+{"id": "tx:p:castanea:sativa", "rank": "species", "display_name": "Chestnut", "latin_name": "Castanea sativa", "aliases": ["chestnut", "chestnuts"], "ncbi_taxid": 21020}
+{"id": "tx:p:carya:illinoinensis", "rank": "species", "display_name": "Pecan", "latin_name": "Carya illinoinensis", "aliases": ["pecan", "pecans"], "ncbi_taxid": 32201}
+{"id": "tx:p:juglans:regia", "rank": "species", "display_name": "Walnut (English)", "latin_name": "Juglans regia", "aliases": ["walnut", "english walnut"], "ncbi_taxid": 51240}
+{"id": "tx:p:salvia:hispanica", "rank": "species", "display_name": "Chia", "latin_name": "Salvia hispanica", "aliases": ["chia", "chia seed", "chia seeds"], "ncbi_taxid": 49212}
+{"id": "tx:p:olea:europaea", "rank": "species", "display_name": "Olive", "latin_name": "Olea europaea", "aliases": ["olive", "olives"], "ncbi_taxid": 4146}
+{"id": "tx:p:sesamum:indicum", "rank": "species", "display_name": "Sesame", "latin_name": "Sesamum indicum", "aliases": ["sesame", "sesame seeds"], "ncbi_taxid": 4182}
+{"id": "tx:p:cinnamomum:cassia", "rank": "species", "display_name": "Cinnamon (cassia)", "latin_name": "Cinnamomum cassia", "aliases": ["cinnamon (cassia)", "Chinese cinnamon", "cassia cinnamon"], "ncbi_taxid": 119260}
+{"id": "tx:p:laurus:nobilis", "rank": "species", "display_name": "Bay Leaf", "latin_name": "Laurus nobilis", "aliases": ["bay leaf"], "ncbi_taxid": 85223}
+{"id": "tx:p:persea:americana", "rank": "species", "display_name": "Avocado", "latin_name": "Persea americana", "aliases": ["avocado"], "ncbi_taxid": 3435}
+{"id": "tx:p:asimina:triloba", "rank": "species", "display_name": "Pawpaw", "latin_name": "Asimina triloba", "aliases": ["pawpaw"], "ncbi_taxid": 12953}
+{"id": "tx:p:myristica:fragrans", "rank": "species", "display_name": "Nutmeg", "latin_name": "Myristica fragrans", "aliases": ["nutmeg"], "ncbi_taxid": 51089}
+{"id": "tx:p:manihot:esculenta", "rank": "species", "display_name": "Cassava", "latin_name": "Manihot esculenta", "aliases": ["cassava", "yuca", "manioc"], "ncbi_taxid": 3983}
+{"id": "tx:p:linum:usitatissimum", "rank": "species", "display_name": "Flax", "latin_name": "Linum usitatissimum", "aliases": ["flax", "flaxseed", "linseed"], "ncbi_taxid": 4006}
+{"id": "tx:p:pimenta:dioica", "rank": "species", "display_name": "Allspice", "latin_name": "Pimenta dioica", "aliases": ["allspice"], "ncbi_taxid": 375272}
+{"id": "tx:p:syzygium:aromaticum", "rank": "species", "display_name": "Clove", "latin_name": "Syzygium aromaticum", "aliases": ["clove"], "ncbi_taxid": 219868}
+{"id": "tx:p:piper:nigrum", "rank": "species", "display_name": "Black Pepper", "latin_name": "Piper nigrum", "aliases": ["black pepper"], "ncbi_taxid": 13216}
+{"id": "tx:p:macadamia:integrifolia", "rank": "species", "display_name": "Macadamia", "latin_name": "Macadamia integrifolia", "aliases": ["macadamia", "macadamia nuts"], "ncbi_taxid": 60698}
+{"id": "tx:p:malus:domestica", "rank": "species", "display_name": "Apple", "latin_name": "Malus domestica", "aliases": ["apple"], "ncbi_taxid": 3750}
+{"id": "tx:p:prunus:avium", "rank": "species", "display_name": "Sweet cherry", "latin_name": "Prunus avium", "aliases": ["cherry", "sweet cherry"], "ncbi_taxid": 42229}
+{"id": "tx:p:prunus:domestica", "rank": "species", "display_name": "Plum", "latin_name": "Prunus domestica", "aliases": ["plum", "European plum"], "ncbi_taxid": 3758}
+{"id": "tx:p:prunus:dulcis", "rank": "species", "display_name": "Almond", "latin_name": "Prunus dulcis", "aliases": ["almond", "almonds"], "ncbi_taxid": 3755}
+{"id": "tx:p:prunus:persica", "rank": "species", "display_name": "Peach", "latin_name": "Prunus persica", "aliases": ["peach", "peaches"], "ncbi_taxid": 3760}
+{"id": "tx:p:prunus:persica:nucipersica", "rank": "variety", "display_name": "Nectarine", "latin_name": "Prunus persica var. nucipersica", "aliases": ["nectarine"], "ncbi_taxid": 323851}
+{"id": "tx:p:pyrus:communis", "rank": "species", "display_name": "Pear", "latin_name": "Pyrus communis", "aliases": ["pear", "pears", "European pear"], "ncbi_taxid": 23211}
+{"id": "tx:p:rubus:fruticosus", "rank": "species", "display_name": "Blackberry", "latin_name": "Rubus fruticosus agg.", "aliases": ["blackberry", "blackberries"], "ncbi_taxid": 211815}
+{"id": "tx:p:rubus:idaeus", "rank": "species", "display_name": "Raspberry", "latin_name": "Rubus idaeus", "aliases": ["raspberry", "raspberries"], "ncbi_taxid": 32247}
+{"id": "tx:p:anacardium:occidentale", "rank": "species", "display_name": "Cashew", "latin_name": "Anacardium occidentale", "aliases": ["cashew", "cashews"], "ncbi_taxid": 171929}
+{"id": "tx:p:mangifera:indica", "rank": "species", "display_name": "Mango", "latin_name": "Mangifera indica", "aliases": ["mango"], "ncbi_taxid": 29780}
+{"id": "tx:p:pistacia:vera", "rank": "species", "display_name": "Pistachio", "latin_name": "Pistacia vera", "aliases": ["pistachio", "pistachios"], "ncbi_taxid": 55513}
+{"id": "tx:p:citrus:paradisi", "rank": "species", "display_name": "Grapefruit", "latin_name": "Citrus × paradisi", "aliases": ["grapefruit"], "ncbi_taxid": 37656, "_ncbi_source": "scientific name", "_ncbi_note": "Hybrid species (Citrus sinensis × Citrus grandis)"}
+{"id": "tx:p:citrus:reticulata", "rank": "species", "display_name": "Mandarin", "latin_name": "Citrus reticulata", "aliases": ["mandarin", "tangerine"], "ncbi_taxid": 85571}
+{"id": "tx:p:citrus:sinensis", "rank": "species", "display_name": "Orange", "latin_name": "Citrus sinensis", "aliases": ["orange", "navel orange"], "ncbi_taxid": 2711}
+{"id": "tx:p:ipomoea:batatas", "rank": "species", "display_name": "Sweet potato", "latin_name": "Ipomoea batatas", "aliases": ["sweet potato", "yams (market)"], "ncbi_taxid": 4120}
+{"id": "tx:p:capsicum:annuum", "rank": "species", "display_name": "Bell pepper", "latin_name": "Capsicum annuum", "aliases": ["bell pepper", "capsicum", "sweet pepper", "red/green pepper"], "ncbi_taxid": 4072}
+{"id": "tx:p:physalis:philadelphica", "rank": "species", "display_name": "Tomatillo", "latin_name": "Physalis philadelphica", "aliases": ["tomatillo", "Physalis ixocarpa"], "ncbi_taxid": 304130}
+{"id": "tx:p:solanum:lycopersicum", "rank": "species", "display_name": "Tomato", "latin_name": "Solanum lycopersicum", "aliases": ["tomato", "tomatoes"], "ncbi_taxid": 4081}
+{"id": "tx:p:solanum:melongena", "rank": "species", "display_name": "Eggplant", "latin_name": "Solanum melongena", "aliases": ["eggplant"], "ncbi_taxid": 4111}
+{"id": "tx:p:solanum:tuberosum", "rank": "species", "display_name": "Potato", "latin_name": "Solanum tuberosum", "aliases": ["potato", "potatoes"], "ncbi_taxid": 4113}
+{"id": "tx:p:vitis:vinifera", "rank": "species", "display_name": "Grape", "latin_name": "Vitis vinifera", "aliases": ["grape", "table grape", "wine grape"], "ncbi_taxid": 29760}
+{"id": "tx:p:pinus:pinea", "rank": "species", "display_name": "Pine nut (stone pine)", "latin_name": "Pinus pinea", "aliases": ["pine nut", "pignoli", "pignolia"], "ncbi_taxid": 3346}
+{"id": "tx:p:cocos:nucifera", "rank": "species", "display_name": "Coconut", "latin_name": "Cocos nucifera", "aliases": ["coconut"], "ncbi_taxid": 13894}
+{"id": "tx:p:allium:cepa", "rank": "species", "display_name": "Onion", "latin_name": "Allium cepa", "aliases": ["onion", "onions", "bulb onion", "yellow onion"], "ncbi_taxid": 4679}
+{"id": "tx:p:allium:fistulosum", "rank": "species", "display_name": "Scallion (green onion)", "latin_name": "Allium fistulosum", "aliases": ["scallion", "green onion", "Welsh onion", "bunching onion"], "ncbi_taxid": 35875}
+{"id": "tx:p:allium:porrum", "rank": "species", "display_name": "Leek", "latin_name": "Allium porrum", "aliases": ["leek", "leeks"], "ncbi_taxid": 4681}
+{"id": "tx:p:allium:sativum", "rank": "species", "display_name": "Garlic", "latin_name": "Allium sativum", "aliases": ["garlic"], "ncbi_taxid": 4682}
+{"id": "tx:p:asparagus:officinalis", "rank": "species", "display_name": "Asparagus", "latin_name": "Asparagus officinalis", "aliases": ["asparagus"], "ncbi_taxid": 4686}
+{"id": "tx:p:ananas:comosus", "rank": "species", "display_name": "Pineapple", "latin_name": "Ananas comosus", "aliases": ["pineapple"], "ncbi_taxid": 4615}
+{"id": "tx:p:avena:sativa", "rank": "species", "display_name": "Oat", "latin_name": "Avena sativa", "aliases": ["oat"], "ncbi_taxid": 4498}
+{"id": "tx:p:digitaria:exilis", "rank": "species", "display_name": "Fonio", "latin_name": "Digitaria exilis", "aliases": ["fonio"], "ncbi_taxid": 1010633}
+{"id": "tx:p:hordeum:vulgare", "rank": "species", "display_name": "Barley", "latin_name": "Hordeum vulgare", "aliases": ["barley"], "ncbi_taxid": 4513}
+{"id": "tx:p:oryza:sativa", "rank": "species", "display_name": "Rice", "latin_name": "Oryza sativa", "aliases": ["rice"], "ncbi_taxid": 4530}
+{"id": "tx:p:oryza:sativa:glutinosa", "rank": "variety", "display_name": "Rice (glutinous)", "latin_name": "Oryza sativa var. glutinosa", "aliases": ["sticky rice", "sweet rice", "glutinous rice"], "ncbi_taxid": 4530, "_ncbi_source": "parent species", "_ncbi_note": "Cultivar variety of Oryza sativa (glutinous rice)", "_cultivar_variety": true}
+{"id": "tx:p:pennisetum:glaucum", "rank": "species", "display_name": "Millet (pearl)", "latin_name": "Cenchrus americanus", "aliases": ["pearl millet", "millet", "Pennisetum glaucum"], "ncbi_taxid": 4543}
+{"id": "tx:p:secale:cereale", "rank": "species", "display_name": "Rye", "latin_name": "Secale cereale", "aliases": ["rye"], "ncbi_taxid": 4550}
+{"id": "tx:p:sorghum:bicolor", "rank": "species", "display_name": "Sorghum", "latin_name": "Sorghum bicolor", "aliases": ["sorghum"], "ncbi_taxid": 4558}
+{"id": "tx:p:triticum:aestivum", "rank": "species", "display_name": "Wheat", "latin_name": "Triticum aestivum", "aliases": ["wheat"], "ncbi_taxid": 4565}
+{"id": "tx:p:triticum:spelta", "rank": "species", "display_name": "Spelt", "latin_name": "Triticum spelta", "aliases": ["spelt"], "ncbi_taxid": 58933}
+{"id": "tx:p:triticum:durum", "rank": "species", "display_name": "Durum wheat", "latin_name": "Triticum durum", "aliases": ["durum wheat", "durum"], "ncbi_taxid": 4567}
+{"id": "tx:p:zea:mays", "rank": "species", "display_name": "Maize (corn)", "latin_name": "Zea mays", "aliases": ["corn", "maize", "sweet corn"], "ncbi_taxid": 4577}
+{"id": "tx:p:zizania:palustris", "rank": "species", "display_name": "Wild rice", "latin_name": "Zizania palustris", "aliases": ["wild rice", "manoomin"], "ncbi_taxid": 103762}
+{"id": "tx:p:musa:acuminata", "rank": "species", "display_name": "Banana", "latin_name": "Musa (cultivar groups: AAA/AAB/ABB)", "aliases": ["banana", "Musa × paradisiaca"], "ncbi_taxid": 4641, "_ncbi_source": "scientific name", "_ncbi_note": "Wild banana species (cultivar groups AAA/AAB/ABB)"}
+{"id": "tx:p:curcuma:longa", "rank": "species", "display_name": "Turmeric", "latin_name": "Curcuma longa", "aliases": ["turmeric"], "ncbi_taxid": 136217}
+{"id": "tx:p:elettaria:cardamomum", "rank": "species", "display_name": "Cardamom", "latin_name": "Elettaria cardamomum", "aliases": ["cardamom"], "ncbi_taxid": 105181}
+{"id": "tx:p:brassica:oleracea:sabellica", "rank": "variety", "display_name": "Curly kale (group within var. acephala)", "latin_name": "Brassica oleracea var. sabellica", "aliases": ["curly kale"], "ncbi_taxid": 2650123}

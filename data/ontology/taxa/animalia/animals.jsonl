@@ -1,58 +1,57 @@
-{"id": "tx:a:chordata", "rank": "phylum", "display_name": "Chordata", "latin_name": "Chordata", "aliases": []}
-{"id": "tx:a:mammalia", "rank": "class", "display_name": "Mammalia", "latin_name": "Mammalia", "aliases": []}
-{"id": "tx:a:artiodactyla", "rank": "order", "display_name": "Artiodactyla", "latin_name": "Artiodactyla", "aliases": []}
-{"id": "tx:a:bovidae", "rank": "family", "display_name": "Bovidae", "latin_name": "Bovidae", "aliases": []}
-{"id": "tx:a:bos", "rank": "genus", "display_name": "Cattle", "latin_name": "Bos", "aliases": []}
-{"id": "tx:a:bos:taurus", "rank": "species", "display_name": "Cow", "latin_name": "Bos taurus", "aliases": ["cow"]}
-{"id": "tx:a:ovis", "rank": "genus", "display_name": "Ovis", "latin_name": "Ovis", "aliases": []}
-{"id": "tx:a:ovis:aries", "rank": "species", "display_name": "Sheep (lamb)", "latin_name": "Ovis aries", "aliases": ["lamb", "mutton"]}
-{"id": "tx:a:bison", "rank": "genus", "display_name": "Bison", "latin_name": "Bison", "aliases": []}
-{"id": "tx:a:bison:bison", "rank": "species", "display_name": "American bison", "latin_name": "Bison bison", "aliases": ["bison"]}
-{"id": "tx:a:suidae", "rank": "family", "display_name": "Suidae", "latin_name": "Suidae", "aliases": []}
-{"id": "tx:a:sus", "rank": "genus", "display_name": "Sus", "latin_name": "Sus", "aliases": []}
-{"id": "tx:a:sus:scrofa_domesticus", "rank": "species", "display_name": "Pig", "latin_name": "Sus scrofa domesticus", "aliases": ["pork", "pig"]}
-{"id": "tx:a:aves", "rank": "class", "display_name": "Aves", "latin_name": "Aves", "aliases": []}
-{"id": "tx:a:galliformes", "rank": "order", "display_name": "Galliformes", "latin_name": "Galliformes", "aliases": []}
-{"id": "tx:a:phasianidae", "rank": "family", "display_name": "Phasianidae", "latin_name": "Phasianidae", "aliases": []}
-{"id": "tx:a:gallus", "rank": "genus", "display_name": "Gallus", "latin_name": "Gallus", "aliases": []}
-{"id": "tx:a:gallus:gallus_domesticus", "rank": "species", "display_name": "Chicken", "latin_name": "Gallus gallus domesticus", "aliases": ["chicken"]}
-{"id": "tx:a:meleagrididae", "rank": "family", "display_name": "Meleagrididae", "latin_name": "Meleagrididae", "aliases": []}
-{"id": "tx:a:meleagris", "rank": "genus", "display_name": "Meleagris", "latin_name": "Meleagris", "aliases": []}
-{"id": "tx:a:meleagris:gallopavo", "rank": "species", "display_name": "Turkey", "latin_name": "Meleagris gallopavo", "aliases": ["turkey"]}
-{"id": "tx:a:actinopterygii", "rank": "class", "display_name": "Actinopterygii", "latin_name": "Actinopterygii", "aliases": []}
-{"id": "tx:a:gadiformes", "rank": "order", "display_name": "Gadiformes", "latin_name": "Gadiformes", "aliases": []}
-{"id": "tx:a:gadidae", "rank": "family", "display_name": "Gadidae", "latin_name": "Gadidae", "aliases": []}
-{"id": "tx:a:gadus", "rank": "genus", "display_name": "Gadus", "latin_name": "Gadus", "aliases": []}
-{"id": "tx:a:gadus:morhua", "rank": "species", "display_name": "Atlantic cod", "latin_name": "Gadus morhua", "aliases": ["cod"]}
-{"id": "tx:a:gadus:chalcogrammus", "rank": "species", "display_name": "Alaska pollock", "latin_name": "Gadus chalcogrammus", "aliases": ["pollock"]}
-{"id": "tx:a:melanogrammus", "rank": "genus", "display_name": "Melanogrammus", "latin_name": "Melanogrammus", "aliases": []}
-{"id": "tx:a:melanogrammus:aeglefinus", "rank": "species", "display_name": "Haddock", "latin_name": "Melanogrammus aeglefinus", "aliases": ["haddock"]}
-{"id": "tx:a:salmoniformes", "rank": "order", "display_name": "Salmoniformes", "latin_name": "Salmoniformes", "aliases": []}
-{"id": "tx:a:salmonidae", "rank": "family", "display_name": "Salmonidae", "latin_name": "Salmonidae", "aliases": []}
-{"id": "tx:a:salmo", "rank": "genus", "display_name": "Salmo", "latin_name": "Salmo", "aliases": []}
-{"id": "tx:a:salmo:salar", "rank": "species", "display_name": "Atlantic salmon", "latin_name": "Salmo salar", "aliases": ["salmon"]}
-{"id": "tx:a:oncorhynchus", "rank": "genus", "display_name": "Oncorhynchus", "latin_name": "Oncorhynchus", "aliases": []}
-{"id": "tx:a:oncorhynchus:nerka", "rank": "species", "display_name": "Sockeye salmon", "latin_name": "Oncorhynchus nerka", "aliases": ["sockeye"]}
-{"id": "tx:a:perciformes", "rank": "order", "display_name": "Perciformes", "latin_name": "Perciformes", "aliases": []}
-{"id": "tx:a:cichlidae", "rank": "family", "display_name": "Cichlidae", "latin_name": "Cichlidae", "aliases": []}
-{"id": "tx:a:oreochromis", "rank": "genus", "display_name": "Oreochromis", "latin_name": "Oreochromis", "aliases": []}
-{"id": "tx:a:oreochromis:niloticus", "rank": "species", "display_name": "Nile tilapia", "latin_name": "Oreochromis niloticus", "aliases": ["tilapia"]}
-{"id": "tx:a:siluriformes", "rank": "order", "display_name": "Siluriformes", "latin_name": "Siluriformes", "aliases": []}
-{"id": "tx:a:ictaluridae", "rank": "family", "display_name": "Ictaluridae", "latin_name": "Ictaluridae", "aliases": []}
-{"id": "tx:a:ictalurus", "rank": "genus", "display_name": "Ictalurus", "latin_name": "Ictalurus", "aliases": []}
-{"id": "tx:a:ictalurus:punctatus", "rank": "species", "display_name": "Channel catfish", "latin_name": "Ictalurus punctatus", "aliases": ["catfish"]}
-{"id": "tx:a:scombriformes", "rank": "order", "display_name": "Scombriformes", "latin_name": "Scombriformes", "aliases": []}
-{"id": "tx:a:scombridae", "rank": "family", "display_name": "Scombridae", "latin_name": "Scombridae", "aliases": []}
-{"id": "tx:a:katsuwonus", "rank": "genus", "display_name": "Katsuwonus", "latin_name": "Katsuwonus", "aliases": []}
-{"id": "tx:a:katsuwonus:pelamis", "rank": "species", "display_name": "Skipjack tuna", "latin_name": "Katsuwonus pelamis", "aliases": ["skipjack", "light tuna"]}
-{"id": "tx:a:arthropoda", "rank": "phylum", "display_name": "Arthropoda", "latin_name": "Arthropoda", "aliases": []}
-{"id": "tx:a:malacostraca", "rank": "class", "display_name": "Malacostraca", "latin_name": "Malacostraca", "aliases": []}
-{"id": "tx:a:decapoda", "rank": "order", "display_name": "Decapoda", "latin_name": "Decapoda", "aliases": []}
-{"id": "tx:a:dendrobranchiata", "rank": "suborder", "display_name": "Dendrobranchiata", "latin_name": "Dendrobranchiata", "aliases": []}
-{"id": "tx:a:penaeidae", "rank": "family", "display_name": "Penaeidae", "latin_name": "Penaeidae", "aliases": []}
-{"id": "tx:a:litopenaeus", "rank": "genus", "display_name": "Litopenaeus", "latin_name": "Litopenaeus", "aliases": []}
-{"id": "tx:a:litopenaeus:vannamei", "rank": "species", "display_name": "Whiteleg shrimp", "latin_name": "Litopenaeus vannamei", "aliases": ["pacific white shrimp", "whiteleg shrimp", "shrimp"]}
-{"id": "tx:a:pleocyemata", "rank": "suborder", "display_name": "Pleocyemata", "latin_name": "Pleocyemata", "aliases": []}
-{"id": "tx:a:portunidae", "rank": "family", "display_name": "Portunidae", "latin_name": "Portunidae", "aliases": []}
-{"id": "tx:a:portunus", "rank": "genus", "display_name": "Portunus", "latin_name": "Portunus", "aliases": []}
-{"id": "tx:a:portunus:pelagicus", "rank": "species", "display_name": "Blue swimming crab", "latin_name": "Portunus pelagicus", "aliases": ["blue swimming crab", "portunus"]}
+{"id": "tx:a:chordata", "rank": "phylum", "display_name": "Chordata", "latin_name": "Chordata", "aliases": [], "ncbi_taxid": 7711}
+{"id": "tx:a:mammalia", "rank": "class", "display_name": "Mammalia", "latin_name": "Mammalia", "aliases": [], "ncbi_taxid": 40674}
+{"id": "tx:a:artiodactyla", "rank": "order", "display_name": "Artiodactyla", "latin_name": "Artiodactyla", "aliases": [], "ncbi_taxid": 91561}
+{"id": "tx:a:bovidae", "rank": "family", "display_name": "Bovidae", "latin_name": "Bovidae", "aliases": [], "ncbi_taxid": 9895}
+{"id": "tx:a:bos", "rank": "genus", "display_name": "Cattle", "latin_name": "Bos", "aliases": [], "ncbi_taxid": 9903}
+{"id": "tx:a:bos:taurus", "rank": "species", "display_name": "Cow", "latin_name": "Bos taurus", "aliases": ["cow"], "ncbi_taxid": 9913}
+{"id": "tx:a:ovis", "rank": "genus", "display_name": "Ovis", "latin_name": "Ovis", "aliases": [], "ncbi_taxid": 9935}
+{"id": "tx:a:ovis:aries", "rank": "species", "display_name": "Sheep (lamb)", "latin_name": "Ovis aries", "aliases": ["lamb", "mutton"], "ncbi_taxid": 9940}
+{"id": "tx:a:bison", "rank": "genus", "display_name": "Bison", "latin_name": "Bison", "aliases": [], "ncbi_taxid": 9900}
+{"id": "tx:a:bison:bison", "rank": "species", "display_name": "American bison", "latin_name": "Bison bison", "aliases": ["bison"], "ncbi_taxid": 9901}
+{"id": "tx:a:suidae", "rank": "family", "display_name": "Suidae", "latin_name": "Suidae", "aliases": [], "ncbi_taxid": 9821}
+{"id": "tx:a:sus", "rank": "genus", "display_name": "Sus", "latin_name": "Sus", "aliases": [], "ncbi_taxid": 9822}
+{"id": "tx:a:sus:scrofa_domesticus", "rank": "species", "display_name": "Pig", "latin_name": "Sus scrofa domesticus", "aliases": ["pork", "pig"], "ncbi_taxid": 9823}
+{"id": "tx:a:aves", "rank": "class", "display_name": "Aves", "latin_name": "Aves", "aliases": [], "ncbi_taxid": 8782}
+{"id": "tx:a:galliformes", "rank": "order", "display_name": "Galliformes", "latin_name": "Galliformes", "aliases": [], "ncbi_taxid": 8976}
+{"id": "tx:a:phasianidae", "rank": "family", "display_name": "Phasianidae", "latin_name": "Phasianidae", "aliases": [], "ncbi_taxid": 9005}
+{"id": "tx:a:gallus", "rank": "genus", "display_name": "Gallus", "latin_name": "Gallus", "aliases": [], "ncbi_taxid": 9030}
+{"id": "tx:a:gallus:gallus_domesticus", "rank": "species", "display_name": "Chicken", "latin_name": "Gallus gallus domesticus", "aliases": ["chicken"], "ncbi_taxid": 9031}
+{"id": "tx:a:meleagris", "rank": "genus", "display_name": "Meleagris", "latin_name": "Meleagris", "aliases": [], "ncbi_taxid": 9102}
+{"id": "tx:a:meleagris:gallopavo", "rank": "species", "display_name": "Turkey", "latin_name": "Meleagris gallopavo", "aliases": ["turkey"], "ncbi_taxid": 9103}
+{"id": "tx:a:actinopterygii", "rank": "class", "display_name": "Actinopterygii", "latin_name": "Actinopterygii", "aliases": [], "ncbi_taxid": 7898}
+{"id": "tx:a:gadiformes", "rank": "order", "display_name": "Gadiformes", "latin_name": "Gadiformes", "aliases": [], "ncbi_taxid": 8043}
+{"id": "tx:a:gadidae", "rank": "family", "display_name": "Gadidae", "latin_name": "Gadidae", "aliases": [], "ncbi_taxid": 8045}
+{"id": "tx:a:gadus", "rank": "genus", "display_name": "Gadus", "latin_name": "Gadus", "aliases": [], "ncbi_taxid": 8048}
+{"id": "tx:a:gadus:morhua", "rank": "species", "display_name": "Atlantic cod", "latin_name": "Gadus morhua", "aliases": ["cod"], "ncbi_taxid": 8049}
+{"id": "tx:a:gadus:chalcogrammus", "rank": "species", "display_name": "Alaska pollock", "latin_name": "Gadus chalcogrammus", "aliases": ["pollock"], "ncbi_taxid": 1042646}
+{"id": "tx:a:melanogrammus", "rank": "genus", "display_name": "Melanogrammus", "latin_name": "Melanogrammus", "aliases": [], "ncbi_taxid": 8055}
+{"id": "tx:a:melanogrammus:aeglefinus", "rank": "species", "display_name": "Haddock", "latin_name": "Melanogrammus aeglefinus", "aliases": ["haddock"], "ncbi_taxid": 8056}
+{"id": "tx:a:salmoniformes", "rank": "order", "display_name": "Salmoniformes", "latin_name": "Salmoniformes", "aliases": [], "ncbi_taxid": 8006}
+{"id": "tx:a:salmonidae", "rank": "family", "display_name": "Salmonidae", "latin_name": "Salmonidae", "aliases": [], "ncbi_taxid": 8015}
+{"id": "tx:a:salmo", "rank": "genus", "display_name": "Salmo", "latin_name": "Salmo", "aliases": [], "ncbi_taxid": 8028}
+{"id": "tx:a:salmo:salar", "rank": "species", "display_name": "Atlantic salmon", "latin_name": "Salmo salar", "aliases": ["salmon"], "ncbi_taxid": 8030}
+{"id": "tx:a:oncorhynchus", "rank": "genus", "display_name": "Oncorhynchus", "latin_name": "Oncorhynchus", "aliases": [], "ncbi_taxid": 8016}
+{"id": "tx:a:oncorhynchus:nerka", "rank": "species", "display_name": "Sockeye salmon", "latin_name": "Oncorhynchus nerka", "aliases": ["sockeye"], "ncbi_taxid": 8023}
+{"id": "tx:a:perciformes", "rank": "order", "display_name": "Perciformes", "latin_name": "Perciformes", "aliases": [], "ncbi_taxid": 8111}
+{"id": "tx:a:cichlidae", "rank": "family", "display_name": "Cichlidae", "latin_name": "Cichlidae", "aliases": [], "ncbi_taxid": 8113}
+{"id": "tx:a:oreochromis", "rank": "genus", "display_name": "Oreochromis", "latin_name": "Oreochromis", "aliases": [], "ncbi_taxid": 8139}
+{"id": "tx:a:oreochromis:niloticus", "rank": "species", "display_name": "Nile tilapia", "latin_name": "Oreochromis niloticus", "aliases": ["tilapia"], "ncbi_taxid": 8128}
+{"id": "tx:a:siluriformes", "rank": "order", "display_name": "Siluriformes", "latin_name": "Siluriformes", "aliases": [], "ncbi_taxid": 7995}
+{"id": "tx:a:ictaluridae", "rank": "family", "display_name": "Ictaluridae", "latin_name": "Ictaluridae", "aliases": [], "ncbi_taxid": 7996}
+{"id": "tx:a:ictalurus", "rank": "genus", "display_name": "Ictalurus", "latin_name": "Ictalurus", "aliases": [], "ncbi_taxid": 7997}
+{"id": "tx:a:ictalurus:punctatus", "rank": "species", "display_name": "Channel catfish", "latin_name": "Ictalurus punctatus", "aliases": ["catfish"], "ncbi_taxid": 7998}
+{"id": "tx:a:scombriformes", "rank": "order", "display_name": "Scombriformes", "latin_name": "Scombriformes", "aliases": [], "ncbi_taxid": 1489894}
+{"id": "tx:a:scombridae", "rank": "family", "display_name": "Scombridae", "latin_name": "Scombridae", "aliases": [], "ncbi_taxid": 8224}
+{"id": "tx:a:katsuwonus", "rank": "genus", "display_name": "Katsuwonus", "latin_name": "Katsuwonus", "aliases": [], "ncbi_taxid": 13580}
+{"id": "tx:a:katsuwonus:pelamis", "rank": "species", "display_name": "Skipjack tuna", "latin_name": "Katsuwonus pelamis", "aliases": ["skipjack", "light tuna"], "ncbi_taxid": 8226}
+{"id": "tx:a:arthropoda", "rank": "phylum", "display_name": "Arthropoda", "latin_name": "Arthropoda", "aliases": [], "ncbi_taxid": 6656}
+{"id": "tx:a:malacostraca", "rank": "class", "display_name": "Malacostraca", "latin_name": "Malacostraca", "aliases": [], "ncbi_taxid": 6681}
+{"id": "tx:a:decapoda", "rank": "order", "display_name": "Decapoda", "latin_name": "Decapoda", "aliases": [], "ncbi_taxid": 6683}
+{"id": "tx:a:dendrobranchiata", "rank": "suborder", "display_name": "Dendrobranchiata", "latin_name": "Dendrobranchiata", "aliases": [], "ncbi_taxid": 6684}
+{"id": "tx:a:penaeidae", "rank": "family", "display_name": "Penaeidae", "latin_name": "Penaeidae", "aliases": [], "ncbi_taxid": 6685}
+{"id": "tx:a:litopenaeus", "rank": "genus", "display_name": "Litopenaeus", "latin_name": "Litopenaeus", "aliases": [], "ncbi_taxid": 133894}
+{"id": "tx:a:litopenaeus:vannamei", "rank": "species", "display_name": "Whiteleg shrimp", "latin_name": "Litopenaeus vannamei", "aliases": ["pacific white shrimp", "whiteleg shrimp", "shrimp"], "ncbi_taxid": 6689}
+{"id": "tx:a:pleocyemata", "rank": "suborder", "display_name": "Pleocyemata", "latin_name": "Pleocyemata", "aliases": [], "ncbi_taxid": 6692}
+{"id": "tx:a:portunidae", "rank": "family", "display_name": "Portunidae", "latin_name": "Portunidae", "aliases": [], "ncbi_taxid": 6757}
+{"id": "tx:a:portunus", "rank": "genus", "display_name": "Portunus", "latin_name": "Portunus", "aliases": [], "ncbi_taxid": 80835}
+{"id": "tx:a:portunus:pelagicus", "rank": "species", "display_name": "Blue swimming crab", "latin_name": "Portunus pelagicus", "aliases": ["blue swimming crab", "portunus"], "ncbi_taxid": 80836}

@@ -165,62 +165,13 @@ class Tier2TPTConstructor:
                          applicable_parts: List[Dict[str, Any]], 
                          available_transforms: List[Dict[str, Any]]) -> str:
         """Build prompt for TPT construction"""
-        prompt = f"Food: {taxon_resolution.food_name}\n"
-        prompt += f"Taxon: {taxon_resolution.taxon_id}\n"
-        prompt += f"NCBI Confidence: {taxon_resolution.confidence:.2f}\n\n"
-        
-        prompt += "Applicable Parts:\n"
-        for part in applicable_parts:
-            prompt += f"- {part.id}: {part.name} ({part.kind or 'unknown'})\n"
-        
-        prompt += "\nAvailable Transforms:\n"
-        for transform in available_transforms:
-            prompt += f"- {transform.id}: {transform.name} (order: {transform.order or 999})\n"
-        
-        prompt += "\nConstruct TPT combination. Return JSON with:"
-        prompt += "\n- part_id: selected part ID or null"
-        prompt += "\n- transforms: list of transform objects with id and params"
-        prompt += "\n- confidence: 0.0-1.0"
-        prompt += "\n- disposition: 'constructed', 'ambiguous', or 'skip'"
-        prompt += "\n- reason: brief explanation"
-        prompt += "\n- new_parts: [] (if proposing new parts)"
-        prompt += "\n- new_transforms: [] (if proposing new transforms)"
-        
-        return prompt
+        from .optimized_prompts import get_enhanced_tpt_prompt
+        return get_enhanced_tpt_prompt(taxon_resolution, applicable_parts, available_transforms)
     
     def _get_tpt_system_prompt(self) -> str:
         """Get system prompt for TPT construction"""
-        return """
-You are a food science expert specializing in food structure and processing. Your task is to construct Taxon-Part-Transform (TPT) combinations for food items.
-
-BIOLOGICAL CONTEXT:
-- Broccoli florets = immature flower buds (use part:flower)
-- Broccoli stems = plant stems (use part:stem) 
-- Broccoli leaves = plant leaves (use part:leaf)
-- Tomatoes = fruits (use part:fruit)
-- Milk = animal secretion (use part:milk)
-- Cheese = fermented milk product (use part:cheese)
-- Meat cuts = muscle tissue (use part:muscle)
-
-RULES:
-1. Select the most appropriate biological part for the food item
-2. Include transforms that the food has undergone (cooking, processing, etc.)
-3. Use only the provided applicable parts and available transforms
-4. Be conservative - if uncertain, use fewer transforms or mark as ambiguous
-5. Consider the food's processing state and biological structure
-6. Transforms should be ordered by processing sequence
-7. ONLY propose new parts if absolutely no existing part fits the biological structure
-
-EXAMPLES:
-- "Raw apple" → part: fruit, transforms: []
-- "Broccoli, raw" → part: flower, transforms: []
-- "Cooked beef" → part: muscle, transforms: [{"id": "tf:cook", "params": {}}]
-- "Ground beef" → part: muscle, transforms: [{"id": "tf:grind", "params": {}}]
-- "Pasteurized milk" → part: milk, transforms: [{"id": "tf:pasteurize", "params": {}}]
-- "Cheddar cheese" → part: cheese, transforms: [{"id": "tf:age", "params": {}}]
-
-Return valid JSON only.
-""".strip()
+        from .optimized_prompts import get_optimized_tpt_system_prompt
+        return get_optimized_tpt_system_prompt()
     
     def construct_batch(self, taxon_resolutions: List[TaxonResolution], 
                        available_parts: List[Dict[str, Any]], 

@@ -400,50 +400,8 @@ class Tier3Curator:
     
     def _get_curation_system_prompt(self) -> str:
         """Get system prompt for comprehensive ontology curation"""
-        return """
-You are a senior ontology curator specializing in food taxonomy and processing systems. Your role is to evaluate food mappings and provide comprehensive recommendations for evolving the ontology.
-
-Your analysis should cover:
-
-1. **Part Analysis**:
-   - Are new parts needed for this food?
-   - Should existing parts be modified (name, description, kind)?
-   - Do we need new applies_to rules for taxonomic applicability?
-   - Are there derived parts that should be created?
-
-2. **Transform Analysis**:
-   - Are new transforms needed for this processing?
-   - Should existing transforms be modified?
-   - Do transform parameter schemas need new parameters?
-   - Are there processing steps not covered by current transforms?
-
-3. **Relationship Analysis**:
-   - Are there new derived part relationships needed?
-   - Should existing rules be modified?
-   - Are there taxonomic relationships that need updating?
-
-4. **Ontology Optimization**:
-   - How can the overall ontology structure be improved?
-   - Are there redundancies or gaps in the current design?
-   - What general recommendations do you have?
-
-Return JSON with this exact structure:
-{
-  "new_parts": [{"id": "part:new_id", "name": "New Part", "kind": "plant", "description": "...", "applies_to": ["tx:p:genus:species"]}],
-  "modify_parts": [{"id": "part:existing", "modifications": {"name": "Updated Name", "applies_to": ["tx:p:genus:species"]}}],
-  "part_applies_to_rules": [{"part_id": "part:existing", "add_taxa": ["tx:p:genus:species"], "remove_taxa": []}],
-  "new_transforms": [{"id": "tf:new_id", "name": "New Transform", "description": "...", "params": {"param1": "type"}}],
-  "modify_transforms": [{"id": "tf:existing", "modifications": {"params": {"new_param": "type"}}}],
-  "transform_param_schemas": [{"transform_id": "tf:existing", "new_params": {"param": "type", "description": "..."}}],
-  "derived_part_rules": [{"base_part": "part:base", "derived_part": "part:derived", "transform": "tf:transform", "conditions": {}}],
-  "modify_rules": [{"rule_id": "rule_id", "modifications": {...}}],
-  "optimization_suggestions": ["General optimization recommendation 1", "General optimization recommendation 2"],
-  "confidence": 0.8,
-  "reasoning": "Detailed explanation of all recommendations and their rationale"
-}
-
-Be conservative but thorough. Only recommend changes that are clearly needed and well-justified.
-""".strip()
+        from .optimized_prompts import get_optimized_curation_system_prompt
+        return get_optimized_curation_system_prompt()
     
     def _parse_curation_response(self, response: Dict[str, Any]) -> OntologyCuration:
         """Parse LLM response into OntologyCuration object"""

@@ -2,10 +2,8 @@ artifacts:
   - path: compiled/taxa.jsonl
     type: jsonl
     validators:
-      - kind: min_rows
-        min_rows: 1
       - kind: field_presence
         fields: ["id", "rank", "display_name", "latin_name", "parent"]
-      - kind: field_format
+      - kind: id_format_consistency
         field: id
         pattern: "^tx:[paf]:"

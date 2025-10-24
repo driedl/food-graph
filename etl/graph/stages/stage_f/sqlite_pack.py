@@ -545,9 +545,38 @@ def build_sqlite(*, in_dir: Path, build_dir: Path, db_path: Path, verbose: bool 
     if verbose and nutrients_list:
         print(f"✓ Loaded {len(nutrients_list)} nutrients")
 
-    # Insert nodes + synonyms (+collect synonyms for FTS)
+    # Create kingdom-level root nodes first
+    kingdom_nodes = [
+        {'id': 'tx:a', 'name': 'Animalia', 'slug': 'a', 'rank': 'kingdom', 'parent': None, 'display_name': 'Animalia', 'latin_name': 'Animalia'},
+        {'id': 'tx:p', 'name': 'Plantae', 'slug': 'p', 'rank': 'kingdom', 'parent': None, 'display_name': 'Plantae', 'latin_name': 'Plantae'},
+        {'id': 'tx:f', 'name': 'Fungi', 'slug': 'f', 'rank': 'kingdom', 'parent': None, 'display_name': 'Fungi', 'latin_name': 'Fungi'}
+    ]
+    
+    # Use taxa as-is since Stage 1 already does topological sorting
+    taxa_sorted = taxa
+    
+    # Insert kingdom nodes first
     _syn_by_node: Dict[str, List[str]] = {}
-    for i, row in enumerate(taxa):
+    for kingdom in kingdom_nodes:
+        try:
+            cur.execute("""
+                INSERT INTO nodes (id, name, slug, rank, parent_id, ncbi_taxid, ncbi_lineage_json)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(id) DO UPDATE SET
+                  name=excluded.name,
+                  slug=excluded.slug,
+                  rank=excluded.rank,
+                  parent_id=excluded.parent_id,
+                  ncbi_taxid=excluded.ncbi_taxid,
+                  ncbi_lineage_json=excluded.ncbi_lineage_json
+            """, (kingdom['id'], kingdom['name'], kingdom['slug'], kingdom['rank'], 
+                  kingdom['parent'], kingdom.get('ncbi_taxid'), kingdom.get('ncbi_lineage_json')))
+        except sqlite3.IntegrityError as e:
+            print(f"Error inserting kingdom node {kingdom['id']}: {e}")
+            raise
+    
+    # Insert nodes + synonyms (+collect synonyms for FTS)
+    for i, row in enumerate(taxa_sorted):
         try:
             tid = row["id"]
             nm = (row.get("display_name") or row.get("latin_name") or _last(tid)).strip()

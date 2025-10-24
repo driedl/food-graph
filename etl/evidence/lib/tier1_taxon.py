@@ -126,48 +126,13 @@ class Tier1TaxonResolver:
     
     def _build_taxon_prompt(self, food_name: str, food_description: str = "") -> str:
         """Build prompt for taxon resolution"""
-        prompt = f"Food: {food_name}"
-        if food_description:
-            prompt += f"\nDescription: {food_description}"
-        
-        prompt += "\n\nIdentify the biological taxon for this food item. Return JSON with:"
-        prompt += "\n- taxon_id: tx:{k}:{genus}:{species}[:{cultivar/breed}] or null"
-        prompt += "\n- confidence: 0.0-1.0"
-        prompt += "\n- disposition: 'resolved', 'ambiguous', or 'skip'"
-        prompt += "\n- reason: brief explanation"
-        prompt += "\n- new_taxa: [] (if proposing new taxa)"
-        
-        return prompt
+        from .optimized_prompts import get_enhanced_taxon_prompt
+        return get_enhanced_taxon_prompt(food_name, food_description)
     
     def _get_taxon_system_prompt(self) -> str:
         """Get system prompt for taxon resolution"""
-        return """
-You are a taxonomic expert specializing in food identification. Your task is to identify the biological taxon for food items.
-
-Rules:
-1. Use the format tx:{k}:{genus}:{species}[:{cultivar/breed}] where k is kingdom code (p=plantae, a=animalia, f=fungi)
-2. Be conservative - if uncertain, back off to higher taxonomic levels (genus, family)
-3. For processed foods, identify the base biological source
-4. Skip non-biological items (minerals, water, synthetic compounds)
-5. Skip processed food mixtures that significantly alter nutritional composition
-6. Use existing taxon IDs when possible
-7. Only propose new taxa when absolutely necessary
-
-SKIP THESE TYPES OF FOODS:
-- Processed mixtures (hummus, salsa, salad dressings, etc.)
-- Multi-ingredient products where the base biological source is unclear
-- Foods with significant processing that changes nutritional profile
-- Non-biological items (salt, water, synthetic compounds)
-
-Examples:
-- "Apple" → tx:p:malus:domestica
-- "Beef" → tx:a:bos:taurus  
-- "Button mushroom" → tx:f:agaricus:bisporus
-- "Hummus, commercial" → disposition: "skip" (processed mixture)
-- "Table salt" → disposition: "skip" (non-biological)
-
-Return valid JSON only.
-""".strip()
+        from .optimized_prompts import get_optimized_taxon_system_prompt
+        return get_optimized_taxon_system_prompt()
     
     def resolve_batch(self, foods: List[Dict[str, Any]]) -> List[TaxonResolution]:
         """Resolve taxa for a batch of foods"""
