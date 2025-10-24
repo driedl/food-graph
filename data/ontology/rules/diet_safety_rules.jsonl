@@ -1,10 +1,10 @@
-{"when":{"allOf":[{"param":"tf:cure.nitrite_ppm","op":"gt","value":0}]},"emit":"contains_nitrite","flag_type":"safety"}
-{"when":{"allOf":[{"has_transform":"tf:smoke"}]},"emit":"smoked","flag_type":"safety"}
-{"when":{"allOf":[{"has_part":"part:milk"}],"noneOf":[{"has_transform":"tf:pasteurize"}]},"emit":"unpasteurized","flag_type":"safety"}
-{"when":{"allOf":[{"param":"tf:strain.strain_level","op":"gte","value":5}]},"emit":"greek_style","flag_type":"dietary"}
-{"when":{"allOf":[{"has_transform":"tf:press"}],"noneOf":[{"has_transform":"tf:refine_oil"}]},"emit":"virgin_oil","flag_type":"dietary"}
-{"when":{"allOf":[{"has_transform":"tf:press"},{"has_transform":"tf:age"}],"noneOf":[{"has_transform":"tf:stretch"}]},"emit":"cheese_hard_style","flag_type":"dietary"}
-{"when":{"allOf":[{"has_transform":"tf:ferment"}]},"emit":"fermented","flag_type":"dietary"}
-{"when":{"allOf":[{"param":"tf:cure.salt_pct","op":"gte","value":15}]},"emit":"high_salt","flag_type":"safety"}
-{"when":{"allOf":[{"has_transform":"tf:age"}]},"emit":"aged","flag_type":"dietary"}
-{"when":{"allOf":[{"has_part":"part:butter"},{"has_transform":"tf:clarify_butter"}]},"emit":"clarified_butter","flag_type":"dietary"}
+{"when": {"allOf": [{"param": "tf:cure.nitrite_ppm", "op": "gt", "value": 0}]}, "emit": "contains_nitrite", "flag_type": "safety"}
+{"when": {"allOf": [{"has_transform": "tf:smoke"}]}, "emit": "smoked", "flag_type": "safety"}
+{"when": {"allOf": [{"has_part": "part:milk"}], "noneOf": [{"has_transform": "tf:pasteurize"}]}, "emit": "unpasteurized", "flag_type": "safety"}
+{"when": {"allOf": [{"param": "tf:strain.strain_level", "op": "gte", "value": 5}]}, "emit": "greek_style", "flag_type": "dietary"}
+{"when": {"allOf": [{"has_transform": "tf:press"}], "noneOf": [{"has_transform": "tf:refine_oil"}]}, "emit": "virgin_oil", "flag_type": "dietary"}
+{"when": {"allOf": [{"has_transform": "tf:press"}, {"has_transform": "tf:age"}], "noneOf": [{"has_transform": "tf:stretch"}]}, "emit": "cheese_hard_style", "flag_type": "dietary"}
+{"when": {"allOf": [{"has_transform": "tf:ferment"}]}, "emit": "fermented", "flag_type": "dietary"}
+{"when": {"allOf": [{"param": "tf:cure.salt_pct", "op": "gte", "value": 15}]}, "emit": "high_salt", "flag_type": "safety"}
+{"when": {"allOf": [{"has_transform": "tf:age"}]}, "emit": "aged", "flag_type": "dietary"}
+{"when": {"allOf": [{"has_part": "part:butter"}, {"has_transform": "tf:clarify_butter"}]}, "emit": "clarified_butter", "flag_type": "dietary"}

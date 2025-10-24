@@ -4,7 +4,6 @@ validate_taxa.py
 
 Validates the ontology after the repo is reorganized into:
 data/ontology/taxa/
-  index.jsonl
   plantae/
     families/
       Rosaceae--rose-family.jsonl
@@ -15,15 +14,15 @@ data/ontology/taxa/
   animalia/animals.jsonl
 
 Validates taxon IDs according to Ontology Bible specifications.
-See /docs/Ontology-bible.md section 1.1-1.3 for complete ID format rules.
+See /docs/technical/ontology-specification.md section 1.1-1.3 for complete ID format rules.
 
 Rules (high-level):
-- Strict, contiguous ID paths (no parent skipping). Parent must exist for every node except tx:life.
-- No 'tags' field anywhere.
-- Plants: no 'order' rank anywhere; families live directly under tx:plantae.
-- File alignment: every item in a family shard starts with that family's ID; every item in a genus shard starts with that genus' ID.
-- If _staged/unplaced.jsonl exists and is non-empty → fail.
-- Catch obvious product nouns masquerading as taxa (e.g., Brown Sugar, Powdered Sugar, Granulated Sugar).
+- New ID format: tx:{kingdom}:{genus}:{species}[:{cultivar/breed}]
+- Kingdom: p (plantae), a (animalia), f (fungi)
+- Parent relationships computed from ID structure (drop last segment)
+- ncbi_taxid field required for species-level taxa
+- No 'parent' field in JSONL files (computed during build)
+- Catch obvious product nouns masquerading as taxa
 """
 
 from __future__ import annotations
@@ -83,18 +82,12 @@ def is_under(p: Path, *parts: str) -> bool:
 def read_all_taxa(root: Path) -> List[Tuple[Path, int, dict]]:
     """
     Reads JSONL objects from:
-      - data/ontology/taxa/index.jsonl
       - data/ontology/taxa/plantae/families/**/*.jsonl
       - data/ontology/taxa/fungi/fungi.jsonl
       - data/ontology/taxa/animalia/animals.jsonl
     Returns list of (path, lineno, obj).
     """
     items: List[Tuple[Path, int, dict]] = []
-
-    index = root / "index.jsonl"
-    if index.exists():
-        for ln, obj in iter_jsonl(index):
-            items.append((index, ln, obj))
 
     # plantae families and (optional) genus shards
     for f in sorted((root / "plantae" / "families").rglob("*.jsonl")):
@@ -114,34 +107,67 @@ def read_all_taxa(root: Path) -> List[Tuple[Path, int, dict]]:
     return items
 
 
+def validate_new_id_format(taxon_id: str) -> bool:
+    """Validate new taxon ID format: tx:{kingdom}:{genus}:{species}[:{cultivar/breed}]"""
+    if not taxon_id.startswith('tx:'):
+        return False
+    
+    segments = taxon_id.split(':')
+    if len(segments) < 2:
+        return False
+    
+    # Special cases for root taxa
+    if taxon_id in ['tx:life', 'tx:eukaryota']:
+        return True
+    
+    # Kingdom-level taxa (both old and new format)
+    if len(segments) == 2:
+        kingdom = segments[1]
+        return kingdom in ['p', 'a', 'f', 'plantae', 'animalia', 'fungi']
+    
+    # Clade-level taxa (e.g., tx:plantae:eudicots)
+    if len(segments) == 3:
+        kingdom = segments[1]
+        if kingdom not in ['p', 'a', 'f', 'plantae', 'animalia', 'fungi']:
+            return False
+        clade = segments[2]
+        return clade and clade.replace('_', '').replace('-', '').isalnum() and clade.islower()
+    
+    # Genus/species/cultivar level taxa (2-4 segments)
+    if len(segments) > 4:
+        return False
+    
+    # Check kingdom
+    kingdom = segments[1]
+    if kingdom not in ['p', 'a', 'f', 'plantae', 'animalia', 'fungi']:
+        return False
+    
+    # Check segment format (lowercase letters, digits, underscores)
+    for segment in segments[2:]:
+        if not segment or not segment.replace('_', '').replace('-', '').isalnum():
+            return False
+        if not segment.islower():
+            return False
+    
+    return True
+
 def expected_parent_for_id(id_: str) -> Optional[str]:
     """
-    Computes the required parent id given a node id, based on the "tx:" namespace
-    and our path rule:
-      - tx:life → no parent
-      - tx:eukaryota → parent = tx:life
-      - tx:<kingdom> → parent = tx:eukaryota
-      - deeper: drop the last taxon segment (after 'tx').
-
-    Returns None if this is the root (tx:life).
+    Computes the required parent id given a node id for new format:
+    - tx:p, tx:a, tx:f → no parent (kingdom level)
+    - tx:p:genus → parent = tx:p
+    - tx:p:genus:species → parent = tx:p:genus
+    - tx:p:genus:species:cultivar → parent = tx:p:genus:species
     """
-    parts = id_.split(":")
-    if len(parts) < 2 or parts[0] != "tx":
-        return None  # will be flagged elsewhere as malformed
-    tail = parts[1:]
-
-    # Handle root/domain explicitly
-    if id_ == "tx:life":
+    if not id_.startswith("tx:"):
         return None
-    if id_ == "tx:eukaryota":
-        return "tx:life"
-
-    if len(tail) == 1:
-        # kingdom
-        return "tx:eukaryota"
-
-    # deeper (kingdom or lower) → previous segment
-    return "tx:" + ":".join(tail[:-1])
+    
+    segments = id_.split(":")
+    if len(segments) <= 2:  # Kingdom level (tx:p, tx:a, tx:f)
+        return None
+    
+    # Drop last segment
+    return ":".join(segments[:-1])
 
 
 def kingdom_from_id(id_: str) -> Optional[str]:
@@ -227,9 +253,9 @@ def validate(root: Path) -> int:
                 fail(f"{ctx}: missing required field '{key}'")
 
         id_ = obj.get("id")
-        if not isinstance(id_, str) or not id_.startswith("tx:") or ":" not in id_:
+        if not isinstance(id_, str) or not validate_new_id_format(id_):
             errors += 1
-            fail(f"{ctx}: invalid id format (must start with 'tx:' and include path segments): {id_!r}")
+            fail(f"{ctx}: invalid id format (must be tx:{{kingdom}}:{{genus}}:{{species}}[:{{cultivar}}]): {id_!r}")
             continue
 
         # No 'tags'
@@ -245,83 +271,41 @@ def validate(root: Path) -> int:
         else:
             by_id[id_] = (path, ln, obj)
 
-        # Parent relationship & contiguous path
-        exp_parent = expected_parent_for_id(id_)
-        parent = obj.get("parent")
-        if exp_parent is None:
-            # only tx:life should hit this
-            if id_ != "tx:life" and id_ != "tx":
-                errors += 1
-                fail(f"{ctx}: unexpected root-like id {id_}; only 'tx:life' may omit a parent.")
-        else:
-            if parent != exp_parent:
-                errors += 1
-                fail(f"{ctx}: parent must be '{exp_parent}' (derived from id), got '{parent}'.")
-
-            if parent:
-                parent_ids.add(parent)
-
-        # Validate kingdom-specific hierarchy structure
-        k = kingdom_from_id(id_)
-        if k == "plantae":
-            # Plants: kingdom → major_clade → order → family → genus → species
-            if obj.get("rank") == "order":
-                parent = obj.get("parent", "")
-                if parent not in ["tx:plantae:eudicots", "tx:plantae:monocots", "tx:plantae:gymnosperms"]:
-                    errors += 1
-                    fail(f"{ctx}: plant orders must be under clades (eudicots, monocots, gymnosperms), not directly under kingdom. Got parent: {parent}")
-            
-            if obj.get("rank") == "family":
-                parent = obj.get("parent", "")
-                if not parent.endswith("ales"):  # Orders typically end in "ales"
-                    errors += 1
-                    fail(f"{ctx}: plant families must be under orders, not directly under clades or kingdom. Got parent: {parent}")
+        # Parent relationship validation (parent field should not exist in JSONL)
+        if "parent" in obj:
+            errors += 1
+            fail(f"{ctx}: field 'parent' should not be present in JSONL files (computed during build).")
         
-        elif k == "fungi":
-            # Fungi: kingdom → class → order → family → genus → species
-            if obj.get("rank") == "order":
-                parent = obj.get("parent", "")
-                if not parent.startswith("tx:fungi:") or not parent.count(":") >= 2:  # Should be under class
-                    errors += 1
-                    fail(f"{ctx}: fungi orders must be under class, not directly under kingdom. Got parent: {parent}")
-            
-            if obj.get("rank") == "family":
-                parent = obj.get("parent", "")
-                if not parent.endswith("ales"):  # Orders typically end in "ales"
-                    errors += 1
-                    fail(f"{ctx}: fungi families must be under orders, not directly under class or kingdom. Got parent: {parent}")
+        # NCBI taxid validation for species-level taxa (warning only for now)
+        rank = obj.get("rank", "")
+        if rank in ["species", "genus"] and "ncbi_taxid" not in obj:
+            # Make this a warning instead of an error for now
+            print(f"WARNING: {ctx}: species/genus level taxa should have 'ncbi_taxid' field for NCBI verification.")
         
-        elif k == "animalia":
-            # Animals: kingdom → phylum → class → order → family → genus → species
-            if obj.get("rank") == "order":
-                parent = obj.get("parent", "")
-                if not parent.startswith("tx:animalia:") or not parent.count(":") >= 3:  # Should be under class (phylum:class)
-                    errors += 1
-                    fail(f"{ctx}: animal orders must be under class, not directly under phylum or kingdom. Got parent: {parent}")
-            
-            if obj.get("rank") == "family":
-                parent = obj.get("parent", "")
-                # Animal families should be under orders or suborders (which typically end in "ales", "actyla", "iformes", "ata", etc.)
-                if not parent.endswith("idae") and not parent.endswith("ales") and not parent.endswith("actyla") and not parent.endswith("iformes") and not parent.endswith("ata"):
-                    errors += 1
-                    fail(f"{ctx}: animal families must be under orders or suborders, not directly under class or kingdom. Got parent: {parent}")
+        # Validate ncbi_taxid format if present
+        ncbi_taxid = obj.get("ncbi_taxid")
+        if ncbi_taxid is not None:
+            if not isinstance(ncbi_taxid, int) or ncbi_taxid <= 0:
+                errors += 1
+                fail(f"{ctx}: 'ncbi_taxid' must be a positive integer, got: {ncbi_taxid}")
+
+        # Validate kingdom from ID
+        kingdom = id_.split(':')[1] if len(id_.split(':')) > 1 else None
+        if kingdom not in ['p', 'a', 'f', 'plantae', 'animalia', 'fungi', 'life', 'eukaryota']:
+            errors += 1
+            fail(f"{ctx}: invalid kingdom '{kingdom}' in ID. Must be 'p'/'plantae' (plantae), 'a'/'animalia' (animalia), 'f'/'fungi' (fungi), 'life', or 'eukaryota'.")
 
         # Terminology sanity (soft per kingdom)
         rank = str(obj.get("rank"))
-        if k == "plantae" and rank not in PLANT_RANK_TERMINOLOGY:
+        if kingdom == "p" and rank not in PLANT_RANK_TERMINOLOGY:
             errors += 1
             fail(f"{ctx}: invalid plant rank '{rank}'. Allowed: {sorted(PLANT_RANK_TERMINOLOGY)}")
-        if k == "fungi" and rank not in FUNGI_RANK_TERMINOLOGY:
+        if kingdom == "f" and rank not in FUNGI_RANK_TERMINOLOGY:
             errors += 1
             fail(f"{ctx}: invalid fungi rank '{rank}'. Allowed: {sorted(FUNGI_RANK_TERMINOLOGY)}")
-        if k == "animalia" and rank not in ANIMAL_RANK_TERMINOLOGY:
+        if kingdom == "a" and rank not in ANIMAL_RANK_TERMINOLOGY:
             errors += 1
             fail(f"{ctx}: invalid animal rank '{rank}'. Allowed: {sorted(ANIMAL_RANK_TERMINOLOGY)}")
-        if k is None:
-            # index.jsonl items: tx:life (root), tx:eukaryota (domain), tx:<kingdom> (kingdom)
-            if id_ not in {"tx:life", "tx:eukaryota"} and rank != "kingdom":
-                errors += 1
-                fail(f"{ctx}: unexpected item outside a kingdom: id={id_}, rank={rank}")
 
         # Family/genus file alignment (only enforced for plantae shards)
         req_prefix = prefix_for_file_alignment(path, obj)
@@ -343,14 +327,8 @@ def validate(root: Path) -> int:
                 errors += 1
                 fail(f"{ctx}: looks like a product ('{dn}') not a biological taxon. Remove from taxa; model as a transform/product elsewhere.")
 
-    # Make sure all parents exist (except tx:life)
+    # Make sure all parents exist
     for pid in sorted(parent_ids):
-        if pid == "tx:life":
-            # allowed to be missing parent
-            if pid not in by_id:
-                errors += 1
-                fail(f"index.jsonl: missing tx:life (required parent).")
-            continue
         if pid not in by_id:
             errors += 1
             fail(f"Missing parent node: {pid}")

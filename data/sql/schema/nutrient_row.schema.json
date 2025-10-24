@@ -1,0 +1,83 @@
+{
+    "$id": "nutrient_row.schema.json",
+    "title": "Nutrient Row",
+    "type": "object",
+    "required": [
+        "id",
+        "food_id",
+        "nutrient_id",
+        "amount",
+        "unit",
+        "original_amount",
+        "original_unit",
+        "original_nutrient_id",
+        "conversion_factor",
+        "source",
+        "confidence"
+    ],
+    "properties": {
+        "id": {
+            "type": "string",
+            "description": "Unique identifier for this nutrient row"
+        },
+        "food_id": {
+            "type": "string",
+            "description": "FDC food ID this nutrient data belongs to"
+        },
+        "nutrient_id": {
+            "type": "string",
+            "description": "Canonical INFOODS nutrient ID (e.g., ENERC_KCAL)"
+        },
+        "amount": {
+            "type": "number",
+            "description": "Canonical converted nutrient amount per 100g"
+        },
+        "unit": {
+            "type": "string",
+            "description": "Canonical unit of measurement (kcal, g, mg, µg, etc.)"
+        },
+        "original_amount": {
+            "type": "number",
+            "description": "Original FDC nutrient amount before conversion"
+        },
+        "original_unit": {
+            "type": "string",
+            "description": "Original FDC unit of measurement"
+        },
+        "original_nutrient_id": {
+            "type": "string",
+            "description": "Original FDC nutrient ID"
+        },
+        "conversion_factor": {
+            "type": "number",
+            "description": "Factor applied to convert from original to canonical values"
+        },
+        "source": {
+            "type": "string",
+            "description": "Source of the nutrient data (e.g., 'fdc_foundation', 'canadian_nf', 'euro_food')"
+        },
+        "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Confidence score for this nutrient value"
+        },
+        "notes": {
+            "type": "string",
+            "description": "Additional notes about this nutrient value"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When this row was created"
+        },
+        "nutrient_name": {
+            "type": "string",
+            "description": "Human-readable nutrient name"
+        },
+        "nutrient_class": {
+            "type": "string",
+            "description": "Nutrient class (proximate, vitamin, mineral, fatty_acid, etc.)"
+        }
+    }
+}

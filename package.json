@@ -26,8 +26,10 @@
     "stop:force": "./scripts/stop-all.sh --force",
     "stop:all-ports": "./scripts/stop-all.sh --all-ports",
     "stop:force-all-ports": "./scripts/stop-all.sh --force --all-ports",
-    "evidence:map": "cd etl && python3 -m evidence.map",
-    "evidence:map:limit": "cd etl && python3 -m evidence.map --limit",
+    "evidence:map": "tsx scripts/evidence-map.ts",
+    "evidence:map:limit": "tsx scripts/evidence-map.ts --limit 100",
+    "evidence:map:test": "tsx scripts/evidence-map.ts --limit 10 --min-confidence 0.5",
+    "evidence:map:full": "cd etl && python3 -m evidence.evidence_mapper --graph-db ./build/database/graph.dev.sqlite --ncbi-db ./build/database/ncbi.sqlite --fdc-dir ../data/sources/fdc --output ../data/evidence/fdc-foundation-3tier",
     "evidence:profiles": "cd etl && python3 -m evidence.profiles",
     "evidence:validate": "cd etl && python3 -m evidence.validation.validate --evidence ../data/evidence/fdc-foundation --build ./build --verbose",
     "check": "pnpm typecheck && pnpm lint"

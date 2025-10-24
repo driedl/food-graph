@@ -10,7 +10,7 @@ from .db import GraphDB
 
 def main():
     ap = argparse.ArgumentParser(prog="evidence-profiles", description="(Stub) Insert accepted evidence into graph DB.")
-    ap.add_argument("--graph", default="etl2/build/database/graph.dev.sqlite")
+    ap.add_argument("--graph", default="etl/build/database/graph.dev.sqlite")
     ap.add_argument("--evidence", default="data/evidence/fdc-foundation")
     ap.add_argument("--accept-threshold", type=float, default=0.7)
     args = ap.parse_args()

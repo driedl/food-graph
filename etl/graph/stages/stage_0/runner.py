@@ -27,24 +27,23 @@ def run(in_dir: Path, build_dir: Path, skip_validate: bool = False, verbose: boo
             console.print("  ❌ Taxa compilation failed", style="red")
         return rc
 
-    # 2) Compile docs (uses compiled taxa we just wrote)
-    out_docs = compiled_dir / "docs.jsonl"
-    rc = compile_docs_into(
-        taxa_root=in_dir / "taxa",
-        compiled_taxa_path=out_taxa,
-        out_docs_path=out_docs,
-        verbose=verbose,
-    )
-    if rc != 0:
-        if verbose:
-            console.print("  ❌ Docs compilation failed", style="red")
-        return rc
+    # 2) Compile docs (disabled for now - MD files use old taxonomic hierarchy format)
+    # out_docs = compiled_dir / "docs.jsonl"
+    # rc = compile_docs_into(
+    #     taxa_root=in_dir / "taxa",
+    #     compiled_taxa_path=out_taxa,
+    #     out_docs_path=out_docs,
+    #     verbose=verbose,
+    # )
+    # if rc != 0:
+    #     if verbose:
+    #         console.print("  ❌ Docs compilation failed", style="red")
+    #     return rc
 
     if verbose:
         # Count entries in output files for better feedback
         taxa_count = sum(1 for _ in out_taxa.open()) if out_taxa.exists() else 0
-        docs_count = sum(1 for _ in out_docs.open()) if out_docs.exists() else 0
         console.print(f"  ✓ Compiled taxa ({taxa_count:,} entries)", style="green")
-        console.print(f"  ✓ Compiled docs ({docs_count:,} entries)", style="green")
+        console.print(f"  ✓ Docs compilation disabled (MD files use old taxonomic hierarchy)", style="yellow")
     
     return 0

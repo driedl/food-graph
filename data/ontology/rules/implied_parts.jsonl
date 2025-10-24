@@ -1,181 +1,156 @@
-{"applies_to":["tx:plantae:rosaceae:malus:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:rosaceae:pyrus:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:rosaceae:prunus:"],"part":"part:fruit","exclude":["tx:plantae:eudicots:rosales:prunus:dulcis"]}
-
-{"applies_to":["tx:plantae:rosaceae:fragaria:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:rosaceae:rubus:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:ericaceae:vaccinium:"],"part":"part:fruit","exclude":[]}
-
-{"applies_to":["tx:plantae:eudicots:sapindales:mangifera:indica"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:monocots:poales:ananas:comosus"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:caricaceae:carica:papaya"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:eudicots:ericales:actinidia:deliciosa"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:musaceae:musa:"],"part":"part:fruit","exclude":[]}
-
-{"applies_to":["tx:plantae:cucurbitaceae:citrullus:lanatus"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:eudicots:cucurbitales:cucumis:melo"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:eudicots:cucurbitales:cucurbita:pepo"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:eudicots:cucurbitales:cucurbita:moschata"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:cucurbitaceae:cucurbita:maxima"],"part":"part:fruit","exclude":[]}
-
-{"applies_to":["tx:plantae:rutaceae:citrus:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:vitaceae:vitis:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:eudicots:solanales:solanum:lycopersicum"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:eudicots:solanales:capsicum:annuum"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:solanaceae:capsicum:chinense"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:solanaceae:capsicum:frutescens"],"part":"part:fruit","exclude":[]}
-
-{"applies_to":["tx:plantae:eudicots:lamiales:olea:europaea"],"part":"part:fruit","exclude":[]}
-
-{"applies_to":["tx:plantae:eudicots:solanales:solanum:tuberosum"],"part":"part:tuber","exclude":[]}
-{"applies_to":["tx:plantae:eudicots:solanales:ipomoea:batatas"],"part":"part:tuber","exclude":[]}
-{"applies_to":["tx:plantae:dioscoreaceae:dioscorea:"],"part":"part:tuber","exclude":[]}
-
-{"applies_to":["tx:plantae:poaceae:triticum:"],"part":"part:grain","exclude":[]}
-{"applies_to":["tx:plantae:poaceae:oryza:"],"part":"part:grain","exclude":[]}
-{"applies_to":["tx:plantae:monocots:poales:zea:mays"],"part":"part:grain","exclude":[]}
-{"applies_to":["tx:plantae:monocots:poales:hordeum:vulgare"],"part":"part:grain","exclude":[]}
-{"applies_to":["tx:plantae:monocots:poales:avena:sativa"],"part":"part:grain","exclude":[]}
-{"applies_to":["tx:plantae:monocots:poales:secale:cereale"],"part":"part:grain","exclude":[]}
-
-{"applies_to":["tx:plantae:brassicaceae:brassica:oleracea:var:capitata"],"part":"part:leaf","exclude":[]}
-{"applies_to":["tx:plantae:brassicaceae:brassica:rapa:subsp:pekinensis"],"part":"part:leaf","exclude":[]}
-{"applies_to":["tx:plantae:eudicots:caryophyllales:spinacia:oleracea"],"part":"part:leaf","exclude":[]}
-{"applies_to":["tx:plantae:eudicots:asterales:lactuca:sativa"],"part":"part:leaf","exclude":[]}
-
-{"applies_to":["tx:plantae:brassicaceae:brassica:oleracea:var:italica"],"part":"part:flower","exclude":[]}
-{"applies_to":["tx:plantae:brassicaceae:brassica:oleracea:var:botrytis"],"part":"part:flower","exclude":[]}
-
-{"applies_to":["tx:plantae:eudicots:apiales:daucus:carota"],"part":"part:root","exclude":[]}
-{"applies_to":["tx:plantae:apiaceae:pastinaca:sativa"],"part":"part:root","exclude":[]}
-{"applies_to":["tx:plantae:brassicaceae:brassica:rapa:subsp:rapa"],"part":"part:root","exclude":[]}
-{"applies_to":["tx:plantae:eudicots:caryophyllales:beta:vulgaris"],"part":"part:root","exclude":[]}
-{"applies_to":["tx:plantae:brassicaceae:raphanus:sativus"],"part":"part:root","exclude":[]}
-{"applies_to":["tx:plantae:eudicots:malpighiales:manihot:esculenta"],"part":"part:root","exclude":[]}
-
-{"applies_to":["tx:plantae:monocots:asparagales:allium:cepa"],"part":"part:bulb","exclude":[]}
-{"applies_to":["tx:plantae:monocots:asparagales:allium:sativum"],"part":"part:bulb","exclude":[]}
-
-{"applies_to":["tx:plantae:eudicots:fabales:phaseolus:vulgaris"],"part":"part:seed","exclude":[]}
-{"applies_to":["tx:plantae:eudicots:fabales:glycine:max"],"part":"part:seed","exclude":[]}
-{"applies_to":["tx:plantae:eudicots:fabales:cicer:arietinum"],"part":"part:seed","exclude":[]}
-{"applies_to":["tx:plantae:eudicots:fabales:lens:culinaris"],"part":"part:seed","exclude":[]}
-{"applies_to":["tx:plantae:fabaceae:pisum:sativum"],"part":"part:seed","exclude":[]}
-
-{"applies_to":["tx:plantae:eudicots:rosales:prunus:dulcis"],"part":"part:seed","exclude":[]}
-{"applies_to":["tx:plantae:eudicots:fagales:juglans:regia"],"part":"part:seed","exclude":[]}
-{"applies_to":["tx:plantae:eudicots:sapindales:pistacia:vera"],"part":"part:seed","exclude":[]}
-{"applies_to":["tx:plantae:eudicots:sapindales:anacardium:occidentale"],"part":"part:seed","exclude":[]}
-{"applies_to":["tx:plantae:eudicots:fagales:corylus:avellana"],"part":"part:seed","exclude":[]}
-{"applies_to":["tx:plantae:eudicots:asterales:helianthus:annuus"],"part":"part:seed","exclude":[]}
-{"applies_to":["tx:plantae:eudicots:lamiales:sesamum:indicum"],"part":"part:seed","exclude":[]}
-
-{"applies_to":["tx:plantae:myrtaceae:psidium:guajava:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:myrtaceae:psidium:cattleianum:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:myrtaceae:acca:sellowiana"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:passifloraceae:passiflora:edulis:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:annonaceae:annona:cherimola:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:annonaceae:annona:muricata:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:annonaceae:annona:squamosa:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:moraceae:artocarpus:heterophyllus:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:moraceae:artocarpus:altilis:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:malvaceae:durio:zibethinus:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:sapindaceae:litchi:chinensis:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:sapindaceae:nephelium:lappaceum:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:sapindaceae:dimocarpus:longan:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:oxalidaceae:averrhoa:carambola:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:lythraceae:punica:granatum:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:moraceae:ficus:carica:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:moraceae:morus:alba:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:moraceae:morus:nigra:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:arecaceae:phoenix:dactylifera:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:arecaceae:cocos:nucifera:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:arecaceae:euterpe:oleracea:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:cactaceae:hylocereus:undatus:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:cactaceae:opuntia:ficus-indica:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:solanaceae:physalis:peruviana:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:solanaceae:lycium:barbarum:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:sapotaceae:manilkara:zapota:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:sapotaceae:chrysophyllum:cainito:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:sapotaceae:synsepalum:dulcificum:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:myricaceae:myrica:rubra:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:rhamnaceae:ziziphus:jujuba:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:malpighiaceae:malpighia:emarginata:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:myrtaceae:plinia:cauliflora:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:arecaceae:salacca:zalacca:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:meliaceae:lansium:parasiticum:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:elaeagnaceae:hippophae:rhamnoides:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:rosaceae:eriobotrya:japonica:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:rosaceae:cydonia:oblonga:"],"part":"part:fruit","exclude":[]}
-
-{"applies_to":["tx:plantae:solanaceae:solanum:tuberosum:"],"part":"part:tuber","exclude":[]}
-{"applies_to":["tx:plantae:convolvulaceae:ipomoea:batatas:"],"part":"part:root","exclude":[]}
-{"applies_to":["tx:plantae:euphorbiaceae:manihot:esculenta:"],"part":"part:root","exclude":[]}
-{"applies_to":["tx:plantae:dioscoreaceae:dioscorea:alata:"],"part":"part:tuber","exclude":[]}
-{"applies_to":["tx:plantae:dioscoreaceae:dioscorea:rotundata:"],"part":"part:tuber","exclude":[]}
-
-{"applies_to":["tx:plantae:apiaceae:daucus:carota:"],"part":"part:root","exclude":[]}
-{"applies_to":["tx:plantae:amaranthaceae:beta:vulgaris:"],"part":"part:root","exclude":[]}
-{"applies_to":["tx:plantae:brassicaceae:raphanus:sativus:"],"part":"part:root","exclude":[]}
-{"applies_to":["tx:plantae:apiaceae:pastinaca:sativa:"],"part":"part:root","exclude":[]}
-{"applies_to":["tx:plantae:brassicaceae:brassica:rapa:rapa"],"part":"part:root","exclude":[]}
-
-{"applies_to":["tx:plantae:amaryllidaceae:allium:cepa:"],"part":"part:bulb","exclude":[]}
-{"applies_to":["tx:plantae:amaryllidaceae:allium:sativum:"],"part":"part:bulb","exclude":[]}
-
-{"applies_to":["tx:plantae:asparagaceae:asparagus:officinalis:"],"part":"part:stem","exclude":[]}
-{"applies_to":["tx:plantae:apiaceae:apium:graveolens:dulce"],"part":"part:stem","exclude":[]}
-
-{"applies_to":["tx:plantae:asteraceae:lactuca:sativa:"],"part":"part:leaf","exclude":[]}
-{"applies_to":["tx:plantae:amaranthaceae:spinacia:oleracea:"],"part":"part:leaf","exclude":[]}
-{"applies_to":["tx:plantae:brassicaceae:brassica:oleracea:sabellica"],"part":"part:leaf","exclude":[]}
-{"applies_to":["tx:plantae:brassicaceae:brassica:oleracea:capitata"],"part":"part:leaf","exclude":[]}
-{"applies_to":["tx:plantae:amaranthaceae:beta:vulgaris:cicla"],"part":"part:leaf","exclude":[]}
-
-{"applies_to":["tx:plantae:eudicots:brassicales:brassica:oleracea:italica"],"part":"part:flower","exclude":[]}
-{"applies_to":["tx:plantae:eudicots:brassicales:brassica:oleracea:botrytis"],"part":"part:flower","exclude":[]}
-{"applies_to":["tx:plantae:asteraceae:cynara:cardunculus:scolymus"],"part":"part:flower","exclude":[]}
-
-{"applies_to":["tx:plantae:solanaceae:solanum:lycopersicum:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:solanaceae:capsicum:annuum:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:solanaceae:solanum:melongena:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:malvaceae:abelmoschus:esculentus:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:cucurbitaceae:cucumis:sativus:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:cucurbitaceae:cucurbita:pepo:"],"part":"part:fruit","exclude":[]}
-
-{"applies_to":["tx:plantae:poaceae:zea:mays:"],"part":"part:grain","exclude":[]}
-{"applies_to":["tx:plantae:poaceae:oryza:sativa:"],"part":"part:grain","exclude":[]}
-{"applies_to":["tx:plantae:poaceae:triticum:aestivum:"],"part":"part:grain","exclude":[]}
-{"applies_to":["tx:plantae:poaceae:hordeum:vulgare:"],"part":"part:grain","exclude":[]}
-{"applies_to":["tx:plantae:poaceae:secale:cereale:"],"part":"part:grain","exclude":[]}
-{"applies_to":["tx:plantae:poaceae:avena:sativa:"],"part":"part:grain","exclude":[]}
-
-{"applies_to":["tx:plantae:fabaceae:glycine:max:"],"part":"part:seed","exclude":[]}
-{"applies_to":["tx:plantae:fabaceae:phaseolus:vulgaris:"],"part":"part:seed","exclude":[]}
-{"applies_to":["tx:plantae:fabaceae:cicer:arietinum:"],"part":"part:seed","exclude":[]}
-{"applies_to":["tx:plantae:fabaceae:lens:culinaris:"],"part":"part:seed","exclude":[]}
-{"applies_to":["tx:plantae:fabaceae:pisum:sativum:"],"part":"part:seed","exclude":[]}
-
-{"applies_to":["tx:plantae:juglandaceae:juglans:regia:"],"part":"part:seed","exclude":[]}
-{"applies_to":["tx:plantae:betulaceae:corylus:avellana:"],"part":"part:seed","exclude":[]}
-{"applies_to":["tx:plantae:rosaceae:prunus:dulcis:"],"part":"part:seed","exclude":[]}
-{"applies_to":["tx:plantae:juglandaceae:carya:illinoinensis:"],"part":"part:seed","exclude":[]}
-{"applies_to":["tx:plantae:lecythidaceae:bertholletia:excelsa:"],"part":"part:seed","exclude":[]}
-{"applies_to":["tx:plantae:anacardiaceae:anacardium:occidentale:"],"part":"part:seed","exclude":[]}
-{"applies_to":["tx:plantae:anacardiaceae:pistacia:vera:"],"part":"part:seed","exclude":[]}
-{"applies_to":["tx:plantae:fabaceae:arachis:hypogaea:"],"part":"part:seed","exclude":[]}
-
-{"applies_to":["tx:plantae:eudicots:solanales:solanum:tuberosum"],"part":"part:tuber","exclude":[]}
-{"applies_to":["tx:plantae:poaceae:triticum:"],"part":"part:grain","exclude":[]}
-{"applies_to":["tx:plantae:poaceae:oryza:"],"part":"part:grain","exclude":[]}
-{"applies_to":["tx:plantae:brassicaceae:brassica:oleracea:var:italica"],"part":"part:flower","exclude":[]}
-{"applies_to":["tx:plantae:brassicaceae:brassica:oleracea:var:capitata"],"part":"part:leaf","exclude":[]}
-{"applies_to":["tx:plantae:alliaceae:allium:"],"part":"part:bulb","exclude":[]}
-{"applies_to":["tx:plantae:eudicots:apiales:daucus:carota"],"part":"part:root","exclude":[]}
-{"applies_to":["tx:plantae:fabaceae:phaseolus:"],"part":"part:seed","exclude":[]}
-{"applies_to":["tx:plantae:eudicots:fabales:glycine:max"],"part":"part:seed","exclude":[]}
-{"applies_to":["tx:plantae:vitaceae:vitis:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:musaceae:musa:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:rutaceae:citrus:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:cucurbitaceae:cucurbita:"],"part":"part:fruit","exclude":[]}
-{"applies_to":["tx:plantae:eudicots:solanales:solanum:lycopersicum"],"part":"part:fruit","exclude":[]}
+{"applies_to": ["tx:p:malus:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:pyrus:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:prunus:"], "part": "part:fruit", "exclude": ["tx:plantae:eudicots:rosales:prunus:dulcis"]}
+{"applies_to": ["tx:p:fragaria:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:rubus:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:vaccinium:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:mangifera:indica"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:ananas:comosus"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:papaya"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:actinidia:deliciosa"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:musa:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:lanatus"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:cucumis:melo"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:cucurbita:pepo"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:cucurbita:moschata"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:maxima"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:citrus:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:vitis:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:solanum:lycopersicum"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:capsicum:annuum"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:chinense"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:frutescens"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:olea:europaea"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:solanum:tuberosum"], "part": "part:tuber", "exclude": []}
+{"applies_to": ["tx:p:ipomoea:batatas"], "part": "part:tuber", "exclude": []}
+{"applies_to": ["tx:p:dioscorea:"], "part": "part:tuber", "exclude": []}
+{"applies_to": ["tx:p:triticum:"], "part": "part:grain", "exclude": []}
+{"applies_to": ["tx:p:oryza:"], "part": "part:grain", "exclude": []}
+{"applies_to": ["tx:p:zea:mays"], "part": "part:grain", "exclude": []}
+{"applies_to": ["tx:p:hordeum:vulgare"], "part": "part:grain", "exclude": []}
+{"applies_to": ["tx:p:oryza:sativa"], "part": "part:grain", "exclude": []}
+{"applies_to": ["tx:p:secale:cereale"], "part": "part:grain", "exclude": []}
+{"applies_to": ["tx:p:capitata"], "part": "part:leaf", "exclude": []}
+{"applies_to": ["tx:p:pekinensis"], "part": "part:leaf", "exclude": []}
+{"applies_to": ["tx:p:oleracea"], "part": "part:leaf", "exclude": []}
+{"applies_to": ["tx:p:oryza:sativa"], "part": "part:leaf", "exclude": []}
+{"applies_to": ["tx:p:brassica:oleracea:italica"], "part": "part:flower", "exclude": []}
+{"applies_to": ["tx:p:brassica:oleracea:botrytis"], "part": "part:flower", "exclude": []}
+{"applies_to": ["tx:p:daucus:carota"], "part": "part:root", "exclude": []}
+{"applies_to": ["tx:p:oryza:sativa"], "part": "part:root", "exclude": []}
+{"applies_to": ["tx:p:brassica:rapa"], "part": "part:root", "exclude": []}
+{"applies_to": ["tx:p:phaseolus:vulgaris"], "part": "part:root", "exclude": []}
+{"applies_to": ["tx:p:cucumis:sativus"], "part": "part:root", "exclude": []}
+{"applies_to": ["tx:p:manihot:esculenta"], "part": "part:root", "exclude": []}
+{"applies_to": ["tx:p:allium:cepa"], "part": "part:bulb", "exclude": []}
+{"applies_to": ["tx:p:allium:sativum"], "part": "part:bulb", "exclude": []}
+{"applies_to": ["tx:p:phaseolus:vulgaris"], "part": "part:seed", "exclude": []}
+{"applies_to": ["tx:p:glycine:max"], "part": "part:seed", "exclude": []}
+{"applies_to": ["tx:p:cicer:arietinum"], "part": "part:seed", "exclude": []}
+{"applies_to": ["tx:p:lens:culinaris"], "part": "part:seed", "exclude": []}
+{"applies_to": ["tx:p:allium:sativum"], "part": "part:seed", "exclude": []}
+{"applies_to": ["tx:p:prunus:dulcis"], "part": "part:seed", "exclude": []}
+{"applies_to": ["tx:p:juglans:regia"], "part": "part:seed", "exclude": []}
+{"applies_to": ["tx:p:pistacia:vera"], "part": "part:seed", "exclude": []}
+{"applies_to": ["tx:p:anacardium:occidentale"], "part": "part:seed", "exclude": []}
+{"applies_to": ["tx:p:corylus:avellana"], "part": "part:seed", "exclude": []}
+{"applies_to": ["tx:p:helianthus:annuus"], "part": "part:seed", "exclude": []}
+{"applies_to": ["tx:p:sesamum:indicum"], "part": "part:seed", "exclude": []}
+{"applies_to": ["tx:p:guajava:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:cattleianum:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:sellowiana"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:edulis:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:cherimola:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:muricata:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:squamosa:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:heterophyllus:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:altilis:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:zibethinus:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:chinensis:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:lappaceum:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:longan:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:carambola:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:granatum:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:carica:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:alba:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:nigra:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:dactylifera:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:nucifera:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:oleracea:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:undatus:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:ficus-indica:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:peruviana:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:barbarum:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:zapota:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:cainito:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:dulcificum:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:rubra:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:jujuba:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:emarginata:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:cauliflora:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:zalacca:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:parasiticum:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:rhamnoides:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:japonica:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:oblonga:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:tuberosum:"], "part": "part:tuber", "exclude": []}
+{"applies_to": ["tx:p:batatas:"], "part": "part:root", "exclude": []}
+{"applies_to": ["tx:p:esculenta:"], "part": "part:root", "exclude": []}
+{"applies_to": ["tx:p:alata:"], "part": "part:tuber", "exclude": []}
+{"applies_to": ["tx:p:rotundata:"], "part": "part:tuber", "exclude": []}
+{"applies_to": ["tx:p:carota:"], "part": "part:root", "exclude": []}
+{"applies_to": ["tx:p:vulgaris:"], "part": "part:root", "exclude": []}
+{"applies_to": ["tx:p:sativus:"], "part": "part:root", "exclude": []}
+{"applies_to": ["tx:p:sativa:"], "part": "part:root", "exclude": []}
+{"applies_to": ["tx:p:brassica:rapa"], "part": "part:root", "exclude": []}
+{"applies_to": ["tx:p:cepa:"], "part": "part:bulb", "exclude": []}
+{"applies_to": ["tx:p:sativum:"], "part": "part:bulb", "exclude": []}
+{"applies_to": ["tx:p:officinalis:"], "part": "part:stem", "exclude": []}
+{"applies_to": ["tx:p:dulce"], "part": "part:stem", "exclude": []}
+{"applies_to": ["tx:p:sativa:"], "part": "part:leaf", "exclude": []}
+{"applies_to": ["tx:p:oleracea:"], "part": "part:leaf", "exclude": []}
+{"applies_to": ["tx:p:brassica:oleracea:sabellica"], "part": "part:leaf", "exclude": []}
+{"applies_to": ["tx:p:capitata"], "part": "part:leaf", "exclude": []}
+{"applies_to": ["tx:p:cicla"], "part": "part:leaf", "exclude": []}
+{"applies_to": ["tx:p:brassica:oleracea:italica"], "part": "part:flower", "exclude": []}
+{"applies_to": ["tx:p:brassica:oleracea:botrytis"], "part": "part:flower", "exclude": []}
+{"applies_to": ["tx:p:scolymus"], "part": "part:flower", "exclude": []}
+{"applies_to": ["tx:p:lycopersicum:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:annuum:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:melongena:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:esculentus:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:sativus:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:pepo:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:mays:"], "part": "part:grain", "exclude": []}
+{"applies_to": ["tx:p:sativa:"], "part": "part:grain", "exclude": []}
+{"applies_to": ["tx:p:aestivum:"], "part": "part:grain", "exclude": []}
+{"applies_to": ["tx:p:vulgare:"], "part": "part:grain", "exclude": []}
+{"applies_to": ["tx:p:cereale:"], "part": "part:grain", "exclude": []}
+{"applies_to": ["tx:p:sativa:"], "part": "part:grain", "exclude": []}
+{"applies_to": ["tx:p:max:"], "part": "part:seed", "exclude": []}
+{"applies_to": ["tx:p:vulgaris:"], "part": "part:seed", "exclude": []}
+{"applies_to": ["tx:p:arietinum:"], "part": "part:seed", "exclude": []}
+{"applies_to": ["tx:p:culinaris:"], "part": "part:seed", "exclude": []}
+{"applies_to": ["tx:p:sativum:"], "part": "part:seed", "exclude": []}
+{"applies_to": ["tx:p:regia:"], "part": "part:seed", "exclude": []}
+{"applies_to": ["tx:p:avellana:"], "part": "part:seed", "exclude": []}
+{"applies_to": ["tx:p:dulcis:"], "part": "part:seed", "exclude": []}
+{"applies_to": ["tx:p:illinoinensis:"], "part": "part:seed", "exclude": []}
+{"applies_to": ["tx:p:excelsa:"], "part": "part:seed", "exclude": []}
+{"applies_to": ["tx:p:occidentale:"], "part": "part:seed", "exclude": []}
+{"applies_to": ["tx:p:vera:"], "part": "part:seed", "exclude": []}
+{"applies_to": ["tx:p:hypogaea:"], "part": "part:seed", "exclude": []}
+{"applies_to": ["tx:p:solanum:tuberosum"], "part": "part:tuber", "exclude": []}
+{"applies_to": ["tx:p:triticum:"], "part": "part:grain", "exclude": []}
+{"applies_to": ["tx:p:oryza:"], "part": "part:grain", "exclude": []}
+{"applies_to": ["tx:p:brassica:oleracea:italica"], "part": "part:flower", "exclude": []}
+{"applies_to": ["tx:p:capitata"], "part": "part:leaf", "exclude": []}
+{"applies_to": ["tx:p:allium:"], "part": "part:bulb", "exclude": []}
+{"applies_to": ["tx:p:daucus:carota"], "part": "part:root", "exclude": []}
+{"applies_to": ["tx:p:phaseolus:"], "part": "part:seed", "exclude": []}
+{"applies_to": ["tx:p:glycine:max"], "part": "part:seed", "exclude": []}
+{"applies_to": ["tx:p:vitis:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:musa:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:citrus:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:cucurbita:"], "part": "part:fruit", "exclude": []}
+{"applies_to": ["tx:p:solanum:lycopersicum"], "part": "part:fruit", "exclude": []}

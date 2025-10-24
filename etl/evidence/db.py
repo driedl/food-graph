@@ -13,6 +13,15 @@ class Part:
     id: str
     name: str
     synonyms: List[str]
+    kind: Optional[str] = None
+    category: Optional[str] = None
+    parent_id: Optional[str] = None
+    notes: Optional[str] = None
+    applies_to: List[str] = None
+    
+    def __post_init__(self):
+        if self.applies_to is None:
+            self.applies_to = []
 
 @dataclass
 class Transform:
@@ -28,17 +37,26 @@ class GraphDB:
 
     def parts(self) -> List[Part]:
         q = """
-          SELECT p.id, p.name,
+          SELECT p.id, p.name, p.kind, p.category, p.parent_id,
                  COALESCE(GROUP_CONCAT(ps.synonym,'\u001f'), '') AS syns
           FROM part_def p
           LEFT JOIN part_synonym ps ON ps.part_id = p.id
-          GROUP BY p.id, p.name
+          GROUP BY p.id, p.name, p.kind, p.category, p.parent_id
           ORDER BY p.id
         """
         out: List[Part] = []
         for r in self.con.execute(q):
             syns = (r["syns"] or "").split("\u001f") if r["syns"] else []
-            out.append(Part(id=r["id"], name=r["name"], synonyms=[s for s in syns if s]))
+            out.append(Part(
+                id=r["id"], 
+                name=r["name"], 
+                synonyms=[s for s in syns if s],
+                kind=r["kind"],
+                category=r["category"],
+                parent_id=r["parent_id"],
+                notes=None,  # Not available in current schema
+                applies_to=[]  # Will be populated separately if needed
+            ))
         return out
 
     def transforms(self) -> List[Transform]:

@@ -4,53 +4,67 @@
 
 ## 🎯 Project Overview
 
-**Food Graph** is a monorepo for building a biological taxonomy-driven food & nutrition knowledge base. Identity is structural: **(Taxon + Part + Transform chain)**. Nutrient values are **evidence** that "fills" the graph.
+**Food Graph** is a monorepo for building a biological taxonomy-driven food & nutrition knowledge base. The system uses a **TPT (Taxon-Part-Transform)** model where food identity is structural: **(Taxon + Part + Transform chain)**. Nutrient values are **evidence** that "fills" the graph.
 
 **Vision:** Stable food identities based on biology + processing, not brittle name matching. Evidence can evolve without breaking canonical IDs.
 
-### Key Principles
+### Core Concepts
 
-- **Identity is structural**: FoodState = Taxon + Part + ordered Transforms
-- **Git-first ontology**: Human-authored, version-controlled, validated
-- **Evidence over assertion**: Numbers come from provenance-tracked evidence
-- **Compute on-demand**: FoodState paths are computed, not stored (for now)
+- **Taxa (T)**: Biological sources (e.g., `tx:p:malus:domestica` for apple)
+- **Parts (P)**: Anatomical components (e.g., `part:fruit`, `part:muscle`)
+- **Transforms (TF)**: Processing operations (e.g., `tf:cook`, `tf:ferment`)
+- **TPT**: Transformed products (e.g., `tpt:tx:p:malus:domestica:part:fruit:FRESH:abc123`)
+- **Evidence**: Nutrition data mapped to TPTs via 3-tier system
 
-## 🏗️ Architecture
+## 🏗️ System Architecture
 
-### Core Entities
+### ETL Pipeline (8 Stages: 0, 1, A-G)
 
-1. **Taxon** — Biological lineage (Life → Kingdom → ... → Species)
-   - Example: `tx:plantae:poaceae:oryza:sativa` (Rice)
-2. **Part** — Anatomical/edible parts (fruit, milk, muscle, grain)
-   - Example: `part:milk`, `part:fruit`, `part:muscle`
-3. **Transform** — Processes with parameters (cook, mill, ferment, cure)
-   - Example: `tf:cook{method=boil,fat_added=false}`
-4. **FoodState** — Identity-bearing path (not yet materialized in DB)
-   - Example: `fs://plantae/poaceae/oryza/sativa/part:grain/tf:mill{refinement=whole}/tf:cook{method=boil}`
-5. **Attribute** — Metadata with roles (identity_param, covariate, facet)
+The ETL pipeline compiles Git-authored ontology data into a queryable SQLite database:
 
-### Current Implementation Status
+```bash
+# Full pipeline
+pnpm etl:run
 
-**✅ Implemented:**
+# Individual stages
+pnpm etl:run --stage 0    # Validation & preprocessing
+pnpm etl:run --stage 1    # NCBI integration
+pnpm etl:run --stage A    # Transform normalization
+pnpm etl:run --stage B    # Substrate materialization
+pnpm etl:run --stage C    # Derived food ingestion
+pnpm etl:run --stage D    # Family templatization
+pnpm etl:run --stage E    # Canonicalization & IDs
+pnpm etl:run --stage F    # SQLite database creation
+pnpm etl:run --stage G    # Evidence loading & rollups
+```
 
-- Taxonomy with 200+ taxa across plantae, animalia, fungi
-- Parts system with 40+ parts and hierarchical applicability rules
-- 29 transform families with param schemas
-- FTS5 full-text search for taxa
-- FoodState computation (on-demand via API)
-- Documentation system (`.tx.md` files with YAML frontmatter)
+**Output**: `etl/build/database/graph.dev.sqlite`
 
-**🔄 In Progress:**
+### Evidence System (3-Tier Mapping)
 
-- Taxon+part search nodes (see doc 14_TAXON_PART_SEARCH_PROPOSAL.md)
-- Evidence model and nutrient data integration
+The system maps external nutrition data (FDC, etc.) to canonical TPTs:
 
-**📋 Planned:**
+1. **Tier 1**: Taxon-only resolution with NCBI verification
+2. **Tier 2**: TPT construction with lineage-based part filtering
+3. **Tier 3**: Full curation with overlay system for complex cases
 
-- FoodState materialization in database
-- Evidence tables with provenance
-- Mixture DAG evaluation
-- Hierarchical nutrient rollups
+```bash
+# Map evidence from FDC
+pnpm evidence:map --limit 100
+pnpm evidence:map:test --limit 10 --min-confidence 0.5
+pnpm evidence:map:full  # Full FDC processing
+```
+
+### Database Schema
+
+**Core Tables**:
+- `nodes` — Taxa, parts, transforms with hierarchical relationships
+- `edges` — Typed relationships between entities
+- `tpt_nodes` — Transformed products with identity hashes
+- `nutrients` — Canonical nutrient definitions (INFOODS format)
+- `nutrient_row` — Evidence data with original + converted values
+- `evidence_mapping` — Food ID to TPT mapping with confidence scores
+- `nutrient_profile_rollup` — Pre-computed nutrient profiles
 
 ## 📁 Repository Structure
 
@@ -61,166 +75,79 @@ food-graph/
 │   └── web/              # React + Vite frontend
 ├── packages/
 │   ├── shared/           # Shared types and FoodState logic
-│   ├── config/           # Environment and path configuration
+│   ├── config/           # Environment configuration
 │   └── api-contract/     # API type definitions
-├── etl/                  # ETL pipeline (Python)
-│   └── graph/             # Python ETL framework
-│       └── stages/       # Pipeline stages
+├── etl/                  # Python ETL pipeline
+│   ├── graph/            # Stage-based ETL framework
+│   └── evidence/         # 3-tier evidence mapping system
 ├── data/
 │   ├── ontology/         # Source of truth (Git)
 │   │   ├── taxa/         # **/*.tx.md files with frontmatter
 │   │   ├── parts.json
 │   │   ├── transforms.json
-│   │   ├── attributes.json
 │   │   ├── nutrients.json
-│   │   ├── animal_cuts/  # Hierarchical animal part defs
 │   │   └── rules/        # Applicability rules (JSONL)
 │   └── sources/          # External data (FDC, etc.)
-├── docs/                 # Architecture & design docs
-└── scripts/              # Utility scripts
+├── scripts/              # Utility scripts
+└── docs/                 # Architecture & design docs
 ```
 
-## 🔧 Build Pipeline (ETL)
+## 🔧 Essential Commands
 
-The ETL pipeline transforms Git-authored ontology data into a queryable SQLite database.
-
-### Pipeline Steps
+### Development Workflow
 
 ```bash
+# Start API + Web (parallel)
+pnpm dev
+
+# Start individually
+pnpm dev:api
+pnpm dev:web
+
+# Build everything
+pnpm build
+
+# Type checking and linting
+pnpm check
+```
+
+### ETL Pipeline
+
+```bash
+# Install Python dependencies
+pnpm etl:install
+
+# Run full pipeline
 pnpm etl:run
+
+# Run with tests/validation
+pnpm etl:run --with-tests
+
+# Clean build artifacts
+pnpm etl:clean
+
+# Show pipeline help
+pnpm etl:plan
 ```
 
-**Runs:**
+### Evidence System
 
-1. **Validate** — Schema checks, parent existence, acyclicity
-2. **Compile Taxa** — Extract frontmatter from `.tx.md` → `taxa.jsonl`
-3. **Compile Docs** — Extract markdown content → `docs.jsonl`
-4. **Build Database** — Load all data into SQLite with FTS
-5. **Verify** — Integrity checks and search tests
-6. **Doc Report** — Coverage analysis
+```bash
+# Map evidence (incremental)
+pnpm evidence:map --limit 50
 
-**Output:** `etl/build/database/graph.dev.sqlite`
+# Test mapping with low confidence
+pnpm evidence:map:test --limit 10 --min-confidence 0.5
 
-### Ontology File Formats
+# Full FDC processing
+pnpm evidence:map:full
 
-**Taxa** (`.tx.md` with YAML frontmatter):
+# Generate evidence profiles
+pnpm evidence:profiles
 
-```markdown
----
-id: tx:plantae:rosaceae:malus:domestica
-rank: species
-latin_name: Malus domestica
-display_name: Apple
-aliases: ['apple', 'apples']
-tags: ['foundation']
----
-
-Culinary notes, nutrition patterns, variability...
+# Validate evidence data
+pnpm evidence:validate
 ```
-
-**Rules** (`rules/*.jsonl`):
-
-```json
-{"part":"part:milk","applies_to":["tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus"]}
-{"transform":"tf:ferment","applies_to":[{"taxon_prefix":"tx:animalia:...","parts":["part:milk"]}]}
-```
-
-## 🗄️ Database Schema
-
-### Taxonomy Tables
-
-- **`nodes`** — Taxon hierarchy (id, name, slug, rank, parent_id)
-- **`synonyms`** — Alternative names for taxa
-- **`node_attributes`** — Key-value attributes on nodes (reserved)
-- **`attr_def`** — Attribute registry (kind: numeric|boolean|categorical, role)
-- **`attr_enum`** — Enum values for categorical attributes
-
-### Documentation Tables
-
-- **`taxon_doc`** — Markdown docs per taxon (summary, description_md, updated_at, checksum)
-
-### Parts & Transforms
-
-- **`part_def`** — Part registry (id, name, kind, notes, parent_id)
-- **`part_synonym`** — Part aliases
-- **`has_part`** — Materialized taxon ↔ part relationships
-- **`transform_def`** — Transform registry (id, name, identity, schema_json, ordering)
-- **`transform_applicability`** — Allowed transforms per taxon+part
-
-### Search
-
-- **`taxa_fts`** — FTS5 virtual table for taxa (name, synonyms, taxon_rank)
-- **`tp_fts`** — FTS5 virtual table for taxon+part nodes (name, synonyms, taxon_rank, kind)
-
-### Key Indexes
-
-- `idx_nodes_parent` — Fast child queries
-- `idx_nodes_slug_parent` — Unique slug per parent
-- `idx_taxon_doc_taxon_id` — Doc lookups
-
-## 🔌 API Endpoints (tRPC)
-
-All endpoints are under `/trpc/`:
-
-### Health
-
-- `health` → `{ ok: true }`
-
-### Taxonomy
-
-- `taxonomy.getRoot` → Root node
-- `taxonomy.getNode({ id })` → Single node
-- `taxonomy.getChildren({ id, orderBy?, offset?, limit? })` → Children list
-- `taxonomy.neighborhood({ id, childLimit, orderBy })` → Node + parent + siblings + children + counts
-- `taxonomy.pathToRoot({ id })` → Lineage array from node to root
-- `taxonomy.search({ q, rankFilter? })` → FTS5 search results
-- `taxonomy.getPartsForTaxon({ id })` → Parts applicable to taxon (via lineage)
-- `taxonomy.partTree({ id })` → Hierarchical part tree
-
-### Documentation
-
-- `docs.getByTaxon({ taxonId })` → Doc for taxon
-
-### Search (Combined)
-
-- `search.combined({ q, kinds?, limit? })` → Unified search (taxa + docs)
-- `search.docs({ q, lang?, limit? })` → Doc-only search
-
-### FoodState (Computation)
-
-- `foodstate.compose({ taxonId, partId, transforms })` → Computes FoodState path with validation
-
-## 📊 Ontology Reference
-
-### ID Conventions
-
-- **Taxa**: `tx:<path>` (e.g., `tx:plantae:poaceae:oryza:sativa`)
-- **Parts**: `part:<slug>` (e.g., `part:fruit`, `part:milk`)
-- **Transforms**: `tf:<slug>` (e.g., `tf:cook`, `tf:mill`)
-- **Attributes**: `attr:<slug>` (e.g., `attr:salt_level`)
-- **Nutrients**: `nutr:<slug>` (e.g., `nutr:protein_g`)
-
-### Ranks
-
-`root | domain | kingdom | phylum | class | order | family | genus | species | subspecies | cultivar | variety | breed | product | form`
-
-### Transform Families (Examples)
-
-- `tf:cook` — `{method: enum(raw|boil|steam|bake|roast|fry|broil), fat_added: boolean}`
-- `tf:mill` — `{refinement: enum(whole|refined|pearled|00), oat_form?: enum(rolled|steel_cut)}`
-- `tf:ferment` — `{starter: enum(yogurt_thermo|yogurt_meso|kefir|...), temp_C, time_h}`
-- `tf:cure` — `{method: enum(dry|wet), salt_pct, sugar_pct, nitrite_ppm, time_d}`
-
-See `data/ontology/transforms.json` for all 29 transforms.
-
-### Attribute Roles
-
-1. **identity_param** — Affects FoodState identity (e.g., `salt_level`, `fat_pct`)
-2. **taxon_refinement** — Rare; internal taxonomy refinement
-3. **covariate** — Influences evidence selection, not identity (e.g., `ripeness_bucket`, `region`)
-4. **facet** — Discovery metadata only (e.g., `color`, `brand`)
-
-## 🛠️ Quick Commands
 
 ### Database Access
 
@@ -228,7 +155,7 @@ See `data/ontology/transforms.json` for all 29 transforms.
 # Interactive SQL REPL
 pnpm sql:repl
 
-# Run a single query (returns JSON)
+# Run single query (returns JSON)
 pnpm sql "SELECT * FROM nodes LIMIT 3"
 
 # Pipe SQL from stdin
@@ -238,68 +165,38 @@ echo 'SELECT count(*) c FROM nodes;' | pnpm sql --stdin
 pnpm db:open
 ```
 
-### Development
+### Utility Scripts
 
 ```bash
-# Start API + Web (parallel)
-pnpm dev
-
-# Start API only
-pnpm dev:api
-
-# Start Web only
-pnpm dev:web
-
-# Full type check + lint + ETL build
-pnpm check
-
-# Build database from ontology
-pnpm etl:run
-
-# Run ETL validation only
-pnpm etl:run --with-tests
-
-# Run smoke tests
-pnpm etl:run --with-tests
-
 # List all tRPC routes
 pnpm api:routes
+
+# Sync database
+pnpm sync-db
+
+# Stop all services
+pnpm stop
+
+# Aggregation tools
+pnpm ag:etl    # ETL aggregation
+pnpm ag:api    # API aggregation
 ```
 
-### Debugging
+## 🗄️ Database Querying
 
-```bash
-# View ETL pipeline config
-cat etl/graph/config.py
+### Common Query Patterns
 
-# Check database stats
-pnpm sql "SELECT
-  (SELECT COUNT(*) FROM nodes) as taxa,
-  (SELECT COUNT(*) FROM synonyms) as synonyms,
-  (SELECT COUNT(*) FROM taxon_doc) as docs,
-  (SELECT COUNT(*) FROM has_part) as has_part_rows,
-  (SELECT COUNT(*) FROM nodes_fts) as fts_entries;"
-
-# View recent docs
-pnpm sql "SELECT taxon_id, display_name, updated_at FROM taxon_doc ORDER BY updated_at DESC LIMIT 5;"
-```
-
-## 🔍 Common Queries
-
-### Find Root Node
-
+**Find root node**:
 ```sql
 SELECT * FROM nodes WHERE parent_id IS NULL;
 ```
 
-### Get Children of a Node
-
+**Get children of a node**:
 ```sql
-SELECT * FROM nodes WHERE parent_id = 'tx:plantae' ORDER BY name;
+SELECT * FROM nodes WHERE parent_id = 'tx:p' ORDER BY name;
 ```
 
-### Search Using FTS5
-
+**Search using FTS5**:
 ```sql
 -- Search taxa
 SELECT n.* FROM nodes n
@@ -307,20 +204,12 @@ JOIN taxa_fts fts ON taxa_fts.rowid = n.rowid
 WHERE taxa_fts MATCH 'apple'
 ORDER BY bm25(taxa_fts) ASC
 LIMIT 10;
-
--- Search taxon+part combinations
-SELECT tp.* FROM taxon_part_nodes tp
-JOIN tp_fts fts ON tp_fts.rowid = tp.rowid
-WHERE tp_fts MATCH 'milk'
-ORDER BY bm25(tp_fts) ASC
-LIMIT 10;
 ```
 
-### Get Path to Root (Lineage)
-
+**Get lineage to root**:
 ```sql
 WITH RECURSIVE lineage(id,name,slug,rank,parent_id,depth) AS (
-  SELECT id,name,slug,rank,parent_id,0 FROM nodes WHERE id = 'tx:plantae:rosaceae:malus:domestica'
+  SELECT id,name,slug,rank,parent_id,0 FROM nodes WHERE id = 'tx:p:malus:domestica'
   UNION ALL
   SELECT n.id,n.name,n.slug,n.rank,n.parent_id,depth+1 FROM nodes n
   JOIN lineage l ON n.id = l.parent_id
@@ -328,31 +217,83 @@ WITH RECURSIVE lineage(id,name,slug,rank,parent_id,depth) AS (
 SELECT id,name,slug,rank,parent_id FROM lineage ORDER BY depth DESC;
 ```
 
-### Get Parts for a Taxon (with inheritance)
-
+**Query TPT nodes**:
 ```sql
-WITH RECURSIVE lineage(id) AS (
-  SELECT id FROM nodes WHERE id = 'tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus'
-  UNION ALL
-  SELECT n.parent_id FROM nodes n JOIN lineage l ON n.id = l.id WHERE n.parent_id IS NOT NULL
-)
-SELECT DISTINCT p.id, p.name, p.kind
-FROM has_part hp
-JOIN part_def p ON p.id = hp.part_id
-WHERE hp.taxon_id IN (SELECT id FROM lineage)
-ORDER BY p.kind, p.name;
+-- Find TPTs for a specific taxon
+SELECT * FROM tpt_nodes WHERE taxon_id = 'tx:p:malus:domestica';
+
+-- Find TPTs with specific part
+SELECT * FROM tpt_nodes WHERE part_id = 'part:fruit';
 ```
 
-### Search Documentation
-
+**Query evidence data**:
 ```sql
--- Documentation is not currently searchable via FTS
--- Use LIKE queries for basic text search in taxon_doc table
-SELECT taxon_id, display_name, summary
-FROM taxon_doc
-WHERE summary LIKE '%fermented%' OR description_md LIKE '%cultured%'
-LIMIT 10;
+-- Get nutrient data for a food
+SELECT nr.*, n.name as nutrient_name, n.unit as canonical_unit
+FROM nutrient_row nr
+JOIN nutrients n ON n.id = nr.nutrient_id
+WHERE nr.food_id = 'fdc:12345';
+
+-- Get evidence mapping
+SELECT em.*, tpt.taxon_id, tpt.part_id, tpt.family
+FROM evidence_mapping em
+JOIN tpt_nodes tpt ON tpt.id = em.tpt_id
+WHERE em.food_id = 'fdc:12345';
 ```
+
+**Query nutrient profiles**:
+```sql
+-- Get rollup profile for a TPT
+SELECT * FROM nutrient_profile_rollup WHERE tpt_id = 'tpt:...';
+
+-- Find foods with high protein
+SELECT tpt_id, protein_g FROM nutrient_profile_rollup 
+WHERE protein_g > 20 ORDER BY protein_g DESC;
+```
+
+## 🔌 API Endpoints (tRPC)
+
+All endpoints are under `/trpc/`:
+
+### Core Routers
+
+- **`health`** → `{ ok: true }`
+- **`taxonomy.*`** — Taxon hierarchy navigation
+- **`search.*`** — Full-text search across entities
+- **`entities.*`** — Generic entity retrieval
+- **`browse.*`** — Hierarchical browsing
+- **`taxa.*`** — Taxon-specific operations
+- **`tp.*`** — Taxon-Part combinations
+- **`tpt.*`** — Transformed products
+- **`tptAdvanced.*`** — Advanced TPT operations
+- **`facets.*`** — Metadata and flags
+- **`docs.*`** — Documentation retrieval
+- **`foodstate.*`** — FoodState computation
+- **`evidence.*`** — Evidence and nutrition data
+- **`meta.*`** — System metadata
+
+### Key Endpoints
+
+**Taxonomy**:
+- `taxonomy.getRoot` → Root node
+- `taxonomy.getNode({ id })` → Single node
+- `taxonomy.getChildren({ id, orderBy?, offset?, limit? })` → Children list
+- `taxonomy.neighborhood({ id, childLimit, orderBy })` → Node + context
+- `taxonomy.search({ q, rankFilter? })` → FTS5 search results
+
+**Search**:
+- `search.combined({ q, kinds?, limit? })` → Unified search
+- `search.docs({ q, lang?, limit? })` → Doc-only search
+
+**TPT Operations**:
+- `tpt.get({ id })` → Get TPT by ID
+- `tpt.search({ q, filters? })` → Search TPTs
+- `tptAdvanced.getNutrientProfile({ tptId })` → Get nutrition profile
+
+**Evidence**:
+- `evidence.getByFoodId({ foodId })` → Get evidence for FDC food
+- `evidence.getNutrientData({ tptId, nutrientId? })` → Get nutrient data
+- `evidence.search({ q, filters? })` → Search evidence
 
 ## 🧪 FoodState Examples
 
@@ -361,8 +302,8 @@ LIMIT 10;
 ```typescript
 // Via API endpoint
 const result = await trpc.foodstate.compose.query({
-  taxonId: 'tx:plantae:poaceae:oryza:sativa',
-  partId: 'part:grain',
+  taxonId: 'tx:p:malus:domestica',
+  partId: 'part:fruit',
   transforms: [
     { id: 'tf:mill', params: { refinement: 'whole' } },
     { id: 'tf:cook', params: { method: 'boil', fat_added: false } }
@@ -371,47 +312,49 @@ const result = await trpc.foodstate.compose.query({
 
 // Returns:
 {
-  id: 'fs://plantae/poaceae/oryza/sativa/part:grain/tf:mill{refinement=whole}/tf:cook{fat_added=false,method=boil}',
+  id: 'fs://p/malus/domestica/part:fruit/tf:mill{refinement=whole}/tf:cook{fat_added=false,method=boil}',
   errors: [],
   normalized: { taxonId, partId, transforms }
 }
 ```
 
-### Identity Rules
+## 📊 Evidence System Usage
 
-- Only **identity-bearing** transforms appear in path (`identity: true` in transform_def)
-- Transforms are ordered by `ordering` field (e.g., mill before cook)
-- Params are canonicalized (alpha-sorted, booleans as `true`/`false`, numbers without trailing zeros)
+### Mapping External Data
 
-## 📚 Documentation Index
+The evidence system maps external nutrition data to canonical TPTs:
 
-Located in `docs/`:
+```bash
+# Process FDC data in batches
+pnpm evidence:map --limit 100
 
-1. **00_VISION.md** — Aspirational goals and principles
-2. **01_ARCHITECTURE.md** — Core entities and edges
-3. **02_ONTOLOGY_KIT.md** — Authoring formats and compile process
-4. **03_ID_CONVENTIONS.md** — ID shapes and stability policy
-5. **04_ATTRIBUTES.md** — Attribute roles and promotion policy
-6. **05_TRANSFORMS.md** — Transform families and math
-7. **06_EVIDENCE_MODEL.md** — Evidence types and rollups (planned)
-8. **07_ROADMAP.md** — Implementation phases
-9. **08_PRIORS_EMBEDDINGS.md** — Statistical models (planned)
-10. **09_CLASSIFICATIONS_AND_OVERLAYS.md** — Regulatory/market taxonomies (planned)
-11. **10_QA_GUARDS.md** — Quality checks (planned)
-12. **11_STORAGE_AND_ARTIFACTS.md** — File layout and build outputs
-13. **12_RULES_APPLICABILITY.md** — Part and transform applicability system
-14. **13_MONOREPO_OPTIMIZATION.md** — Technical debt analysis
-15. **14_TAXON_PART_SEARCH_PROPOSAL.md** — Taxon+part search design
+# Review unmapped nutrients
+cat data/ontology/_proposals/unmapped_nutrients_report.md
 
-### ADRs (Architecture Decision Records)
+# Validate evidence data
+pnpm evidence:validate
+```
 
-- **0001-foodstate-identity-is-path.md** — Why paths, not UUIDs
-- **0002-fdc-as-evidence-not-identity.md** — Evidence vs identity separation
+### Querying Evidence
+
+```sql
+-- Find evidence for a specific food
+SELECT em.*, tpt.taxon_id, tpt.part_id, tpt.family
+FROM evidence_mapping em
+JOIN tpt_nodes tpt ON tpt.id = em.tpt_id
+WHERE em.food_id = 'fdc:12345';
+
+-- Get nutrient data with confidence scores
+SELECT nr.nutrient_id, nr.amount, nr.unit, nr.confidence, n.name
+FROM nutrient_row nr
+JOIN nutrients n ON n.id = nr.nutrient_id
+WHERE nr.food_id = 'fdc:12345'
+ORDER BY nr.confidence DESC;
+```
 
 ## 🐛 Troubleshooting
 
 ### Database Not Found
-
 ```bash
 # Rebuild from ontology
 pnpm etl:run
@@ -420,63 +363,68 @@ pnpm etl:run
 ls -lh etl/build/database/graph.dev.sqlite
 ```
 
-### FTS Search Not Working
-
+### ETL Pipeline Issues
 ```bash
-# Verify FTS tables exist
-pnpm sql "SELECT COUNT(*) FROM taxa_fts;"
-pnpm sql "SELECT COUNT(*) FROM tp_fts;"
+# Check stage-specific errors
+pnpm etl:run --stage 0 --verbose
 
-# Test search
-pnpm sql "SELECT * FROM taxa_fts WHERE taxa_fts MATCH 'apple' LIMIT 1;"
-pnpm sql "SELECT * FROM tp_fts WHERE tp_fts MATCH 'milk' LIMIT 1;"
-```
-
-### API Returns 404
-
-```bash
-# List all routes
-pnpm api:routes
-
-# Check if API is running
-curl http://localhost:3000/trpc/health
-```
-
-### Stale Data in Reports
-
-```bash
 # Clean and rebuild
 pnpm etl:clean
 pnpm etl:run
 ```
 
-## 🎯 Development Tips
+### Evidence Mapping Issues
+```bash
+# Check evidence validation
+pnpm evidence:validate
 
-1. **Type Safety**: Import types from `@nutrition/shared` and `@nutrition/api-contract`
-2. **Path Resolution**: Use `@nutrition/config` for all file paths (never hardcode)
-3. **FTS5 Search**: Supports phrase matching, boolean operators, prefix matching with `*`
-4. **Performance**: Database uses WAL mode; read queries are concurrent
-5. **Validation**: Run `pnpm etl:run --with-tests` before committing ontology changes
-6. **Hot Reload**: API uses `tsx watch`; web uses Vite HMR
-7. **Transform Order**: Transforms execute in `ordering` sequence (lower = earlier)
-8. **Part Inheritance**: Parts cascade down taxonomy via `has_part` materialization
+# Review unmapped nutrients
+cat data/ontology/_proposals/unmapped_nutrients_report.md
+```
 
-## 🔐 Configuration
+### API Issues
+```bash
+# Check if API is running
+curl http://localhost:3000/trpc/health
 
-Environment variables (via `@nutrition/config`):
+# List all routes
+pnpm api:routes
+```
 
+## 🎯 Quick Reference
+
+### Essential File Locations
+- **Database**: `etl/build/database/graph.dev.sqlite`
+- **Ontology**: `data/ontology/`
+- **Evidence**: `data/evidence/`
+- **ETL Code**: `etl/`
+- **API Code**: `apps/api/`
+- **Web UI**: `apps/web/`
+
+### Key Environment Variables
+- `DB_PATH` — SQLite database path
 - `PORT` — API server port (default: 3000)
-- `DB_PATH` — SQLite database path (default: `etl/build/database/graph.dev.sqlite`)
-- `NODE_ENV` — Environment: development|test|production
+- `NODE_ENV` — Environment (development|test|production)
 
-## 📦 Package Reference
+### Common Workflows
 
-- **`@nutrition/api`** — Fastify + tRPC backend (apps/api)
-- **`@nutrition/web`** — React + Vite frontend (apps/web)
-- **`@nutrition/shared`** — FoodState logic, shared types (packages/shared)
-- **`@nutrition/config`** — Zod-validated env config, paths (packages/config)
-- **`@nutrition/api-contract`** — Type-only API exports (packages/api-contract)
+1. **Add new food**: Create taxon in `data/ontology/taxa/`, run ETL
+2. **Map nutrition data**: Use evidence mapping system
+3. **Query nutrition**: Use `evidence.*` API endpoints or direct SQL
+4. **Debug ETL**: Run individual stages with `--verbose`
+5. **Explore data**: Use `pnpm sql:repl` for interactive queries
+
+## 📚 Documentation Index
+
+For detailed information, see:
+- **Architecture**: `docs/01_ARCHITECTURE.md`
+- **Evidence System**: `docs/02_EVIDENCE_SYSTEM.md`
+- **ETL Pipeline**: `docs/03_ETL_PIPELINE.md`
+- **API Reference**: `docs/04_API_REFERENCE.md`
+- **Development Guide**: `docs/05_DEVELOPMENT_GUIDE.md`
+- **ETL Details**: `etl/docs/00-overview.md`
+- **Evidence Details**: `etl/evidence/README.md`
 
 ---
 
-**For more details, see the full documentation in `/docs/` or start with `docs/INDEX.md`.**
+**This guide provides everything needed to immediately start working with the Food Graph project. For specific implementation details, refer to the linked documentation.**

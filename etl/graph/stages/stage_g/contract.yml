@@ -1,0 +1,10 @@
+artifacts:
+  - path: database/graph.dev.sqlite
+    type: sqlite
+    validators:
+      - kind: field_presence
+        fields: [
+          "evidence_mapping",
+          "nutrient_row",
+          "nutrient_profile_rollup"
+        ]

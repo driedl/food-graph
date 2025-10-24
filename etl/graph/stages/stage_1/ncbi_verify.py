@@ -108,6 +108,116 @@ def verify_ncbi_taxid(taxon: Dict[str, Any], ncbi_db: sqlite3.Connection) -> Dic
     
     return result
 
+def complete_taxonomic_tree(taxa: List[Dict[str, Any]], ncbi_db: sqlite3.Connection, verbose: bool = False) -> List[Dict[str, Any]]:
+    """Complete the taxonomic tree by adding missing intermediate nodes from NCBI."""
+    # Create a set of existing taxon IDs
+    existing_ids = {taxon['id'] for taxon in taxa}
+    
+    # For each taxon, walk up the hierarchy and add missing nodes
+    all_taxa = taxa.copy()
+    added_taxa = set()
+    
+    for taxon in taxa:
+        current_id = taxon['id']
+        
+        # Walk up the hierarchy
+        while True:
+            parent_id = compute_parent_from_id(current_id)
+            if not parent_id:
+                break
+                
+            if parent_id not in existing_ids and parent_id not in added_taxa:
+                # Create missing parent node from NCBI
+                parent_taxon = create_parent_from_ncbi(parent_id, ncbi_db, verbose)
+                if parent_taxon:
+                    all_taxa.append(parent_taxon)
+                    added_taxa.add(parent_id)
+                    if verbose:
+                        print(f"Added missing parent: {parent_id}")
+            
+            current_id = parent_id
+    
+    return all_taxa
+
+def create_parent_from_ncbi(parent_id: str, ncbi_db: sqlite3.Connection, verbose: bool = False) -> Optional[Dict[str, Any]]:
+    """Create a parent taxon from NCBI data."""
+    segments = parent_id.split(':')
+    if len(segments) < 2:
+        return None
+    
+    kingdom = segments[1]
+    kingdom_name = {'p': 'Plantae', 'a': 'Animalia', 'f': 'Fungi'}.get(kingdom)
+    if not kingdom_name:
+        return None
+    
+    cursor = ncbi_db.cursor()
+    
+    if len(segments) == 2:
+        # Kingdom level
+        cursor.execute("""
+            SELECT taxid FROM ncbi_lineage 
+            WHERE kingdom = ? AND phylum IS NULL
+            LIMIT 1
+        """, (kingdom_name,))
+    elif len(segments) == 3:
+        # Genus level
+        genus = segments[2]
+        cursor.execute("""
+            SELECT taxid FROM ncbi_lineage 
+            WHERE kingdom = ? AND genus = ?
+            LIMIT 1
+        """, (kingdom_name, genus))
+    else:
+        # Higher level - would need more complex logic
+        return None
+    
+    result = cursor.fetchone()
+    if not result:
+        return None
+    
+    taxid = result[0]
+    
+    # Get lineage data
+    cursor.execute("""
+        SELECT kingdom, phylum, class, order_name, family, genus, species, lineage_json
+        FROM ncbi_lineage WHERE taxid = ?
+    """, (taxid,))
+    
+    lineage_row = cursor.fetchone()
+    if not lineage_row:
+        return None
+    
+    # Determine rank and display name
+    if len(segments) == 2:
+        rank = 'kingdom'
+        display_name = kingdom_name
+        latin_name = kingdom_name
+    elif len(segments) == 3:
+        rank = 'genus'
+        display_name = segments[2].title()
+        latin_name = segments[2]
+    else:
+        return None
+    
+    return {
+        'id': parent_id,
+        'rank': rank,
+        'display_name': display_name,
+        'latin_name': latin_name,
+        'aliases': [],
+        'ncbi_taxid': taxid,
+        'ncbi_lineage': {
+            'kingdom': lineage_row[0],
+            'phylum': lineage_row[1],
+            'class': lineage_row[2],
+            'order': lineage_row[3],
+            'family': lineage_row[4],
+            'genus': lineage_row[5],
+            'species': lineage_row[6]
+        },
+        'ncbi_lineage_json': lineage_row[7]
+    }
+
 def verify_taxa(in_dir: Path, tmp_dir: Path, ncbi_db_path: Path, verbose: bool = False) -> None:
     """Main verification function."""
     ensure_dir(tmp_dir)
@@ -134,16 +244,22 @@ def verify_taxa(in_dir: Path, tmp_dir: Path, ncbi_db_path: Path, verbose: bool =
             verified = verify_ncbi_taxid(taxon, ncbi_db)
             verified_taxa.append(verified)
         
-        # Write verified taxa
-        output_path = tmp_dir / "taxa_verified.jsonl"
-        write_jsonl(output_path, verified_taxa)
+        # Complete the taxonomic tree
+        if verbose:
+            print("Completing taxonomic tree...")
+        complete_taxa = complete_taxonomic_tree(verified_taxa, ncbi_db, verbose)
+        
+        # Write verified taxa to compiled directory (overwrites Stage 0 output)
+        output_path = tmp_dir.parent / "compiled" / "taxa.jsonl"
+        write_jsonl(output_path, complete_taxa)
         
         if verbose:
-            print(f"Verified {len(verified_taxa)} taxa, wrote to {output_path}")
+            print(f"Verified {len(verified_taxa)} original taxa, added {len(complete_taxa) - len(verified_taxa)} missing nodes")
+            print(f"Total: {len(complete_taxa)} taxa, wrote to {output_path}")
             
             # Print summary
-            with_ncbi = sum(1 for t in verified_taxa if t.get('ncbi_taxid'))
-            needs_refinement = sum(1 for t in verified_taxa if t.get('needs_refinement'))
+            with_ncbi = sum(1 for t in complete_taxa if t.get('ncbi_taxid'))
+            needs_refinement = sum(1 for t in complete_taxa if t.get('needs_refinement'))
             print(f"Summary: {with_ncbi} with NCBI taxid, {needs_refinement} need refinement")
     
     finally:

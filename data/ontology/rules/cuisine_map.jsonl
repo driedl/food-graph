@@ -1,10 +1,10 @@
-{"match":{"taxon_prefix":"tx:animalia:chordata:mammalia:artiodactyla:suidae:sus","parts":["part:belly"]},"cuisines":["American","British","German"]}
-{"match":{"taxon_prefix":"tx:animalia:chordata:actinopterygii:salmoniformes:salmo","parts":["part:fillet"]},"cuisines":["Nordic","Jewish"]}
-{"match":{"taxon_prefix":"tx:plantae:fabaceae:glycine:max","parts":["part:seed","part:tofu"]},"cuisines":["Chinese","Japanese","Korean","Indian"]}
-{"match":{"taxon_prefix":"tx:plantae:oleaceae:olea:europaea","parts":["part:expressed_oil"]},"cuisines":["Mediterranean","Middle Eastern"]}
-{"match":{"taxon_prefix":"tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos","parts":["part:milk","part:butter","part:cheese"]},"cuisines":["French","Italian","Swiss"]}
-{"match":{"taxon_prefix":"tx:plantae:poaceae:oryza","parts":["part:grain"]},"cuisines":["Chinese","Japanese","Korean","Indian","Thai"]}
-{"match":{"taxon_prefix":"tx:plantae:poaceae:triticum","parts":["part:grain"]},"cuisines":["European","American","Middle Eastern"]}
-{"match":{"taxon_prefix":"tx:plantae:solanaceae:solanum","parts":["part:fruit"]},"cuisines":["Italian","Mediterranean","American"]}
-{"match":{"taxon_prefix":"tx:animalia:chordata:actinopterygii:gadiformes:gadus","parts":["part:fillet"]},"cuisines":["Nordic","Portuguese","Spanish"]}
-{"match":{"taxon_prefix":"tx:plantae:brassicaceae:brassica","parts":["part:leaf","part:flower"]},"cuisines":["Chinese","Korean","German"]}
+{"match": {"taxon_prefix": "tx:animalia:chordata:mammalia:artiodactyla:suidae:sus", "parts": ["part:belly"]}, "cuisines": ["American", "British", "German"]}
+{"match": {"taxon_prefix": "tx:animalia:chordata:actinopterygii:salmoniformes:salmo", "parts": ["part:fillet"]}, "cuisines": ["Nordic", "Jewish"]}
+{"match": {"taxon_prefix": "tx:plantae:fabaceae:glycine:max", "parts": ["part:seed", "part:tofu"]}, "cuisines": ["Chinese", "Japanese", "Korean", "Indian"]}
+{"match": {"taxon_prefix": "tx:plantae:oleaceae:olea:europaea", "parts": ["part:expressed_oil"]}, "cuisines": ["Mediterranean", "Middle Eastern"]}
+{"match": {"taxon_prefix": "tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos", "parts": ["part:milk", "part:butter", "part:cheese"]}, "cuisines": ["French", "Italian", "Swiss"]}
+{"match": {"taxon_prefix": "tx:plantae:poaceae:oryza", "parts": ["part:grain"]}, "cuisines": ["Chinese", "Japanese", "Korean", "Indian", "Thai"]}
+{"match": {"taxon_prefix": "tx:plantae:poaceae:triticum", "parts": ["part:grain"]}, "cuisines": ["European", "American", "Middle Eastern"]}
+{"match": {"taxon_prefix": "tx:plantae:solanaceae:solanum", "parts": ["part:fruit"]}, "cuisines": ["Italian", "Mediterranean", "American"]}
+{"match": {"taxon_prefix": "tx:animalia:chordata:actinopterygii:gadiformes:gadus", "parts": ["part:fillet"]}, "cuisines": ["Nordic", "Portuguese", "Spanish"]}
+{"match": {"taxon_prefix": "tx:plantae:brassicaceae:brassica", "parts": ["part:leaf", "part:flower"]}, "cuisines": ["Chinese", "Korean", "German"]}

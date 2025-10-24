@@ -1,0 +1,42 @@
+{
+    "version": "1.0",
+    "description": "Source quality tiers for nutrient data rollup weighting",
+    "tiers": {
+        "fdc_foundation": {
+            "tier": 1,
+            "weight": 1.0,
+            "description": "USDA FoodData Central Foundation foods - high quality analytical data",
+            "per_method_modifiers": {
+                "Analytical": 1.0,
+                "Calculated": 0.8,
+                "Assumed zero": 0.5,
+                "Imputed": 0.3
+            }
+        },
+        "fdc_sr_legacy": {
+            "tier": 2,
+            "weight": 0.9,
+            "description": "USDA SR Legacy - historical analytical data"
+        },
+        "canadian_nf": {
+            "tier": 1,
+            "weight": 1.0,
+            "description": "Canadian Nutrient File - high quality analytical data"
+        },
+        "euro_food": {
+            "tier": 1,
+            "weight": 1.0,
+            "description": "European food composition databases"
+        },
+        "fdc_branded": {
+            "tier": 3,
+            "weight": 0.6,
+            "description": "FDC Branded foods - label data, lower confidence"
+        }
+    },
+    "default_tier": {
+        "tier": 4,
+        "weight": 0.5,
+        "description": "Unknown source - lowest weight"
+    }
+}

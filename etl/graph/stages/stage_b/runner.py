@@ -13,7 +13,7 @@ def preflight(in_dir: Path, build_dir: Path) -> None:
         raise FileNotFoundError(f"missing {tcanon} — run Stage A first")
     compiled_taxa = build_dir / "compiled" / "taxa.jsonl"
     if not compiled_taxa.exists():
-        raise FileNotFoundError(f"missing {compiled_taxa} — run Stage 0 first")
+        raise FileNotFoundError(f"missing {compiled_taxa} — run Stage 1 first")
 
 def run(in_dir: Path, build_dir: Path, verbose: bool = False) -> int:
     tmp_dir = build_dir / "tmp"

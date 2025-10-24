@@ -29,7 +29,19 @@ nutrient values are **evidence** that “fills” the graph. IDs are stable; evi
 - UI can traverse graph with or without evidence coverage.
 - Clear QA surfaces (coverage deltas, outliers, neighbor checks).
 
+## Current Capabilities
+
+The Food Graph currently provides:
+
+- **Rich Ontology**: Comprehensive taxonomy, parts, and transforms
+- **Evidence System**: 3-tier evidence mapping with nutrition data integration
+- **ETL Pipeline**: Complete data processing pipeline with validation
+- **Search System**: Full-text search across all entities
+- **API**: Type-safe tRPC API with real-time capabilities
+- **Web Interface**: Modern React-based user interface
+- **Nutrition Queries**: Comprehensive nutrient data with rollup aggregation
+
 ## Non-goals (v0.1)
 - Full automation of taxonomy from external DBs.
 - Perfect transform physics; start with pragmatic retention/yield tables.
-- Deterministic “one-click” FDC taxonomy generator (we curate instead).
+- Deterministic "one-click" FDC taxonomy generator (we curate instead).

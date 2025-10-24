@@ -1,217 +1,180 @@
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:mammalia"]}
-{"part":"part:belly","applies_to":["tx:animalia:chordata:mammalia:artiodactyla:suidae:sus:scrofa_domesticus"]}
-{"part":"part:loin","applies_to":["tx:animalia:chordata:mammalia:artiodactyla:suidae:sus:scrofa_domesticus","tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus"]}
-{"part":"part:brisket","applies_to":["tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus"]}
-{"part":"part:round","applies_to":["tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus"]}
-{"part":"part:liver","applies_to":["tx:animalia:chordata:mammalia","tx:animalia:chordata:aves"]}
-{"part":"part:fat:leaf","applies_to":["tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus","tx:animalia:chordata:mammalia:artiodactyla:suidae:sus:scrofa_domesticus"]}
-{"part":"part:milk","applies_to":["tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus"]}
-{"part":"part:breast","applies_to":["tx:animalia:chordata:aves:galliformes:phasianidae:gallus:gallus_domesticus"]}
-{"part":"part:fruiting_body","applies_to":["tx:fungi"]}
-{"part":"part:cap","applies_to":["tx:fungi:"]}
-{"part":"part:stipe","applies_to":["tx:fungi:"]}
-
-{"part":"part:fillet","applies_to":["tx:animalia:chordata:actinopterygii"]}
-{"part":"part:liver","applies_to":["tx:animalia:chordata:actinopterygii","tx:animalia:chordata:mammalia"]}
-{"part":"part:roe","applies_to":["tx:animalia:chordata:actinopterygii"]}
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:mammalia","tx:animalia:chordata:aves","tx:animalia:chordata:actinopterygii"]}
-
-{"part":"part:egg","applies_to":["tx:animalia:chordata:aves"]}
-{"part":"part:egg:white","applies_to":["tx:animalia:chordata:aves"]}
-{"part":"part:egg:yolk","applies_to":["tx:animalia:chordata:aves"]}
-
-{"part":"part:leaf","applies_to":["tx:plantae:eudicots:brassicales","tx:plantae:eudicots:asterales","tx:plantae:eudicots:caryophyllales"]}
-{"part":"part:stem","applies_to":["tx:plantae"]}
-{"part":"part:root","applies_to":["tx:plantae:eudicots:apiales","tx:plantae:eudicots:caryophyllales"]}
-{"part":"part:tuber","applies_to":["tx:plantae:eudicots:solanales:solanum:tuberosum"]}
-{"part":"part:bulb","applies_to":["tx:plantae:monocots:asparagales:allium:cepa"]}
-{"part":"part:rhizome","applies_to":["tx:plantae:monocots:zingiberales"]}
-{"part":"part:fruit","applies_to":["tx:plantae"]}
-
-{"part":"part:seed","applies_to":["tx:plantae:eudicots:fabales","tx:plantae:monocots:poales","tx:plantae:eudicots:caryophyllales","tx:plantae:eudicots:lamiales","tx:plantae:eudicots:piperales","tx:plantae:gymnosperms:pinales","tx:plantae:eudicots:fagales","tx:plantae:eudicots:sapindales"]}
-{"part":"part:kernel","applies_to":["tx:plantae:eudicots:fagales","tx:plantae:eudicots:sapindales","tx:plantae:eudicots:proteales","tx:plantae:eudicots:fagales"]}
-{"part":"part:flavedo","applies_to":["tx:plantae:eudicots:sapindales:citrus"]}
-{"part":"part:pith","applies_to":["tx:plantae:eudicots:sapindales:citrus"]}
-
-{"part":"part:bran","applies_to":["tx:plantae:monocots:poales"]}
-{"part":"part:germ","applies_to":["tx:plantae:monocots:poales"]}
-{"part":"part:endosperm","applies_to":["tx:plantae:monocots:poales"]}
-{"part":"part:hull","applies_to":["tx:plantae:monocots:poales"]}
-
-{"part":"part:expressed_oil","applies_to":["tx:plantae:eudicots:lamiales:olea:europaea","tx:plantae:eudicots:lamiales:sesamum:indicum","tx:plantae:eudicots:malpighiales:linum:usitatissimum","tx:plantae:eudicots:asterales:helianthus:annuus","tx:plantae:eudicots:brassicales:brassica:napus","tx:plantae:eudicots:proteales:macadamia:integrifolia","tx:plantae:eudicots:sapindales:pistacia:vera","tx:plantae:eudicots:fagales:juglans:regia","tx:plantae:eudicots:fagales:carya:illinoinensis"]}
-{"part":"part:expressed_juice","applies_to":["tx:plantae:eudicots:sapindales:citrus","tx:plantae:eudicots:vitales:vitis:vinifera","tx:plantae:eudicots:solanales:solanum:lycopersicum"]}
-{"part":"part:milk","applies_to":["tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus","tx:animalia:chordata:mammalia:artiodactyla:bovidae:ovis:aries"]}
-{"part":"part:cream","applies_to":["tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus","tx:animalia:chordata:mammalia:artiodactyla:bovidae:ovis:aries"]}
-{"part":"part:curd","applies_to":["tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus","tx:animalia:chordata:mammalia:artiodactyla:bovidae:ovis:aries"]}
-{"part":"part:whey","applies_to":["tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus","tx:animalia:chordata:mammalia:artiodactyla:bovidae:ovis:aries"]}
-{"part":"part:butter","applies_to":["tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus","tx:animalia:chordata:mammalia:artiodactyla:bovidae:ovis:aries"]}
-{"part":"part:buttermilk","applies_to":["tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus","tx:animalia:chordata:mammalia:artiodactyla:bovidae:ovis:aries"]}
-
-{"part":"part:hull","applies_to":["tx:plantae:eudicots:fabales"]}
-
-{"part":"part:milk","applies_to":["tx:animalia:chordata:mammalia:artiodactyla:bovidae:capra:hircus"],"exclude":[]}
-{"part":"part:milk","applies_to":["tx:animalia:chordata:mammalia:artiodactyla:bovidae:bubalus:bubalis"],"exclude":[]}
-{"part":"part:milk","applies_to":["tx:animalia:chordata:mammalia:artiodactyla:camelidae:camelus:dromedarius"],"exclude":[]}
-{"part":"part:milk","applies_to":["tx:animalia:chordata:mammalia:artiodactyla:camelidae:camelus:bactrianus"],"exclude":[]}
-{"part":"part:milk","applies_to":["tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:grunniens"],"exclude":[]}
-{"part":"part:milk","applies_to":["tx:animalia:chordata:mammalia:perissodactyla:equidae:equus:caballus"],"exclude":[]}
-{"part":"part:milk","applies_to":["tx:animalia:chordata:mammalia:artiodactyla:cervidae:rangifer:tarandus"],"exclude":[]}
-
-{"part":"part:egg","applies_to":["tx:animalia:chordata:aves:anseriformes:anatidae:anas:platyrhynchos_domesticus"],"exclude":[]}
-{"part":"part:egg","applies_to":["tx:animalia:chordata:aves:anseriformes:anatidae:anser:anser_domesticus"],"exclude":[]}
-{"part":"part:egg","applies_to":["tx:animalia:chordata:aves:galliformes:meleagrididae:meleagris:gallopavo_domesticus"],"exclude":[]}
-{"part":"part:egg","applies_to":["tx:animalia:chordata:aves:galliformes:phasianidae:coturnix:japonica"],"exclude":[]}
-
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:mammalia:artiodactyla:bovidae:capra:hircus"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:aves:galliformes:meleagrididae:meleagris:gallopavo_domesticus"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:aves:anseriformes:anatidae:anas:platyrhynchos_domesticus"],"exclude":[]}
-
-{"part":"part:egg","applies_to":["tx:animalia:chordata:aves:struthioniformes:struthionidae:struthio:camelus"],"exclude":[]}
-{"part":"part:egg","applies_to":["tx:animalia:chordata:aves:casuariiformes:dromaiidae:dromaius:novaehollandiae"],"exclude":[]}
-{"part":"part:egg","applies_to":["tx:animalia:chordata:aves:rheiformes:rheidae:rhea:americana"],"exclude":[]}
-{"part":"part:egg","applies_to":["tx:animalia:chordata:aves:galliformes:phasianidae:phasianus:colchicus"],"exclude":[]}
-{"part":"part:egg","applies_to":["tx:animalia:chordata:aves:guineafowliformes:numididae:numida:meleagris"],"exclude":[]}
-{"part":"part:egg","applies_to":["tx:animalia:chordata:aves:galliformes:phasianidae:pavo:cristatus"],"exclude":[]}
-{"part":"part:egg","applies_to":["tx:animalia:chordata:aves:columbiformes:columbidae:columba:livia_domestica"],"exclude":[]}
-{"part":"part:egg","applies_to":["tx:animalia:chordata:aves:anseriformes:anatidae:cairina:moschata_domestica"],"exclude":[]}
-
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:aves:struthioniformes:struthionidae:struthio:camelus"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:aves:casuariiformes:dromaiidae:dromaius:novaehollandiae"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:aves:rheiformes:rheidae:rhea:americana"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:aves:galliformes:phasianidae:phasianus:colchicus"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:aves:guineafowliformes:numididae:numida:meleagris"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:aves:galliformes:phasianidae:pavo:cristatus"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:aves:columbiformes:columbidae:columba:livia_domestica"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:aves:anseriformes:anatidae:cairina:moschata_domestica"],"exclude":[]}
-
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:mammalia:lagomorpha:leporidae:oryctolagus:cuniculus"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:mammalia:lagomorpha:leporidae:lepus:europaeus"],"exclude":[]}
-
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:mammalia:artiodactyla:cervidae:cervus:elaphus"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:mammalia:artiodactyla:cervidae:cervus:canadensis"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:mammalia:artiodactyla:cervidae:alces:alces"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:mammalia:artiodactyla:cervidae:capreolus:capreolus"],"exclude":[]}
-
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:mammalia:perissodactyla:equidae:equus:caballus"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:mammalia:perissodactyla:equidae:equus:asinus"],"exclude":[]}
-
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:grunniens"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:mammalia:artiodactyla:bovidae:bubalus:bubalis"],"exclude":[]}
-
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:mammalia:artiodactyla:cervidae:rangifer:tarandus"],"exclude":[]}
-{"part":"part:milk","applies_to":["tx:animalia:chordata:mammalia:perissodactyla:equidae:equus:asinus"],"exclude":[]}
-
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae:salmo:salar"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae:oncorhynchus:mykiss"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae:oncorhynchus:kisutch"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae:oncorhynchus:tshawytscha"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae:oncorhynchus:nerka"],"exclude":[]}
-
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:actinopterygii:scombriformes:scombridae:thunnus:albacares"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:actinopterygii:scombriformes:scombridae:thunnus:obesus"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:actinopterygii:scombriformes:scombridae:thunnus:thynnus"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:actinopterygii:scombriformes:scombridae:katsuwonus:pelamis"],"exclude":[]}
-
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:actinopterygii:gadiformes:gadidae:gadus:morhua"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:actinopterygii:gadiformes:gadidae:gadus:chalcogrammus"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:actinopterygii:gadiformes:gadidae:melanogrammus:aeglefinus"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:actinopterygii:gadiformes:merlucciidae:merluccius:productus"],"exclude":[]}
-
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:actinopterygii:clupeiformes:clupeidae:clupea:harengus"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:actinopterygii:clupeiformes:engraulidae:engraulis:encrasicolus"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:actinopterygii:clupeiformes:clupeidae:sardina:pilchardus"],"exclude":[]}
-
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:actinopterygii:scombriformes:scombridae:scomber:scombrus"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:actinopterygii:carangiformes:xiphiidae:xiphias:gladius"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:chordata:actinopterygii:pleuronectiformes:hippoglossidae:hippoglossus:hippoglossus"],"exclude":[]}
-
-{"part":"part:muscle","applies_to":["tx:animalia:arthropoda:malacostraca:decapoda:penaeidae:litopenaeus:vannamei"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:arthropoda:malacostraca:decapoda:penaeidae:penaeus:monodon"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:arthropoda:malacostraca:decapoda:nephropidae:homarus:americanus"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:arthropoda:malacostraca:decapoda:palinuridae:panulirus:argus"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:arthropoda:malacostraca:decapoda:portunidae:callinectes:sapidus"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:arthropoda:malacostraca:decapoda:canceridae:cancer:pagurus"],"exclude":[]}
-
-{"part":"part:muscle","applies_to":["tx:animalia:mollusca:bivalvia:ostreida:ostreidae:crassostrea:gigas"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:mollusca:bivalvia:ostreida:ostreidae:crassostrea:virginica"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:mollusca:bivalvia:ostreida:ostreidae:ostrea:edulis"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:mollusca:bivalvia:mytilida:mytilidae:mytilus:edulis"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:mollusca:bivalvia:venerida:veneridae:ruditapes:philippinarum"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:mollusca:bivalvia:venerida:veneridae:mercenaria:mercenaria"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:mollusca:bivalvia:pectinida:pectinidae:placopecten:magellanicus"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:mollusca:bivalvia:pectinida:pectinidae:pecten:maximus"],"exclude":[]}
-
-{"part":"part:muscle","applies_to":["tx:animalia:mollusca:cephalopoda:teuthida:loliginidae:doryteuthis:opalescens"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:mollusca:cephalopoda:sepiida:sepiidae:sepia:officinalis"],"exclude":[]}
-{"part":"part:muscle","applies_to":["tx:animalia:mollusca:cephalopoda:octopoda:octopodidae:octopus:vulgaris"],"exclude":[]}
-
-{"part":"part:roe","applies_to":["tx:animalia:chordata:actinopterygii:acipenseriformes:acipenseridae:acipenser:baerii"],"exclude":[]}
-{"part":"part:roe","applies_to":["tx:animalia:chordata:actinopterygii:acipenseriformes:acipenseridae:acipenser:gueldenstaedtii"],"exclude":[]}
-{"part":"part:roe","applies_to":["tx:animalia:chordata:actinopterygii:acipenseriformes:acipenseridae:acipenser:transmontanus"],"exclude":[]}
-{"part":"part:roe","applies_to":["tx:animalia:chordata:actinopterygii:acipenseriformes:acipenseridae:huso:huso"],"exclude":[]}
-{"part":"part:roe","applies_to":["tx:animalia:chordata:actinopterygii:polyodontiformes:polyodontidae:polyodon:spathula"],"exclude":[]}
-{"part":"part:roe","applies_to":["tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae:salmo:salar"],"exclude":[]}
-{"part":"part:roe","applies_to":["tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae:oncorhynchus:keta"],"exclude":[]}
-
-{"part":"part:tuber","applies_to":["tx:plantae:solanaceae:solanum:tuberosum:"],"exclude":[]}
-{"part":"part:root","applies_to":["tx:plantae:convolvulaceae:ipomoea:batatas:"],"exclude":[]}
-{"part":"part:root","applies_to":["tx:plantae:euphorbiaceae:manihot:esculenta:"],"exclude":[]}
-{"part":"part:tuber","applies_to":["tx:plantae:dioscoreaceae:dioscorea:alata:"],"exclude":[]}
-{"part":"part:tuber","applies_to":["tx:plantae:dioscoreaceae:dioscorea:rotundata:"],"exclude":[]}
-
-{"part":"part:root","applies_to":["tx:plantae:apiaceae:daucus:carota:"],"exclude":[]}
-{"part":"part:root","applies_to":["tx:plantae:amaranthaceae:beta:vulgaris:"],"exclude":[]}
-{"part":"part:root","applies_to":["tx:plantae:brassicaceae:raphanus:sativus:"],"exclude":[]}
-{"part":"part:root","applies_to":["tx:plantae:apiaceae:pastinaca:sativa:"],"exclude":[]}
-{"part":"part:root","applies_to":["tx:plantae:brassicaceae:brassica:rapa:rapa"],"exclude":[]}
-{"part":"part:root","applies_to":["tx:plantae:brassicaceae:armoracia:rusticana"],"exclude":[]}
-
-{"part":"part:bulb","applies_to":["tx:plantae:amaryllidaceae:allium:cepa:"],"exclude":[]}
-{"part":"part:bulb","applies_to":["tx:plantae:amaryllidaceae:allium:sativum:"],"exclude":[]}
-
-{"part":"part:stem","applies_to":["tx:plantae:asparagaceae:asparagus:officinalis:"],"exclude":[]}
-{"part":"part:stem","applies_to":["tx:plantae:apiaceae:apium:graveolens:dulce"],"exclude":[]}
-
-{"part":"part:leaf","applies_to":["tx:plantae:asteraceae:lactuca:sativa:"],"exclude":[]}
-{"part":"part:leaf","applies_to":["tx:plantae:amaranthaceae:spinacia:oleracea:"],"exclude":[]}
-{"part":"part:leaf","applies_to":["tx:plantae:brassicaceae:brassica:oleracea:sabellica"],"exclude":[]}
-{"part":"part:leaf","applies_to":["tx:plantae:brassicaceae:brassica:oleracea:capitata"],"exclude":[]}
-{"part":"part:leaf","applies_to":["tx:plantae:amaranthaceae:beta:vulgaris:cicla"],"exclude":[]}
-
-{"part":"part:flower","applies_to":["tx:plantae:eudicots:brassicales:brassica:oleracea:italica"],"exclude":[]}
-{"part":"part:flower","applies_to":["tx:plantae:eudicots:brassicales:brassica:oleracea:botrytis"],"exclude":[]}
-{"part":"part:flower","applies_to":["tx:plantae:asteraceae:cynara:cardunculus:scolymus"],"exclude":[]}
-
-{"part":"part:fruit","applies_to":["tx:plantae:solanaceae:solanum:lycopersicum:"],"exclude":[]}
-{"part":"part:fruit","applies_to":["tx:plantae:solanaceae:capsicum:annuum:"],"exclude":[]}
-{"part":"part:fruit","applies_to":["tx:plantae:solanaceae:solanum:melongena:"],"exclude":[]}
-{"part":"part:fruit","applies_to":["tx:plantae:malvaceae:abelmoschus:esculentus:"],"exclude":[]}
-{"part":"part:fruit","applies_to":["tx:plantae:cucurbitaceae:cucumis:sativus:"],"exclude":[]}
-{"part":"part:fruit","applies_to":["tx:plantae:cucurbitaceae:cucurbita:pepo:"],"exclude":[]}
-
-{"part":"part:grain","applies_to":["tx:plantae:poaceae:zea:mays:"],"exclude":[]}
-{"part":"part:grain","applies_to":["tx:plantae:poaceae:oryza:sativa:"],"exclude":[]}
-{"part":"part:grain","applies_to":["tx:plantae:poaceae:triticum:aestivum:"],"exclude":[]}
-{"part":"part:grain","applies_to":["tx:plantae:poaceae:hordeum:vulgare:"],"exclude":[]}
-{"part":"part:grain","applies_to":["tx:plantae:poaceae:secale:cereale:"],"exclude":[]}
-{"part":"part:grain","applies_to":["tx:plantae:poaceae:avena:sativa:"],"exclude":[]}
-
-{"part":"part:seed","applies_to":["tx:plantae:fabaceae:glycine:max:"],"exclude":[]}
-{"part":"part:seed","applies_to":["tx:plantae:fabaceae:phaseolus:vulgaris:"],"exclude":[]}
-{"part":"part:seed","applies_to":["tx:plantae:fabaceae:cicer:arietinum:"],"exclude":[]}
-{"part":"part:seed","applies_to":["tx:plantae:fabaceae:lens:culinaris:"],"exclude":[]}
-{"part":"part:seed","applies_to":["tx:plantae:fabaceae:pisum:sativum:"],"exclude":[]}
-
-{"part":"part:seed","applies_to":["tx:plantae:juglandaceae:juglans:regia:"],"exclude":[]}
-{"part":"part:seed","applies_to":["tx:plantae:betulaceae:corylus:avellana:"],"exclude":[]}
-{"part":"part:seed","applies_to":["tx:plantae:rosaceae:prunus:dulcis:"],"exclude":[]}
-{"part":"part:seed","applies_to":["tx:plantae:juglandaceae:carya:illinoinensis:"],"exclude":[]}
-{"part":"part:seed","applies_to":["tx:plantae:lecythidaceae:bertholletia:excelsa:"],"exclude":[]}
-{"part":"part:seed","applies_to":["tx:plantae:anacardiaceae:anacardium:occidentale:"],"exclude":[]}
-{"part":"part:seed","applies_to":["tx:plantae:anacardiaceae:pistacia:vera:"],"exclude":[]}
-{"part":"part:seed","applies_to":["tx:plantae:fabaceae:arachis:hypogaea:"],"exclude":[]}
-
-{"part":"part:plant_milk","applies_to":["tx:plantae:fabaceae:glycine:max:","tx:plantae:rosaceae:prunus:dulcis:","tx:plantae:poaceae:avena:sativa:","tx:plantae:poaceae:oryza:sativa:"],"exclude":[]}
-{"part":"part:tofu","applies_to":["tx:plantae:fabaceae:glycine:max:"],"exclude":[]}
-{"part":"part:okara","applies_to":["tx:plantae:fabaceae:glycine:max:","tx:plantae:rosaceae:prunus:dulcis:","tx:plantae:poaceae:avena:sativa:"],"exclude":[]}
-{"part":"part:tofu_serum","applies_to":["tx:plantae:fabaceae:glycine:max:"],"exclude":[]}
+{"part": "part:muscle", "applies_to": ["tx:a:mammalia"]}
+{"part": "part:belly", "applies_to": ["tx:a:scrofa_domesticus"]}
+{"part": "part:loin", "applies_to": ["tx:a:scrofa_domesticus", "tx:a:taurus"]}
+{"part": "part:brisket", "applies_to": ["tx:a:taurus"]}
+{"part": "part:round", "applies_to": ["tx:a:taurus"]}
+{"part": "part:liver", "applies_to": ["tx:a:mammalia", "tx:a:aves"]}
+{"part": "part:fat:leaf", "applies_to": ["tx:a:taurus", "tx:a:scrofa_domesticus"]}
+{"part": "part:milk", "applies_to": ["tx:a:taurus"]}
+{"part": "part:breast", "applies_to": ["tx:a:gallus_domesticus"]}
+{"part": "part:fruiting_body", "applies_to": ["tx:fungi"]}
+{"part": "part:cap", "applies_to": ["tx:fungi:"]}
+{"part": "part:stipe", "applies_to": ["tx:fungi:"]}
+{"part": "part:fillet", "applies_to": ["tx:a:actinopterygii"]}
+{"part": "part:liver", "applies_to": ["tx:a:actinopterygii", "tx:a:mammalia"]}
+{"part": "part:roe", "applies_to": ["tx:a:actinopterygii"]}
+{"part": "part:muscle", "applies_to": ["tx:a:mammalia", "tx:a:aves", "tx:a:actinopterygii"]}
+{"part": "part:egg", "applies_to": ["tx:a:aves"]}
+{"part": "part:egg:white", "applies_to": ["tx:a:aves"]}
+{"part": "part:egg:yolk", "applies_to": ["tx:a:aves"]}
+{"part": "part:leaf", "applies_to": ["tx:p:brassicales", "tx:p:asterales", "tx:p:caryophyllales"]}
+{"part": "part:stem", "applies_to": ["tx:plantae"]}
+{"part": "part:root", "applies_to": ["tx:p:apiales", "tx:p:caryophyllales"]}
+{"part": "part:tuber", "applies_to": ["tx:p:solanum:tuberosum"]}
+{"part": "part:bulb", "applies_to": ["tx:p:allium:cepa"]}
+{"part": "part:rhizome", "applies_to": ["tx:p:zingiberales"]}
+{"part": "part:fruit", "applies_to": ["tx:plantae"]}
+{"part": "part:seed", "applies_to": ["tx:p:fabales", "tx:p:poales", "tx:p:caryophyllales", "tx:p:lamiales", "tx:p:piperales", "tx:p:pinales", "tx:p:fagales", "tx:p:sapindales"]}
+{"part": "part:kernel", "applies_to": ["tx:p:fagales", "tx:p:sapindales", "tx:p:proteales", "tx:p:fagales"]}
+{"part": "part:flavedo", "applies_to": ["tx:p:citrus"]}
+{"part": "part:pith", "applies_to": ["tx:p:citrus"]}
+{"part": "part:bran", "applies_to": ["tx:p:poales"]}
+{"part": "part:germ", "applies_to": ["tx:p:poales"]}
+{"part": "part:endosperm", "applies_to": ["tx:p:poales"]}
+{"part": "part:hull", "applies_to": ["tx:p:poales"]}
+{"part": "part:expressed_oil", "applies_to": ["tx:p:olea:europaea", "tx:p:sesamum:indicum", "tx:p:linum:usitatissimum", "tx:p:helianthus:annuus", "tx:p:brassica:napus", "tx:p:macadamia:integrifolia", "tx:p:pistacia:vera", "tx:p:juglans:regia", "tx:p:carya:illinoinensis"]}
+{"part": "part:expressed_juice", "applies_to": ["tx:p:citrus", "tx:p:vitis:vinifera", "tx:p:solanum:lycopersicum"]}
+{"part": "part:milk", "applies_to": ["tx:a:taurus", "tx:a:aries"]}
+{"part": "part:cream", "applies_to": ["tx:a:taurus", "tx:a:aries"]}
+{"part": "part:curd", "applies_to": ["tx:a:taurus", "tx:a:aries"]}
+{"part": "part:whey", "applies_to": ["tx:a:taurus", "tx:a:aries"]}
+{"part": "part:butter", "applies_to": ["tx:a:taurus", "tx:a:aries"]}
+{"part": "part:buttermilk", "applies_to": ["tx:a:taurus", "tx:a:aries"]}
+{"part": "part:hull", "applies_to": ["tx:p:fabales"]}
+{"part": "part:milk", "applies_to": ["tx:a:hircus"], "exclude": []}
+{"part": "part:milk", "applies_to": ["tx:a:bubalis"], "exclude": []}
+{"part": "part:milk", "applies_to": ["tx:a:dromedarius"], "exclude": []}
+{"part": "part:milk", "applies_to": ["tx:a:bactrianus"], "exclude": []}
+{"part": "part:milk", "applies_to": ["tx:a:grunniens"], "exclude": []}
+{"part": "part:milk", "applies_to": ["tx:a:caballus"], "exclude": []}
+{"part": "part:milk", "applies_to": ["tx:a:tarandus"], "exclude": []}
+{"part": "part:egg", "applies_to": ["tx:a:platyrhynchos_domesticus"], "exclude": []}
+{"part": "part:egg", "applies_to": ["tx:a:anser_domesticus"], "exclude": []}
+{"part": "part:egg", "applies_to": ["tx:a:gallopavo_domesticus"], "exclude": []}
+{"part": "part:egg", "applies_to": ["tx:a:japonica"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:hircus"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:gallopavo_domesticus"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:platyrhynchos_domesticus"], "exclude": []}
+{"part": "part:egg", "applies_to": ["tx:a:camelus"], "exclude": []}
+{"part": "part:egg", "applies_to": ["tx:a:novaehollandiae"], "exclude": []}
+{"part": "part:egg", "applies_to": ["tx:a:americana"], "exclude": []}
+{"part": "part:egg", "applies_to": ["tx:a:colchicus"], "exclude": []}
+{"part": "part:egg", "applies_to": ["tx:a:meleagris"], "exclude": []}
+{"part": "part:egg", "applies_to": ["tx:a:cristatus"], "exclude": []}
+{"part": "part:egg", "applies_to": ["tx:a:livia_domestica"], "exclude": []}
+{"part": "part:egg", "applies_to": ["tx:a:moschata_domestica"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:camelus"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:novaehollandiae"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:americana"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:colchicus"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:meleagris"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:cristatus"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:livia_domestica"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:moschata_domestica"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:cuniculus"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:europaeus"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:elaphus"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:canadensis"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:alces"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:capreolus"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:caballus"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:asinus"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:grunniens"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:bubalis"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:tarandus"], "exclude": []}
+{"part": "part:milk", "applies_to": ["tx:a:asinus"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:salar"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:mykiss"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:kisutch"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:tshawytscha"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:nerka"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:albacares"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:obesus"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:thynnus"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:pelamis"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:morhua"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:chalcogrammus"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:aeglefinus"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:productus"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:harengus"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:encrasicolus"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:pilchardus"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:scombrus"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:gladius"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:hippoglossus"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:vannamei"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:monodon"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:americanus"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:argus"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:sapidus"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:pagurus"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:gigas"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:virginica"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:edulis"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:edulis"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:philippinarum"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:mercenaria"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:magellanicus"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:maximus"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:opalescens"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:officinalis"], "exclude": []}
+{"part": "part:muscle", "applies_to": ["tx:a:vulgaris"], "exclude": []}
+{"part": "part:roe", "applies_to": ["tx:a:baerii"], "exclude": []}
+{"part": "part:roe", "applies_to": ["tx:a:gueldenstaedtii"], "exclude": []}
+{"part": "part:roe", "applies_to": ["tx:a:transmontanus"], "exclude": []}
+{"part": "part:roe", "applies_to": ["tx:a:huso"], "exclude": []}
+{"part": "part:roe", "applies_to": ["tx:a:spathula"], "exclude": []}
+{"part": "part:roe", "applies_to": ["tx:a:salar"], "exclude": []}
+{"part": "part:roe", "applies_to": ["tx:a:keta"], "exclude": []}
+{"part": "part:tuber", "applies_to": ["tx:p:tuberosum:"], "exclude": []}
+{"part": "part:root", "applies_to": ["tx:p:batatas:"], "exclude": []}
+{"part": "part:root", "applies_to": ["tx:p:esculenta:"], "exclude": []}
+{"part": "part:tuber", "applies_to": ["tx:p:alata:"], "exclude": []}
+{"part": "part:tuber", "applies_to": ["tx:p:rotundata:"], "exclude": []}
+{"part": "part:root", "applies_to": ["tx:p:carota:"], "exclude": []}
+{"part": "part:root", "applies_to": ["tx:p:vulgaris:"], "exclude": []}
+{"part": "part:root", "applies_to": ["tx:p:sativus:"], "exclude": []}
+{"part": "part:root", "applies_to": ["tx:p:sativa:"], "exclude": []}
+{"part": "part:root", "applies_to": ["tx:p:brassica:rapa"], "exclude": []}
+{"part": "part:root", "applies_to": ["tx:p:rusticana"], "exclude": []}
+{"part": "part:bulb", "applies_to": ["tx:p:cepa:"], "exclude": []}
+{"part": "part:bulb", "applies_to": ["tx:p:sativum:"], "exclude": []}
+{"part": "part:stem", "applies_to": ["tx:p:officinalis:"], "exclude": []}
+{"part": "part:stem", "applies_to": ["tx:p:dulce"], "exclude": []}
+{"part": "part:leaf", "applies_to": ["tx:p:sativa:"], "exclude": []}
+{"part": "part:leaf", "applies_to": ["tx:p:oleracea:"], "exclude": []}
+{"part": "part:leaf", "applies_to": ["tx:p:brassica:oleracea:sabellica"], "exclude": []}
+{"part": "part:leaf", "applies_to": ["tx:p:capitata"], "exclude": []}
+{"part": "part:leaf", "applies_to": ["tx:p:cicla"], "exclude": []}
+{"part": "part:flower", "applies_to": ["tx:p:brassica:oleracea:italica"], "exclude": []}
+{"part": "part:flower", "applies_to": ["tx:p:brassica:oleracea:botrytis"], "exclude": []}
+{"part": "part:flower", "applies_to": ["tx:p:scolymus"], "exclude": []}
+{"part": "part:fruit", "applies_to": ["tx:p:lycopersicum:"], "exclude": []}
+{"part": "part:fruit", "applies_to": ["tx:p:annuum:"], "exclude": []}
+{"part": "part:fruit", "applies_to": ["tx:p:melongena:"], "exclude": []}
+{"part": "part:fruit", "applies_to": ["tx:p:esculentus:"], "exclude": []}
+{"part": "part:fruit", "applies_to": ["tx:p:sativus:"], "exclude": []}
+{"part": "part:fruit", "applies_to": ["tx:p:pepo:"], "exclude": []}
+{"part": "part:grain", "applies_to": ["tx:p:mays:"], "exclude": []}
+{"part": "part:grain", "applies_to": ["tx:p:sativa:"], "exclude": []}
+{"part": "part:grain", "applies_to": ["tx:p:aestivum:"], "exclude": []}
+{"part": "part:grain", "applies_to": ["tx:p:vulgare:"], "exclude": []}
+{"part": "part:grain", "applies_to": ["tx:p:cereale:"], "exclude": []}
+{"part": "part:grain", "applies_to": ["tx:p:sativa:"], "exclude": []}
+{"part": "part:seed", "applies_to": ["tx:p:max:"], "exclude": []}
+{"part": "part:seed", "applies_to": ["tx:p:vulgaris:"], "exclude": []}
+{"part": "part:seed", "applies_to": ["tx:p:arietinum:"], "exclude": []}
+{"part": "part:seed", "applies_to": ["tx:p:culinaris:"], "exclude": []}
+{"part": "part:seed", "applies_to": ["tx:p:sativum:"], "exclude": []}
+{"part": "part:seed", "applies_to": ["tx:p:regia:"], "exclude": []}
+{"part": "part:seed", "applies_to": ["tx:p:avellana:"], "exclude": []}
+{"part": "part:seed", "applies_to": ["tx:p:dulcis:"], "exclude": []}
+{"part": "part:seed", "applies_to": ["tx:p:illinoinensis:"], "exclude": []}
+{"part": "part:seed", "applies_to": ["tx:p:excelsa:"], "exclude": []}
+{"part": "part:seed", "applies_to": ["tx:p:occidentale:"], "exclude": []}
+{"part": "part:seed", "applies_to": ["tx:p:vera:"], "exclude": []}
+{"part": "part:seed", "applies_to": ["tx:p:hypogaea:"], "exclude": []}
+{"part": "part:plant_milk", "applies_to": ["tx:p:max:", "tx:p:dulcis:", "tx:p:sativa:", "tx:p:sativa:"], "exclude": []}
+{"part": "part:tofu", "applies_to": ["tx:p:max:"], "exclude": []}
+{"part": "part:okara", "applies_to": ["tx:p:max:", "tx:p:dulcis:", "tx:p:sativa:"], "exclude": []}
+{"part": "part:tofu_serum", "applies_to": ["tx:p:max:"], "exclude": []}

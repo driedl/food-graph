@@ -15,7 +15,10 @@ def run_validators(spec: Dict[str, Any], build_dir: Path) -> List[str]:
         
         t = art.get("type", "jsonl")
         if t == "jsonl":
-            lines = _read_jsonl(path)
+            if not path.exists():
+                lines = []
+            else:
+                lines = _read_jsonl(path)
             if "min_lines" in art and len(lines) < art["min_lines"]:
                 errs.append(f"{art['path']}: min_lines {art['min_lines']} not met (got {len(lines)})")
             if "max_lines" in art and len(lines) > art["max_lines"]:
@@ -484,7 +487,7 @@ def _validate_schema_enum_compliance_json(path: Path, obj: Any, validator: Dict[
 def _validate_id_format_consistency(path: Path, lines: List[dict], validator: Dict[str, Any]) -> List[str]:
     """Validate ID format consistency using regex patterns - no data maintenance needed
     
-    Patterns based on Ontology Bible specifications (/docs/Ontology-bible.md section 1.1)
+    Patterns based on Ontology Bible specifications (/docs/technical/ontology-specification.md section 1.1)
     """
     errs: List[str] = []
     

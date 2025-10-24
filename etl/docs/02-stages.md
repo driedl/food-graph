@@ -11,11 +11,32 @@ This is the authoritative stage blueprint. We will bring these online incrementa
 | D | Family Expansions | `stages/d_family_expand.py` | families.json, allowlist, buckets | `tmp/tpt_generated.jsonl` | Instantiate minimal identity paths without explosion |
 | E | Canonicalization & IDs | `stages/e_canon_ids.py` | transforms_canon, buckets | `tmp/tpt_canon.jsonl` | Sort steps; bucket params; compute identity hash & final ID |
 | F | Naming & Synonyms | `stages/f_names_syns.py` | name_overrides, tp_synonyms | `tmp/tpt_named.jsonl` | Resolve display names & synonyms; cuisines & regions |
-| G | Diet & Safety Flags | `stages/g_flags.py` | diet_safety_rules.jsonl | `tmp/tpt_named.jsonl` (updated) | Evaluate guarded rules with params (nitrite, smoke, pasteurize, etc.) |
+| G | Evidence Loading & Rollup | `stages/stage_g/` | `data/evidence/*/` JSONL files | `database/graph.dev.sqlite` (updated) | Load evidence data and compute nutrient profile rollups |
 | H | Graph Edges | `stages/h_edges.py` | prior outputs | `graph/edges.jsonl` | T --has_part--> P; P --transforms_to--> TPT; etc. |
 | I | TPT Meta | `stages/i_tpt_meta.py` | prior outputs | `out/tpt_meta.jsonl` | Denormalized card blobs for API |
 | J | Search Docs | `stages/j_search_docs.py` | TP, TPT, promoted parts | `out/search_docs.jsonl` | Unified search corpus |
 | K | Database | `stages/k_database.py` | everything | `database/graph.dev.sqlite` | API-ready SQLite with FTS (T and TP first; TPT later) |
+
+## Stage G: Evidence Loading and Rollup
+
+**Input**: `data/evidence/*/` JSONL files from evidence mapper
+**Output**: Populated `evidence_mapping`, `nutrient_row`, `nutrient_profile_rollup` tables
+
+Loads processed evidence data into the graph database and computes nutrient profile rollups.
+
+### Process
+
+1. Scan `data/evidence/` for source directories
+2. Load `evidence_mappings.jsonl` → `evidence_mapping` table
+3. Load `nutrient_data.jsonl` → `nutrient_row` table
+4. Compute weighted rollups → `nutrient_profile_rollup` table
+
+### Rollup Algorithm
+
+- Group by `(tpt_id, nutrient_id)`
+- Weight = `source_quality_tier * row_confidence`
+- Aggregate using weighted median
+- Store min/max/count for provenance
 
 ### Error codes (curated TPT path)
 

@@ -1,44 +1,40 @@
-{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus","part_id":"part:milk","synonyms":["cow's milk","cows milk","bovine milk","dairy milk"]}
-{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:bovidae:capra:hircus","part_id":"part:milk","synonyms":["goat's milk","goats milk","caprine milk"]}
-{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:bovidae:ovis:aries","part_id":"part:milk","synonyms":["sheep's milk","sheeps milk","ewe milk","ewe's milk","ovine milk"]}
-{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:bovidae:bubalus:bubalis","part_id":"part:milk","synonyms":["buffalo's milk","water buffalo milk","bubaline milk"]}
-
-{"taxon_id":"tx:animalia:chordata:aves:galliformes:phasianidae:gallus:gallus_domesticus","part_id":"part:egg","synonyms":["hen egg","chicken eggs"]}
-{"taxon_id":"tx:animalia:chordata:aves:anseriformes:anatidae:anas:platyrhynchos_domesticus","part_id":"part:egg","synonyms":["duck eggs"]}
-{"taxon_id":"tx:animalia:chordata:aves:anseriformes:anatidae:anser:anser_domesticus","part_id":"part:egg","synonyms":["goose eggs"]}
-{"taxon_id":"tx:animalia:chordata:aves:galliformes:meleagrididae:meleagris:gallopavo_domesticus","part_id":"part:egg","synonyms":["turkey eggs"]}
-{"taxon_id":"tx:animalia:chordata:aves:galliformes:phasianidae:coturnix:japonica","part_id":"part:egg","synonyms":["quail eggs"]}
-
-{"taxon_id":"tx:animalia:chordata:mammalia:lagomorpha:leporidae:oryctolagus:cuniculus","part_id":"part:muscle","synonyms":["rabbit meat","coney","lapin"]}
-{"taxon_id":"tx:animalia:chordata:mammalia:lagomorpha:leporidae:lepus:europaeus","part_id":"part:muscle","synonyms":["hare meat"]}
-{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:cervidae:cervus:elaphus","part_id":"part:muscle","synonyms":["venison","deer meat"]}
-{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:cervidae:cervus:canadensis","part_id":"part:muscle","synonyms":["elk meat","wapiti"]}
-{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:cervidae:alces:alces","part_id":"part:muscle","synonyms":["moose meat","elk (EU)"]}
-{"taxon_id":"tx:animalia:chordata:aves:columbiformes:columbidae:columba:livia_domestica","part_id":"part:muscle","synonyms":["pigeon","pigeon meat"]}
-{"taxon_id":"tx:animalia:chordata:aves:guineafowliformes:numididae:numida:meleagris","part_id":"part:muscle","synonyms":["guinea hen"]}
-{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:bovidae:capra:hircus","part_id":"part:muscle","synonyms":["goat meat","chevon","cabrito","capretto"]}
-{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:bovidae:ovis:aries","part_id":"part:muscle","synonyms":["sheep meat","mutton","hogget","lamb meat"]}
-{"taxon_id":"tx:animalia:chordata:aves:casuariiformes:dromaiidae:dromaius:novaehollandiae","part_id":"part:egg","synonyms":["emu eggs"]}
-{"taxon_id":"tx:animalia:chordata:aves:struthioniformes:struthionidae:struthio:camelus","part_id":"part:egg","synonyms":["ostrich eggs"]}
-{"taxon_id":"tx:animalia:chordata:aves:columbiformes:columbidae:columba:livia_domestica","part_id":"part:egg","synonyms":["pigeon eggs"]}
-
-{"taxon_id":"tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae:salmo:salar","part_id":"part:muscle","synonyms":["lox","gravlax","salmon fillet"]}
-{"taxon_id":"tx:animalia:chordata:actinopterygii:scombriformes:scombridae:thunnus:albacares","part_id":"part:muscle","synonyms":["ahi","yellowfin tuna"]}
-{"taxon_id":"tx:animalia:chordata:actinopterygii:scombriformes:scombridae:thunnus:obesus","part_id":"part:muscle","synonyms":["ahi","bigeye tuna"]}
-{"taxon_id":"tx:animalia:chordata:actinopterygii:gadiformes:gadidae:gadus:morhua","part_id":"part:muscle","synonyms":["codfish","bacalhau (salted)"]}
-{"taxon_id":"tx:animalia:arthropoda:malacostraca:decapoda:penaeidae:litopenaeus:vannamei","part_id":"part:muscle","synonyms":["whiteleg shrimp","prawn"]}
-
-{"taxon_id":"tx:animalia:chordata:actinopterygii:scombriformes:scombridae:thunnus:","part_id":"part:muscle","synonyms":["ahi","yellowfin","bluefin","tuna"]}
-{"taxon_id":"tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae:salmo:salar","part_id":"part:muscle","synonyms":["lox","smoked salmon","nova","gravlax"]}
-{"taxon_id":"tx:animalia:chordata:actinopterygii:gadiformes:gadidae:gadus:morhua","part_id":"part:muscle","synonyms":["bacalhau","salt cod","dried cod"]}
-{"taxon_id":"tx:animalia:chordata:actinopterygii:cypriniformes:cyprinidae:cyprinus:carpio","part_id":"part:muscle","synonyms":["koi","carp"]}
-{"taxon_id":"tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae:oncorhynchus:","part_id":"part:muscle","synonyms":["ikura","salmon roe","red caviar"]}
-{"taxon_id":"tx:animalia:chordata:actinopterygii:scorpaeniformes:hexagrammidae:hexagrammos:","part_id":"part:muscle","synonyms":["mentaiko","pollock roe","spicy cod roe"]}
-{"taxon_id":"tx:animalia:chordata:mammalia:artiodactyla:bovidae:bos:taurus","part_id":"part:milk","synonyms":["dairy","whole milk","raw milk"]}
-{"taxon_id":"tx:animalia:chordata:aves:galliformes:phasianidae:gallus:gallus_domesticus","part_id":"part:egg","synonyms":["chicken eggs","farm eggs","free range eggs"]}
-{"taxon_id":"tx:plantae:rosaceae:malus:","part_id":"part:fruit","synonyms":["apples","apple fruit","fresh apples"]}
-{"taxon_id":"tx:plantae:monocots:poales:oryza:sativa","part_id":"part:grain","synonyms":["rice grain","white rice","brown rice","jasmine rice","basmati rice"]}
-{"taxon_id":"tx:animalia:mollusca:bivalvia:ostreida:ostreidae:crassostrea:gigas","part_id":"part:muscle","synonyms":["oyster","pacific oyster"]}
-{"taxon_id":"tx:animalia:chordata:actinopterygii:acipenseriformes:acipenseridae:acipenser:baerii","part_id":"part:roe","synonyms":["black caviar","sturgeon caviar"]}
-{"taxon_id":"tx:animalia:chordata:actinopterygii:salmoniformes:salmonidae:salmo:salar","part_id":"part:roe","synonyms":["ikura","red caviar"]}
-{"taxon_id":"tx:animalia:chordata:actinopterygii:gadiformes:gadidae:gadus:chalcogrammus","part_id":"part:roe","synonyms":["tarako","mentaiko","pollock roe"]}
+{"taxon_id": "tx:a:taurus", "part_id": "part:milk", "synonyms": ["cow's milk", "cows milk", "bovine milk", "dairy milk"]}
+{"taxon_id": "tx:a:hircus", "part_id": "part:milk", "synonyms": ["goat's milk", "goats milk", "caprine milk"]}
+{"taxon_id": "tx:a:aries", "part_id": "part:milk", "synonyms": ["sheep's milk", "sheeps milk", "ewe milk", "ewe's milk", "ovine milk"]}
+{"taxon_id": "tx:a:bubalis", "part_id": "part:milk", "synonyms": ["buffalo's milk", "water buffalo milk", "bubaline milk"]}
+{"taxon_id": "tx:a:gallus_domesticus", "part_id": "part:egg", "synonyms": ["hen egg", "chicken eggs"]}
+{"taxon_id": "tx:a:platyrhynchos_domesticus", "part_id": "part:egg", "synonyms": ["duck eggs"]}
+{"taxon_id": "tx:a:anser_domesticus", "part_id": "part:egg", "synonyms": ["goose eggs"]}
+{"taxon_id": "tx:a:gallopavo_domesticus", "part_id": "part:egg", "synonyms": ["turkey eggs"]}
+{"taxon_id": "tx:a:japonica", "part_id": "part:egg", "synonyms": ["quail eggs"]}
+{"taxon_id": "tx:a:cuniculus", "part_id": "part:muscle", "synonyms": ["rabbit meat", "coney", "lapin"]}
+{"taxon_id": "tx:a:europaeus", "part_id": "part:muscle", "synonyms": ["hare meat"]}
+{"taxon_id": "tx:a:elaphus", "part_id": "part:muscle", "synonyms": ["venison", "deer meat"]}
+{"taxon_id": "tx:a:canadensis", "part_id": "part:muscle", "synonyms": ["elk meat", "wapiti"]}
+{"taxon_id": "tx:a:alces", "part_id": "part:muscle", "synonyms": ["moose meat", "elk (EU)"]}
+{"taxon_id": "tx:a:livia_domestica", "part_id": "part:muscle", "synonyms": ["pigeon", "pigeon meat"]}
+{"taxon_id": "tx:a:meleagris", "part_id": "part:muscle", "synonyms": ["guinea hen"]}
+{"taxon_id": "tx:a:hircus", "part_id": "part:muscle", "synonyms": ["goat meat", "chevon", "cabrito", "capretto"]}
+{"taxon_id": "tx:a:aries", "part_id": "part:muscle", "synonyms": ["sheep meat", "mutton", "hogget", "lamb meat"]}
+{"taxon_id": "tx:a:novaehollandiae", "part_id": "part:egg", "synonyms": ["emu eggs"]}
+{"taxon_id": "tx:a:camelus", "part_id": "part:egg", "synonyms": ["ostrich eggs"]}
+{"taxon_id": "tx:a:livia_domestica", "part_id": "part:egg", "synonyms": ["pigeon eggs"]}
+{"taxon_id": "tx:a:salar", "part_id": "part:muscle", "synonyms": ["lox", "gravlax", "salmon fillet"]}
+{"taxon_id": "tx:a:albacares", "part_id": "part:muscle", "synonyms": ["ahi", "yellowfin tuna"]}
+{"taxon_id": "tx:a:obesus", "part_id": "part:muscle", "synonyms": ["ahi", "bigeye tuna"]}
+{"taxon_id": "tx:a:morhua", "part_id": "part:muscle", "synonyms": ["codfish", "bacalhau (salted)"]}
+{"taxon_id": "tx:a:vannamei", "part_id": "part:muscle", "synonyms": ["whiteleg shrimp", "prawn"]}
+{"taxon_id": "tx:a:thunnus:", "part_id": "part:muscle", "synonyms": ["ahi", "yellowfin", "bluefin", "tuna"]}
+{"taxon_id": "tx:a:salar", "part_id": "part:muscle", "synonyms": ["lox", "smoked salmon", "nova", "gravlax"]}
+{"taxon_id": "tx:a:morhua", "part_id": "part:muscle", "synonyms": ["bacalhau", "salt cod", "dried cod"]}
+{"taxon_id": "tx:a:carpio", "part_id": "part:muscle", "synonyms": ["koi", "carp"]}
+{"taxon_id": "tx:a:oncorhynchus:", "part_id": "part:muscle", "synonyms": ["ikura", "salmon roe", "red caviar"]}
+{"taxon_id": "tx:a:hexagrammos:", "part_id": "part:muscle", "synonyms": ["mentaiko", "pollock roe", "spicy cod roe"]}
+{"taxon_id": "tx:a:taurus", "part_id": "part:milk", "synonyms": ["dairy", "whole milk", "raw milk"]}
+{"taxon_id": "tx:a:gallus_domesticus", "part_id": "part:egg", "synonyms": ["chicken eggs", "farm eggs", "free range eggs"]}
+{"taxon_id": "tx:p:malus:", "part_id": "part:fruit", "synonyms": ["apples", "apple fruit", "fresh apples"]}
+{"taxon_id": "tx:p:oryza:sativa", "part_id": "part:grain", "synonyms": ["rice grain", "white rice", "brown rice", "jasmine rice", "basmati rice"]}
+{"taxon_id": "tx:a:gigas", "part_id": "part:muscle", "synonyms": ["oyster", "pacific oyster"]}
+{"taxon_id": "tx:a:baerii", "part_id": "part:roe", "synonyms": ["black caviar", "sturgeon caviar"]}
+{"taxon_id": "tx:a:salar", "part_id": "part:roe", "synonyms": ["ikura", "red caviar"]}
+{"taxon_id": "tx:a:chalcogrammus", "part_id": "part:roe", "synonyms": ["tarako", "mentaiko", "pollock roe"]}

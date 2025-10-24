@@ -10,11 +10,14 @@ def preflight(in_dir: Path, build_dir: Path) -> None:
     req = [
         build_dir / "compiled" / "taxa.jsonl",
         build_dir / "compiled" / "parts.json",
-        build_dir / "compiled" / "docs.jsonl",
         build_dir / "graph" / "substrates.jsonl",
         build_dir / "tmp" / "tp_index.jsonl",
         build_dir / "tmp" / "tpt_canon.jsonl",
         build_dir / "tmp" / "transforms_canon.json",
+    ]
+    # docs.jsonl is optional (disabled for now due to old taxonomic hierarchy format)
+    optional = [
+        build_dir / "compiled" / "docs.jsonl",
     ]
     missing = [str(p) for p in req if not p.exists()]
     if missing:

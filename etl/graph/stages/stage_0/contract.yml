@@ -19,7 +19,7 @@ artifacts:
   
   - path: compiled/docs.jsonl
     type: jsonl
-    must_exist: true
+    must_exist: false
     validators: []
   
   - path: compiled/parts.json

@@ -2,6 +2,7 @@ from __future__ import annotations
 import json, re, sys
 from pathlib import Path
 from typing import Dict, List, Optional
+import sqlite3
 
 import yaml  # ensure present in your venv
 
@@ -17,6 +18,63 @@ def _load_taxa_graph(compiled_taxa_path: Path) -> Dict[str, dict]:
             o = json.loads(line)
             taxa[o["id"]] = o
     return taxa
+
+def _check_taxon_exists_in_ncbi(taxon_id: str, ncbi_db_path: Path) -> bool:
+    """Check if a taxon ID exists in the NCBI database."""
+    if not ncbi_db_path.exists():
+        print(f"WARNING: NCBI database not found at {ncbi_db_path}", file=sys.stderr)
+        return False
+    
+    try:
+        with sqlite3.connect(ncbi_db_path) as conn:
+            cursor = conn.cursor()
+            
+            # Parse the taxon ID to extract components
+            parts = taxon_id.split(':')
+            if len(parts) < 2:
+                return False
+            
+            kingdom = parts[1]
+            if kingdom in ['p', 'plantae']:
+                kingdom_name = 'Plantae'
+            elif kingdom in ['a', 'animalia']:
+                kingdom_name = 'Animalia'
+            elif kingdom in ['f', 'fungi']:
+                kingdom_name = 'Fungi'
+            else:
+                return False
+            
+            # Build the scientific name from the taxon ID
+            if len(parts) == 2:
+                # Kingdom level
+                scientific_name = kingdom_name
+            elif len(parts) == 3:
+                # Genus level
+                genus = parts[2]
+                scientific_name = genus
+            elif len(parts) == 4:
+                # Species level
+                genus = parts[2]
+                species = parts[3]
+                scientific_name = f"{genus} {species}"
+            else:
+                # Variety/cultivar level - check species
+                genus = parts[2]
+                species = parts[3]
+                scientific_name = f"{genus} {species}"
+            
+            # Check if the taxon exists in NCBI
+            cursor.execute("""
+                SELECT COUNT(*) FROM ncbi_lineage 
+                WHERE (kingdom = ? OR genus = ? OR species = ?)
+            """, (kingdom_name, scientific_name, scientific_name))
+            
+            count = cursor.fetchone()[0]
+            return count > 0
+            
+    except Exception as e:
+        print(f"WARNING: Error checking NCBI database: {e}", file=sys.stderr)
+        return False
 
 def _parse_doc_file(file_path: Path) -> Optional[dict]:
     content = file_path.read_text(encoding="utf-8")
@@ -43,9 +101,14 @@ def _parse_doc_file(file_path: Path) -> Optional[dict]:
 def compile_docs_into(*, taxa_root: Path, compiled_taxa_path: Path, out_docs_path: Path, verbose: bool = False) -> int:
     out_docs_path.parent.mkdir(parents=True, exist_ok=True)
 
-    # Load graph for validation
+    # Load graph for validation (fallback for our curated taxa)
     taxa_graph = _load_taxa_graph(compiled_taxa_path)
     if verbose: print(f"Loaded {len(taxa_graph)} taxa for doc validation")
+
+    # Get NCBI database path
+    from graph.config import BuildConfig
+    config = BuildConfig.from_env()
+    ncbi_db_path = config.ncbi_db_path
 
     # Discover *.tx.md
     doc_files = sorted(taxa_root.rglob("*.tx.md"))
@@ -60,9 +123,14 @@ def compile_docs_into(*, taxa_root: Path, compiled_taxa_path: Path, out_docs_pat
 
         fm = data["front_matter"]
         tid = fm.get("id")
+        
+        # Check if taxon exists in our curated taxa first, then NCBI
         if tid not in taxa_graph:
-            print(f"ERROR: {doc_file}: Taxon '{tid}' not found in compiled taxa", file=sys.stderr)
-            errors += 1; continue
+            if not _check_taxon_exists_in_ncbi(tid, ncbi_db_path):
+                print(f"ERROR: {doc_file}: Taxon '{tid}' not found in compiled taxa or NCBI database", file=sys.stderr)
+                errors += 1; continue
+            elif verbose:
+                print(f"INFO: {doc_file}: Taxon '{tid}' found in NCBI database (not in curated taxa)", file=sys.stderr)
 
         lang = fm.get("lang", "en")
         summary = (fm.get("summary") or "").strip()

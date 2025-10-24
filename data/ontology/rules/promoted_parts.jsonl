@@ -1,4 +1,4 @@
-{"part_id":"part:plant_milk","proto_path":[{"id":"tf:mill"},{"id":"tf:strain"}],"byproducts":["part:okara"],"notes":"Aqueous extraction; okara is retained solids"}
-{"part_id":"part:tofu","proto_path":[{"id":"tf:coagulate","params":{"agent":"nigari"}},{"id":"tf:press"}],"byproducts":["part:tofu_serum"],"notes":"Pressed soy curd"}
-{"part_id":"part:butter","proto_path":[{"id":"tf:separate","params":{"method":"centrifuge"}},{"id":"tf:churn"}],"byproducts":["part:buttermilk"]}
-{"part_id":"part:flour","proto_path":[{"id":"tf:mill","params":{"target":"flour"}}],"byproducts":[]}
+{"part_id": "part:plant_milk", "proto_path": [{"id": "tf:mill"}, {"id": "tf:strain"}], "byproducts": ["part:okara"], "notes": "Aqueous extraction; okara is retained solids"}
+{"part_id": "part:tofu", "proto_path": [{"id": "tf:coagulate", "params": {"agent": "nigari"}}, {"id": "tf:press"}], "byproducts": ["part:tofu_serum"], "notes": "Pressed soy curd"}
+{"part_id": "part:butter", "proto_path": [{"id": "tf:separate", "params": {"method": "centrifuge"}}, {"id": "tf:churn"}], "byproducts": ["part:buttermilk"]}
+{"part_id": "part:flour", "proto_path": [{"id": "tf:mill", "params": {"target": "flour"}}], "byproducts": []}

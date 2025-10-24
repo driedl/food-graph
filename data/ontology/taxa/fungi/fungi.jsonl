@@ -1,101 +1,101 @@
-{"id":"tx:fungi:agaricomycetes","parent":"tx:fungi","rank":"class","display_name":"Agaricomycetes","latin_name":"Agaricomycetes","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:agaricales","parent":"tx:fungi:agaricomycetes","rank":"order","display_name":"Agaricales","latin_name":"Agaricales","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:russulales","parent":"tx:fungi:agaricomycetes","rank":"order","display_name":"Russulales","latin_name":"Russulales","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:polyporales","parent":"tx:fungi:agaricomycetes","rank":"order","display_name":"Polyporales","latin_name":"Polyporales","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:agaricales:agaricaceae","parent":"tx:fungi:agaricomycetes:agaricales","rank":"family","display_name":"Agaricaceae","latin_name":"Agaricaceae","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:agaricales:omphalotaceae","parent":"tx:fungi:agaricomycetes:agaricales","rank":"family","display_name":"Omphalotaceae","latin_name":"Omphalotaceae","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:agaricales:pleurotaceae","parent":"tx:fungi:agaricomycetes:agaricales","rank":"family","display_name":"Pleurotaceae","latin_name":"Pleurotaceae","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:agaricales:physalacriaceae","parent":"tx:fungi:agaricomycetes:agaricales","rank":"family","display_name":"Physalacriaceae","latin_name":"Physalacriaceae","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:agaricales:lyophyllaceae","parent":"tx:fungi:agaricomycetes:agaricales","rank":"family","display_name":"Lyophyllaceae","latin_name":"Lyophyllaceae","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:agaricales:strophariaceae","parent":"tx:fungi:agaricomycetes:agaricales","rank":"family","display_name":"Strophariaceae","latin_name":"Strophariaceae","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:russulales:hericiaceae","parent":"tx:fungi:agaricomycetes:russulales","rank":"family","display_name":"Hericiaceae","latin_name":"Hericiaceae","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:polyporales:meripilaceae","parent":"tx:fungi:agaricomycetes:polyporales","rank":"family","display_name":"Meripilaceae","latin_name":"Meripilaceae","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:agaricales:agaricaceae:agaricus","parent":"tx:fungi:agaricomycetes:agaricales:agaricaceae","rank":"genus","display_name":"Agaricus","latin_name":"Agaricus","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:agaricales:agaricaceae:agaricus:bisporus","parent":"tx:fungi:agaricomycetes:agaricales:agaricaceae:agaricus","rank":"species","display_name":"Agaricus bisporus (button/crimini/portobello)","latin_name":"Agaricus bisporus","aliases":["white button","button mushroom","crimini","brown mushroom","portabella","portobello"]}
-{"id":"tx:fungi:agaricomycetes:agaricales:omphalotaceae:lentinula","parent":"tx:fungi:agaricomycetes:agaricales:omphalotaceae","rank":"genus","display_name":"Lentinula","latin_name":"Lentinula","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:agaricales:omphalotaceae:lentinula:edodes","parent":"tx:fungi:agaricomycetes:agaricales:omphalotaceae:lentinula","rank":"species","display_name":"Shiitake","latin_name":"Lentinula edodes","aliases":["shiitake"]}
-{"id":"tx:fungi:agaricomycetes:agaricales:pleurotaceae:pleurotus","parent":"tx:fungi:agaricomycetes:agaricales:pleurotaceae","rank":"genus","display_name":"Pleurotus","latin_name":"Pleurotus","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:agaricales:pleurotaceae:pleurotus:ostreatus","parent":"tx:fungi:agaricomycetes:agaricales:pleurotaceae:pleurotus","rank":"species","display_name":"Oyster mushroom","latin_name":"Pleurotus ostreatus","aliases":["oyster mushroom"]}
-{"id":"tx:fungi:agaricomycetes:agaricales:pleurotaceae:pleurotus:eryngii","parent":"tx:fungi:agaricomycetes:agaricales:pleurotaceae:pleurotus","rank":"species","display_name":"King oyster mushroom","latin_name":"Pleurotus eryngii","aliases":["king oyster","king trumpet"]}
-{"id":"tx:fungi:agaricomycetes:polyporales:meripilaceae:grifola","parent":"tx:fungi:agaricomycetes:polyporales:meripilaceae","rank":"genus","display_name":"Grifola","latin_name":"Grifola","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:polyporales:meripilaceae:grifola:frondosa","parent":"tx:fungi:agaricomycetes:polyporales:meripilaceae:grifola","rank":"species","display_name":"Maitake","latin_name":"Grifola frondosa","aliases":["maitake","hen of the woods"]}
-{"id":"tx:fungi:agaricomycetes:agaricales:physalacriaceae:flammulina","parent":"tx:fungi:agaricomycetes:agaricales:physalacriaceae","rank":"genus","display_name":"Flammulina","latin_name":"Flammulina","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:agaricales:physalacriaceae:flammulina:velutipes","parent":"tx:fungi:agaricomycetes:agaricales:physalacriaceae:flammulina","rank":"species","display_name":"Enoki","latin_name":"Flammulina velutipes","aliases":["enoki","enokitake"]}
-{"id":"tx:fungi:agaricomycetes:agaricales:lyophyllaceae:hypsizygus","parent":"tx:fungi:agaricomycetes:agaricales:lyophyllaceae","rank":"genus","display_name":"Hypsizygus","latin_name":"Hypsizygus","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:agaricales:lyophyllaceae:hypsizygus:tessulatus","parent":"tx:fungi:agaricomycetes:agaricales:lyophyllaceae:hypsizygus","rank":"species","display_name":"Beech mushroom (shimeji)","latin_name":"Hypsizygus tessulatus","aliases":["beech mushroom","shimeji","hypsizygus tessulatus"]}
-{"id":"tx:fungi:agaricomycetes:agaricales:lyophyllaceae:hypsizygus:marmoreus","parent":"tx:fungi:agaricomycetes:agaricales:lyophyllaceae:hypsizygus","rank":"species","display_name":"Beech mushroom (buna-shimeji)","latin_name":"Hypsizygus marmoreus","aliases":["buna-shimeji","beech mushroom"]}
-{"id":"tx:fungi:agaricomycetes:agaricales:strophariaceae:cyclocybe","parent":"tx:fungi:agaricomycetes:agaricales:strophariaceae","rank":"genus","display_name":"Cyclocybe","latin_name":"Cyclocybe","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:agaricales:strophariaceae:cyclocybe:aegerita","parent":"tx:fungi:agaricomycetes:agaricales:strophariaceae:cyclocybe","rank":"species","display_name":"Pioppini","latin_name":"Cyclocybe aegerita","aliases":["pioppini","pioppino","black poplar mushroom","Agrocybe aegerita"]}
-{"id":"tx:fungi:agaricomycetes:agaricales:strophariaceae:agrocybe","parent":"tx:fungi:agaricomycetes:agaricales:strophariaceae","rank":"genus","display_name":"Agrocybe","latin_name":"Agrocybe","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:russulales:hericiaceae:hericium","parent":"tx:fungi:agaricomycetes:russulales:hericiaceae","rank":"genus","display_name":"Hericium","latin_name":"Hericium","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:russulales:hericiaceae:hericium:erinaceus","parent":"tx:fungi:agaricomycetes:russulales:hericiaceae:hericium","rank":"species","display_name":"Lion's mane","latin_name":"Hericium erinaceus","aliases":["lion's mane","lions mane"]}
-{"id":"tx:fungi:pezizomycetes","parent":"tx:fungi","rank":"class","display_name":"Pezizomycetes","latin_name":"Pezizomycetes","aliases":[]}
-{"id":"tx:fungi:pezizomycetes:pezizales","parent":"tx:fungi:pezizomycetes","rank":"order","display_name":"Pezizales","latin_name":"Pezizales","aliases":[]}
-{"id":"tx:fungi:pezizomycetes:pezizales:morchellaceae","parent":"tx:fungi:pezizomycetes:pezizales","rank":"family","display_name":"Morchellaceae","latin_name":"Morchellaceae","aliases":[]}
-{"id":"tx:fungi:pezizomycetes:pezizales:tuberaceae","parent":"tx:fungi:pezizomycetes:pezizales","rank":"family","display_name":"Tuberaceae","latin_name":"Tuberaceae","aliases":[]}
-{"id":"tx:fungi:tremellomycetes","parent":"tx:fungi","rank":"class","display_name":"Tremellomycetes","latin_name":"Tremellomycetes","aliases":[]}
-{"id":"tx:fungi:tremellomycetes:tremellales","parent":"tx:fungi:tremellomycetes","rank":"order","display_name":"Tremellales","latin_name":"Tremellales","aliases":[]}
-{"id":"tx:fungi:tremellomycetes:tremellales:tremellaceae","parent":"tx:fungi:tremellomycetes:tremellales","rank":"family","display_name":"Tremellaceae","latin_name":"Tremellaceae","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:boletales","parent":"tx:fungi:agaricomycetes","rank":"order","display_name":"Boletales","latin_name":"Boletales","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:boletales:boletaceae","parent":"tx:fungi:agaricomycetes:boletales","rank":"family","display_name":"Boletaceae","latin_name":"Boletaceae","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:boletales:suillaceae","parent":"tx:fungi:agaricomycetes:boletales","rank":"family","display_name":"Suillaceae","latin_name":"Suillaceae","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:cantharellales","parent":"tx:fungi:agaricomycetes","rank":"order","display_name":"Cantharellales","latin_name":"Cantharellales","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:cantharellales:cantharellaceae","parent":"tx:fungi:agaricomycetes:cantharellales","rank":"family","display_name":"Cantharellaceae","latin_name":"Cantharellaceae","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:cantharellales:hydnaceae","parent":"tx:fungi:agaricomycetes:cantharellales","rank":"family","display_name":"Hydnaceae","latin_name":"Hydnaceae","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:auriculariales","parent":"tx:fungi:agaricomycetes","rank":"order","display_name":"Auriculariales","latin_name":"Auriculariales","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:auriculariales:auriculariaceae","parent":"tx:fungi:agaricomycetes:auriculariales","rank":"family","display_name":"Auriculariaceae","latin_name":"Auriculariaceae","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:phallales","parent":"tx:fungi:agaricomycetes","rank":"order","display_name":"Phallales","latin_name":"Phallales","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:phallales:phallaceae","parent":"tx:fungi:agaricomycetes:phallales","rank":"family","display_name":"Phallaceae","latin_name":"Phallaceae","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:agaricales:tricholomataceae","parent":"tx:fungi:agaricomycetes:agaricales","rank":"family","display_name":"Tricholomataceae","latin_name":"Tricholomataceae","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:agaricales:pluteaceae","parent":"tx:fungi:agaricomycetes:agaricales","rank":"family","display_name":"Pluteaceae","latin_name":"Pluteaceae","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:agaricales:amanitaceae","parent":"tx:fungi:agaricomycetes:agaricales","rank":"family","display_name":"Amanitaceae","latin_name":"Amanitaceae","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:russulales:russulaceae","parent":"tx:fungi:agaricomycetes:russulales","rank":"family","display_name":"Russulaceae","latin_name":"Russulaceae","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:polyporales:sparassidaceae","parent":"tx:fungi:agaricomycetes:polyporales","rank":"family","display_name":"Sparassidaceae","latin_name":"Sparassidaceae","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:boletales:boletaceae:boletus","parent":"tx:fungi:agaricomycetes:boletales:boletaceae","rank":"genus","display_name":"Boletus","latin_name":"Boletus","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:boletales:boletaceae:boletus:edulis","parent":"tx:fungi:agaricomycetes:boletales:boletaceae:boletus","rank":"species","display_name":"Porcini","latin_name":"Boletus edulis","aliases":["porcini","cep","king bolete"]}
-{"id":"tx:fungi:agaricomycetes:boletales:boletaceae:leccinum","parent":"tx:fungi:agaricomycetes:boletales:boletaceae","rank":"genus","display_name":"Leccinum","latin_name":"Leccinum","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:boletales:boletaceae:leccinum:scabrum","parent":"tx:fungi:agaricomycetes:boletales:boletaceae:leccinum","rank":"species","display_name":"Birch bolete","latin_name":"Leccinum scabrum","aliases":["birch bolete"]}
-{"id":"tx:fungi:agaricomycetes:boletales:suillaceae:suillus","parent":"tx:fungi:agaricomycetes:boletales:suillaceae","rank":"genus","display_name":"Suillus","latin_name":"Suillus","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:boletales:suillaceae:suillus:luteus","parent":"tx:fungi:agaricomycetes:boletales:suillaceae:suillus","rank":"species","display_name":"Slippery jack","latin_name":"Suillus luteus","aliases":["slippery jack"]}
-{"id":"tx:fungi:agaricomycetes:cantharellales:cantharellaceae:cantharellus","parent":"tx:fungi:agaricomycetes:cantharellales:cantharellaceae","rank":"genus","display_name":"Cantharellus","latin_name":"Cantharellus","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:cantharellales:cantharellaceae:cantharellus:cibarius","parent":"tx:fungi:agaricomycetes:cantharellales:cantharellaceae:cantharellus","rank":"species","display_name":"Chanterelle","latin_name":"Cantharellus cibarius","aliases":["chanterelle","girolle","golden chanterelle"]}
-{"id":"tx:fungi:agaricomycetes:cantharellales:cantharellaceae:craterellus","parent":"tx:fungi:agaricomycetes:cantharellales:cantharellaceae","rank":"genus","display_name":"Craterellus","latin_name":"Craterellus","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:cantharellales:cantharellaceae:craterellus:cornucopioides","parent":"tx:fungi:agaricomycetes:cantharellales:cantharellaceae:craterellus","rank":"species","display_name":"Black trumpet","latin_name":"Craterellus cornucopioides","aliases":["black trumpet","horn of plenty"]}
-{"id":"tx:fungi:agaricomycetes:cantharellales:cantharellaceae:craterellus:fallax","parent":"tx:fungi:agaricomycetes:cantharellales:cantharellaceae:craterellus","rank":"species","display_name":"Black trumpet (NA)","latin_name":"Craterellus fallax","aliases":["black trumpet"]}
-{"id":"tx:fungi:agaricomycetes:cantharellales:hydnaceae:hydnum","parent":"tx:fungi:agaricomycetes:cantharellales:hydnaceae","rank":"genus","display_name":"Hydnum","latin_name":"Hydnum","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:cantharellales:hydnaceae:hydnum:repandum","parent":"tx:fungi:agaricomycetes:cantharellales:hydnaceae:hydnum","rank":"species","display_name":"Hedgehog mushroom","latin_name":"Hydnum repandum","aliases":["hedgehog","sweet tooth"]}
-{"id":"tx:fungi:agaricomycetes:russulales:russulaceae:lactarius","parent":"tx:fungi:agaricomycetes:russulales:russulaceae","rank":"genus","display_name":"Lactarius","latin_name":"Lactarius","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:russulales:russulaceae:lactarius:deliciosus","parent":"tx:fungi:agaricomycetes:russulales:russulaceae:lactarius","rank":"species","display_name":"Saffron milk cap","latin_name":"Lactarius deliciosus","aliases":["saffron milkcap","red pine mushroom"]}
-{"id":"tx:fungi:agaricomycetes:agaricales:physalacriaceae:armillaria","parent":"tx:fungi:agaricomycetes:agaricales:physalacriaceae","rank":"genus","display_name":"Armillaria","latin_name":"Armillaria","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:agaricales:physalacriaceae:armillaria:mellea","parent":"tx:fungi:agaricomycetes:agaricales:physalacriaceae:armillaria","rank":"species","display_name":"Honey mushroom","latin_name":"Armillaria mellea","aliases":["honey fungus"]}
-{"id":"tx:fungi:agaricomycetes:agaricales:tricholomataceae:tricholoma","parent":"tx:fungi:agaricomycetes:agaricales:tricholomataceae","rank":"genus","display_name":"Tricholoma","latin_name":"Tricholoma","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:agaricales:tricholomataceae:tricholoma:matsutake","parent":"tx:fungi:agaricomycetes:agaricales:tricholomataceae:tricholoma","rank":"species","display_name":"Matsutake","latin_name":"Tricholoma matsutake","aliases":["matsutake"]}
-{"id":"tx:fungi:agaricomycetes:agaricales:tricholomataceae:tricholoma:murrillianum","parent":"tx:fungi:agaricomycetes:agaricales:tricholomataceae:tricholoma","rank":"species","display_name":"Matsutake (North American)","latin_name":"Tricholoma murrillianum","aliases":["NA matsutake"]}
-{"id":"tx:fungi:agaricomycetes:agaricales:strophariaceae:pholiota","parent":"tx:fungi:agaricomycetes:agaricales:strophariaceae","rank":"genus","display_name":"Pholiota","latin_name":"Pholiota","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:agaricales:strophariaceae:pholiota:microspora","parent":"tx:fungi:agaricomycetes:agaricales:strophariaceae:pholiota","rank":"species","display_name":"Nameko","latin_name":"Pholiota microspora","aliases":["nameko"]}
-{"id":"tx:fungi:agaricomycetes:agaricales:strophariaceae:pholiota:adiposa","parent":"tx:fungi:agaricomycetes:agaricales:strophariaceae:pholiota","rank":"species","display_name":"Chestnut mushroom","latin_name":"Pholiota adiposa","aliases":["chestnut mushroom"]}
-{"id":"tx:fungi:agaricomycetes:agaricales:pluteaceae:volvariella","parent":"tx:fungi:agaricomycetes:agaricales:pluteaceae","rank":"genus","display_name":"Volvariella","latin_name":"Volvariella","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:agaricales:pluteaceae:volvariella:volvacea","parent":"tx:fungi:agaricomycetes:agaricales:pluteaceae:volvariella","rank":"species","display_name":"Straw mushroom","latin_name":"Volvariella volvacea","aliases":["paddy straw mushroom"]}
-{"id":"tx:fungi:agaricomycetes:agaricales:agaricaceae:coprinus","parent":"tx:fungi:agaricomycetes:agaricales:agaricaceae","rank":"genus","display_name":"Coprinus","latin_name":"Coprinus","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:agaricales:agaricaceae:coprinus:comatus","parent":"tx:fungi:agaricomycetes:agaricales:agaricaceae:coprinus","rank":"species","display_name":"Shaggy mane","latin_name":"Coprinus comatus","aliases":["shaggy ink cap"]}
-{"id":"tx:fungi:agaricomycetes:agaricales:amanitaceae:amanita","parent":"tx:fungi:agaricomycetes:agaricales:amanitaceae","rank":"genus","display_name":"Amanita","latin_name":"Amanita","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:agaricales:amanitaceae:amanita:caesarea","parent":"tx:fungi:agaricomycetes:agaricales:amanitaceae:amanita","rank":"species","display_name":"Caesar's mushroom","latin_name":"Amanita caesarea","aliases":["caesar","ovolo"]}
-{"id":"tx:fungi:agaricomycetes:auriculariales:auriculariaceae:auricularia","parent":"tx:fungi:agaricomycetes:auriculariales:auriculariaceae","rank":"genus","display_name":"Auricularia","latin_name":"Auricularia","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:auriculariales:auriculariaceae:auricularia:heimuer","parent":"tx:fungi:agaricomycetes:auriculariales:auriculariaceae:auricularia","rank":"species","display_name":"Black wood ear","latin_name":"Auricularia heimuer","aliases":["black wood ear","black fungus"]}
-{"id":"tx:fungi:agaricomycetes:auriculariales:auriculariaceae:auricularia:auricula_judae","parent":"tx:fungi:agaricomycetes:auriculariales:auriculariaceae:auricularia","rank":"species","display_name":"Wood ear","latin_name":"Auricularia auricula-judae","aliases":["wood ear","jelly ear"]}
-{"id":"tx:fungi:agaricomycetes:auriculariales:auriculariaceae:auricularia:polytricha","parent":"tx:fungi:agaricomycetes:auriculariales:auriculariaceae:auricularia","rank":"species","display_name":"Cloud ear","latin_name":"Auricularia polytricha","aliases":["cloud ear","black fungus"]}
-{"id":"tx:fungi:tremellomycetes:tremellales:tremellaceae:tremella","parent":"tx:fungi:tremellomycetes:tremellales:tremellaceae","rank":"genus","display_name":"Tremella","latin_name":"Tremella","aliases":[]}
-{"id":"tx:fungi:tremellomycetes:tremellales:tremellaceae:tremella:fuciformis","parent":"tx:fungi:tremellomycetes:tremellales:tremellaceae:tremella","rank":"species","display_name":"Snow fungus","latin_name":"Tremella fuciformis","aliases":["white jelly mushroom","silver ear"]}
-{"id":"tx:fungi:pezizomycetes:pezizales:morchellaceae:morchella","parent":"tx:fungi:pezizomycetes:pezizales:morchellaceae","rank":"genus","display_name":"Morchella","latin_name":"Morchella","aliases":[]}
-{"id":"tx:fungi:pezizomycetes:pezizales:morchellaceae:morchella:esculenta","parent":"tx:fungi:pezizomycetes:pezizales:morchellaceae:morchella","rank":"species","display_name":"Morel (yellow)","latin_name":"Morchella esculenta","aliases":["yellow morel","common morel"]}
-{"id":"tx:fungi:pezizomycetes:pezizales:morchellaceae:morchella:importuna","parent":"tx:fungi:pezizomycetes:pezizales:morchellaceae:morchella","rank":"species","display_name":"Morel (black/cultivated)","latin_name":"Morchella importuna","aliases":["black morel","landscape morel"]}
-{"id":"tx:fungi:pezizomycetes:pezizales:tuberaceae:tuber","parent":"tx:fungi:pezizomycetes:pezizales:tuberaceae","rank":"genus","display_name":"Tuber","latin_name":"Tuber","aliases":[]}
-{"id":"tx:fungi:pezizomycetes:pezizales:tuberaceae:tuber:melanosporum","parent":"tx:fungi:pezizomycetes:pezizales:tuberaceae:tuber","rank":"species","display_name":"Black truffle","latin_name":"Tuber melanosporum","aliases":["Périgord truffle","black winter truffle"]}
-{"id":"tx:fungi:pezizomycetes:pezizales:tuberaceae:tuber:magnatum","parent":"tx:fungi:pezizomycetes:pezizales:tuberaceae:tuber","rank":"species","display_name":"White truffle","latin_name":"Tuber magnatum","aliases":["Alba truffle"]}
-{"id":"tx:fungi:agaricomycetes:polyporales:sparassidaceae:sparassis","parent":"tx:fungi:agaricomycetes:polyporales:sparassidaceae","rank":"genus","display_name":"Sparassis","latin_name":"Sparassis","aliases":[]}
-{"id":"tx:fungi:agaricomycetes:polyporales:sparassidaceae:sparassis:crispa","parent":"tx:fungi:agaricomycetes:polyporales:sparassidaceae:sparassis","rank":"species","display_name":"Cauliflower mushroom","latin_name":"Sparassis crispa","aliases":["cauliflower fungus"]}
-{"id":"tx:fungi:agaricomycetes:agaricales:pleurotaceae:pleurotus:pulmonarius","parent":"tx:fungi:agaricomycetes:agaricales:pleurotaceae:pleurotus","rank":"species","display_name":"Oyster mushroom (phoenix)","latin_name":"Pleurotus pulmonarius","aliases":["phoenix oyster","Italian oyster"]}
-{"id":"tx:fungi:agaricomycetes:agaricales:pleurotaceae:pleurotus:djamor","parent":"tx:fungi:agaricomycetes:agaricales:pleurotaceae:pleurotus","rank":"species","display_name":"Oyster mushroom (pink)","latin_name":"Pleurotus djamor","aliases":["pink oyster"]}
-{"id":"tx:fungi:agaricomycetes:agaricales:pleurotaceae:pleurotus:citrinopileatus","parent":"tx:fungi:agaricomycetes:agaricales:pleurotaceae:pleurotus","rank":"species","display_name":"Oyster mushroom (golden)","latin_name":"Pleurotus citrinopileatus","aliases":["golden oyster"]}
-{"id":"tx:fungi:agaricomycetes:agaricales:agaricaceae:agaricus:campestris","parent":"tx:fungi:agaricomycetes:agaricales:agaricaceae:agaricus","rank":"species","display_name":"Field mushroom","latin_name":"Agaricus campestris","aliases":["field mushroom"]}
-{"id":"tx:fungi:agaricomycetes:agaricales:agaricaceae:agaricus:subrufescens","parent":"tx:fungi:agaricomycetes:agaricales:agaricaceae:agaricus","rank":"species","display_name":"Almond mushroom","latin_name":"Agaricus subrufescens","aliases":["almond mushroom","Agaricus blazei","himematsutake"]}
+{"id": "tx:f:agaricomycetes", "rank": "class", "display_name": "Agaricomycetes", "latin_name": "Agaricomycetes", "aliases": []}
+{"id": "tx:f:agaricales", "rank": "order", "display_name": "Agaricales", "latin_name": "Agaricales", "aliases": []}
+{"id": "tx:f:russulales", "rank": "order", "display_name": "Russulales", "latin_name": "Russulales", "aliases": []}
+{"id": "tx:f:polyporales", "rank": "order", "display_name": "Polyporales", "latin_name": "Polyporales", "aliases": []}
+{"id": "tx:f:agaricaceae", "rank": "family", "display_name": "Agaricaceae", "latin_name": "Agaricaceae", "aliases": []}
+{"id": "tx:f:omphalotaceae", "rank": "family", "display_name": "Omphalotaceae", "latin_name": "Omphalotaceae", "aliases": []}
+{"id": "tx:f:pleurotaceae", "rank": "family", "display_name": "Pleurotaceae", "latin_name": "Pleurotaceae", "aliases": []}
+{"id": "tx:f:physalacriaceae", "rank": "family", "display_name": "Physalacriaceae", "latin_name": "Physalacriaceae", "aliases": []}
+{"id": "tx:f:lyophyllaceae", "rank": "family", "display_name": "Lyophyllaceae", "latin_name": "Lyophyllaceae", "aliases": []}
+{"id": "tx:f:strophariaceae", "rank": "family", "display_name": "Strophariaceae", "latin_name": "Strophariaceae", "aliases": []}
+{"id": "tx:f:hericiaceae", "rank": "family", "display_name": "Hericiaceae", "latin_name": "Hericiaceae", "aliases": []}
+{"id": "tx:f:meripilaceae", "rank": "family", "display_name": "Meripilaceae", "latin_name": "Meripilaceae", "aliases": []}
+{"id": "tx:f:agaricus", "rank": "genus", "display_name": "Agaricus", "latin_name": "Agaricus", "aliases": []}
+{"id": "tx:f:bisporus", "rank": "species", "display_name": "Agaricus bisporus (button/crimini/portobello)", "latin_name": "Agaricus bisporus", "aliases": ["white button", "button mushroom", "crimini", "brown mushroom", "portabella", "portobello"]}
+{"id": "tx:f:lentinula", "rank": "genus", "display_name": "Lentinula", "latin_name": "Lentinula", "aliases": []}
+{"id": "tx:f:edodes", "rank": "species", "display_name": "Shiitake", "latin_name": "Lentinula edodes", "aliases": ["shiitake"]}
+{"id": "tx:f:pleurotus", "rank": "genus", "display_name": "Pleurotus", "latin_name": "Pleurotus", "aliases": []}
+{"id": "tx:f:ostreatus", "rank": "species", "display_name": "Oyster mushroom", "latin_name": "Pleurotus ostreatus", "aliases": ["oyster mushroom"]}
+{"id": "tx:f:eryngii", "rank": "species", "display_name": "King oyster mushroom", "latin_name": "Pleurotus eryngii", "aliases": ["king oyster", "king trumpet"]}
+{"id": "tx:f:grifola", "rank": "genus", "display_name": "Grifola", "latin_name": "Grifola", "aliases": []}
+{"id": "tx:f:frondosa", "rank": "species", "display_name": "Maitake", "latin_name": "Grifola frondosa", "aliases": ["maitake", "hen of the woods"]}
+{"id": "tx:f:flammulina", "rank": "genus", "display_name": "Flammulina", "latin_name": "Flammulina", "aliases": []}
+{"id": "tx:f:velutipes", "rank": "species", "display_name": "Enoki", "latin_name": "Flammulina velutipes", "aliases": ["enoki", "enokitake"]}
+{"id": "tx:f:hypsizygus", "rank": "genus", "display_name": "Hypsizygus", "latin_name": "Hypsizygus", "aliases": []}
+{"id": "tx:f:tessulatus", "rank": "species", "display_name": "Beech mushroom (shimeji)", "latin_name": "Hypsizygus tessulatus", "aliases": ["beech mushroom", "shimeji", "hypsizygus tessulatus"]}
+{"id": "tx:f:marmoreus", "rank": "species", "display_name": "Beech mushroom (buna-shimeji)", "latin_name": "Hypsizygus marmoreus", "aliases": ["buna-shimeji", "beech mushroom"]}
+{"id": "tx:f:cyclocybe", "rank": "genus", "display_name": "Cyclocybe", "latin_name": "Cyclocybe", "aliases": []}
+{"id": "tx:f:aegerita", "rank": "species", "display_name": "Pioppini", "latin_name": "Cyclocybe aegerita", "aliases": ["pioppini", "pioppino", "black poplar mushroom", "Agrocybe aegerita"]}
+{"id": "tx:f:agrocybe", "rank": "genus", "display_name": "Agrocybe", "latin_name": "Agrocybe", "aliases": []}
+{"id": "tx:f:hericium", "rank": "genus", "display_name": "Hericium", "latin_name": "Hericium", "aliases": []}
+{"id": "tx:f:erinaceus", "rank": "species", "display_name": "Lion's mane", "latin_name": "Hericium erinaceus", "aliases": ["lion's mane", "lions mane"]}
+{"id": "tx:f:pezizomycetes", "rank": "class", "display_name": "Pezizomycetes", "latin_name": "Pezizomycetes", "aliases": []}
+{"id": "tx:f:pezizales", "rank": "order", "display_name": "Pezizales", "latin_name": "Pezizales", "aliases": []}
+{"id": "tx:f:morchellaceae", "rank": "family", "display_name": "Morchellaceae", "latin_name": "Morchellaceae", "aliases": []}
+{"id": "tx:f:tuberaceae", "rank": "family", "display_name": "Tuberaceae", "latin_name": "Tuberaceae", "aliases": []}
+{"id": "tx:f:tremellomycetes", "rank": "class", "display_name": "Tremellomycetes", "latin_name": "Tremellomycetes", "aliases": []}
+{"id": "tx:f:tremellales", "rank": "order", "display_name": "Tremellales", "latin_name": "Tremellales", "aliases": []}
+{"id": "tx:f:tremellaceae", "rank": "family", "display_name": "Tremellaceae", "latin_name": "Tremellaceae", "aliases": []}
+{"id": "tx:f:boletales", "rank": "order", "display_name": "Boletales", "latin_name": "Boletales", "aliases": []}
+{"id": "tx:f:boletaceae", "rank": "family", "display_name": "Boletaceae", "latin_name": "Boletaceae", "aliases": []}
+{"id": "tx:f:suillaceae", "rank": "family", "display_name": "Suillaceae", "latin_name": "Suillaceae", "aliases": []}
+{"id": "tx:f:cantharellales", "rank": "order", "display_name": "Cantharellales", "latin_name": "Cantharellales", "aliases": []}
+{"id": "tx:f:cantharellaceae", "rank": "family", "display_name": "Cantharellaceae", "latin_name": "Cantharellaceae", "aliases": []}
+{"id": "tx:f:hydnaceae", "rank": "family", "display_name": "Hydnaceae", "latin_name": "Hydnaceae", "aliases": []}
+{"id": "tx:f:auriculariales", "rank": "order", "display_name": "Auriculariales", "latin_name": "Auriculariales", "aliases": []}
+{"id": "tx:f:auriculariaceae", "rank": "family", "display_name": "Auriculariaceae", "latin_name": "Auriculariaceae", "aliases": []}
+{"id": "tx:f:phallales", "rank": "order", "display_name": "Phallales", "latin_name": "Phallales", "aliases": []}
+{"id": "tx:f:phallaceae", "rank": "family", "display_name": "Phallaceae", "latin_name": "Phallaceae", "aliases": []}
+{"id": "tx:f:tricholomataceae", "rank": "family", "display_name": "Tricholomataceae", "latin_name": "Tricholomataceae", "aliases": []}
+{"id": "tx:f:pluteaceae", "rank": "family", "display_name": "Pluteaceae", "latin_name": "Pluteaceae", "aliases": []}
+{"id": "tx:f:amanitaceae", "rank": "family", "display_name": "Amanitaceae", "latin_name": "Amanitaceae", "aliases": []}
+{"id": "tx:f:russulaceae", "rank": "family", "display_name": "Russulaceae", "latin_name": "Russulaceae", "aliases": []}
+{"id": "tx:f:sparassidaceae", "rank": "family", "display_name": "Sparassidaceae", "latin_name": "Sparassidaceae", "aliases": []}
+{"id": "tx:f:boletus", "rank": "genus", "display_name": "Boletus", "latin_name": "Boletus", "aliases": []}
+{"id": "tx:f:edulis", "rank": "species", "display_name": "Porcini", "latin_name": "Boletus edulis", "aliases": ["porcini", "cep", "king bolete"]}
+{"id": "tx:f:leccinum", "rank": "genus", "display_name": "Leccinum", "latin_name": "Leccinum", "aliases": []}
+{"id": "tx:f:scabrum", "rank": "species", "display_name": "Birch bolete", "latin_name": "Leccinum scabrum", "aliases": ["birch bolete"]}
+{"id": "tx:f:suillus", "rank": "genus", "display_name": "Suillus", "latin_name": "Suillus", "aliases": []}
+{"id": "tx:f:luteus", "rank": "species", "display_name": "Slippery jack", "latin_name": "Suillus luteus", "aliases": ["slippery jack"]}
+{"id": "tx:f:cantharellus", "rank": "genus", "display_name": "Cantharellus", "latin_name": "Cantharellus", "aliases": []}
+{"id": "tx:f:cibarius", "rank": "species", "display_name": "Chanterelle", "latin_name": "Cantharellus cibarius", "aliases": ["chanterelle", "girolle", "golden chanterelle"]}
+{"id": "tx:f:craterellus", "rank": "genus", "display_name": "Craterellus", "latin_name": "Craterellus", "aliases": []}
+{"id": "tx:f:cornucopioides", "rank": "species", "display_name": "Black trumpet", "latin_name": "Craterellus cornucopioides", "aliases": ["black trumpet", "horn of plenty"]}
+{"id": "tx:f:fallax", "rank": "species", "display_name": "Black trumpet (NA)", "latin_name": "Craterellus fallax", "aliases": ["black trumpet"]}
+{"id": "tx:f:hydnum", "rank": "genus", "display_name": "Hydnum", "latin_name": "Hydnum", "aliases": []}
+{"id": "tx:f:repandum", "rank": "species", "display_name": "Hedgehog mushroom", "latin_name": "Hydnum repandum", "aliases": ["hedgehog", "sweet tooth"]}
+{"id": "tx:f:lactarius", "rank": "genus", "display_name": "Lactarius", "latin_name": "Lactarius", "aliases": []}
+{"id": "tx:f:deliciosus", "rank": "species", "display_name": "Saffron milk cap", "latin_name": "Lactarius deliciosus", "aliases": ["saffron milkcap", "red pine mushroom"]}
+{"id": "tx:f:armillaria", "rank": "genus", "display_name": "Armillaria", "latin_name": "Armillaria", "aliases": []}
+{"id": "tx:f:mellea", "rank": "species", "display_name": "Honey mushroom", "latin_name": "Armillaria mellea", "aliases": ["honey fungus"]}
+{"id": "tx:f:tricholoma", "rank": "genus", "display_name": "Tricholoma", "latin_name": "Tricholoma", "aliases": []}
+{"id": "tx:f:matsutake", "rank": "species", "display_name": "Matsutake", "latin_name": "Tricholoma matsutake", "aliases": ["matsutake"]}
+{"id": "tx:f:murrillianum", "rank": "species", "display_name": "Matsutake (North American)", "latin_name": "Tricholoma murrillianum", "aliases": ["NA matsutake"]}
+{"id": "tx:f:pholiota", "rank": "genus", "display_name": "Pholiota", "latin_name": "Pholiota", "aliases": []}
+{"id": "tx:f:microspora", "rank": "species", "display_name": "Nameko", "latin_name": "Pholiota microspora", "aliases": ["nameko"]}
+{"id": "tx:f:adiposa", "rank": "species", "display_name": "Chestnut mushroom", "latin_name": "Pholiota adiposa", "aliases": ["chestnut mushroom"]}
+{"id": "tx:f:volvariella", "rank": "genus", "display_name": "Volvariella", "latin_name": "Volvariella", "aliases": []}
+{"id": "tx:f:volvacea", "rank": "species", "display_name": "Straw mushroom", "latin_name": "Volvariella volvacea", "aliases": ["paddy straw mushroom"]}
+{"id": "tx:f:coprinus", "rank": "genus", "display_name": "Coprinus", "latin_name": "Coprinus", "aliases": []}
+{"id": "tx:f:comatus", "rank": "species", "display_name": "Shaggy mane", "latin_name": "Coprinus comatus", "aliases": ["shaggy ink cap"]}
+{"id": "tx:f:amanita", "rank": "genus", "display_name": "Amanita", "latin_name": "Amanita", "aliases": []}
+{"id": "tx:f:caesarea", "rank": "species", "display_name": "Caesar's mushroom", "latin_name": "Amanita caesarea", "aliases": ["caesar", "ovolo"]}
+{"id": "tx:f:auricularia", "rank": "genus", "display_name": "Auricularia", "latin_name": "Auricularia", "aliases": []}
+{"id": "tx:f:heimuer", "rank": "species", "display_name": "Black wood ear", "latin_name": "Auricularia heimuer", "aliases": ["black wood ear", "black fungus"]}
+{"id": "tx:f:auricula_judae", "rank": "species", "display_name": "Wood ear", "latin_name": "Auricularia auricula-judae", "aliases": ["wood ear", "jelly ear"]}
+{"id": "tx:f:polytricha", "rank": "species", "display_name": "Cloud ear", "latin_name": "Auricularia polytricha", "aliases": ["cloud ear", "black fungus"]}
+{"id": "tx:f:tremella", "rank": "genus", "display_name": "Tremella", "latin_name": "Tremella", "aliases": []}
+{"id": "tx:f:fuciformis", "rank": "species", "display_name": "Snow fungus", "latin_name": "Tremella fuciformis", "aliases": ["white jelly mushroom", "silver ear"]}
+{"id": "tx:f:morchella", "rank": "genus", "display_name": "Morchella", "latin_name": "Morchella", "aliases": []}
+{"id": "tx:f:esculenta", "rank": "species", "display_name": "Morel (yellow)", "latin_name": "Morchella esculenta", "aliases": ["yellow morel", "common morel"]}
+{"id": "tx:f:importuna", "rank": "species", "display_name": "Morel (black/cultivated)", "latin_name": "Morchella importuna", "aliases": ["black morel", "landscape morel"]}
+{"id": "tx:f:tuber", "rank": "genus", "display_name": "Tuber", "latin_name": "Tuber", "aliases": []}
+{"id": "tx:f:melanosporum", "rank": "species", "display_name": "Black truffle", "latin_name": "Tuber melanosporum", "aliases": ["Périgord truffle", "black winter truffle"]}
+{"id": "tx:f:magnatum", "rank": "species", "display_name": "White truffle", "latin_name": "Tuber magnatum", "aliases": ["Alba truffle"]}
+{"id": "tx:f:sparassis", "rank": "genus", "display_name": "Sparassis", "latin_name": "Sparassis", "aliases": []}
+{"id": "tx:f:crispa", "rank": "species", "display_name": "Cauliflower mushroom", "latin_name": "Sparassis crispa", "aliases": ["cauliflower fungus"]}
+{"id": "tx:f:pulmonarius", "rank": "species", "display_name": "Oyster mushroom (phoenix)", "latin_name": "Pleurotus pulmonarius", "aliases": ["phoenix oyster", "Italian oyster"]}
+{"id": "tx:f:djamor", "rank": "species", "display_name": "Oyster mushroom (pink)", "latin_name": "Pleurotus djamor", "aliases": ["pink oyster"]}
+{"id": "tx:f:citrinopileatus", "rank": "species", "display_name": "Oyster mushroom (golden)", "latin_name": "Pleurotus citrinopileatus", "aliases": ["golden oyster"]}
+{"id": "tx:f:campestris", "rank": "species", "display_name": "Field mushroom", "latin_name": "Agaricus campestris", "aliases": ["field mushroom"]}
+{"id": "tx:f:subrufescens", "rank": "species", "display_name": "Almond mushroom", "latin_name": "Agaricus subrufescens", "aliases": ["almond mushroom", "Agaricus blazei", "himematsutake"]}

@@ -10,6 +10,7 @@ DEFAULT_BUILD_ROOT = "etl/build"
 class BuildConfig:
     build_root: Path
     db_path: Path
+    ncbi_db_path: Path
     profile: str
 
     @staticmethod
@@ -28,8 +29,9 @@ class BuildConfig:
             root = project_root / DEFAULT_BUILD_ROOT
         
         db = Path(os.environ.get("GRAPH_DB_PATH", str(root / "database" / "graph.dev.sqlite")))
+        ncbi_db = Path(os.environ.get("GRAPH_NCBI_DB_PATH", str(root / "database" / "ncbi.sqlite")))
         profile = os.environ.get("GRAPH_BUILD_PROFILE", "local")
-        cfg = BuildConfig(build_root=root, db_path=db, profile=profile)
+        cfg = BuildConfig(build_root=root, db_path=db, ncbi_db_path=ncbi_db, profile=profile)
         cfg.ensure_dirs()
         return cfg
 

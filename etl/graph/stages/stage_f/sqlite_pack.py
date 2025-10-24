@@ -15,10 +15,13 @@ CREATE TABLE IF NOT EXISTS nodes (
   name TEXT NOT NULL,
   slug TEXT NOT NULL,
   rank TEXT NOT NULL,
-  parent_id TEXT REFERENCES nodes(id) ON DELETE CASCADE
+  parent_id TEXT REFERENCES nodes(id) ON DELETE CASCADE,
+  ncbi_taxid INTEGER,
+  ncbi_lineage_json TEXT
 );
 CREATE UNIQUE INDEX IF NOT EXISTS idx_nodes_slug_parent ON nodes(slug, parent_id);
 CREATE INDEX IF NOT EXISTS idx_nodes_parent ON nodes(parent_id);
+CREATE INDEX IF NOT EXISTS idx_nodes_ncbi_taxid ON nodes(ncbi_taxid);
 
 CREATE TABLE IF NOT EXISTS synonyms (
   node_id TEXT REFERENCES nodes(id) ON DELETE CASCADE,
@@ -216,6 +219,70 @@ CREATE TABLE IF NOT EXISTS nutrients (
   rounding TEXT,        -- JSON object with decimals
   notes_method TEXT
 );
+
+-- 7) Nutrient rows table (actual nutrient data per food)
+CREATE TABLE IF NOT EXISTS nutrient_row (
+  id TEXT PRIMARY KEY,
+  food_id TEXT NOT NULL,
+  nutrient_id TEXT NOT NULL,
+  amount REAL NOT NULL,
+  unit TEXT NOT NULL,
+  original_amount REAL NOT NULL,
+  original_unit TEXT NOT NULL,
+  original_nutrient_id TEXT NOT NULL,
+  conversion_factor REAL NOT NULL,
+  source TEXT NOT NULL,
+  confidence REAL NOT NULL,
+  notes TEXT,
+  created_at TEXT,
+  nutrient_name TEXT,
+  nutrient_class TEXT,
+  tpt_id TEXT REFERENCES tpt_nodes(id) ON DELETE CASCADE,
+  FOREIGN KEY (nutrient_id) REFERENCES nutrients(id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_nutrient_row_food_id ON nutrient_row(food_id);
+CREATE INDEX IF NOT EXISTS idx_nutrient_row_nutrient_id ON nutrient_row(nutrient_id);
+CREATE INDEX IF NOT EXISTS idx_nutrient_row_source ON nutrient_row(source);
+CREATE INDEX IF NOT EXISTS idx_nutrient_row_tpt_id ON nutrient_row(tpt_id);
+
+-- Evidence mapping table (food_id → TPT mapping)
+CREATE TABLE IF NOT EXISTS evidence_mapping (
+  id TEXT PRIMARY KEY,
+  food_id TEXT NOT NULL,
+  source TEXT NOT NULL,
+  tpt_id TEXT REFERENCES tpt_nodes(id) ON DELETE CASCADE,
+  taxon_id TEXT NOT NULL,
+  part_id TEXT NOT NULL,
+  transforms_json TEXT NOT NULL,
+  confidence REAL NOT NULL,
+  disposition TEXT NOT NULL,
+  reason TEXT,
+  created_at TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_evidence_mapping_food_id ON evidence_mapping(food_id);
+CREATE INDEX IF NOT EXISTS idx_evidence_mapping_tpt_id ON evidence_mapping(tpt_id);
+CREATE INDEX IF NOT EXISTS idx_evidence_mapping_source ON evidence_mapping(source);
+
+-- Nutrient profile rollup table (pre-computed aggregates)
+CREATE TABLE IF NOT EXISTS nutrient_profile_rollup (
+  tpt_id TEXT NOT NULL REFERENCES tpt_nodes(id) ON DELETE CASCADE,
+  nutrient_id TEXT NOT NULL REFERENCES nutrients(id),
+  value REAL NOT NULL,
+  unit TEXT NOT NULL,
+  source_count INTEGER NOT NULL,
+  min_value REAL,
+  max_value REAL,
+  confidence REAL NOT NULL,
+  updated_at TEXT NOT NULL,
+  PRIMARY KEY (tpt_id, nutrient_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_nutrient_profile_tpt ON nutrient_profile_rollup(tpt_id);
+CREATE INDEX IF NOT EXISTS idx_nutrient_profile_nutrient ON nutrient_profile_rollup(nutrient_id);
+CREATE INDEX IF NOT EXISTS idx_nutrient_profile_tpt_nutrient ON nutrient_profile_rollup(tpt_id, nutrient_id);
+CREATE INDEX IF NOT EXISTS idx_nutrient_row_tpt_nutrient ON nutrient_row(tpt_id, nutrient_id);
 """
 
 def _last(seg: str) -> str:
@@ -390,7 +457,8 @@ def build_sqlite(*, in_dir: Path, build_dir: Path, db_path: Path, verbose: bool 
 
     # Load compiled pieces
     taxa = read_jsonl(build_dir / "compiled" / "taxa.jsonl")
-    docs = read_jsonl(build_dir / "compiled" / "docs.jsonl")
+    docs_path = build_dir / "compiled" / "docs.jsonl"
+    docs = read_jsonl(docs_path) if docs_path.exists() else []
     parts_obj = read_json(build_dir / "compiled" / "parts.json")
     # Accept either array-of-objects ({id,name,...}) or map {id: {...}}
     if isinstance(parts_obj, dict):
@@ -488,14 +556,16 @@ def build_sqlite(*, in_dir: Path, build_dir: Path, db_path: Path, verbose: bool 
             parent = row.get("parent")
             try:
                 cur.execute("""
-                  INSERT INTO nodes (id, name, slug, rank, parent_id)
-                  VALUES (?, ?, ?, ?, ?)
+                  INSERT INTO nodes (id, name, slug, rank, parent_id, ncbi_taxid, ncbi_lineage_json)
+                  VALUES (?, ?, ?, ?, ?, ?, ?)
                   ON CONFLICT(id) DO UPDATE SET
                     name=excluded.name,
                     slug=excluded.slug,
                     rank=excluded.rank,
-                    parent_id=excluded.parent_id
-                """, (tid, nm, row.get("slug") or slug, rank, parent))
+                    parent_id=excluded.parent_id,
+                    ncbi_taxid=excluded.ncbi_taxid,
+                    ncbi_lineage_json=excluded.ncbi_lineage_json
+                """, (tid, nm, row.get("slug") or slug, rank, parent, row.get("ncbi_taxid"), row.get("ncbi_lineage_json")))
             except sqlite3.IntegrityError as e:
                 # Handle UNIQUE(slug,parent_id) collisions without deleting other rows
                 if "UNIQUE constraint failed: nodes.slug, nodes.parent_id" not in str(e):
@@ -506,14 +576,16 @@ def build_sqlite(*, in_dir: Path, build_dir: Path, db_path: Path, verbose: bool 
                     alt = f"{base}-{k}"
                     try:
                         cur.execute("""
-                          INSERT INTO nodes (id, name, slug, rank, parent_id)
-                          VALUES (?, ?, ?, ?, ?)
+                          INSERT INTO nodes (id, name, slug, rank, parent_id, ncbi_taxid, ncbi_lineage_json)
+                          VALUES (?, ?, ?, ?, ?, ?, ?)
                           ON CONFLICT(id) DO UPDATE SET
                             name=excluded.name,
                             slug=excluded.slug,
                             rank=excluded.rank,
-                            parent_id=excluded.parent_id
-                        """, (tid, nm, alt, rank, parent))
+                            parent_id=excluded.parent_id,
+                            ncbi_taxid=excluded.ncbi_taxid,
+                            ncbi_lineage_json=excluded.ncbi_lineage_json
+                        """, (tid, nm, alt, rank, parent, row.get("ncbi_taxid"), row.get("ncbi_lineage_json")))
                         break
                     except sqlite3.IntegrityError as e2:
                         if "UNIQUE constraint failed: nodes.slug, nodes.parent_id" in str(e2):
@@ -640,16 +712,17 @@ def build_sqlite(*, in_dir: Path, build_dir: Path, db_path: Path, verbose: bool 
             print(f"Row: {row}")
             raise
 
-    # Insert taxon docs
-    for row in docs:
-        tid = row["taxon_id"]
-        lang = row.get("lang", "en")
-        summary = row.get("summary", "")
-        desc = row.get("description_md", "")
-        updated = row.get("updated_at", datetime.now(timezone.utc).isoformat())
-        checksum = row.get("checksum", "")
-        cur.execute("INSERT OR REPLACE INTO taxon_doc (taxon_id, lang, summary, description_md, updated_at, checksum) VALUES (?, ?, ?, ?, ?, ?)",
-                   (tid, lang, summary, desc, updated, checksum))
+    # Insert taxon docs (only if docs exist)
+    if docs:
+        for row in docs:
+            tid = row["taxon_id"]
+            lang = row.get("lang", "en")
+            summary = row.get("summary", "")
+            desc = row.get("description_md", "")
+            updated = row.get("updated_at", datetime.now(timezone.utc).isoformat())
+            checksum = row.get("checksum", "")
+            cur.execute("INSERT OR REPLACE INTO taxon_doc (taxon_id, lang, summary, description_md, updated_at, checksum) VALUES (?, ?, ?, ?, ?, ?)",
+                       (tid, lang, summary, desc, updated, checksum))
 
     # Insert TP nodes (respect name overrides if present)
     for i, row in enumerate(tp_index):

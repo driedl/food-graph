@@ -6,12 +6,14 @@ from rich.console import Console
 from rich.text import Text
 
 from graph.stages.stage_0.runner import run as run_0
+from graph.stages.stage_1.runner import run as run_1
 from graph.stages.stage_a.runner import run as run_A
 from graph.stages.stage_b.runner import run as run_B, preflight as pre_B
 from graph.stages.stage_c.runner import run as run_C, preflight as pre_C
 from graph.stages.stage_d.runner import run as run_D, preflight as pre_D
 from graph.stages.stage_e.runner import run as run_E, preflight as pre_E
 from graph.stages.stage_f.runner import run as run_F, preflight as pre_F
+from graph.stages.stage_g import run as run_G
 from graph.contracts.engine import verify
 
 console = Console()
@@ -106,14 +108,14 @@ def main():
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     run = sub.add_parser("run", help="Run a stage")
-    run.add_argument("stage", choices=["0", "A", "B", "C", "D", "E", "F", "0A", "0AB", "0ABC", "0ABCDE", "0ABCDEF", "build"], help="Stage(s) to run")
+    run.add_argument("stage", choices=["0", "1", "A", "B", "C", "D", "E", "F", "G", "01", "01A", "01AB", "01ABC", "01ABCDE", "01ABCDEF", "01ABCDEFG", "build"], help="Stage(s) to run")
     run.add_argument("--in", dest="in_dir", default="data/ontology")
     run.add_argument("--build", dest="build_dir", default="etl/build")
     run.add_argument("--verbose", action="store_true")
     run.add_argument("--with-tests", action="store_true", help="Run contract verification after each stage")
     
     test = sub.add_parser("test", help="Test a stage's contract")
-    test.add_argument("stage", choices=["0", "A", "B", "C", "D", "E", "F"], help="Stage to test")
+    test.add_argument("stage", choices=["0", "1", "A", "B", "C", "D", "E", "F", "G"], help="Stage to test")
     test.add_argument("--in", dest="in_dir", default="data/ontology")
     test.add_argument("--build", dest="build_dir", default="etl/build")
     test.add_argument("--verbose", action="store_true")
@@ -126,6 +128,9 @@ def main():
         
         if args.stage == "0":
             rc, _ = run_stage_with_tests(run_0, "0", "Compiling taxa and docs", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, False, args.verbose)
+            sys.exit(rc)
+        if args.stage == "1":
+            rc, _ = run_stage_with_tests(run_1, "1", "NCBI verification", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
             sys.exit(rc)
         if args.stage == "A":
             rc, _ = run_stage_with_tests(run_A, "A", "Normalizing transforms and rules", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
@@ -169,8 +174,15 @@ def main():
                 print_error(f"Preflight F: {e}")
                 sys.exit(2)
             rc, _ = run_stage_with_tests(run_F, "F", "SQLite graph packer", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
+            if rc != 0: sys.exit(rc)
+            
+            rc, _ = run_stage_with_tests(run_G, "G", "Load evidence and compute rollups", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
             sys.exit(rc)
-        if args.stage in ("0ABC", "0ABCDE", "0ABCDEF", "build"):
+            
+        if args.stage == "G":
+            rc, _ = run_stage_with_tests(run_G, "G", "Load evidence and compute rollups", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
+            sys.exit(rc)
+        if args.stage in ("0ABC", "0ABCDE", "0ABCDEF", "0ABCDEFG", "build"):
             # Run all stages with timing and optional tests
             rc, _ = run_stage_with_tests(run_0, "0", "Compiling taxa and docs", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, False, args.verbose)
             if rc != 0: sys.exit(rc)
@@ -216,6 +228,9 @@ def main():
                 print_error(f"Preflight F: {e}")
                 sys.exit(2)
             rc, _ = run_stage_with_tests(run_F, "F", "SQLite graph packer", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
+            if rc != 0: sys.exit(rc)
+            
+            rc, _ = run_stage_with_tests(run_G, "G", "Load evidence and compute rollups", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
             
             total_duration = (time.time() - total_start) * 1000
             if rc == 0:
@@ -228,8 +243,10 @@ def main():
             rc, _ = run_stage_with_tests(run_A, "A", "Normalizing transforms and rules", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
             sys.exit(rc)
             
-        if args.stage == "0AB":
+        if args.stage == "01AB":
             rc, _ = run_stage_with_tests(run_0, "0", "Compiling taxa and docs", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, False, args.verbose)
+            if rc != 0: sys.exit(rc)
+            rc, _ = run_stage_with_tests(run_1, "1", "NCBI verification", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
             if rc != 0: sys.exit(rc)
             
             rc, _ = run_stage_with_tests(run_A, "A", "Normalizing transforms and rules", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
@@ -242,10 +259,125 @@ def main():
                 sys.exit(2)
             rc, _ = run_stage_with_tests(run_B, "B", "Building substrates", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
             sys.exit(rc)
+            
+        if args.stage == "01":
+            rc, _ = run_stage_with_tests(run_0, "0", "Compiling taxa and docs", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, False, args.verbose)
+            if rc != 0: sys.exit(rc)
+            rc, _ = run_stage_with_tests(run_1, "1", "NCBI verification", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
+            sys.exit(rc)
+            
+        if args.stage == "01A":
+            rc, _ = run_stage_with_tests(run_0, "0", "Compiling taxa and docs", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, False, args.verbose)
+            if rc != 0: sys.exit(rc)
+            rc, _ = run_stage_with_tests(run_1, "1", "NCBI verification", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
+            if rc != 0: sys.exit(rc)
+            rc, _ = run_stage_with_tests(run_A, "A", "Normalizing transforms and rules", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
+            sys.exit(rc)
+            
+        if args.stage == "01ABC":
+            rc, _ = run_stage_with_tests(run_0, "0", "Compiling taxa and docs", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, False, args.verbose)
+            if rc != 0: sys.exit(rc)
+            rc, _ = run_stage_with_tests(run_1, "1", "NCBI verification", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
+            if rc != 0: sys.exit(rc)
+            rc, _ = run_stage_with_tests(run_A, "A", "Normalizing transforms and rules", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
+            if rc != 0: sys.exit(rc)
+            try: 
+                pre_B(in_dir, build_dir)
+            except Exception as e: 
+                print_error(f"Preflight B: {e}")
+                sys.exit(2)
+            rc, _ = run_stage_with_tests(run_B, "B", "Building substrates", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
+            if rc != 0: sys.exit(rc)
+            try: 
+                pre_C(in_dir, build_dir)
+            except Exception as e: 
+                print_error(f"Preflight C: {e}")
+                sys.exit(2)
+            rc, _ = run_stage_with_tests(run_C, "C", "Ingesting curated seed", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
+            sys.exit(rc)
+            
+        if args.stage == "01ABCDE":
+            rc, _ = run_stage_with_tests(run_0, "0", "Compiling taxa and docs", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, False, args.verbose)
+            if rc != 0: sys.exit(rc)
+            rc, _ = run_stage_with_tests(run_1, "1", "NCBI verification", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
+            if rc != 0: sys.exit(rc)
+            rc, _ = run_stage_with_tests(run_A, "A", "Normalizing transforms and rules", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
+            if rc != 0: sys.exit(rc)
+            try: 
+                pre_B(in_dir, build_dir)
+            except Exception as e: 
+                print_error(f"Preflight B: {e}")
+                sys.exit(2)
+            rc, _ = run_stage_with_tests(run_B, "B", "Building substrates", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
+            if rc != 0: sys.exit(rc)
+            try: 
+                pre_C(in_dir, build_dir)
+            except Exception as e: 
+                print_error(f"Preflight C: {e}")
+                sys.exit(2)
+            rc, _ = run_stage_with_tests(run_C, "C", "Ingesting curated seed", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
+            if rc != 0: sys.exit(rc)
+            try: 
+                pre_D(in_dir, build_dir)
+            except Exception as e: 
+                print_error(f"Preflight D: {e}")
+                sys.exit(2)
+            rc, _ = run_stage_with_tests(run_D, "D", "Family expansions", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
+            if rc != 0: sys.exit(rc)
+            try: 
+                pre_E(in_dir, build_dir)
+            except Exception as e: 
+                print_error(f"Preflight E: {e}")
+                sys.exit(2)
+            rc, _ = run_stage_with_tests(run_E, "E", "Canonical IDs", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
+            sys.exit(rc)
+            
+        if args.stage == "01ABCDEF":
+            rc, _ = run_stage_with_tests(run_0, "0", "Compiling taxa and docs", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, False, args.verbose)
+            if rc != 0: sys.exit(rc)
+            rc, _ = run_stage_with_tests(run_1, "1", "NCBI verification", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
+            if rc != 0: sys.exit(rc)
+            rc, _ = run_stage_with_tests(run_A, "A", "Normalizing transforms and rules", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
+            if rc != 0: sys.exit(rc)
+            try: 
+                pre_B(in_dir, build_dir)
+            except Exception as e: 
+                print_error(f"Preflight B: {e}")
+                sys.exit(2)
+            rc, _ = run_stage_with_tests(run_B, "B", "Building substrates", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
+            if rc != 0: sys.exit(rc)
+            try: 
+                pre_C(in_dir, build_dir)
+            except Exception as e: 
+                print_error(f"Preflight C: {e}")
+                sys.exit(2)
+            rc, _ = run_stage_with_tests(run_C, "C", "Ingesting curated seed", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
+            if rc != 0: sys.exit(rc)
+            try: 
+                pre_D(in_dir, build_dir)
+            except Exception as e: 
+                print_error(f"Preflight D: {e}")
+                sys.exit(2)
+            rc, _ = run_stage_with_tests(run_D, "D", "Family expansions", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
+            if rc != 0: sys.exit(rc)
+            try: 
+                pre_E(in_dir, build_dir)
+            except Exception as e: 
+                print_error(f"Preflight E: {e}")
+                sys.exit(2)
+            rc, _ = run_stage_with_tests(run_E, "E", "Canonical IDs", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
+            if rc != 0: sys.exit(rc)
+            try: 
+                pre_F(in_dir, build_dir)
+            except Exception as e: 
+                print_error(f"Preflight F: {e}")
+                sys.exit(2)
+            rc, _ = run_stage_with_tests(run_F, "F", "SQLite pack", in_dir, build_dir, args.verbose, args.with_tests, in_dir, build_dir, args.verbose)
+            sys.exit(rc)
     
     elif args.cmd == "test":
         in_dir = Path(args.in_dir); build_dir = Path(args.build_dir)
-        stage_map = {"0": "stage_0", "A": "stage_a", "B": "stage_b", "C": "stage_c", "D": "stage_d", "E": "stage_e", "F": "stage_f"}
+        stage_map = {"0": "stage_0", "1": "stage_1", "A": "stage_a", "B": "stage_b", "C": "stage_c", "D": "stage_d", "E": "stage_e", "F": "stage_f"}
         stage_name = stage_map[args.stage]
         
         print_stage_header(f"Test {args.stage}", f"Contract verification")
