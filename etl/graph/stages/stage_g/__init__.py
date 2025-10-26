@@ -5,6 +5,7 @@ from typing import Dict, Any, Tuple
 
 from etl.evidence.load_evidence import load_evidence_to_db
 from etl.evidence.compute_rollup import compute_nutrient_rollups
+from etl.lib.config import find_project_root, resolve_path
 from .contract import verify_stage_g_contract
 
 def run(
@@ -19,7 +20,10 @@ def run(
     """
     start_time = time.time()
     db_path = build_dir / "database" / "graph.dev.sqlite"
-    evidence_base_dir = Path("data/evidence")
+    
+    # Find project root and resolve evidence path
+    project_root = find_project_root()
+    evidence_base_dir = resolve_path("data/evidence", project_root)
     source_quality_config = in_dir / "source_quality.json"
 
     if not evidence_base_dir.exists():

@@ -298,8 +298,7 @@ def _load_family_rules(in_dir: Path) -> List[Dict[str, Any]]:
 def _final_id(taxon_id: str, part_id: str, family: Optional[str], sig: str) -> str:
     # Keep this stable and short; last 12 of SHA1 is plenty for our scale
     suffix = sig[:12]
-    fam = (family or "unknown")
-    return f"tpt:{taxon_id}:{part_id}:{fam}:{suffix}"
+    return f"{taxon_id}|{part_id}|{suffix}"
 
 def canon_and_id(in_dir: Path, tmp_dir: Path, verbose: bool = False) -> None:
     ensure_dir(tmp_dir)

@@ -21,6 +21,8 @@ Rules (critical):
 - Only cultivar/variety are permitted in plant suffixes; animals may append [breed]. Otherwise, back off rank.
 - Ignore marketing tokens (colors/grades/size) in taxon_id.
 - Non-biological items (minerals/water) => disposition="skip" with null IDs.
+- Processed meat products (frankfurters, sausages, hot dogs, deli meats) are typically multi-ingredient and should be disposition="skip".
+- When in doubt about multi-ingredient status, prefer "skip" over forcing a single-species mapping.
 - If label implies process (frozen, pasteurized, cooked, ground), you MUST include those transforms (if present in the registry) and set node_kind="tpt"; if missing, return disposition="ambiguous".
 """.strip()
 

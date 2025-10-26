@@ -185,8 +185,7 @@ def complete_taxonomic_tree_with_ncbi_hierarchy(taxa: List[Dict[str, Any]], pare
                     all_taxa.append(intermediate_node)
                     added_taxa.add(our_taxon_id)
                     
-                    if verbose:
-                        print(f"Added NCBI hierarchy node: {our_taxon_id} ({node_data['rank']})")
+                    # Don't print individual nodes - we'll summarize at the end
         else:
             # For taxa without NCBI IDs, create missing parents using basic logic
             current_id = taxon['id']
@@ -270,7 +269,12 @@ def complete_taxonomic_tree_with_ncbi_hierarchy(taxa: List[Dict[str, Any]], pare
         
         return result
     
-    return topological_sort(all_taxa)
+    result = topological_sort(all_taxa)
+    
+    if verbose and added_taxa:
+        print(f"Added {len(added_taxa)} NCBI hierarchy nodes to complete taxonomic tree")
+    
+    return result
 
 def walk_ncbi_hierarchy(start_taxid: int, ncbi_db: sqlite3.Connection, verbose: bool = False) -> List[Dict[str, Any]]:
     """Walk up the NCBI hierarchy from a given taxid to kingdom level."""

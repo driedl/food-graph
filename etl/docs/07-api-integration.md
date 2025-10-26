@@ -86,7 +86,7 @@ import { api } from './utils/api';
 
 // Type-safe API calls
 const profile: NutrientProfile = await api.nutrition.getNutrientProfile.query({
-  tptId: "tpt:tx:p:malus:domestica:part:fruit:FRESH:abc123"
+  tptId: "tx:p:malus:domestica|part:fruit|abc123"
 });
 ```
 

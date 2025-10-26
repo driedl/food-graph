@@ -63,8 +63,9 @@ def temp_ontology_dir():
 ]''')
         
         # Create minimal parts
-        parts_file = ontology_dir / "parts.json"
-        parts_file.write_text('''[{"id": "part:fruit", "name": "Fruit"}, {"id": "part:leaf", "name": "Leaf"}]''')
+        parts_file = ontology_dir / "parts.core.jsonl"
+        parts_file.write_text('''{"id": "part:fruit", "name": "Fruit"}
+{"id": "part:leaf", "name": "Leaf"}''')
         
         # Create minimal attributes
         attributes_file = ontology_dir / "attributes.json"

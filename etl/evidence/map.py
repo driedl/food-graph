@@ -67,7 +67,8 @@ def build_static_header(parts: List[Dict[str, Any]], transforms: List[Dict[str, 
         }
       },
       "mapping_policies": {
-        "mixtures": "Reject true multi-ingredient composites that cannot be expressed as transforms on a single (taxon,part).",
+        "mixtures": "Reject true multi-ingredient composites that cannot be expressed as transforms on a single (taxon,part). Processed meat products (sausages, frankfurters, hot dogs, deli meats) are typically multi-ingredient and should be disposition='skip' unless they are clearly single-species products.",
+        "processed_meat_products": "Sausages, frankfurters, hot dogs, deli meats, and similar processed meat products are typically multi-ingredient composites containing multiple species, fats, spices, and binders. These should generally be disposition='skip' unless the label clearly indicates single-species composition.",
         "non_biological": "Minerals/water (e.g., table salt, iodized salt) have no biological taxon: always disposition='skip'; do not propose new parts.",
         "label_implied_transforms": "If the label implies a process (frozen, pasteurized, cooked/roasted/broiled/grilled, ground/minced), you MUST include those transforms if present in the registry and set node_kind='tpt'. If a required transform is missing from the registry, return disposition='ambiguous'.",
         "dairy": "Allowed (TPT). Use transforms (e.g., ferment/strain/pasteurize) with identity params when applicable.",
@@ -203,6 +204,17 @@ def build_static_header(parts: List[Dict[str, Any]], transforms: List[Dict[str, 
             },
             "confidence":0.85,
             "reason_short":"pressed and refined Brassica napus oil",
+            "new_taxa":[],"new_parts":[],"new_transforms":[]
+          }
+        },
+        {
+          "input": {"label":"Frankfurter, beef, unheated","category":"Sausages and Luncheon Meats"},
+          "output": {
+            "disposition":"skip",
+            "node_kind":"tp",
+            "identity_json":{"taxon_id":null,"part_id":null,"transforms":[]},
+            "confidence":0.95,
+            "reason_short":"Multi-ingredient processed meat product",
             "new_taxa":[],"new_parts":[],"new_transforms":[]
           }
         }

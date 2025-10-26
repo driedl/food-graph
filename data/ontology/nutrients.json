@@ -1,19 +1,35 @@
 {
   "canonical_scheme": "INFOODS_tagnames",
-  "version": "v1.1",
-  "notes": "Canonical IDs use INFOODS tagnames. Adds per-nutrient FDC candidate IDs, unit conversions, and a few optional nutrients. Keep INFOODS units as canonical; convert FDC as needed.",
+  "version": "v1.2",
+  "notes": "Canonical IDs use INFOODS tagnames. Adds per-nutrient FDC candidate IDs, unit conversions, and a few optional nutrients. Keep INFOODS units as canonical; convert FDC as needed. Added high and medium priority FDC nutrients for comprehensive coverage.",
   "metadata": {
     "added_nutrients": [
       "FIBSOL",
       "FIBINS",
       "FAPUN3",
       "FAPUN6",
-      "RS"
+      "RS",
+      "VITK_DHQ",
+      "VITK_MK4",
+      "FIBTG_HMW",
+      "FIBTG_LMW",
+      "FOL_5MTHF",
+      "FATRN_MONO",
+      "FATRN_DIENOIC",
+      "FATRN_POLYENOIC",
+      "TRP",
+      "LYS",
+      "MET",
+      "CYS",
+      "LYCPN",
+      "LUTZEA",
+      "LUTZEA_TOTAL",
+      "ZEAX"
     ],
     "rounding_defaults": {
       "g": 1,
       "mg": 0,
-      "µg": 0,
+      "\u00b5g": 0,
       "kcal": 0,
       "kJ": 0
     }
@@ -28,7 +44,10 @@
       "fdc_candidates": [
         "208",
         "957",
-        "958"
+        "958",
+        "1008",
+        "2047",
+        "2048"
       ],
       "fdc_unit": "KCAL",
       "unit_factor_from_fdc": 1,
@@ -70,7 +89,8 @@
       "unit": "kJ",
       "sr_legacy_num": "268",
       "fdc_candidates": [
-        "268"
+        "268",
+        "1062"
       ],
       "fdc_unit": "KJ",
       "unit_factor_from_fdc": 1,
@@ -98,7 +118,8 @@
       "unit": "g",
       "sr_legacy_num": "255",
       "fdc_candidates": [
-        "255"
+        "255",
+        "1051"
       ],
       "fdc_unit": "G",
       "unit_factor_from_fdc": 1,
@@ -120,7 +141,8 @@
       "unit": "g",
       "sr_legacy_num": "207",
       "fdc_candidates": [
-        "207"
+        "207",
+        "1007"
       ],
       "fdc_unit": "G",
       "unit_factor_from_fdc": 1,
@@ -140,7 +162,8 @@
       "unit": "g",
       "sr_legacy_num": "203",
       "fdc_candidates": [
-        "203"
+        "203",
+        "1003"
       ],
       "fdc_unit": "G",
       "unit_factor_from_fdc": 1,
@@ -161,7 +184,9 @@
       "sr_legacy_num": "204",
       "fdc_candidates": [
         "204",
-        "298"
+        "298",
+        "1004",
+        "1085"
       ],
       "fdc_unit": "G",
       "unit_factor_from_fdc": 1,
@@ -184,6 +209,8 @@
       "sr_legacy_num": "205",
       "fdc_candidates": [
         "205",
+        "1005",
+        "1050",
         "205.2"
       ],
       "fdc_unit": "G",
@@ -229,7 +256,9 @@
       "sr_legacy_num": "291",
       "fdc_candidates": [
         "291",
-        "293"
+        "293",
+        "1079",
+        "2033"
       ],
       "fdc_unit": "G",
       "unit_factor_from_fdc": 1,
@@ -253,6 +282,8 @@
       "sr_legacy_num": "269",
       "fdc_candidates": [
         "269",
+        "1063",
+        "2000",
         "269.3"
       ],
       "fdc_unit": "G",
@@ -275,7 +306,8 @@
       "unit": "g",
       "sr_legacy_num": "209",
       "fdc_candidates": [
-        "209"
+        "209",
+        "1009"
       ],
       "fdc_unit": "G",
       "unit_factor_from_fdc": 1,
@@ -295,7 +327,8 @@
       "unit": "g",
       "sr_legacy_num": "221",
       "fdc_candidates": [
-        "221"
+        "221",
+        "1018"
       ],
       "fdc_unit": "G",
       "unit_factor_from_fdc": 1,
@@ -317,7 +350,8 @@
       "unit": "mg",
       "sr_legacy_num": "601",
       "fdc_candidates": [
-        "601"
+        "601",
+        "1253"
       ],
       "fdc_unit": "MG",
       "unit_factor_from_fdc": 1,
@@ -337,7 +371,8 @@
       "unit": "mg",
       "sr_legacy_num": "307",
       "fdc_candidates": [
-        "307"
+        "307",
+        "1093"
       ],
       "fdc_unit": "MG",
       "unit_factor_from_fdc": 1,
@@ -357,7 +392,8 @@
       "unit": "mg",
       "sr_legacy_num": "306",
       "fdc_candidates": [
-        "306"
+        "306",
+        "1092"
       ],
       "fdc_unit": "MG",
       "unit_factor_from_fdc": 1,
@@ -377,7 +413,8 @@
       "unit": "mg",
       "sr_legacy_num": "301",
       "fdc_candidates": [
-        "301"
+        "301",
+        "1087"
       ],
       "fdc_unit": "MG",
       "unit_factor_from_fdc": 1,
@@ -397,7 +434,8 @@
       "unit": "mg",
       "sr_legacy_num": "305",
       "fdc_candidates": [
-        "305"
+        "305",
+        "1091"
       ],
       "fdc_unit": "MG",
       "unit_factor_from_fdc": 1,
@@ -417,7 +455,8 @@
       "unit": "mg",
       "sr_legacy_num": "304",
       "fdc_candidates": [
-        "304"
+        "304",
+        "1090"
       ],
       "fdc_unit": "MG",
       "unit_factor_from_fdc": 1,
@@ -437,7 +476,8 @@
       "unit": "mg",
       "sr_legacy_num": "303",
       "fdc_candidates": [
-        "303"
+        "303",
+        "1089"
       ],
       "fdc_unit": "MG",
       "unit_factor_from_fdc": 1,
@@ -457,7 +497,8 @@
       "unit": "mg",
       "sr_legacy_num": "309",
       "fdc_candidates": [
-        "309"
+        "309",
+        "1095"
       ],
       "fdc_unit": "MG",
       "unit_factor_from_fdc": 1,
@@ -477,7 +518,8 @@
       "unit": "mg",
       "sr_legacy_num": "312",
       "fdc_candidates": [
-        "312"
+        "312",
+        "1098"
       ],
       "fdc_unit": "MG",
       "unit_factor_from_fdc": 1,
@@ -497,7 +539,8 @@
       "unit": "mg",
       "sr_legacy_num": "315",
       "fdc_candidates": [
-        "315"
+        "315",
+        "1101"
       ],
       "fdc_unit": "MG",
       "unit_factor_from_fdc": 1,
@@ -514,10 +557,11 @@
       "id": "SE",
       "name": "Selenium",
       "class": "mineral",
-      "unit": "µg",
+      "unit": "\u00b5g",
       "sr_legacy_num": "317",
       "fdc_candidates": [
-        "317"
+        "317",
+        "1103"
       ],
       "fdc_unit": "UG",
       "unit_factor_from_fdc": 1,
@@ -537,7 +581,8 @@
       "unit": "mg",
       "sr_legacy_num": "302",
       "fdc_candidates": [
-        "302"
+        "302",
+        "1088"
       ],
       "fdc_unit": "MG",
       "unit_factor_from_fdc": 1,
@@ -560,10 +605,11 @@
       "id": "CR",
       "name": "Chromium",
       "class": "mineral",
-      "unit": "µg",
+      "unit": "\u00b5g",
       "sr_legacy_num": "310",
       "fdc_candidates": [
-        "310"
+        "310",
+        "1096"
       ],
       "fdc_unit": "UG",
       "unit_factor_from_fdc": 1,
@@ -580,10 +626,11 @@
       "id": "MO",
       "name": "Molybdenum",
       "class": "mineral",
-      "unit": "µg",
+      "unit": "\u00b5g",
       "sr_legacy_num": "316",
       "fdc_candidates": [
-        "316"
+        "316",
+        "1102"
       ],
       "fdc_unit": "UG",
       "unit_factor_from_fdc": 1,
@@ -600,10 +647,11 @@
       "id": "I",
       "name": "Iodine",
       "class": "mineral",
-      "unit": "µg",
+      "unit": "\u00b5g",
       "sr_legacy_num": "314",
       "fdc_candidates": [
-        "314"
+        "314",
+        "1100"
       ],
       "fdc_unit": "UG",
       "unit_factor_from_fdc": 1,
@@ -623,7 +671,8 @@
       "unit": "mg",
       "sr_legacy_num": "313",
       "fdc_candidates": [
-        "313"
+        "313",
+        "1099"
       ],
       "fdc_unit": "UG",
       "unit_factor_from_fdc": 0.001,
@@ -640,10 +689,11 @@
       "id": "VITA_RAE",
       "name": "Vitamin A (RAE)",
       "class": "vitamin",
-      "unit": "µg",
+      "unit": "\u00b5g",
       "sr_legacy_num": "320",
       "fdc_candidates": [
-        "320"
+        "320",
+        "1106"
       ],
       "fdc_unit": "UG",
       "unit_factor_from_fdc": 1,
@@ -661,19 +711,19 @@
       "computed_from": [
         {
           "id": "RETOL",
-          "factor_per_µg": 1
+          "factor_per_\u00b5g": 1
         },
         {
           "id": "CARTB",
-          "factor_per_µg": 0.0833333333
+          "factor_per_\u00b5g": 0.0833333333
         },
         {
           "id": "CARTA",
-          "factor_per_µg": 0.0416666667
+          "factor_per_\u00b5g": 0.0416666667
         },
         {
           "id": "CRYPX",
-          "factor_per_µg": 0.0416666667
+          "factor_per_\u00b5g": 0.0416666667
         }
       ],
       "label_priority": true,
@@ -681,16 +731,17 @@
         "decimals": 0
       },
       "confidence": "high",
-      "notes_method": "If only IU is available (FDC 318), convert IU→µg as 0.3 µg/IU only for retinol-only entries; otherwise compute RAE from retinol and provitamin A carotenoids."
+      "notes_method": "If only IU is available (FDC 318), convert IU\u2192\u00b5g as 0.3 \u00b5g/IU only for retinol-only entries; otherwise compute RAE from retinol and provitamin A carotenoids."
     },
     {
       "id": "RETOL",
       "name": "Retinol",
       "class": "vitamin",
-      "unit": "µg",
+      "unit": "\u00b5g",
       "sr_legacy_num": "319",
       "fdc_candidates": [
-        "319"
+        "319",
+        "1105"
       ],
       "fdc_unit": "UG",
       "unit_factor_from_fdc": 1,
@@ -707,10 +758,11 @@
       "id": "CARTA",
       "name": "Alpha-carotene",
       "class": "carotenoid",
-      "unit": "µg",
+      "unit": "\u00b5g",
       "sr_legacy_num": "322",
       "fdc_candidates": [
-        "322"
+        "322",
+        "1108"
       ],
       "fdc_unit": "UG",
       "unit_factor_from_fdc": 1,
@@ -727,10 +779,11 @@
       "id": "CARTB",
       "name": "Beta-carotene",
       "class": "carotenoid",
-      "unit": "µg",
+      "unit": "\u00b5g",
       "sr_legacy_num": "321",
       "fdc_candidates": [
-        "321"
+        "321",
+        "1107"
       ],
       "fdc_unit": "UG",
       "unit_factor_from_fdc": 1,
@@ -747,10 +800,11 @@
       "id": "CRYPX",
       "name": "Beta-cryptoxanthin",
       "class": "carotenoid",
-      "unit": "µg",
+      "unit": "\u00b5g",
       "sr_legacy_num": "334",
       "fdc_candidates": [
-        "334"
+        "334",
+        "1120"
       ],
       "fdc_unit": "UG",
       "unit_factor_from_fdc": 1,
@@ -767,13 +821,17 @@
       "id": "VITD",
       "name": "Vitamin D (D2 + D3)",
       "class": "vitamin",
-      "unit": "µg",
+      "unit": "\u00b5g",
       "sr_legacy_num": "328",
       "fdc_candidates": [
-        "328",
         "324",
         "325",
-        "326"
+        "326",
+        "328",
+        "1110",
+        "1111",
+        "1112",
+        "1114"
       ],
       "fdc_unit": "UG",
       "unit_factor_from_fdc": 1,
@@ -791,11 +849,11 @@
       "computed_from": [
         {
           "id": "VITD2",
-          "factor_per_µg": 1
+          "factor_per_\u00b5g": 1
         },
         {
           "id": "VITD3",
-          "factor_per_µg": 1
+          "factor_per_\u00b5g": 1
         }
       ],
       "label_priority": true,
@@ -811,7 +869,8 @@
       "unit": "mg",
       "sr_legacy_num": "323",
       "fdc_candidates": [
-        "323"
+        "323",
+        "1109"
       ],
       "fdc_unit": "MG",
       "unit_factor_from_fdc": 1,
@@ -828,10 +887,11 @@
       "id": "VITK1",
       "name": "Vitamin K (phylloquinone)",
       "class": "vitamin",
-      "unit": "µg",
+      "unit": "\u00b5g",
       "sr_legacy_num": "430",
       "fdc_candidates": [
-        "430"
+        "430",
+        "1185"
       ],
       "fdc_unit": "UG",
       "unit_factor_from_fdc": 1,
@@ -851,7 +911,8 @@
       "unit": "mg",
       "sr_legacy_num": "404",
       "fdc_candidates": [
-        "404"
+        "404",
+        "1165"
       ],
       "fdc_unit": "MG",
       "unit_factor_from_fdc": 1,
@@ -871,7 +932,8 @@
       "unit": "mg",
       "sr_legacy_num": "405",
       "fdc_candidates": [
-        "405"
+        "405",
+        "1166"
       ],
       "fdc_unit": "MG",
       "unit_factor_from_fdc": 1,
@@ -891,7 +953,8 @@
       "unit": "mg",
       "sr_legacy_num": "406",
       "fdc_candidates": [
-        "406"
+        "406",
+        "1167"
       ],
       "fdc_unit": "MG",
       "unit_factor_from_fdc": 1,
@@ -911,7 +974,8 @@
       "unit": "mg",
       "sr_legacy_num": "410",
       "fdc_candidates": [
-        "410"
+        "410",
+        "1170"
       ],
       "fdc_unit": "MG",
       "unit_factor_from_fdc": 1,
@@ -931,7 +995,8 @@
       "unit": "mg",
       "sr_legacy_num": "415",
       "fdc_candidates": [
-        "415"
+        "415",
+        "1175"
       ],
       "fdc_unit": "MG",
       "unit_factor_from_fdc": 1,
@@ -948,11 +1013,13 @@
       "id": "FOL",
       "name": "Folate, total",
       "class": "vitamin",
-      "unit": "µg",
+      "unit": "\u00b5g",
       "sr_legacy_num": "417",
       "fdc_candidates": [
         "417",
-        "432"
+        "432",
+        "1177",
+        "1187"
       ],
       "fdc_unit": "UG",
       "unit_factor_from_fdc": 1,
@@ -969,10 +1036,11 @@
       "id": "FOLAC",
       "name": "Folic acid",
       "class": "vitamin",
-      "unit": "µg",
+      "unit": "\u00b5g",
       "sr_legacy_num": "431",
       "fdc_candidates": [
-        "431"
+        "431",
+        "1186"
       ],
       "fdc_unit": "UG",
       "unit_factor_from_fdc": 1,
@@ -989,10 +1057,11 @@
       "id": "FOLDFE",
       "name": "Folate, DFE",
       "class": "vitamin",
-      "unit": "µg",
+      "unit": "\u00b5g",
       "sr_legacy_num": "435",
       "fdc_candidates": [
-        "435"
+        "435",
+        "1190"
       ],
       "fdc_unit": "UG",
       "unit_factor_from_fdc": 1,
@@ -1004,11 +1073,11 @@
       "computed_from": [
         {
           "id": "FOL",
-          "factor_per_µg": 1
+          "factor_per_\u00b5g": 1
         },
         {
           "id": "FOLAC",
-          "factor_per_µg": 1.7
+          "factor_per_\u00b5g": 1.7
         }
       ],
       "label_priority": true,
@@ -1021,10 +1090,11 @@
       "id": "VITB12",
       "name": "Vitamin B12",
       "class": "vitamin",
-      "unit": "µg",
+      "unit": "\u00b5g",
       "sr_legacy_num": "418",
       "fdc_candidates": [
-        "418"
+        "418",
+        "1178"
       ],
       "fdc_unit": "UG",
       "unit_factor_from_fdc": 1,
@@ -1043,10 +1113,11 @@
       "id": "BIOTN",
       "name": "Biotin (B7)",
       "class": "vitamin",
-      "unit": "µg",
+      "unit": "\u00b5g",
       "sr_legacy_num": "416",
       "fdc_candidates": [
-        "416"
+        "416",
+        "1176"
       ],
       "fdc_unit": "UG",
       "unit_factor_from_fdc": 1,
@@ -1066,7 +1137,8 @@
       "unit": "mg",
       "sr_legacy_num": "421",
       "fdc_candidates": [
-        "421"
+        "421",
+        "1180"
       ],
       "fdc_unit": "MG",
       "unit_factor_from_fdc": 1,
@@ -1086,7 +1158,8 @@
       "unit": "mg",
       "sr_legacy_num": "401",
       "fdc_candidates": [
-        "401"
+        "401",
+        "1162"
       ],
       "fdc_unit": "MG",
       "unit_factor_from_fdc": 1,
@@ -1107,7 +1180,9 @@
       "sr_legacy_num": "606",
       "fdc_candidates": [
         "606",
-        "690"
+        "690",
+        "1258",
+        "1326"
       ],
       "fdc_unit": "G",
       "unit_factor_from_fdc": 1,
@@ -1128,7 +1203,9 @@
       "sr_legacy_num": "645",
       "fdc_candidates": [
         "645",
-        "691"
+        "691",
+        "1292",
+        "1327"
       ],
       "fdc_unit": "G",
       "unit_factor_from_fdc": 1,
@@ -1149,7 +1226,9 @@
       "sr_legacy_num": "646",
       "fdc_candidates": [
         "646",
-        "692"
+        "692",
+        "1293",
+        "1328"
       ],
       "fdc_unit": "G",
       "unit_factor_from_fdc": 1,
@@ -1169,7 +1248,8 @@
       "unit": "g",
       "sr_legacy_num": "605",
       "fdc_candidates": [
-        "605"
+        "605",
+        "1257"
       ],
       "fdc_unit": "G",
       "unit_factor_from_fdc": 1,
@@ -1189,7 +1269,8 @@
       "unit": "g",
       "sr_legacy_num": "851",
       "fdc_candidates": [
-        "851"
+        "851",
+        "1404"
       ],
       "fdc_unit": "G",
       "unit_factor_from_fdc": 1,
@@ -1211,7 +1292,8 @@
       "unit": "g",
       "sr_legacy_num": "675",
       "fdc_candidates": [
-        "675"
+        "675",
+        "1316"
       ],
       "fdc_unit": "G",
       "unit_factor_from_fdc": 1,
@@ -1233,7 +1315,8 @@
       "unit": "g",
       "sr_legacy_num": "629",
       "fdc_candidates": [
-        "629"
+        "629",
+        "1278"
       ],
       "fdc_unit": "G",
       "unit_factor_from_fdc": 1,
@@ -1255,7 +1338,8 @@
       "unit": "g",
       "sr_legacy_num": "631",
       "fdc_candidates": [
-        "631"
+        "631",
+        "1280"
       ],
       "fdc_unit": "G",
       "unit_factor_from_fdc": 1,
@@ -1277,7 +1361,8 @@
       "unit": "g",
       "sr_legacy_num": "621",
       "fdc_candidates": [
-        "621"
+        "621",
+        "1272"
       ],
       "fdc_unit": "G",
       "unit_factor_from_fdc": 1,
@@ -1299,7 +1384,8 @@
       "unit": "g",
       "sr_legacy_num": "210",
       "fdc_candidates": [
-        "210"
+        "210",
+        "1010"
       ],
       "fdc_unit": "G",
       "unit_factor_from_fdc": 1,
@@ -1319,7 +1405,8 @@
       "unit": "g",
       "sr_legacy_num": "211",
       "fdc_candidates": [
-        "211"
+        "211",
+        "1011"
       ],
       "fdc_unit": "G",
       "unit_factor_from_fdc": 1,
@@ -1341,7 +1428,8 @@
       "unit": "g",
       "sr_legacy_num": "212",
       "fdc_candidates": [
-        "212"
+        "212",
+        "1012"
       ],
       "fdc_unit": "G",
       "unit_factor_from_fdc": 1,
@@ -1361,7 +1449,8 @@
       "unit": "g",
       "sr_legacy_num": "213",
       "fdc_candidates": [
-        "213"
+        "213",
+        "1013"
       ],
       "fdc_unit": "G",
       "unit_factor_from_fdc": 1,
@@ -1381,7 +1470,8 @@
       "unit": "g",
       "sr_legacy_num": "214",
       "fdc_candidates": [
-        "214"
+        "214",
+        "1014"
       ],
       "fdc_unit": "G",
       "unit_factor_from_fdc": 1,
@@ -1401,7 +1491,8 @@
       "unit": "g",
       "sr_legacy_num": "539",
       "fdc_candidates": [
-        "539"
+        "539",
+        "1235"
       ],
       "fdc_unit": "G",
       "unit_factor_from_fdc": 1,
@@ -1423,7 +1514,8 @@
       "unit": "mg",
       "sr_legacy_num": "262",
       "fdc_candidates": [
-        "262"
+        "262",
+        "1057"
       ],
       "fdc_unit": "MG",
       "unit_factor_from_fdc": 1,
@@ -1443,7 +1535,8 @@
       "unit": "mg",
       "sr_legacy_num": "263",
       "fdc_candidates": [
-        "263"
+        "263",
+        "1058"
       ],
       "fdc_unit": "MG",
       "unit_factor_from_fdc": 1,
@@ -1463,7 +1556,8 @@
       "unit": "mg",
       "sr_legacy_num": "454",
       "fdc_candidates": [
-        "454"
+        "454",
+        "1198"
       ],
       "fdc_unit": "MG",
       "unit_factor_from_fdc": 1,
@@ -1484,9 +1578,13 @@
       "sr_legacy_num": "295",
       "fdc_candidates": [
         "295",
-        "293.2",
         "953",
-        "954"
+        "954",
+        "1082",
+        "2035",
+        "2036",
+        "2037",
+        "293.2"
       ],
       "fdc_unit": "G",
       "unit_factor_from_fdc": 1,
@@ -1510,6 +1608,8 @@
       "sr_legacy_num": "297",
       "fdc_candidates": [
         "297",
+        "1084",
+        "2034",
         "293.1"
       ],
       "fdc_unit": "G",
@@ -1600,7 +1700,8 @@
       "unit": "g",
       "sr_legacy_num": "283",
       "fdc_candidates": [
-        "283"
+        "283",
+        "1071"
       ],
       "fdc_unit": "G",
       "unit_factor_from_fdc": 1,
@@ -1619,10 +1720,11 @@
       "id": "VITD2",
       "name": "Vitamin D2 (ergocalciferol)",
       "class": "vitamin",
-      "unit": "µg",
+      "unit": "\u00b5g",
       "sr_legacy_num": "325",
       "fdc_candidates": [
-        "325"
+        "325",
+        "1111"
       ],
       "fdc_unit": "UG",
       "unit_factor_from_fdc": 1,
@@ -1639,10 +1741,11 @@
       "id": "VITD3",
       "name": "Vitamin D3 (cholecalciferol)",
       "class": "vitamin",
-      "unit": "µg",
+      "unit": "\u00b5g",
       "sr_legacy_num": "326",
       "fdc_candidates": [
-        "326"
+        "326",
+        "1112"
       ],
       "fdc_unit": "UG",
       "unit_factor_from_fdc": 1,
@@ -1662,7 +1765,8 @@
       "unit": "g",
       "sr_legacy_num": "855",
       "fdc_candidates": [
-        "855"
+        "855",
+        "1408"
       ],
       "fdc_unit": "G",
       "unit_factor_from_fdc": 1,
@@ -1677,6 +1781,340 @@
         "decimals": 3
       },
       "confidence": "high"
+    },
+    {
+      "id": "VITK_DHQ",
+      "name": "Vitamin K (Dihydrophylloquinone)",
+      "class": "vitamin",
+      "unit": "\u00b5g",
+      "sr_legacy_num": "429",
+      "fdc_candidates": [
+        "1184"
+      ],
+      "fdc_unit": "UG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "vitamin_k_dhq",
+        "dihydrophylloquinone"
+      ],
+      "is_sum_or_derived": false,
+      "computed_from": [],
+      "confidence": "high",
+      "notes": "Vitamin K variant found in many foods"
+    },
+    {
+      "id": "VITK_MK4",
+      "name": "Vitamin K (Menaquinone-4)",
+      "class": "vitamin",
+      "unit": "\u00b5g",
+      "sr_legacy_num": "428",
+      "fdc_candidates": [
+        "1183"
+      ],
+      "fdc_unit": "UG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "vitamin_k_mk4",
+        "menaquinone_4"
+      ],
+      "is_sum_or_derived": false,
+      "computed_from": [],
+      "confidence": "high",
+      "notes": "Vitamin K variant found in many foods"
+    },
+    {
+      "id": "FIBTG_HMW",
+      "name": "High Molecular Weight Dietary Fiber",
+      "class": "fiber",
+      "unit": "g",
+      "sr_legacy_num": "293.3",
+      "fdc_candidates": [
+        "2038"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "hmwdf",
+        "high_molecular_weight_fiber"
+      ],
+      "is_sum_or_derived": false,
+      "computed_from": [],
+      "confidence": "high",
+      "notes": "High molecular weight dietary fiber subtype"
+    },
+    {
+      "id": "FIBTG_LMW",
+      "name": "Low Molecular Weight Dietary Fiber",
+      "class": "fiber",
+      "unit": "g",
+      "sr_legacy_num": "293.4",
+      "fdc_candidates": [
+        "2065"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "lmwdf",
+        "low_molecular_weight_fiber"
+      ],
+      "is_sum_or_derived": false,
+      "computed_from": [],
+      "confidence": "high",
+      "notes": "Low molecular weight dietary fiber subtype"
+    },
+    {
+      "id": "FOL_5MTHF",
+      "name": "5-methyl tetrahydrofolate",
+      "class": "vitamin",
+      "unit": "\u00b5g",
+      "sr_legacy_num": "433",
+      "fdc_candidates": [
+        "1188"
+      ],
+      "fdc_unit": "UG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "5_mthf",
+        "methyl_folate"
+      ],
+      "is_sum_or_derived": false,
+      "computed_from": [],
+      "confidence": "high",
+      "notes": "Active form of folate"
+    },
+    {
+      "id": "FATRN_MONO",
+      "name": "Fatty acids, total trans-monoenoic",
+      "class": "fatty_acid",
+      "unit": "g",
+      "sr_legacy_num": "693",
+      "fdc_candidates": [
+        "1329"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "trans_monoenoic",
+        "trans_monounsaturated"
+      ],
+      "is_sum_or_derived": false,
+      "computed_from": [],
+      "confidence": "high",
+      "notes": "Trans fatty acid subtype"
+    },
+    {
+      "id": "FATRN_DIENOIC",
+      "name": "Fatty acids, total trans-dienoic",
+      "class": "fatty_acid",
+      "unit": "g",
+      "sr_legacy_num": "694",
+      "fdc_candidates": [
+        "1330"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "trans_dienoic",
+        "trans_diunsaturated"
+      ],
+      "is_sum_or_derived": false,
+      "computed_from": [],
+      "confidence": "high",
+      "notes": "Trans fatty acid subtype"
+    },
+    {
+      "id": "FATRN_POLYENOIC",
+      "name": "Fatty acids, total trans-polyenoic",
+      "class": "fatty_acid",
+      "unit": "g",
+      "sr_legacy_num": "695",
+      "fdc_candidates": [
+        "1331"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "trans_polyenoic",
+        "trans_polyunsaturated"
+      ],
+      "is_sum_or_derived": false,
+      "computed_from": [],
+      "confidence": "high",
+      "notes": "Trans fatty acid subtype"
+    },
+    {
+      "id": "TRP",
+      "name": "Tryptophan",
+      "class": "amino_acid",
+      "unit": "g",
+      "sr_legacy_num": "410",
+      "fdc_candidates": [
+        "1210"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "tryptophan",
+        "trp"
+      ],
+      "is_sum_or_derived": false,
+      "computed_from": [],
+      "confidence": "medium",
+      "notes": "Essential amino acid"
+    },
+    {
+      "id": "LYS",
+      "name": "Lysine",
+      "class": "amino_acid",
+      "unit": "g",
+      "sr_legacy_num": "414",
+      "fdc_candidates": [
+        "1214"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "lysine",
+        "lys"
+      ],
+      "is_sum_or_derived": false,
+      "computed_from": [],
+      "confidence": "medium",
+      "notes": "Essential amino acid"
+    },
+    {
+      "id": "MET",
+      "name": "Methionine",
+      "class": "amino_acid",
+      "unit": "g",
+      "sr_legacy_num": "415",
+      "fdc_candidates": [
+        "1215"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "methionine",
+        "met"
+      ],
+      "is_sum_or_derived": false,
+      "computed_from": [],
+      "confidence": "medium",
+      "notes": "Essential amino acid"
+    },
+    {
+      "id": "CYS",
+      "name": "Cysteine",
+      "class": "amino_acid",
+      "unit": "g",
+      "sr_legacy_num": "416",
+      "fdc_candidates": [
+        "1232"
+      ],
+      "fdc_unit": "G",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "cysteine",
+        "cys"
+      ],
+      "is_sum_or_derived": false,
+      "computed_from": [],
+      "confidence": "medium",
+      "notes": "Conditionally essential amino acid"
+    },
+    {
+      "id": "LYCPN",
+      "name": "Lycopene",
+      "class": "carotenoid",
+      "unit": "\u00b5g",
+      "sr_legacy_num": "337",
+      "fdc_candidates": [
+        "1122"
+      ],
+      "fdc_unit": "UG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "lycopene"
+      ],
+      "is_sum_or_derived": false,
+      "computed_from": [],
+      "confidence": "medium",
+      "notes": "Important carotenoid antioxidant"
+    },
+    {
+      "id": "LUTZEA",
+      "name": "cis-Lutein/Zeaxanthin",
+      "class": "carotenoid",
+      "unit": "\u00b5g",
+      "sr_legacy_num": "338",
+      "fdc_candidates": [
+        "1161"
+      ],
+      "fdc_unit": "UG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "cis_lutein_zeaxanthin",
+        "lutein_zeaxanthin"
+      ],
+      "is_sum_or_derived": false,
+      "computed_from": [],
+      "confidence": "medium",
+      "notes": "Important carotenoid for eye health"
+    },
+    {
+      "id": "LUTZEA_TOTAL",
+      "name": "Lutein + zeaxanthin",
+      "class": "carotenoid",
+      "unit": "\u00b5g",
+      "sr_legacy_num": "339",
+      "fdc_candidates": [
+        "1123"
+      ],
+      "fdc_unit": "UG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "lutein_plus_zeaxanthin",
+        "lutein_zeaxanthin_total"
+      ],
+      "is_sum_or_derived": false,
+      "computed_from": [],
+      "confidence": "medium",
+      "notes": "Combined lutein and zeaxanthin"
+    },
+    {
+      "id": "ZEAX",
+      "name": "Zeaxanthin",
+      "class": "carotenoid",
+      "unit": "\u00b5g",
+      "sr_legacy_num": "340",
+      "fdc_candidates": [
+        "1119"
+      ],
+      "fdc_unit": "UG",
+      "unit_factor_from_fdc": 1,
+      "fdc_alt_units": [],
+      "aliases": [
+        "zeaxanthin"
+      ],
+      "is_sum_or_derived": false,
+      "computed_from": [],
+      "confidence": "medium",
+      "notes": "Important carotenoid for eye health"
     }
   ]
 }

@@ -88,7 +88,16 @@ class NutrientMapper:
         """Map a single FDC nutrient to canonical format"""
         fdc_id = str(fdc_nutrient.get('nutrient_id', ''))
         food_id = fdc_nutrient.get('fdc_id', fdc_nutrient.get('food_id', ''))
-        amount = float(fdc_nutrient.get('amount', 0))
+        
+        # Handle empty string or None values for amount
+        amount_str = fdc_nutrient.get('amount', '0')
+        if amount_str == '' or amount_str is None:
+            amount_str = '0'
+        try:
+            amount = float(amount_str)
+        except (ValueError, TypeError):
+            amount = 0.0
+            
         unit = fdc_nutrient.get('unit', 'g')
         
         # Check if we have a mapping for this FDC nutrient ID

@@ -14,14 +14,14 @@ def generate_tpt_id(taxon_id: str, part_id: str, transforms: List[Dict[str, Any]
     """
     Generate canonical TPT ID matching the ETL pipeline format.
     
-    Format: tpt:{taxon_id}:{part_id}:{family}:{hash}
-    Where hash is the first 12 characters of SHA1 of normalized transform signature.
+    Format: {taxon_id}|{part_id}|{identity_hash}
+    Where identity_hash is the first 12 characters of SHA1 of normalized identity transforms.
     
     Args:
         taxon_id: Canonical taxon ID (e.g., "tx:a:bos:taurus")
         part_id: Canonical part ID (e.g., "part:milk")
         transforms: List of transform dictionaries with 'id' and 'params'
-        family: Optional family name (defaults to "evidence" for evidence mappings)
+        family: Ignored (kept for compatibility)
     
     Returns:
         Canonical TPT ID string
@@ -29,53 +29,94 @@ def generate_tpt_id(taxon_id: str, part_id: str, transforms: List[Dict[str, Any]
     if not taxon_id or not part_id:
         raise ValueError("taxon_id and part_id are required")
     
-    # Use "evidence" as default family for evidence mappings
-    if family is None:
-        family = "evidence"
+    # Generate identity hash from identity transforms only
+    identity_hash = _generate_identity_hash(transforms)
     
-    # Generate transform signature (normalized)
-    signature = _generate_transform_signature(transforms)
-    
-    # Create hash (first 12 chars of SHA1)
-    hash_obj = hashlib.sha1(signature.encode('utf-8'))
-    hash_suffix = hash_obj.hexdigest()[:12]
-    
-    return f"tpt:{taxon_id}:{part_id}:{family}:{hash_suffix}"
+    return f"{taxon_id}|{part_id}|{identity_hash}"
 
-def _generate_transform_signature(transforms: List[Dict[str, Any]]) -> str:
+def _generate_identity_hash(transforms: List[Dict[str, Any]]) -> str:
     """
-    Generate normalized signature for transform sequence.
+    Generate hash from identity transforms only.
     
-    Sorts transforms by order/id and includes only identity parameters.
+    Filters to transforms with identity=true and includes all parameters.
+    Sorts transforms and params for consistent hashing.
     """
     if not transforms:
-        return "identity"
+        return "raw"
     
-    # Sort transforms by order (if available) then by id
-    sorted_transforms = sorted(transforms, key=lambda t: (t.get('order', 999), t.get('id', '')))
+    # Load identity transforms from ontology
+    identity_transform_ids = _get_identity_transform_ids()
     
+    # Filter to identity transforms only
+    identity_transforms = []
+    for transform in transforms:
+        tf_id = transform.get('id', '')
+        if tf_id in identity_transform_ids:
+            identity_transforms.append(transform)
+    
+    if not identity_transforms:
+        return "raw"
+    
+    # Sort transforms by order (if available) then by id for consistency
+    sorted_transforms = sorted(identity_transforms, key=lambda t: (t.get('order', 999), t.get('id', '')))
+    
+    # Create normalized signature
     signature_parts = []
     for transform in sorted_transforms:
         tf_id = transform.get('id', '')
         params = transform.get('params', {})
         
-        # Only include identity parameters in signature
-        identity_params = {k: v for k, v in params.items() 
-                          if k in ['method', 'temperature', 'duration', 'level', 'type']}
+        # Sort params for consistent signature
+        sorted_params = sorted(params.items()) if params else []
+        param_str = ','.join(f"{k}={v}" for k, v in sorted_params)
         
-        if identity_params:
-            # Sort params for consistent signature
-            sorted_params = sorted(identity_params.items())
-            param_str = ','.join(f"{k}={v}" for k, v in sorted_params)
+        if param_str:
             signature_parts.append(f"{tf_id}({param_str})")
         else:
             signature_parts.append(tf_id)
     
-    return '|'.join(signature_parts)
+    signature = '|'.join(signature_parts)
+    
+    # Create hash (first 12 chars of SHA1)
+    hash_obj = hashlib.sha1(signature.encode('utf-8'))
+    return hash_obj.hexdigest()[:12]
+
+def _get_identity_transform_ids() -> set:
+    """
+    Load identity transform IDs from the ontology transforms.json file.
+    
+    Returns:
+        Set of transform IDs that have identity=true
+    """
+    import json
+    from pathlib import Path
+    
+    # Try to load from data/ontology/transforms.json
+    transforms_file = Path("data/ontology/transforms.json")
+    if not transforms_file.exists():
+        # Fallback: return empty set if file doesn't exist
+        return set()
+    
+    try:
+        with open(transforms_file, 'r') as f:
+            transforms_data = json.load(f)
+        
+        identity_ids = set()
+        for transform in transforms_data:
+            if transform.get('identity', False):
+                identity_ids.add(transform.get('id', ''))
+        
+        return identity_ids
+    except Exception:
+        # Fallback: return empty set if there's an error
+        return set()
+
 
 def validate_tpt_id_format(tpt_id: str) -> bool:
     """
     Validate that TPT ID follows canonical format.
+    
+    Format: {taxon_id}|{part_id}|{identity_hash}
     
     Args:
         tpt_id: TPT ID to validate
@@ -86,15 +127,12 @@ def validate_tpt_id_format(tpt_id: str) -> bool:
     if not tpt_id or not isinstance(tpt_id, str):
         return False
     
-    parts = tpt_id.split(':')
-    if len(parts) != 5:
+    parts = tpt_id.split('|')
+    if len(parts) != 3:
         return False
     
-    if parts[0] != 'tpt':
-        return False
-    
-    # Check that hash part is 12 characters
-    if len(parts[4]) != 12:
+    # Check that identity hash part is 12 characters or "raw"
+    if parts[2] not in ["raw"] and len(parts[2]) != 12:
         return False
     
     return True

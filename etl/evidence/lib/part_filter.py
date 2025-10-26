@@ -355,12 +355,12 @@ class PartFilter:
         applicability_results = self.filter_parts_for_taxon(taxon_id, lineage, available_parts)
         
         applicable_parts = []
+        skipped_count = 0
         for part, applicability in zip(available_parts, applicability_results):
             if applicability.applicable and applicability.confidence >= min_confidence:
                 applicable_parts.append(part)
-                print(f"[PART FILTER] → ✓ {part.id} ({part.name}) - {applicability.reason}")
             else:
-                print(f"[PART FILTER] → ✗ {part.id} ({part.name}) - {applicability.reason}")
+                skipped_count += 1
         
-        print(f"[PART FILTER] → Found {len(applicable_parts)} applicable parts")
+        print(f"[PART FILTER] → Found {len(applicable_parts)} applicable parts ({skipped_count} skipped)")
         return applicable_parts

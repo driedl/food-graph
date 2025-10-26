@@ -118,15 +118,21 @@ def compile_taxa_into(*, taxa_root: Path, ontology_root: Path,
 
 
 def _merge_parts_registry(ontology_root: Path, compiled_dir: Path, verbose: bool) -> None:
-    """Merge parts.core.json and parts.derived.jsonl into parts.registry.json"""
+    """Merge parts.core.jsonl and parts.derived.jsonl into parts.registry.json"""
     import json
     
     # Load core parts
     core_parts = []
-    core_path = ontology_root / "parts.json"
+    core_path = ontology_root / "parts.core.jsonl"
     if core_path.exists():
         with core_path.open("r", encoding="utf-8") as f:
-            core_parts = json.load(f)
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("//"):
+                    try:
+                        core_parts.append(json.loads(line))
+                    except json.JSONDecodeError as e:
+                        print(f"  ⚠️  Invalid JSON in {core_path}: {e}")
         if verbose: print(f"  ✓ Loaded {len(core_parts)} core parts")
     else:
         print(f"  ⚠️  Missing core parts: {core_path}")

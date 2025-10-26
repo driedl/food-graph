@@ -14,7 +14,7 @@ def test_smoke_build(tmp_path, monkeypatch):
         '{"id":"tx:eukaryota","parent":"tx:life","rank":"kingdom","display_name":"Eukaryotes","latin_name":"Eukaryota"}\n'
         '{"id":"tx:plantae","parent":"tx:eukaryota","rank":"kingdom","display_name":"Plants","latin_name":"Plantae"}\n'
     )
-    (in_dir / "parts.json").write_text('[{"id":"part:fruit","name":"Fruit"}]')
+    (in_dir / "parts.core.jsonl").write_text('{"id":"part:fruit","name":"Fruit"}\n')
     (in_dir / "attributes.json").write_text('[{"id":"attr:color","name":"Color"}]')
     (in_dir / "nutrients.json").write_text('[{"id":"nut:protein","name":"Protein"}]')
     (in_dir / "transforms.json").write_text('''[

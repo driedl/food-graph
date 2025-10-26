@@ -243,14 +243,14 @@ def get_enhanced_tpt_prompt(taxon_resolution, applicable_parts, available_transf
     
     prompt += "Applicable Parts:\n"
     for part in applicable_parts:
-        applies_to = part.get('applies_to', [])
+        applies_to = part.applies_to or []
         applies_to_str = f" (applies to: {', '.join(applies_to)})" if applies_to else ""
         prompt += f"- {part.id}: {part.name} ({part.kind or 'unknown'}){applies_to_str}\n"
     
     prompt += "\nAvailable Transforms (ordered by processing sequence):\n"
     for transform in available_transforms:
-        order = transform.get('order', 999)
-        params = transform.get('params', [])
+        order = transform.order or 999
+        params = transform.params or []
         param_str = f" (params: {', '.join([p['key'] for p in params])})" if params else ""
         prompt += f"- {transform.id}: {transform.name} (order: {order}){param_str}\n"
     
