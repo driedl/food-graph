@@ -29,6 +29,7 @@ class Transform:
     name: str
     order: Optional[int]
     params: List[Dict[str, Any]]  # as defined in transform_def.param_keys
+    identity: bool = False  # Whether this transform is identity-bearing
 
 class GraphDB:
     def __init__(self, path: str):
@@ -61,7 +62,7 @@ class GraphDB:
 
     def transforms(self) -> List[Transform]:
         q = """
-          SELECT id, name, "order", param_keys
+          SELECT id, name, "order", param_keys, identity
           FROM transform_def
           ORDER BY "order", id
         """
@@ -73,7 +74,13 @@ class GraphDB:
                 params = json.loads(r["param_keys"] or "[]")
             except Exception:
                 params = []
-            out.append(Transform(id=r["id"], name=r["name"], order=r["order"], params=params))
+            out.append(Transform(
+                id=r["id"], 
+                name=r["name"], 
+                order=r["order"], 
+                params=params,
+                identity=bool(r["identity"])
+            ))
         return out
 
     def search_candidates(self, text: str, topk: int = 15) -> List[Dict[str, Any]]:

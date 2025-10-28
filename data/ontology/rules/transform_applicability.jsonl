@@ -47,3 +47,5 @@
 {"transform": "tf:add_sugar", "applies_to": [{"taxon_prefix": "tx:animalia:chordata:mammalia:artiodactyla:bovidae", "parts": ["part:milk"]}]}
 {"transform": "tf:dry", "applies_to": [{"taxon_prefix": "tx:animalia:chordata:mammalia:artiodactyla:bovidae", "parts": ["part:milk", "part:whey"]}]}
 {"transform": "tf:clarify_butter", "applies_to": [{"taxon_prefix": "tx:animalia:chordata:mammalia:artiodactyla:bovidae", "parts": ["part:butter"]}]}
+{"transform": "tf:grind", "applies_to": [{"taxon_prefix": "tx:p", "parts": ["part:seed", "part:kernel"]}]}
+{"transform": "tf:oil_extraction_defatting", "applies_to": [{"taxon_prefix": "tx:p", "parts": ["part:seed", "part:kernel", "part:flour"]}]}

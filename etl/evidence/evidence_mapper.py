@@ -31,6 +31,7 @@ from .lib.jsonl import write_jsonl, read_jsonl
 from lib.logging import setup_logger, ProgressTracker, MetricsCollector
 from lib.config import find_project_root, resolve_path
 from .db import GraphDB
+from .lib.schema_validator import validate_tpt_construction, ValidationError, ValidationResult
 
 class EvidenceMapper:
     """3-Tier Evidence Mapping Pipeline"""
@@ -67,6 +68,18 @@ class EvidenceMapper:
         # Initialize database
         self.graph_db = GraphDB(graph_db_path)
         self.nutrient_store.create_tables()
+        
+        # Build ontology indices for validation
+        self.parts_index = {p.id: p for p in self.graph_db.parts()}
+        self.transforms_index = {}
+        for t in self.graph_db.transforms():
+            self.transforms_index[t.id] = {
+                'id': t.id,
+                'name': t.name,
+                'identity': t.identity,
+                'order': t.order,
+                'params': t.params or []
+            }
     
     def map_fdc_evidence(self, fdc_dir: Path, output_dir: Path, 
                         limit: int = 0, min_confidence: float = 0.7, 
@@ -162,7 +175,7 @@ class EvidenceMapper:
                 successful_foods += 1
                 
                 # Write results immediately after each food
-                self._save_single_food_result(mapping, output_dir)
+                self._save_single_food_result(mapping, output_dir, nutrients_by_food, parts, transforms)
                 
                 print(f"[FOOD {i}/{len(foods)}] → ✓ Completed: {mapping.disposition} (confidence: {mapping.final_confidence:.2f})")
                 
@@ -233,13 +246,29 @@ class EvidenceMapper:
         print(f"[TIER 2] → Constructing TPT for \"{food_name}\"...")
         tpt_construction = self.tier2_constructor.construct_tpt(taxon_resolution, parts, transforms)
         
+        if tpt_construction.disposition == 'skip':
+            print(f"[TIER 2] → Skipped: {tpt_construction.reason}")
+            return self._create_skipped_mapping(food_id, food_name, taxon_resolution)
+        
+        # NEW: Route ambiguous/failed cases to Tier 3 for intelligent decision-making
         if tpt_construction.disposition != 'constructed':
-            print(f"[TIER 2] → Failed: {tpt_construction.reason}")
-            return self._create_failed_mapping(food_id, food_name, taxon_resolution, tpt_construction)
+            print(f"[TIER 2] → Failed/Ambiguous: {tpt_construction.reason}")
+            print(f"[TIER 3] → Curating ambiguous TPT...")
+            
+            # Pass failed TPT to Tier 3 for curation (not re-running Tier 1/2)
+            mapping = self.tier3_curator.curate_ambiguous_tpt(
+                tpt_construction,
+                taxon_resolution,
+                nutrients_by_food.get(food_id, []),
+                parts,
+                transforms
+            )
+            print(f"[TIER 3] → ✓ Curated: {mapping.disposition} (confidence: {mapping.final_confidence:.2f})")
+            return mapping
         
         print(f"[TIER 2] → ✓ Constructed: {tpt_construction.part_id} (confidence: {tpt_construction.confidence:.2f})")
         
-        # Determine if Tier 3 curation is needed
+        # Determine if Tier 3 curation is needed for low confidence
         needs_curation = tpt_construction.confidence < 0.8
         
         if needs_curation:
@@ -322,23 +351,100 @@ class EvidenceMapper:
             overlay_applied=False
         )
     
-    def _save_single_food_result(self, mapping: EvidenceMapping, output_dir: Path) -> None:
+    def _save_single_food_result(self, mapping: EvidenceMapping, output_dir: Path,
+                                 nutrients_by_food: Dict[str, List[Dict[str, Any]]],
+                                 parts: List[Any], transforms: List[Any]) -> None:
         """Save results for a single food immediately after processing"""
         # Ensure output directory exists
         output_dir.mkdir(parents=True, exist_ok=True)
         
-        # Generate canonical TPT ID if available
+        # Validate TPT construction before generating ID
         tpt_id = None
-        if mapping.tpt_construction and mapping.tpt_construction.part_id:
-            try:
-                tpt_id = generate_tpt_id(
-                    taxon_id=mapping.tpt_construction.taxon_id,
-                    part_id=mapping.tpt_construction.part_id,
-                    transforms=mapping.tpt_construction.transforms
-                )
-            except Exception as e:
-                print(f"[WARNING] Failed to generate TPT ID for {mapping.food_id}: {e}")
-                tpt_id = None
+        disposition = mapping.disposition
+        reason = mapping.reason
+        confidence = mapping.final_confidence
+        
+        if mapping.tpt_construction and mapping.tpt_construction.part_id and disposition == 'mapped':
+            # Validate schema
+            validation_result = validate_tpt_construction(
+                mapping.tpt_construction,
+                self.parts_index,
+                self.transforms_index
+            )
+            
+            if not validation_result.valid:
+                # Route to Tier 3 for remediation
+                print(f"[VALIDATION] {mapping.food_id} ({mapping.food_name}): {len(validation_result.errors)} error(s) detected")
+                print(f"[TIER 3] → Attempting remediation...")
+                
+                try:
+                    # Get nutrient data for this food
+                    nutrient_data = nutrients_by_food.get(mapping.food_id, [])
+                    
+                    # Call Tier 3 remediation
+                    remediated_mapping = self.tier3_curator.remediate_validation_errors(
+                        tpt_construction=mapping.tpt_construction,
+                        validation_errors=validation_result.structured_errors or [],
+                        nutrient_data=nutrient_data,
+                        available_parts=parts,
+                        available_transforms=transforms
+                    )
+                    
+                    # Update mapping with remediation result
+                    mapping = remediated_mapping
+                    disposition = mapping.disposition
+                    reason = mapping.reason
+                    confidence = mapping.final_confidence
+                    
+                    # If remediation succeeded, validate again and generate TPT ID
+                    if disposition == 'mapped':
+                        revalidation = validate_tpt_construction(
+                            mapping.tpt_construction,
+                            self.parts_index,
+                            self.transforms_index
+                        )
+                        
+                        if revalidation.valid:
+                            try:
+                                tpt_id = generate_tpt_id(
+                                    taxon_id=mapping.tpt_construction.taxon_id,
+                                    part_id=mapping.tpt_construction.part_id,
+                                    transforms=mapping.tpt_construction.transforms
+                                )
+                                print(f"[TIER 3] → ✓ Remediation successful: {tpt_id}")
+                            except Exception as e:
+                                print(f"[WARNING] Failed to generate TPT ID after remediation: {e}")
+                                tpt_id = None
+                        else:
+                            # Remediation didn't fix all errors - reject
+                            disposition = 'rejected'
+                            confidence = 0.0
+                            reason = f"Remediation incomplete: {revalidation.errors[0]}"
+                            tpt_id = None
+                            print(f"[TIER 3] → ✗ Remediation incomplete")
+                    else:
+                        # Tier 3 rejected it
+                        tpt_id = None
+                        print(f"[TIER 3] → Rejected: {reason}")
+                        
+                except Exception as e:
+                    # Remediation failed
+                    tpt_id = None
+                    disposition = 'rejected'
+                    confidence = 0.0
+                    reason = f"Remediation error: {str(e)}"
+                    print(f"[TIER 3] → ✗ Remediation failed: {str(e)}")
+            else:
+                # Schema valid, generate TPT ID
+                try:
+                    tpt_id = generate_tpt_id(
+                        taxon_id=mapping.tpt_construction.taxon_id,
+                        part_id=mapping.tpt_construction.part_id,
+                        transforms=mapping.tpt_construction.transforms
+                    )
+                except Exception as e:
+                    print(f"[WARNING] Failed to generate TPT ID for {mapping.food_id}: {e}")
+                    tpt_id = None
         
         # Save evidence mapping
         evidence_data = {
@@ -348,9 +454,9 @@ class EvidenceMapper:
             'part_id': mapping.tpt_construction.part_id if mapping.tpt_construction else None,
             'transforms': mapping.tpt_construction.transforms if mapping.tpt_construction else [],
             'tpt_id': tpt_id,
-            'confidence': mapping.final_confidence,
-            'disposition': mapping.disposition,
-            'reason': mapping.reason,
+            'confidence': confidence,
+            'disposition': disposition,
+            'reason': reason,
             'overlay_applied': mapping.overlay_applied
         }
         

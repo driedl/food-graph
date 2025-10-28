@@ -33,9 +33,9 @@
   },
   {
     "id": "tf:mill",
-    "name": "Mill / Refine / Flake",
+    "name": "Mill / Refine",
     "identity": true,
-    "order": 60,
+    "order": 55,
     "params": [
       {
         "key": "refinement",
@@ -48,6 +48,22 @@
         ]
       },
       {
+        "key": "target",
+        "kind": "enum",
+        "enum": [
+          "wholemeal",
+          "white",
+          "semolina",
+          "meal",
+          "flour"
+        ]
+      },
+      {
+        "key": "extraction_pct",
+        "kind": "number",
+        "unit": "%"
+      },
+      {
         "key": "oat_form",
         "kind": "enum",
         "enum": [
@@ -56,7 +72,7 @@
         ]
       }
     ],
-    "notes": "Grain milling/refinement and common oat forms"
+    "notes": "Grain milling/refinement - applies to grains only (Poaceae)"
   },
   {
     "id": "tf:enrich",
@@ -244,27 +260,45 @@
     ]
   },
   {
-    "id": "tf:mill",
-    "name": "Mill / Grind",
+    "id": "tf:grind",
+    "name": "Grind / Pulverize",
     "identity": true,
-    "order": 55,
+    "order": 57,
     "params": [
       {
-        "key": "extraction_pct",
-        "kind": "number"
-      },
-      {
-        "key": "target",
+        "key": "fineness",
         "kind": "enum",
         "enum": [
-          "wholemeal",
-          "white",
-          "semolina",
-          "meal",
-          "flour"
+          "coarse",
+          "fine",
+          "slurry"
         ]
       }
-    ]
+    ],
+    "notes": "Mechanical grinding/milling of seeds/nuts into paste or slurry. Distinct from grain milling. Applies to part:seed and part:kernel via applicability rules."
+  },
+  {
+    "id": "tf:oil_extraction_defatting",
+    "name": "Oil extraction / Defatting",
+    "identity": true,
+    "order": 58,
+    "params": [
+      {
+        "key": "method",
+        "kind": "enum",
+        "enum": [
+          "expeller",
+          "solvent",
+          "hybrid"
+        ]
+      },
+      {
+        "key": "target_residual_oil_pct",
+        "kind": "number",
+        "unit": "%"
+      }
+    ],
+    "notes": "Removal of extractable oil from oilseed meals/flours. Reduces fat content and increases relative protein/carbohydrate concentrations."
   },
   {
     "id": "tf:polish",

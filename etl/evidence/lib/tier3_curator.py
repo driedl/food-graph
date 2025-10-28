@@ -33,6 +33,7 @@ class OntologyCuration:
     new_transforms: List[Dict[str, Any]]  # New transforms to add
     modify_transforms: List[Dict[str, Any]]  # Existing transforms to modify
     transform_param_schemas: List[Dict[str, Any]]  # New parameter schemas
+    transform_applicability_rules: List[Dict[str, Any]]  # New transform applicability rules
     
     # Relationship modifications
     derived_part_rules: List[Dict[str, Any]]  # New derived part relationships
@@ -74,6 +75,320 @@ class Tier3Curator:
         
         # Ensure overlay directory exists
         self.overlay_dir.mkdir(parents=True, exist_ok=True)
+    
+    def curate_ambiguous_tpt(
+        self,
+        tpt_construction: TPTConstruction,
+        taxon_resolution: TaxonResolution,
+        nutrient_data: List[Dict[str, Any]],
+        available_parts: List[Dict[str, Any]],
+        available_transforms: List[Dict[str, Any]]
+    ) -> EvidenceMapping:
+        """
+        Curate an ambiguous/failed TPT from Tier 2 using LLM intelligence.
+        
+        This is for when Tier 2 couldn't complete a TPT (missing transforms, uncertainty).
+        Tier 3 analyzes the partial TPT and decides what to do.
+        
+        Args:
+            tpt_construction: Partial/failed TPT from Tier 2
+            taxon_resolution: Taxon resolution from Tier 1
+            nutrient_data: Nutrient data for the food
+            available_parts: Available parts from ontology
+            available_transforms: Available transforms from ontology
+            
+        Returns:
+            EvidenceMapping with curated TPT
+        """
+        from .optimized_prompts import get_optimized_curation_system_prompt
+        
+        print(f"[TIER 3] → Curating ambiguous TPT for {tpt_construction.food_name}")
+        
+        # Build curation prompt for the partial TPT
+        prompt = f"Food: {tpt_construction.food_name}\n"
+        prompt += f"Taxon: {taxon_resolution.taxon_id}\n"
+        prompt += f"Reason: {tpt_construction.reason}\n\n"
+        prompt += "Tier 2 constructed a partial TPT but marked it as ambiguous/failed. "
+        prompt += "Analyze the issue and determine the best path forward:\n\n"
+        
+        prompt += "1. Can we complete the TPT despite missing transforms?\n"
+        prompt += "2. Should we propose new transforms/parts to the ontology?\n"
+        prompt += "3. Is Tier 2 fundamentally wrong and we should reject?\n\n"
+        
+        prompt += "Return JSON with: {\"strategy\": \"...\", \"corrected_tpt\": {...}, \"overlay_proposal\": {...}, \"reasoning\": \"...\"}\n"
+        
+        try:
+            # Call LLM for curation analysis
+            start_time = time.time()
+            response = call_llm(
+                model=self.model,
+                system=get_optimized_curation_system_prompt(),
+                user=prompt,
+                temperature=0.3
+            )
+            
+            duration = time.time() - start_time
+            print(f"[TIER 3] → Curation complete ({duration:.2f}s)")
+            
+            strategy = response.get('strategy', 'reject')
+            corrected_tpt = response.get('corrected_tpt', {})
+            reasoning = response.get('reasoning', 'No reasoning')
+            confidence = response.get('confidence', 0.7)
+            overlay_proposal = response.get('overlay_proposal')
+            
+            print(f"[TIER 3] → Strategy: {strategy}, Confidence: {confidence:.2f}")
+            
+            # Apply corrections to TPT
+            if corrected_tpt:
+                tpt_construction.part_id = corrected_tpt.get('part_id', tpt_construction.part_id)
+                tpt_construction.transforms = corrected_tpt.get('transforms', tpt_construction.transforms)
+            
+            # Handle overlay if proposed
+            overlay_applied = False
+            if overlay_proposal and strategy == 'expand':
+                self._apply_overlay([], [overlay_proposal], [])
+                overlay_applied = True
+            
+            # Map nutrients
+            nutrient_mapping = self.nutrient_store.create_nutrient_mapping()
+            nutrient_rows = self.nutrient_store.map_fdc_nutrients(nutrient_data, nutrient_mapping)
+            
+            # Determine final disposition based on strategy
+            if strategy in ['complete', 'expand'] and confidence >= 0.7:
+                disposition = 'mapped'
+            elif confidence >= 0.4:
+                disposition = 'ambiguous'
+            else:
+                disposition = 'rejected'
+            
+            return EvidenceMapping(
+                food_id=tpt_construction.food_id,
+                food_name=tpt_construction.food_name,
+                taxon_resolution=taxon_resolution,
+                tpt_construction=tpt_construction,
+                nutrient_rows=nutrient_rows,
+                final_confidence=confidence,
+                disposition=disposition,
+                reason=f"Tier 3 curation ({strategy}): {reasoning}",
+                overlay_applied=overlay_applied
+            )
+            
+        except Exception as e:
+            print(f"[TIER 3] → Curation failed: {str(e)}")
+            # Preserve taxon from function parameter or tpt_construction
+            final_taxon_resolution = taxon_resolution
+            if not final_taxon_resolution and tpt_construction.taxon_id:
+                from .tier1_taxon import TaxonResolution
+                final_taxon_resolution = TaxonResolution(
+                    food_id=tpt_construction.food_id,
+                    food_name=tpt_construction.food_name,
+                    taxon_id=tpt_construction.taxon_id,
+                    confidence=1.0,
+                    disposition='resolved',
+                    reason='Preserved from TPT construction',
+                    ncbi_resolution=None,
+                    new_taxa=[]
+                )
+            
+            return EvidenceMapping(
+                food_id=tpt_construction.food_id,
+                food_name=tpt_construction.food_name,
+                taxon_resolution=final_taxon_resolution,
+                tpt_construction=tpt_construction,
+                nutrient_rows=[],
+                final_confidence=0.0,
+                disposition='rejected',
+                reason=f"Tier 3 curation error: {str(e)}",
+                overlay_applied=False
+            )
+    
+    def remediate_validation_errors(
+        self,
+        tpt_construction: TPTConstruction,
+        validation_errors: List[Any],
+        nutrient_data: List[Dict[str, Any]],
+        available_parts: List[Dict[str, Any]],
+        available_transforms: List[Dict[str, Any]]
+    ) -> EvidenceMapping:
+        """
+        Remediate validation errors using LLM-guided bucketing strategy.
+        
+        Args:
+            tpt_construction: Original TPT from Tier 2 (failed validation)
+            validation_errors: List of ValidationError objects
+            nutrient_data: Nutrient data for the food
+            available_parts: Available parts from ontology
+            available_transforms: Available transforms from ontology
+            
+        Returns:
+            EvidenceMapping with corrected TPT or rejection
+        """
+        from .optimized_prompts import get_remediation_system_prompt, get_remediation_user_prompt
+        
+        print(f"[TIER 3] → Remediating {len(validation_errors)} validation error(s) for {tpt_construction.food_name}")
+        
+        # Build remediation prompt
+        system_prompt = get_remediation_system_prompt()
+        user_prompt = get_remediation_user_prompt(
+            tpt_construction.food_name,
+            tpt_construction,
+            validation_errors
+        )
+        
+        try:
+            # Call LLM for remediation
+            start_time = time.time()
+            response = call_llm(
+                model=self.model,
+                system=system_prompt,
+                user=user_prompt,
+                temperature=0.2
+            )
+            
+            duration = time.time() - start_time
+            print(f"[TIER 3] → Remediation complete ({duration:.2f}s)")
+            
+            strategy = response.get('strategy', 'reject')
+            corrected_tpt = response.get('corrected_tpt', {})
+            reasoning = response.get('reasoning', 'No reasoning provided')
+            confidence = response.get('confidence', 0.0)
+            overlay_proposal = response.get('overlay_proposal')
+            
+            print(f"[TIER 3] → Strategy: {strategy}, Confidence: {confidence:.2f}")
+            
+            # Handle based on strategy
+            if strategy == 'map':
+                # Apply corrected TPT
+                tpt_construction.part_id = corrected_tpt.get('part_id', tpt_construction.part_id)
+                tpt_construction.transforms = corrected_tpt.get('transforms', tpt_construction.transforms)
+                
+                # Map nutrients
+                nutrient_mapping = self.nutrient_store.create_nutrient_mapping()
+                nutrient_rows = self.nutrient_store.map_fdc_nutrients(nutrient_data, nutrient_mapping)
+                
+                # Preserve taxon information from tpt_construction
+                taxon_resolution = None
+                if tpt_construction.taxon_id:
+                    from .tier1_taxon import TaxonResolution
+                    taxon_resolution = TaxonResolution(
+                        food_id=tpt_construction.food_id,
+                        food_name=tpt_construction.food_name,
+                        taxon_id=tpt_construction.taxon_id,
+                        confidence=1.0,
+                        disposition='resolved',
+                        reason='Preserved from Tier 2',
+                        ncbi_resolution=None,
+                        new_taxa=[]
+                    )
+                
+                return EvidenceMapping(
+                    food_id=tpt_construction.food_id,
+                    food_name=tpt_construction.food_name,
+                    taxon_resolution=taxon_resolution,
+                    tpt_construction=tpt_construction,
+                    nutrient_rows=nutrient_rows,
+                    final_confidence=confidence,
+                    disposition='mapped',
+                    reason=f"Tier 3 remediation (map): {reasoning}",
+                    overlay_applied=False
+                )
+            
+            elif strategy == 'expand':
+                # Propose overlay expansion
+                if overlay_proposal:
+                    self._apply_overlay([], [overlay_proposal], [])
+                
+                # Apply corrected TPT
+                tpt_construction.part_id = corrected_tpt.get('part_id', tpt_construction.part_id)
+                tpt_construction.transforms = corrected_tpt.get('transforms', tpt_construction.transforms)
+                
+                # Map nutrients
+                nutrient_mapping = self.nutrient_store.create_nutrient_mapping()
+                nutrient_rows = self.nutrient_store.map_fdc_nutrients(nutrient_data, nutrient_mapping)
+                
+                # Preserve taxon information from tpt_construction
+                taxon_resolution = None
+                if tpt_construction.taxon_id:
+                    from .tier1_taxon import TaxonResolution
+                    taxon_resolution = TaxonResolution(
+                        food_id=tpt_construction.food_id,
+                        food_name=tpt_construction.food_name,
+                        taxon_id=tpt_construction.taxon_id,
+                        confidence=1.0,
+                        disposition='resolved',
+                        reason='Preserved from Tier 2',
+                        ncbi_resolution=None,
+                        new_taxa=[]
+                    )
+                
+                return EvidenceMapping(
+                    food_id=tpt_construction.food_id,
+                    food_name=tpt_construction.food_name,
+                    taxon_resolution=taxon_resolution,
+                    tpt_construction=tpt_construction,
+                    nutrient_rows=nutrient_rows,
+                    final_confidence=confidence,
+                    disposition='mapped',
+                    reason=f"Tier 3 remediation (expand): {reasoning}",
+                    overlay_applied=True
+                )
+            
+            else:  # reject
+                # Preserve taxon information from tpt_construction
+                taxon_resolution = None
+                if tpt_construction.taxon_id:
+                    from .tier1_taxon import TaxonResolution
+                    taxon_resolution = TaxonResolution(
+                        food_id=tpt_construction.food_id,
+                        food_name=tpt_construction.food_name,
+                        taxon_id=tpt_construction.taxon_id,
+                        confidence=1.0,
+                        disposition='resolved',
+                        reason='Preserved from Tier 2',
+                        ncbi_resolution=None,
+                        new_taxa=[]
+                    )
+                
+                return EvidenceMapping(
+                    food_id=tpt_construction.food_id,
+                    food_name=tpt_construction.food_name,
+                    taxon_resolution=taxon_resolution,
+                    tpt_construction=tpt_construction,
+                    nutrient_rows=[],
+                    final_confidence=0.0,
+                    disposition='rejected',
+                    reason=f"Tier 3 remediation (reject): {reasoning}",
+                    overlay_applied=False
+                )
+        
+        except Exception as e:
+            print(f"[TIER 3] → Remediation failed: {str(e)}")
+            # Preserve taxon information from tpt_construction on error
+            error_taxon_resolution = None
+            if tpt_construction.taxon_id:
+                from .tier1_taxon import TaxonResolution
+                error_taxon_resolution = TaxonResolution(
+                    food_id=tpt_construction.food_id,
+                    food_name=tpt_construction.food_name,
+                    taxon_id=tpt_construction.taxon_id,
+                    confidence=1.0,
+                    disposition='resolved',
+                    reason='Preserved from Tier 2',
+                    ncbi_resolution=None,
+                    new_taxa=[]
+                )
+            
+            return EvidenceMapping(
+                food_id=tpt_construction.food_id,
+                food_name=tpt_construction.food_name,
+                taxon_resolution=error_taxon_resolution,
+                tpt_construction=tpt_construction,
+                nutrient_rows=[],
+                final_confidence=0.0,
+                disposition='rejected',
+                reason=f"Tier 3 remediation error: {str(e)}",
+                overlay_applied=False
+            )
     
     def map_evidence(self, food_data: Dict[str, Any], 
                     nutrient_data: List[Dict[str, Any]],
@@ -167,6 +482,20 @@ class Tier3Curator:
         if new_transforms:
             self._write_overlay_file('transforms.jsonl', new_transforms)
             applied = True
+            
+        # Apply transform applicability rules
+        if new_transforms:
+            # Extract applicability rules from new transforms that have them
+            applicability_rules = []
+            for transform in new_transforms:
+                if 'applies_to' in transform:
+                    applicability_rules.append({
+                        "transform": transform['id'],
+                        "applies_to": transform['applies_to']
+                    })
+            if applicability_rules:
+                self._write_overlay_file('transform_applicability.jsonl', applicability_rules)
+                applied = True
         
         return applied
     
@@ -304,11 +633,26 @@ class Tier3Curator:
             else:
                 disposition = 'skip'
             
+            # Preserve taxon information from tpt construction
+            curation_taxon_resolution = None
+            if curated_tpt.taxon_id:
+                from .tier1_taxon import TaxonResolution
+                curation_taxon_resolution = TaxonResolution(
+                    food_id=food_id,
+                    food_name=food_name,
+                    taxon_id=curated_tpt.taxon_id,
+                    confidence=1.0,
+                    disposition='resolved',
+                    reason='Preserved from curation',
+                    ncbi_resolution=None,
+                    new_taxa=[]
+                )
+            
             # Create evidence mapping with curation results
             mapping = EvidenceMapping(
                 food_id=food_id,
                 food_name=food_name,
-                taxon_resolution=None,  # Not needed for curation
+                taxon_resolution=curation_taxon_resolution,
                 tpt_construction=curated_tpt,
                 nutrient_rows=nutrient_rows,
                 final_confidence=final_confidence,

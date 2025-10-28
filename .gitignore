@@ -6,6 +6,7 @@ etl2/build
 generated
 reports
 apps/api/database/*
+.DS_Store
 
 # Build outputs
 dist/
